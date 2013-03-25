@@ -46,5 +46,52 @@ namespace VFSBaseTests
             m.CreateFolder("test/xxx");
             Assert.IsTrue(m.DoesFolderExist("test/xxx"));
         }
+
+
+        [TestMethod]
+        public void TestDeleteFolder()
+        {
+            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
+            var m = InitTestFileSystemManipulator(fs);
+
+            m.CreateFolder("test");
+            m.DeleteFolder("test");
+            Assert.IsFalse(m.DoesFolderExist("test"));
+
+            m.CreateFolder("test/foo/bar/tamtam");
+            m.DeleteFolder("test/foo");
+            Assert.IsFalse(m.DoesFolderExist("test/foo"));
+            Assert.IsFalse(m.DoesFolderExist("test/foo/bar"));
+            Assert.IsFalse(m.DoesFolderExist("test/foo/bar/tamtam"));
+            Assert.IsTrue(m.DoesFolderExist("test"));
+
+            m.CreateFolder("some/test/test/test/here");
+            m.DeleteFolder("some/test/test/test/here");
+            Assert.IsFalse(m.DoesFolderExist("some/test/test/test/here"));
+            Assert.IsTrue(m.DoesFolderExist("some/test/test/test"));
+
+            m.CreateFolder("test/xxx");
+            m.DeleteFolder("test");
+            Assert.IsFalse(m.DoesFolderExist("test"));
+            Assert.IsFalse(m.DoesFolderExist("test/xxx"));
+        }
+        
+        [TestMethod]
+        public void TestInvalidDeleteFolder()
+        {
+            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
+            var m = InitTestFileSystemManipulator(fs);
+
+            Assert.IsFalse(m.DoesFolderExist("test"));
+            try
+            {
+                m.DeleteFolder("test");
+                Assert.Fail("Should throw exception");
+            }
+            catch(DirectoryNotFoundException ex)
+            {
+                Assert.IsTrue(true);
+            }
+        }
     }
 }

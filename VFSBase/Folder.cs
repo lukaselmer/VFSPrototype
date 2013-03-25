@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace VFSBase
@@ -35,6 +36,25 @@ namespace VFSBase
             folder.CreateFolder(folders);
         }
 
+        public void DeleteFolder(Queue<string> folders)
+        {
+            if (!folders.Any()) throw new ArgumentException("Folder cannot be empty");
+
+            if (folders.Count == 1)
+            {
+                // Found the folder to be deleted
+                var folderToBeDeleted = FindFolder(folders.Dequeue());
+                if (folderToBeDeleted == null) throw new DirectoryNotFoundException();
+                Folders.Remove(folderToBeDeleted);
+                return;
+            }
+
+            var folderName = folders.Dequeue();
+            var folder = FindFolder(folderName);
+            if (folder == null) throw new DirectoryNotFoundException();
+            folder.DeleteFolder(folders);
+        }
+
         private Folder FindFolder(string folderName)
         {
             return Folders.FirstOrDefault(f => f.Name == folderName);
@@ -53,5 +73,6 @@ namespace VFSBase
             if (folder == null) return -1;
             return String.Compare(Name, folder.Name, StringComparison.Ordinal);
         }
+
     }
 }

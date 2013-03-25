@@ -29,5 +29,11 @@ namespace VFSBase
             var folders = new Queue<string>(path.Split('/'));
             return _fileSystem.Root.DoesFolderExist(folders);
         }
+
+        public void DeleteFolder(string path)
+        {
+            var folders = new Queue<string>(path.Split('/'));
+            _fileSystem.Root.DeleteFolder(folders);
+        }
     }
 }
