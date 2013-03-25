@@ -10,7 +10,7 @@ namespace VFSBaseTests
     {
         const string DefaultTestfilePath = "./testfile.vhs";
         private const long DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
-        
+
         private static FileSystem InitTestFileSystem(string testfilePath, long size)
         {
             if (File.Exists(testfilePath)) File.Delete(testfilePath);
@@ -32,18 +32,11 @@ namespace VFSBaseTests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(VFSException))]
         public void TestInvalidLocationInConstructor()
         {
             File.WriteAllText(DefaultTestfilePath, "");
-            try
-            {
-                new FileSystem(DefaultTestfilePath, DefaultSize);
-                Assert.Fail("Should throw exception");
-            }
-            catch (Exception ex)
-            {
-                Assert.IsTrue(true);
-            }
+            new FileSystem(DefaultTestfilePath, DefaultSize);
         }
 
         [TestMethod]
