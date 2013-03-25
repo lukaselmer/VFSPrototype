@@ -75,23 +75,16 @@ namespace VFSBaseTests
             Assert.IsFalse(m.DoesFolderExist("test"));
             Assert.IsFalse(m.DoesFolderExist("test/xxx"));
         }
-        
+
         [TestMethod]
+        [ExpectedException(typeof(DirectoryNotFoundException))]
         public void TestInvalidDeleteFolder()
         {
             var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
             var m = InitTestFileSystemManipulator(fs);
 
             Assert.IsFalse(m.DoesFolderExist("test"));
-            try
-            {
-                m.DeleteFolder("test");
-                Assert.Fail("Should throw exception");
-            }
-            catch(DirectoryNotFoundException ex)
-            {
-                Assert.IsTrue(true);
-            }
+            m.DeleteFolder("test");
         }
     }
 }
