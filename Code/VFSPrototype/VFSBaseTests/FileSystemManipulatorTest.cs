@@ -190,14 +190,20 @@ namespace VFSBaseTests
             var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
             var m = InitTestFileSystemManipulator(fs);
 
+
+            m.CreateFolder("you");
+            m.Move("you", "me");
+            Assert.IsTrue(m.Exists("me"));
+            Assert.IsFalse(m.Exists("you"));
+
             m.CreateFolder("hello/world");
-           // m.MoveFolder("hello/world", "hello/universe");
+            m.Move("hello/world", "hello/universe");
             Assert.IsTrue(m.Exists("hello/universe"));
             Assert.IsFalse(m.Exists("hello/world"));
 
 
             m.CreateFolder("foo/bar");
-           // m.MoveFolder("foo/bar", "ta/da");
+            m.Move("foo/bar", "ta/da");
             Assert.IsTrue(m.Exists("ta/da"));
             Assert.IsFalse(m.Exists("foo/bar"));
         }
@@ -206,6 +212,29 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestMoveFile()
         {
+            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
+            var m = InitTestFileSystemManipulator(fs);
+
+            // Create test file
+            const string testFileSource = "test.txt";
+            if (File.Exists(testFileSource)) File.Delete(testFileSource);
+            var file = File.Create(testFileSource);
+            file.Close();
+
+            m.ImportFile(testFileSource, "you.txt");
+            m.Move("you.txt", "me.txt");
+            Assert.IsTrue(m.Exists("me.txt"));
+            Assert.IsFalse(m.Exists("you.txt"));
+
+            m.ImportFile(testFileSource, "hello/world.txt");
+            m.Move("hello/world.txt", "hello/universe.txt");
+            Assert.IsTrue(m.Exists("hello/universe.txt"));
+            Assert.IsFalse(m.Exists("hello/world.txt"));
+
+            m.ImportFile(testFileSource, "foo/bar.txt");
+            m.Move("foo/bar.txt", "ta/da.txt");
+            Assert.IsTrue(m.Exists("ta/da.txt"));
+            Assert.IsFalse(m.Exists("foo/bar.txt"));
             
         }
     }
