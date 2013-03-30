@@ -5,6 +5,7 @@ namespace VFSBase
     public interface IFileSystemManipulator
     {
         IEnumerable<string> Folders(string path);
+        bool IsDirectory(string path);
         void CreateFolder(string path);
         void ImportFile(string source, string dest);
         void ExportFile(string source, string dest);

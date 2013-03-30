@@ -13,6 +13,11 @@ namespace VFSConsoleTests
             return CurrentFolders;
         }
 
+        public bool IsDirectory(string path)
+        {
+            throw new NotImplementedException();
+        }
+
         public void CreateFolder(string path)
         {
         }

@@ -10,4 +10,11 @@ namespace VFSBase
 
         }
     }
+
+    public class NotFoundException : VFSException
+    {
+        public NotFoundException() : base("")
+        {
+        }
+    }
 }

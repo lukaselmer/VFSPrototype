@@ -77,28 +77,25 @@ namespace VFSBase
             if (folder == null) // Folder does not exist, create one
             {
                 folder = new Folder(folderName);
-                Folders.Add(folder);
+                IndexNodes.Add(folder);
             }
             return folder.CreateFolder(folders);
         }
 
-        public void DeleteFolder(Queue<string> folders)
+        public void Delete(Queue<string> path)
         {
-            if (!folders.Any()) throw new ArgumentException("Folder cannot be empty");
-
-            if (folders.Count == 1)
+            if (path.Count == 1)
             {
-                // Found the folder to be deleted
-                var folderToBeDeleted = FindFolder(folders.Dequeue());
-                if (folderToBeDeleted == null) throw new DirectoryNotFoundException();
-                Folders.Remove(folderToBeDeleted);
+                var node = Find(path.Dequeue());
+                if (node == null) throw new NotFoundException();
+                IndexNodes.Remove(node);
                 return;
             }
 
-            var folderName = folders.Dequeue();
+            var folderName = path.Dequeue();
             var folder = FindFolder(folderName);
-            if (folder == null) throw new DirectoryNotFoundException();
-            folder.DeleteFolder(folders);
+            if (folder == null) throw new NotFoundException();
+            folder.Delete(path);
         }
 
         private Folder FindFolder(string folderName)
@@ -106,28 +103,27 @@ namespace VFSBase
             return Folders.FirstOrDefault(f => f.Name == folderName);
         }
 
-        public bool DoesFolderExist(Queue<string> folders)
-        {
-            if (!folders.Any()) return true;
-            var folder = FindFolder(folders.Dequeue());
-            return folder != null && folder.DoesFolderExist(folders);
-        }
-
         private VFSFile FindFile(string fileName)
         {
             return Files.FirstOrDefault(f => f.Name == fileName);
         }
 
-        public bool DoesFileExist(Queue<string> path)
+        public IIndexNode Find(string name)
+        {
+            return IndexNodes.FirstOrDefault(i => i.Name == name);
+        }
+
+        public bool Exists(Queue<string> path)
         {
             if (path.Count == 1)
             {
-                var file = FindFile(path.Dequeue());
-                return file != null;
+                var node = Find(path.Dequeue());
+                return (node != null);
             }
 
-            var folder = FindFolder(path.Dequeue());
-            return folder != null && folder.DoesFileExist(path);
+            var name = path.Dequeue();
+            var folder = FindFolder(name);
+            return folder != null && folder.Exists(path);
         }
 
         public VFSFile ImportFile(Queue<string> path, string source)
@@ -135,7 +131,7 @@ namespace VFSBase
             if (path.Count == 1)
             {
                 var file = new VFSFile(path.Dequeue(), source);
-                Files.Add(file);
+                IndexNodes.Add(file);
                 return file;
             }
 
@@ -144,7 +140,7 @@ namespace VFSBase
             if (folder == null)
             {
                 folder = new Folder(folderName);
-                Folders.Add(folder);
+                IndexNodes.Add(folder);
             }
             return folder.ImportFile(path, source);
         }
@@ -164,23 +160,6 @@ namespace VFSBase
             var folder = FindFolder(folderName);
             if (folder == null) throw new FileNotFoundException();
             folder.ExportFile(path, dest);
-        }
-
-
-        public void DeleteFile (Queue<string> path)
-        {
-            if (path.Count == 1)
-            {
-                var file = FindFile(path.Dequeue());
-                if (file == null) throw new FileNotFoundException();
-                Files.Remove(file);
-                return;
-            }
-
-            var folderName = path.Dequeue();
-            var folder = FindFolder(folderName);
-            if (folder == null) throw new FileNotFoundException();
-            folder.DeleteFile(path);
         }
 
         public int CompareTo(object obj)
