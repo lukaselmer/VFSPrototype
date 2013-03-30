@@ -25,12 +25,19 @@ namespace VFSConsole
 
             _commands = new Dictionary<string, Action<string>>
                             {
+                                {"delete", Delete},
                                 {"exists", Exists},
                                 {"exit", Exit},
                                 {"help", ShowHelp},
                                 {"ls", ListDirectory},
                                 {"mkdir", Mkdir},
                             };
+        }
+
+        private void Delete(string parameter)
+        {
+            _fileSystemManipulator.DeleteFolder(parameter);
+            _textWriter.WriteLine("Deleted {0}", parameter);
         }
 
         private void Exists(string parameters)

@@ -32,7 +32,6 @@ namespace VFSConsoleTests
 
         public void DeleteFolder(string path)
         {
-            throw new NotImplementedException();
         }
 
         public void ImportFile(string source, string dest)
