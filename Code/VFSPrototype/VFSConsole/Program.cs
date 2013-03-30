@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Practices.Unity;
 using VFSBase;
 
 namespace VFSConsole
@@ -10,9 +11,11 @@ namespace VFSConsole
     {
         static void Main(string[] args)
         {
-            // TODO: use unity to resolve the file system
-            var fileSystem = new FileSystem("./vfs", 1024 * 1024 * 1024);
-            var c = new ConsoleApplication(Console.In, Console.Out, new FileSystemManipulator(fileSystem));
+            var container = new UnityContainer();
+            container.RegisterType<IFileSystemManipulator, FileSystemManipulator>();
+            container.RegisterInstance(new FileSystemOptions("./vfs.xxx", 1024 * 1024 * 1024));
+            container.RegisterInstance(new ConsoleApplicationSettings(Console.In, Console.Out));
+            var c = container.Resolve<ConsoleApplication>();
             c.Run();
         }
     }

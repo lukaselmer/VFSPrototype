@@ -8,7 +8,7 @@ namespace VFSBase
 {
     public class FileSystem
     {
-        public FileSystem(string location, long diskSize)
+        private FileSystem(string location, long diskSize)
         {
             Location = location;
             DiskSize = diskSize;
@@ -18,6 +18,11 @@ namespace VFSBase
             File.WriteAllText(Location, "");
 
             Root = new Folder();
+        }
+
+        public FileSystem(FileSystemOptions fileSystemOptions) : this(fileSystemOptions.Path, fileSystemOptions.Size)
+        {
+            
         }
 
         public long DiskSize { get; private set; }
