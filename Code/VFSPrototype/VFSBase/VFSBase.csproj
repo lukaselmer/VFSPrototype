@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementation\FileSystemOptions.cs" />
+    <Compile Include="Implementation\NotFoundException.cs" />
     <Compile Include="Interfaces\IFileSystem.cs" />
     <Compile Include="Interfaces\IFileSystemManipulator.cs" />
     <Compile Include="Interfaces\IIndexNode.cs" />
