@@ -16,14 +16,14 @@ namespace VFSBase
         public Folder()
         {
             Folders = new SortedSet<Folder>();
-            Files = new SortedSet<File>();
+            Files = new SortedSet<VFSFile>();
         }
 
         protected string Name { get; private set; }
 
         public ISet<Folder> Folders { get; private set; }
 
-        public ISet<File> Files { get; private set; } 
+        public ISet<VFSFile> Files { get; private set; } 
 
         public void CreateFolder(Queue<string> folders)
         {

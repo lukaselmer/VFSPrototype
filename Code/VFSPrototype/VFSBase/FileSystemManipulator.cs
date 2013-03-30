@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace VFSBase
 {
-    public class FileSystemManipulator
+    public class FileSystemManipulator : IFileSystemManipulator
     {
         private readonly FileSystem _fileSystem;
 
@@ -46,7 +46,7 @@ namespace VFSBase
             if (!_fileSystem.Root.DoesFolderExist(folders)) 
                 _fileSystem.Root.CreateFolder(folders);
 
-            _fileSystem.Root.ImportFile(source, folders, fileName);
+            //_fileSystem.Root.ImportFile(source, folders, fileName);
         }
 
         public bool FileExists(string path)
