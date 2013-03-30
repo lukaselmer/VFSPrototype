@@ -157,7 +157,32 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestDeleteFile()
         {
-            // TODO:
+            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
+            var m = InitTestFileSystemManipulator(fs);
+
+            // Create test file
+            const string testFileSource = "test.txt";
+            if (File.Exists(testFileSource)) File.Delete(testFileSource);
+            var file = File.Create(testFileSource);
+            file.Close();
+
+            m.ImportFile(testFileSource, "test.txt");
+            m.DeleteFile("test.txt");
+            Assert.IsFalse(m.DoesFileExists("test.txt"));
+
+            m.ImportFile(testFileSource, "hello/test.txt");
+            m.DeleteFile("hello/test.txt");
+            Assert.IsFalse(m.DoesFileExists("hello/test.txt"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FileNotFoundException))]
+        public void TestInvalidDeleteFile()
+        {
+            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
+            var m = InitTestFileSystemManipulator(fs);
+
+            m.DeleteFile("test.txt");
         }
     }
 }
