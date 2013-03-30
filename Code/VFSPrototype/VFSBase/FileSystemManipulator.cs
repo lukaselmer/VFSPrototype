@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,16 +15,16 @@ namespace VFSBase
             _fileSystem = fileSystem;
         }
 
-        public ISet<Folder> Folders
+        private ISet<Folder> _folders
         {
             get { return _fileSystem.Root.Folders; }
         }
 
 
-        public Folder Folder (string path)
+        public IEnumerable<string> Folders (string path)
         {
             var folders = new Queue<string>(path.Split('/'));
-            return _fileSystem.Root.GetFolder(folders);
+            return _fileSystem.Root.GetFolder(folders).Folders.Select(folder => folder.Name);
         } 
 
         public void CreateFolder(string path)
