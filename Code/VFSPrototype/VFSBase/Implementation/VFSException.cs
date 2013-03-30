@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VFSBase
+namespace VFSBase.Implementation
 {
     public class VFSException : Exception
     {

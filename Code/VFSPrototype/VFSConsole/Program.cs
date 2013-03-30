@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Practices.Unity;
 using VFSBase;
+using VFSBase.Implementation;
+using VFSBase.Interfaces;
 
 namespace VFSConsole
 {

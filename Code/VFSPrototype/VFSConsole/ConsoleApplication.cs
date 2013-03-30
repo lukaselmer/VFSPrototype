@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using VFSBase;
+using VFSBase.Interfaces;
 
 namespace VFSConsole
 {

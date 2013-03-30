@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VFSBase.Interfaces;
 
-namespace VFSBase
+namespace VFSBase.Implementation
 {
     public class Folder : IComparable, IIndexNode
     {

@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase;
+using VFSBase.Implementation;
 
 namespace VFSBaseTests
 {
