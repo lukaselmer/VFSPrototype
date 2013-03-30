@@ -96,25 +96,26 @@ namespace VFSBaseTests
 
             const string testFileSource = "test.txt";
             const string testFileDest = "test.txt";
-            File.Create(testFileSource);
+
+            if (File.Exists(testFileSource)) File.Delete(testFileSource);
+            FileStream file = File.Create(testFileSource);
+            file.Close();
             
             m.ImportFile(testFileSource, testFileDest);
             
-            Assert.IsTrue(m.FileExists(testFileDest));
-
-            File.Delete(testFileSource);
+            Assert.IsTrue(m.DoesFileExists(testFileDest));
         }
 
         [TestMethod]
         public void TestExportFile()
         {
-            
+            // TODO:
         }
 
         [TestMethod]
         public void TestDeleteFile()
         {
-            
+            // TODO:
         }
     }
 }
