@@ -7,6 +7,7 @@ namespace VFSConsoleTests
     {
         public bool FolderExists = false;
         public IEnumerable<string> CurrentFolders;
+        public bool IsCurrentDirectory = false;
 
         public IEnumerable<string> Folders(string path)
         {
@@ -15,7 +16,7 @@ namespace VFSConsoleTests
 
         public bool IsDirectory(string path)
         {
-            throw new NotImplementedException();
+            return IsCurrentDirectory;
         }
 
         public void CreateFolder(string path)

@@ -13,7 +13,7 @@ namespace VFSConsole
         private volatile bool _running = true;
         private readonly IDictionary<string, Action<string>> _commands;
         private readonly IFileSystemManipulator _fileSystemManipulator;
-        private string _currentDirectory = "/";
+        private string _currentDirectory = "";
 
         public ConsoleApplication(ConsoleApplicationSettings consoleApplicationSettings, IFileSystemManipulator fileSystemManipulator)
         {
@@ -155,11 +155,29 @@ namespace VFSConsole
             foreach (var command in _commands) _textWriter.WriteLine(command.Key);
         }
 
-        public string Prompt { get { return string.Format("{0}> ", _currentDirectory); } }
+        public string Prompt
+        {
+            get
+            {
+                var prefix = _currentDirectory == "" ? "/" : _currentDirectory;
+                return string.Format("{0}> ", prefix);
+            }
+        }
 
         public void Cd(string parameter)
         {
-            _currentDirectory = parameter;
+            if (!_fileSystemManipulator.IsDirectory(parameter))
+            {
+                _textWriter.WriteLine("Directory {0} does not exist", parameter);
+                return;
+            }
+
+            _currentDirectory = parameter.StartsWith("/") ? parameter : (_currentDirectory + "/" + parameter);
+
+            if (_currentDirectory == "/") _currentDirectory = "";
+
+            if (_currentDirectory.EndsWith("/")) _currentDirectory = _currentDirectory.Substring(0, _currentDirectory.Length - 1);
+
             _textWriter.WriteLine("Directory changed");
         }
     }
