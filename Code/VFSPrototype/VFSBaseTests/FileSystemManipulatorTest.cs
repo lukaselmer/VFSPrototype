@@ -86,5 +86,35 @@ namespace VFSBaseTests
             Assert.IsFalse(m.DoesFolderExist("test"));
             m.DeleteFolder("test");
         }
+
+
+        [TestMethod]
+        public void TestImportFile()
+        {
+            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
+            var m = InitTestFileSystemManipulator(fs);
+
+            const string testFileSource = "test.txt";
+            const string testFileDest = "test.txt";
+            File.Create(testFileSource);
+            
+            m.ImportFile(testFileSource, testFileDest);
+            
+            Assert.IsTrue(m.FileExists(testFileDest));
+
+            File.Delete(testFileSource);
+        }
+
+        [TestMethod]
+        public void TestExportFile()
+        {
+            
+        }
+
+        [TestMethod]
+        public void TestDeleteFile()
+        {
+            
+        }
     }
 }
