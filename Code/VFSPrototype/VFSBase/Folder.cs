@@ -16,15 +16,18 @@ namespace VFSBase
         public Folder()
         {
             Folders = new SortedSet<Folder>();
+            Files = new SortedSet<VFSFile>();
         }
 
-        protected string Name { get; private set; }
+        public string Name { get; private set; }
 
         public ISet<Folder> Folders { get; private set; }
 
-        public void CreateFolder(Queue<string> folders)
+        public ISet<VFSFile> Files { get; private set; } 
+
+        public Folder CreateFolder(Queue<string> folders)
         {
-            if (!folders.Any()) return;
+            if (!folders.Any()) return this;
 
             var folderName = folders.Dequeue();
             var folder = FindFolder(folderName);
@@ -33,7 +36,7 @@ namespace VFSBase
                 folder = new Folder(folderName);
                 Folders.Add(folder);
             }
-            folder.CreateFolder(folders);
+            return folder.CreateFolder(folders);
         }
 
         public void DeleteFolder(Queue<string> folders)
@@ -65,6 +68,76 @@ namespace VFSBase
             if (!folders.Any()) return true;
             var folder = FindFolder(folders.Dequeue());
             return folder != null && folder.DoesFolderExist(folders);
+        }
+
+        private VFSFile FindFile(string fileName)
+        {
+            return Files.FirstOrDefault(f => f.Name == fileName);
+        }
+
+        public bool DoesFileExist(Queue<string> path)
+        {
+            if (path.Count == 1)
+            {
+                var file = FindFile(path.Dequeue());
+                return file != null;
+            }
+
+            var folder = FindFolder(path.Dequeue());
+            return folder != null && folder.DoesFileExist(path);
+        }
+
+        public VFSFile ImportFile(Queue<string> path, string source)
+        {
+            if (path.Count == 1)
+            {
+                var file = new VFSFile(path.Dequeue(), source);
+                Files.Add(file);
+                return file;
+            }
+
+            var folderName = path.Dequeue();
+            var folder = FindFolder(folderName);
+            if (folder == null)
+            {
+                folder = new Folder(folderName);
+                Folders.Add(folder);
+            }
+            return folder.ImportFile(path, source);
+        }
+
+
+        public void ExportFile(Queue<string> path, string dest)
+        {
+            if (path.Count == 1)
+            {
+                var file = FindFile(path.Dequeue());
+                if (file == null) throw new FileNotFoundException();
+                File.WriteAllBytes(dest, file.Data);
+                return;
+            }
+
+            var folderName = path.Dequeue();
+            var folder = FindFolder(folderName);
+            if (folder == null) throw new FileNotFoundException();
+            folder.ExportFile(path, dest);
+        }
+
+
+        public void DeleteFile (Queue<string> path)
+        {
+            if (path.Count == 1)
+            {
+                var file = FindFile(path.Dequeue());
+                if (file == null) throw new FileNotFoundException();
+                Files.Remove(file);
+                return;
+            }
+
+            var folderName = path.Dequeue();
+            var folder = FindFolder(folderName);
+            if (folder == null) throw new FileNotFoundException();
+            folder.DeleteFile(path);
         }
 
         public int CompareTo(object obj)
