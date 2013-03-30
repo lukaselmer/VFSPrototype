@@ -20,12 +20,16 @@ namespace VFSBase
             get { return _fileSystem.Root.Folders; }
         }
 
-
         public IEnumerable<string> Folders (string path)
         {
             var folders = new Queue<string>(path.Split('/'));
             return _fileSystem.Root.GetFolder(folders).Folders.Select(folder => folder.Name);
-        } 
+        }
+
+        public bool IsDirectory(string path)
+        {
+            throw new System.NotImplementedException();
+        }
 
         public void CreateFolder(string path)
         {
@@ -35,7 +39,8 @@ namespace VFSBase
 
         public void Delete(string path)
         {
-            throw new System.NotImplementedException();
+            var folders = new Queue<string>(path.Split('/'));
+            _fileSystem.Root.Delete(folders);
         }
 
         public void Move (string source, string dest)
@@ -43,22 +48,13 @@ namespace VFSBase
             //var sourceFolder = Folder(source);
         }
 
+        
         public bool Exists(string path)
         {
-            throw new System.NotImplementedException();
+            var folders = new Queue<string>(path.Split('/'));
+            return _fileSystem.Root.Exists(folders);
         }
 
-        public bool DoesFolderExist(string path)
-        {
-            var folders = new Queue<string>(path.Split('/'));
-            return _fileSystem.Root.DoesFolderExist(folders);
-        }
-
-        public void DeleteFolder(string path)
-        {
-            var folders = new Queue<string>(path.Split('/'));
-            _fileSystem.Root.DeleteFolder(folders);
-        }
 
         public void ImportFile(string source, string dest)
         {
@@ -80,18 +76,6 @@ namespace VFSBase
         public void MoveFile(string source, string dest)
         {
             throw new System.NotImplementedException();
-        }
-
-        public void DeleteFile(string file)
-        {
-            var path = new Queue<string>(file.Split('/'));
-            _fileSystem.Root.DeleteFile(path);
-        }
-
-        public bool DoesFileExists(string file)
-        {
-            var path = new Queue<string>(file.Split('/'));
-            return _fileSystem.Root.DoesFileExist(path);
         }
     }
 }

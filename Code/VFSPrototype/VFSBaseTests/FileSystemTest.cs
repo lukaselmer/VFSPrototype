@@ -9,7 +9,7 @@ namespace VFSBaseTests
     public class FileSystemTest
     {
         const string DefaultTestfilePath = "./testfile.vhs";
-        private const long DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
+        private const ulong DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
 
         private static FileSystem InitTestFileSystem(string testfilePath, ulong size)
         {
