@@ -123,7 +123,7 @@ namespace VFSConsoleTests
 
                 var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
-                Assert.AreEqual("/> Directory /test/blub/bla created)", mocks.FakeOutLine(true));
+                Assert.AreEqual("/> Directory /test/blub/bla created", mocks.FakeOutLine(true));
                 Assert.AreEqual("/> Directory /test/blub/xxx created", mocks.FakeOutLine());
                 mocks.FakeOutLine(); // skip cd output
                 Assert.AreEqual(string.Format("{0}Directory /test/aaa/bbb created", c.Prompt), mocks.FakeOutLine());
