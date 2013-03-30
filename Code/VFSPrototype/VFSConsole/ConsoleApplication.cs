@@ -25,16 +25,16 @@ namespace VFSConsole
             _textWriter = consoleApplicationSettings.TextWriter;
 
             _commands = new Dictionary<string, Action<string>>
-                            {
-                                {"cd", Cd},
-                                {"delete", Delete},
-                                {"exists", Exists},
-                                {"exit", Exit},
-                                {"help", ShowHelp},
-                                {"import", Import},
-                                {"ls", ListDirectory},
-                                {"mkdir", Mkdir},
-                            };
+                {
+                    {"cd", Cd},
+                    {"delete", Delete},
+                    {"exists", Exists},
+                    {"exit", Exit},
+                    {"help", ShowHelp},
+                    {"import", Import},
+                    {"ls", ListDirectory},
+                    {"mkdir", Mkdir},
+                };
         }
 
         public void Run()
@@ -189,7 +189,8 @@ namespace VFSConsole
 
             if (_currentDirectory == "/") _currentDirectory = "";
 
-            if (_currentDirectory.EndsWith("/")) _currentDirectory = _currentDirectory.Substring(0, _currentDirectory.Length - 1);
+            if (_currentDirectory.EndsWith("/"))
+                _currentDirectory = _currentDirectory.Substring(0, _currentDirectory.Length - 1);
 
             _textWriter.WriteLine("Directory changed");
         }
