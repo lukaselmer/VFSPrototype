@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,7 +46,17 @@ namespace VFSBase
 
         public void Move (string source, string dest)
         {
-            //var sourceFolder = Folder(source);
+            var sourceFolders = new Queue<string>(source.Split('/'));
+            IIndexNode node = _fileSystem.Root.Delete(sourceFolders);
+
+            var last = dest.LastIndexOf('/');
+            var folder = last >= 0 ? dest.Substring(0, last) : "";
+            var name = last >= 0 ? dest.Substring(last+1) : dest;
+            var destFolders = new Queue<string>(folder.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries));
+
+            node.Name = name;
+            _fileSystem.Root.Insert(destFolders, node);
+
         }
 
         

@@ -18,7 +18,7 @@ namespace VFSBase
             IndexNodes = new SortedSet<IIndexNode>();
         }
 
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
         public ISet<IIndexNode> IndexNodes { get; set; }
 
@@ -82,20 +82,38 @@ namespace VFSBase
             return folder.CreateFolder(folders);
         }
 
-        public void Delete(Queue<string> path)
+        public IIndexNode Delete(Queue<string> path)
         {
             if (path.Count == 1)
             {
                 var node = Find(path.Dequeue());
                 if (node == null) throw new NotFoundException();
                 IndexNodes.Remove(node);
-                return;
+                return node;
             }
 
             var folderName = path.Dequeue();
             var folder = FindFolder(folderName);
             if (folder == null) throw new NotFoundException();
-            folder.Delete(path);
+            return folder.Delete(path);
+        }
+
+        public void Insert(Queue<string> path, IIndexNode node)
+        {
+            if (!path.Any())
+            {
+                IndexNodes.Add(node);
+                return;
+            }
+
+            var folderName = path.Dequeue();
+            var folder = FindFolder(folderName);
+            if (folder == null)
+            {
+                folder = new Folder(folderName);
+                IndexNodes.Add(folder);
+            }
+            folder.Insert(path, node);
         }
 
         private Folder FindFolder(string folderName)

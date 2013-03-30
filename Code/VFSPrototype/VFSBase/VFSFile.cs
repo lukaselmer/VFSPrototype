@@ -20,7 +20,7 @@ namespace VFSBase
             Data = data;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; set; }
         public ISet<IIndexNode> IndexNodes { get; set; }
         public byte[] Data { get; private set; }
 

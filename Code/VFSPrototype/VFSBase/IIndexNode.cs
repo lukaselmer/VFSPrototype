@@ -4,7 +4,7 @@ namespace VFSBase
 {
     public interface IIndexNode
     {
-        string Name { get; }
+        string Name { get; set; }
         ISet<IIndexNode> IndexNodes { get; set; }
     }
 }
