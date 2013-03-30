@@ -41,9 +41,10 @@ namespace VFSConsoleTests
                 var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
                 c.Run();
                 Assert.AreEqual("> Available commands:", mocks.FakeOutLine(true));
+                Assert.AreEqual("exists", mocks.FakeOutLine());
+                Assert.AreEqual("exit", mocks.FakeOutLine());
                 Assert.AreEqual("help", mocks.FakeOutLine());
                 Assert.AreEqual("ls", mocks.FakeOutLine());
-                Assert.AreEqual("exit", mocks.FakeOutLine());
                 Assert.AreEqual("mkdir", mocks.FakeOutLine());
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
             }
@@ -117,6 +118,42 @@ namespace VFSConsoleTests
                 var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
                 c.Run();
                 Assert.AreEqual("> Directory test/blub/bla created", mocks.FakeOutLine(true));
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestExistsYes()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = true;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("exists test/blub/bla");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                c.Run();
+                Assert.AreEqual("> Yes", mocks.FakeOutLine(true));
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestExistsNo()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("exists test/blub/bla");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                c.Run();
+                Assert.AreEqual("> No", mocks.FakeOutLine(true));
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
             }
         }
