@@ -28,7 +28,7 @@ namespace VFSConsole
                                 {"help", ShowHelp},
                                 {"ls", ListDirectory},
                                 {"exit", Exit},
-           //                     {"mkdir", Mkdir},
+                                {"mkdir", Mkdir},
                             };
         }
 
@@ -76,10 +76,11 @@ namespace VFSConsole
             }
         }
 
-        /*private void Mkdir(string obj)
+        private void Mkdir(string parameter)
         {
-            
-        }*/
+            _fileSystemManipulator.CreateFolder(parameter);
+            _textWriter.WriteLine("Directory {0} created", parameter);
+        }
 
         private void CommandNotFound(string parameter)
         {
