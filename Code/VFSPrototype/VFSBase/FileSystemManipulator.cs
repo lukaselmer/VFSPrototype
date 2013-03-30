@@ -63,6 +63,12 @@ namespace VFSBase
             _fileSystem.Root.ExportFile(path, dest);
         }
 
+        public void DeleteFile(string file)
+        {
+            var path = new Queue<string>(file.Split('/'));
+            _fileSystem.Root.DeleteFile(path);
+        }
+
         public bool DoesFileExists(string file)
         {
             var path = new Queue<string>(file.Split('/'));
