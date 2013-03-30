@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VFSBase;
 
 namespace VFSConsole
 {
@@ -11,18 +12,83 @@ namespace VFSConsole
         private readonly TextWriter _textWriter;
         private volatile bool _running = true;
         private readonly IDictionary<string, Action<string>> _commands;
+        private readonly IFileSystemManipulator _fileSystemManipulator;
 
-        public ConsoleApplication(TextReader textReader, TextWriter textWriter)
+        public ConsoleApplication(TextReader textReader, TextWriter textWriter, IFileSystemManipulator fileSystemManipulator)
         {
+            if (fileSystemManipulator == null) throw new ArgumentNullException("fileSystemManipulator", "fileSystem must not be null.");
+
+            _fileSystemManipulator = fileSystemManipulator;
+
             _textReader = textReader;
             _textWriter = textWriter;
 
             _commands = new Dictionary<string, Action<string>>
                             {
-                                {"help", ShowHelp},
-                                {"ls", ListDirectory},
+                                {"delete", Delete},
+                                {"exists", Exists},
                                 {"exit", Exit},
+                                {"help", ShowHelp},
+                                {"import", Import},
+                                {"ls", ListDirectory},
+                                {"mkdir", Mkdir},
                             };
+        }
+
+        private void Import(string parameters)
+        {
+            try
+            {
+                var options = ParseParams(parameters, 2);
+                _fileSystemManipulator.ImportFile(options[0], options[1]);
+                _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", options[0], options[1]);
+            }
+            catch (ArgumentException)
+            {
+                _textWriter.WriteLine(@"Please provide two parameters. E.g. import ""C:\host system\path"" /to/dest");
+            }
+        }
+
+        private static IList<string> ParseParams(string parameters, int parametersCount)
+        {
+            IList<string> l = new List<string>(parametersCount);
+
+            var currentParameter = "";
+            var open = false;
+
+            var chars = parameters.ToList();
+            while (chars.Any())
+            {
+                var c = chars[0];
+                chars.RemoveAt(0);
+
+                if (c == '"') open = !open;
+                else if (c == ' ' && !open)
+                {
+                    l.Add(currentParameter);
+                    currentParameter = "";
+                }
+                else currentParameter += c;
+            }
+            l.Add(currentParameter);
+
+            if (l.Count != parametersCount || open)
+            {
+                throw new ArgumentException(string.Format("Parameters must be {0}", parametersCount), "parameters");
+            }
+            return l;
+        }
+
+        private void Delete(string parameter)
+        {
+            _fileSystemManipulator.DeleteFolder(parameter);
+            _textWriter.WriteLine("Deleted {0}", parameter);
+        }
+
+        private void Exists(string parameters)
+        {
+            var exists = _fileSystemManipulator.DoesFolderExist(parameters);
+            _textWriter.WriteLine(exists ? "Yes" : "No");
         }
 
         private void Exit(string obj)
@@ -54,9 +120,25 @@ namespace VFSConsole
 
         private void ListDirectory(string parameter)
         {
-            _textWriter.WriteLine("TODO: implement this!");
-            _textWriter.WriteLine("and this");
-            _textWriter.WriteLine("and so on...");
+            if (!_fileSystemManipulator.DoesFolderExist(parameter))
+            {
+                _textWriter.WriteLine("File or directory does not exist");
+                return;
+            }
+
+            var folders = _fileSystemManipulator.Folder(parameter).Folders;
+            _textWriter.WriteLine("Found {0} directories:", folders.Count);
+
+            foreach (var folder in folders)
+            {
+                _textWriter.WriteLine(folder.Name);
+            }
+        }
+
+        private void Mkdir(string parameter)
+        {
+            _fileSystemManipulator.CreateFolder(parameter);
+            _textWriter.WriteLine("Directory {0} created", parameter);
         }
 
         private void CommandNotFound(string parameter)
