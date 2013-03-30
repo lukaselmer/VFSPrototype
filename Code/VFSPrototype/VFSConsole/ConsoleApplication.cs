@@ -29,9 +29,54 @@ namespace VFSConsole
                                 {"exists", Exists},
                                 {"exit", Exit},
                                 {"help", ShowHelp},
+                                {"import", Import},
                                 {"ls", ListDirectory},
                                 {"mkdir", Mkdir},
                             };
+        }
+
+        private void Import(string parameters)
+        {
+            try
+            {
+                var options = ParseParams(parameters, 2);
+                _fileSystemManipulator.ImportFile(options[0], options[1]);
+                _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", options[0], options[1]);
+            }
+            catch (ArgumentException)
+            {
+                _textWriter.WriteLine(@"Please provide two parameters. E.g. import ""C:\host system\path"" /to/dest");
+            }
+        }
+
+        private static IList<string> ParseParams(string parameters, int parametersCount)
+        {
+            IList<string> l = new List<string>(parametersCount);
+
+            var currentParameter = "";
+            var open = false;
+
+            var chars = parameters.ToList();
+            while (chars.Any())
+            {
+                var c = chars[0];
+                chars.RemoveAt(0);
+
+                if (c == '"') open = !open;
+                else if (c == ' ' && !open)
+                {
+                    l.Add(currentParameter);
+                    currentParameter = "";
+                }
+                else currentParameter += c;
+            }
+            l.Add(currentParameter);
+
+            if (l.Count != parametersCount || open)
+            {
+                throw new ArgumentException(string.Format("Parameters must be {0}", parametersCount), "parameters");
+            }
+            return l;
         }
 
         private void Delete(string parameter)
@@ -43,7 +88,7 @@ namespace VFSConsole
         private void Exists(string parameters)
         {
             var exists = _fileSystemManipulator.DoesFolderExist(parameters);
-           _textWriter.WriteLine(exists ? "Yes" : "No"); 
+            _textWriter.WriteLine(exists ? "Yes" : "No");
         }
 
         private void Exit(string obj)
