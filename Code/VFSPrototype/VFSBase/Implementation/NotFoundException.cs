@@ -1,8 +1,12 @@
-﻿namespace VFSBase.Implementation
+﻿using System;
+
+namespace VFSBase.Implementation
 {
+    [Serializable]
     public class NotFoundException : VFSException
     {
-        public NotFoundException() : base("")
+        public NotFoundException()
+            : base("")
         {
         }
     }
