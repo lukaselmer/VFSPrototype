@@ -139,8 +139,14 @@ namespace VFSConsole
 
         private void Mkdir(string parameter)
         {
-            _fileSystemManipulator.CreateFolder(parameter);
-            _textWriter.WriteLine("Directory {0} created", parameter);
+            _fileSystemManipulator.CreateFolder(PathFor(parameter));
+            _textWriter.WriteLine("Directory {0} created", PathFor(parameter));
+        }
+
+        private string PathFor(string parameter)
+        {
+            var ret = parameter.StartsWith("/") ? parameter : _currentDirectory + "/" + parameter;
+            return ret.EndsWith("/") ? ret.Substring(0, ret.Length - 1) : ret;
         }
 
         private void CommandNotFound(string parameter)
