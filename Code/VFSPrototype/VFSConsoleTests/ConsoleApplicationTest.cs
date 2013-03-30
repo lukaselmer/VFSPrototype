@@ -45,6 +45,7 @@ namespace VFSConsoleTests
                 Assert.AreEqual("exists", mocks.FakeOutLine());
                 Assert.AreEqual("exit", mocks.FakeOutLine());
                 Assert.AreEqual("help", mocks.FakeOutLine());
+                Assert.AreEqual("import", mocks.FakeOutLine());
                 Assert.AreEqual("ls", mocks.FakeOutLine());
                 Assert.AreEqual("mkdir", mocks.FakeOutLine());
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
@@ -61,6 +62,7 @@ namespace VFSConsoleTests
                 {
                     Folders = new SortedSet<Folder> { new Folder("Bla"), new Folder("blurb"), new Folder("xxx") }
                 };
+
             using (var mocks = new InOutMocks())
             {
                 mocks.FakeInLine("ls /");
@@ -177,5 +179,44 @@ namespace VFSConsoleTests
             }
         }
 
+        [TestMethod]
+        public void TestImportWrongParameters()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("import blub");
+                mocks.FakeInLine(@"import bl""ub");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                c.Run();
+                Assert.AreEqual(@"> Please provide two parameters. E.g. import ""C:\host system\path"" /to/dest", mocks.FakeOutLine(true));
+                Assert.AreEqual(@"> Please provide two parameters. E.g. import ""C:\host system\path"" /to/dest", mocks.FakeOutLine(true));
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestImport()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine(@"import C:\a /bla/a");
+                mocks.FakeInLine(@"import ""C:\test folder\xxx"" /bla/xxx");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                c.Run();
+                Assert.AreEqual(@"> Imported ""C:\a"" to ""/bla/a""", mocks.FakeOutLine(true));
+                Assert.AreEqual(@"> Imported ""C:\test folder\xxx"" to ""/bla/xxx""", mocks.FakeOutLine());
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
+            }
+        }
     }
 }

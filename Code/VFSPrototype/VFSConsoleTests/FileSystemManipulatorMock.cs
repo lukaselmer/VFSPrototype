@@ -36,7 +36,6 @@ namespace VFSConsoleTests
 
         public void ImportFile(string source, string dest)
         {
-            throw new NotImplementedException();
         }
 
         public bool FileExists(string path)
