@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileSystemOptions.cs" />
     <Compile Include="IFileSystemManipulator.cs" />
     <Compile Include="VFSFile.cs" />
     <Compile Include="FileSystem.cs" />
