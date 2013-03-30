@@ -57,6 +57,12 @@ namespace VFSBase
             _fileSystem.Root.ImportFile(path, source);
         }
 
+        public void ExportFile(string source, string dest)
+        {
+            var path = new Queue<string>(source.Split('/'));
+            _fileSystem.Root.ExportFile(path, dest);
+        }
+
         public bool DoesFileExists(string file)
         {
             var path = new Queue<string>(file.Split('/'));
