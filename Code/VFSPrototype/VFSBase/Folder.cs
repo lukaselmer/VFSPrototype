@@ -108,6 +108,25 @@ namespace VFSBase
             return folder.ImportFile(path, source);
         }
 
+
+        public VFSFile ExportFile(Queue<string> path, string dest)
+        {
+            if (path.Count == 1)
+            {
+                var file = FindFile(path.Dequeue());
+                if (file == null) throw new FileNotFoundException();
+                File.WriteAllBytes(dest, file.Data);
+                return file;
+            }
+
+            var folderName = path.Dequeue();
+            var folder = FindFolder(folderName);
+
+            if (folder == null) throw new FileNotFoundException();
+
+            return folder.ExportFile(path, dest);
+        }
+
         public int CompareTo(object obj)
         {
             var folder = obj as Folder;
