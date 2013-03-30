@@ -39,6 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IFileSystemManipulator.cs" />
+    <Compile Include="VFSFile.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="FileSystemManipulator.cs" />
     <Compile Include="Folder.cs" />
