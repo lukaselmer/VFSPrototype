@@ -14,14 +14,14 @@ namespace VFSConsole
         private readonly IDictionary<string, Action<string>> _commands;
         private readonly IFileSystemManipulator _fileSystemManipulator;
 
-        public ConsoleApplication(TextReader textReader, TextWriter textWriter, IFileSystemManipulator fileSystemManipulator)
+        public ConsoleApplication(ConsoleApplicationSettings consoleApplicationSettings, IFileSystemManipulator fileSystemManipulator)
         {
             if (fileSystemManipulator == null) throw new ArgumentNullException("fileSystemManipulator", "fileSystem must not be null.");
 
             _fileSystemManipulator = fileSystemManipulator;
 
-            _textReader = textReader;
-            _textWriter = textWriter;
+            _textReader = consoleApplicationSettings.TextReader;
+            _textWriter = consoleApplicationSettings.TextWriter;
 
             _commands = new Dictionary<string, Action<string>>
                             {
