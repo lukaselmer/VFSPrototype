@@ -5,7 +5,7 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    public class VFSFile : IComparable, IIndexNode
+    internal class VFSFile : IComparable, IIndexNode
     {
         public VFSFile(string name, string source)
             : this (name, File.ReadAllBytes(source))

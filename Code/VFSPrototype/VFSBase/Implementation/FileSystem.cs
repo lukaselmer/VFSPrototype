@@ -28,7 +28,7 @@ namespace VFSBase.Implementation
 
         public string Location { get; private set; }
 
-        public Folder Root { get; private set; }
+        internal Folder Root { get; private set; }
 
         public void Destroy()
         {
