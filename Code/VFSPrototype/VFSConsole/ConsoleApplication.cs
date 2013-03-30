@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VFSBase;
 
 namespace VFSConsole
 {
@@ -11,9 +12,14 @@ namespace VFSConsole
         private readonly TextWriter _textWriter;
         private volatile bool _running = true;
         private readonly IDictionary<string, Action<string>> _commands;
+        private readonly IFileSystemManipulator _fileSystemManipulator;
 
-        public ConsoleApplication(TextReader textReader, TextWriter textWriter)
+        public ConsoleApplication(TextReader textReader, TextWriter textWriter, IFileSystemManipulator fileSystemManipulator)
         {
+            if (fileSystemManipulator == null) throw new ArgumentNullException("fileSystemManipulator", "fileSystem must not be null.");
+
+            _fileSystemManipulator = fileSystemManipulator;
+
             _textReader = textReader;
             _textWriter = textWriter;
 
@@ -22,6 +28,7 @@ namespace VFSConsole
                                 {"help", ShowHelp},
                                 {"ls", ListDirectory},
                                 {"exit", Exit},
+           //                     {"mkdir", Mkdir},
                             };
         }
 
@@ -54,10 +61,25 @@ namespace VFSConsole
 
         private void ListDirectory(string parameter)
         {
-            _textWriter.WriteLine("TODO: implement this!");
-            _textWriter.WriteLine("and this");
-            _textWriter.WriteLine("and so on...");
+            if (!_fileSystemManipulator.DoesFolderExist(parameter))
+            {
+                _textWriter.WriteLine("File or directory does not exist");
+                return;
+            }
+
+            var folders = _fileSystemManipulator.Folder(parameter).Folders;
+            _textWriter.WriteLine("Found {0} directories:", folders.Count);
+
+            foreach (var folder in folders)
+            {
+                _textWriter.WriteLine(folder.Name);
+            }
         }
+
+        /*private void Mkdir(string obj)
+        {
+            
+        }*/
 
         private void CommandNotFound(string parameter)
         {
