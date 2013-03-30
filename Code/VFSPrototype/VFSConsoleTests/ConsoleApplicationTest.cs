@@ -41,6 +41,7 @@ namespace VFSConsoleTests
                 var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
                 c.Run();
                 Assert.AreEqual("> Available commands:", mocks.FakeOutLine(true));
+                Assert.AreEqual("delete", mocks.FakeOutLine());
                 Assert.AreEqual("exists", mocks.FakeOutLine());
                 Assert.AreEqual("exit", mocks.FakeOutLine());
                 Assert.AreEqual("help", mocks.FakeOutLine());
@@ -154,6 +155,24 @@ namespace VFSConsoleTests
                 var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
                 c.Run();
                 Assert.AreEqual("> No", mocks.FakeOutLine(true));
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestDeleted()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("delete test/blub/bla");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                c.Run();
+                Assert.AreEqual("> Deleted test/blub/bla", mocks.FakeOutLine(true));
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
             }
         }
