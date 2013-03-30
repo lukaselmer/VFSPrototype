@@ -38,7 +38,7 @@ namespace VFSConsoleTests
         {
         }
 
-        public bool FileExists(string path)
+        public bool DoesFileExists(string path)
         {
             throw new NotImplementedException();
         }
