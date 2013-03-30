@@ -221,21 +221,79 @@ namespace VFSConsoleTests
         public void TestCd()
         {
             var fs = FileSystemMock();
-            fs.FolderExists = false;
+            fs.FolderExists = true;
+            fs.IsCurrentDirectory = true;
 
             using (var mocks = new InOutMocks())
             {
                 mocks.FakeInLine("cd /a/b");
                 mocks.FakeInLine("cd /");
-
-                mocks.FakeInLine("");
                 mocks.FakeInLine("exit", true);
 
                 var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("/> Directory changed", mocks.FakeOutLine(true));
                 Assert.AreEqual("/a/b> Directory changed", mocks.FakeOutLine());
-                Assert.AreEqual("/> ", mocks.FakeOutLine());
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestCdInvalidDirecory()
+        {
+            var fs = FileSystemMock();
+            fs.IsCurrentDirectory = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("cd /a/b");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual("/> Directory /a/b does not exist", mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+
+        [TestMethod]
+        public void TestCdRelative()
+        {
+            var fs = FileSystemMock();
+            fs.IsCurrentDirectory = true;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("cd a/b");
+                mocks.FakeInLine("cd /");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual("/> Directory changed", mocks.FakeOutLine(true));
+                Assert.AreEqual("/a/b> Directory changed", mocks.FakeOutLine());
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+
+        [TestMethod]
+        public void TestCdRemoveSlashAtEnd()
+        {
+            var fs = FileSystemMock();
+            fs.IsCurrentDirectory = true;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("cd /a/b/");
+                mocks.FakeInLine("cd /");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual("/> Directory changed", mocks.FakeOutLine(true));
+                Assert.AreEqual("/a/b> Directory changed", mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
