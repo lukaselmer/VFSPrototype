@@ -13,6 +13,7 @@ namespace VFSConsole
         private volatile bool _running = true;
         private readonly IDictionary<string, Action<string>> _commands;
         private readonly IFileSystemManipulator _fileSystemManipulator;
+        private string _currentDirectory = "/";
 
         public ConsoleApplication(ConsoleApplicationSettings consoleApplicationSettings, IFileSystemManipulator fileSystemManipulator)
         {
@@ -25,6 +26,7 @@ namespace VFSConsole
 
             _commands = new Dictionary<string, Action<string>>
                             {
+                                {"cd", Cd},
                                 {"delete", Delete},
                                 {"exists", Exists},
                                 {"exit", Exit},
@@ -100,7 +102,7 @@ namespace VFSConsole
         {
             while (_running)
             {
-                _textWriter.Write("> ");
+                _textWriter.Write(Prompt);
                 var line = _textReader.ReadLine();
                 ProcessLine(line);
             }
@@ -151,6 +153,14 @@ namespace VFSConsole
         {
             _textWriter.WriteLine("Available commands:");
             foreach (var command in _commands) _textWriter.WriteLine(command.Key);
+        }
+
+        public string Prompt { get { return string.Format("{0}> ", _currentDirectory); } }
+
+        public void Cd(string parameter)
+        {
+            _currentDirectory = parameter;
+            _textWriter.WriteLine("Directory changed");
         }
     }
 }
