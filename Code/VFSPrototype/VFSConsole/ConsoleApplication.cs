@@ -126,12 +126,12 @@ namespace VFSConsole
                 return;
             }
 
-            var folders = _fileSystemManipulator.Folder(parameter).Folders;
+            var folders = _fileSystemManipulator.Folders(parameter).ToList();
             _textWriter.WriteLine("Found {0} directories:", folders.Count);
 
             foreach (var folder in folders)
             {
-                _textWriter.WriteLine(folder.Name);
+                _textWriter.WriteLine(folder);
             }
         }
 

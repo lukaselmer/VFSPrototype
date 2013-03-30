@@ -53,6 +53,7 @@
     <Compile Include="FileSystemOptions.cs" />
     <Compile Include="IFileSystem.cs" />
     <Compile Include="IFileSystemManipulator.cs" />
+    <Compile Include="IIndexNode.cs" />
     <Compile Include="VFSFile.cs" />
     <Compile Include="FileSystem.cs" />
     <Compile Include="FileSystemManipulator.cs" />

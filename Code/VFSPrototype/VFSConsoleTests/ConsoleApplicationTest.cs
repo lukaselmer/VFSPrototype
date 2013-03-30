@@ -58,10 +58,7 @@ namespace VFSConsoleTests
             var fs = FileSystemMock();
             fs.FolderExists = true;
 
-            fs.CurrentFolder = new Folder
-                {
-                    Folders = new SortedSet<Folder> { new Folder("Bla"), new Folder("blurb"), new Folder("xxx") }
-                };
+            fs._folders = new SortedSet<string> {"Bla", "blurb", "xxx"};
 
             using (var mocks = new InOutMocks())
             {
