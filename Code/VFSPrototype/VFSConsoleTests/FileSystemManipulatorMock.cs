@@ -38,6 +38,31 @@ namespace VFSConsoleTests
         {
         }
 
+        public void ExportFile(string source, string dest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Copy(string source, string dest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Delete(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Move(string source, string dest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Exists(string path)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool DoesFileExists(string path)
         {
             throw new NotImplementedException();

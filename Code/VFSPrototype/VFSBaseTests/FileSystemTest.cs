@@ -11,10 +11,10 @@ namespace VFSBaseTests
         const string DefaultTestfilePath = "./testfile.vhs";
         private const long DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
 
-        private static FileSystem InitTestFileSystem(string testfilePath, long size)
+        private static FileSystem InitTestFileSystem(string testfilePath, ulong size)
         {
             if (File.Exists(testfilePath)) File.Delete(testfilePath);
-            var fileSystem = new FileSystem(testfilePath, size);
+            var fileSystem = new FileSystem(new FileSystemOptions(testfilePath, size));
             Assert.IsTrue(File.Exists(testfilePath), String.Format("testfile {0} should exist!", testfilePath));
             return fileSystem;
         }
@@ -36,7 +36,7 @@ namespace VFSBaseTests
         public void TestInvalidLocationInConstructor()
         {
             File.WriteAllText(DefaultTestfilePath, "");
-            new FileSystem(DefaultTestfilePath, DefaultSize);
+            new FileSystem(new FileSystemOptions(DefaultTestfilePath, DefaultSize));
         }
 
         [TestMethod]

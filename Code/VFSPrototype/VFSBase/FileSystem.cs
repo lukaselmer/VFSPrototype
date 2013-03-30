@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace VFSBase
 {
-    public class FileSystem
+    public class FileSystem : IFileSystem
     {
-        private FileSystem(string location, long diskSize)
+        private FileSystem(string location, ulong diskSize)
         {
             Location = location;
             DiskSize = diskSize;
@@ -25,7 +25,9 @@ namespace VFSBase
             
         }
 
-        public long DiskSize { get; private set; }
+        public ulong DiskSize { get; private set; }
+        public ulong DiskFree { get; private set; }
+        public ulong DiskOccupied { get; private set; }
 
         public string Location { get; private set; }
 

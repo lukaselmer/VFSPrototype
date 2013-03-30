@@ -25,6 +25,16 @@ namespace VFSBase
 
         public ISet<VFSFile> Files { get; private set; } 
 
+        public Folder GetFolder(Queue<string> folders)
+        {
+            if (!folders.Any()) return this;
+
+            var folderName = folders.Dequeue();
+            var folder = FindFolder(folderName);
+            if (folder == null) throw new DirectoryNotFoundException();
+            return folder.GetFolder(folders);
+        }
+
         public Folder CreateFolder(Queue<string> folders)
         {
             if (!folders.Any()) return this;
