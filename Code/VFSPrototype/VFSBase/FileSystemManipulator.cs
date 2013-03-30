@@ -22,14 +22,29 @@ namespace VFSBase
 
         public Folder Folder (string path)
         {
-            // TODO: get Folder
-            return null;
+            var folders = new Queue<string>(path.Split('/'));
+            return _fileSystem.Root.GetFolder(folders);
         } 
 
         public void CreateFolder(string path)
         {
             var folders = new Queue<string>(path.Split('/'));
             _fileSystem.Root.CreateFolder(folders);
+        }
+
+        public void Delete(string path)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Move (string source, string dest)
+        {
+            //var sourceFolder = Folder(source);
+        }
+
+        public bool Exists(string path)
+        {
+            throw new System.NotImplementedException();
         }
 
         public bool DoesFolderExist(string path)
@@ -44,13 +59,6 @@ namespace VFSBase
             _fileSystem.Root.DeleteFolder(folders);
         }
 
-        /*private void SplitPath (string path, out string folder, out string file)
-        {
-            var filePos = path.LastIndexOf('/');
-            file = (filePos >= 0) ? path.Substring(filePos) : path;
-            folder = (filePos >= 0) ? path.Substring(0, filePos) : "";   
-        }*/
-
         public void ImportFile(string source, string dest)
         {
             var path = new Queue<string>(dest.Split('/'));   
@@ -61,6 +69,16 @@ namespace VFSBase
         {
             var path = new Queue<string>(source.Split('/'));
             _fileSystem.Root.ExportFile(path, dest);
+        }
+
+        public void Copy(string source, string dest)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void MoveFile(string source, string dest)
+        {
+            throw new System.NotImplementedException();
         }
 
         public void DeleteFile(string file)

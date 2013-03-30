@@ -6,9 +6,11 @@ namespace VFSBase
     {
         Folder Folder(string path);
         void CreateFolder(string path);
-        bool DoesFolderExist(string path);
-        void DeleteFolder(string path);
         void ImportFile(string source, string dest);
-        bool DoesFileExists(string path);
+        void ExportFile(string source, string dest);
+        void Copy(string source, string dest);
+        void Delete(string path);
+        void Move(string source, string dest);
+        bool Exists(string path);
     }
 }

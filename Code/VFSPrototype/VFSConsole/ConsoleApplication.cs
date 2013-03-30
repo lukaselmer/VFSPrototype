@@ -81,13 +81,13 @@ namespace VFSConsole
 
         private void Delete(string parameter)
         {
-            _fileSystemManipulator.DeleteFolder(parameter);
+            _fileSystemManipulator.Delete(parameter);
             _textWriter.WriteLine("Deleted {0}", parameter);
         }
 
         private void Exists(string parameters)
         {
-            var exists = _fileSystemManipulator.DoesFolderExist(parameters);
+            var exists = _fileSystemManipulator.Exists(parameters);
             _textWriter.WriteLine(exists ? "Yes" : "No");
         }
 
@@ -120,7 +120,7 @@ namespace VFSConsole
 
         private void ListDirectory(string parameter)
         {
-            if (!_fileSystemManipulator.DoesFolderExist(parameter))
+            if (!_fileSystemManipulator.Exists(parameter))
             {
                 _textWriter.WriteLine("File or directory does not exist");
                 return;

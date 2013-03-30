@@ -3,9 +3,9 @@
     public class FileSystemOptions
     {
         public readonly string Path;
-        public readonly int Size;
+        public readonly ulong Size;
 
-        public FileSystemOptions(string path, int size)
+        public FileSystemOptions(string path, ulong size)
         {
             Path = path;
             Size = size;
