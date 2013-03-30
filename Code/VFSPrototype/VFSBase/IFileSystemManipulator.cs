@@ -5,6 +5,7 @@ namespace VFSBase
     public interface IFileSystemManipulator
     {
         ISet<Folder> Folders { get; }
+        Folder Folder(string path);
         void CreateFolder(string path);
         bool DoesFolderExist(string path);
         void DeleteFolder(string path);
