@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace VFSBase
 {
-    public class Folder : IComparable
+    public class Folder : IComparable, IIndexNode
     {
         public Folder(string name)
             : this()
@@ -15,15 +15,48 @@ namespace VFSBase
 
         public Folder()
         {
-            Folders = new SortedSet<Folder>();
-            Files = new SortedSet<VFSFile>();
+            IndexNodes = new SortedSet<IIndexNode>();
         }
 
         public string Name { get; private set; }
 
-        public ISet<Folder> Folders { get; set; }
+        public ISet<IIndexNode> IndexNodes { get; set; }
 
-        public ISet<VFSFile> Files { get; private set; } 
+        public ISet<Folder> Folders
+        {
+            get { return new SortedSet<Folder>(IndexNodes.OfType<Folder>()); }
+            set { 
+                var files = Files;
+                IndexNodes.Clear();
+
+                foreach (var folder in value)
+                {
+                    IndexNodes.Add(folder);
+                }
+                foreach (var vfsFile in files)
+                {
+                    IndexNodes.Add(vfsFile);
+                }
+            }
+        }
+        public ISet<VFSFile> Files
+        {
+            get { return new SortedSet<VFSFile>(IndexNodes.OfType<VFSFile>()); }
+            set
+            {
+                var folders = Folders;
+                IndexNodes.Clear();
+
+                foreach (var file in value)
+                {
+                    IndexNodes.Add(file);
+                }
+                foreach (var folder in folders)
+                {
+                    IndexNodes.Add(folder);
+                }
+            }
+        }
 
         public Folder GetFolder(Queue<string> folders)
         {

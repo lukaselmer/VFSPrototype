@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace VFSBase
 {
-    public class VFSFile : IComparable
+    public class VFSFile : IComparable, IIndexNode
     {
         public VFSFile(string name, string source)
             : this (name, File.ReadAllBytes(source))
@@ -21,6 +21,7 @@ namespace VFSBase
         }
 
         public string Name { get; private set; }
+        public ISet<IIndexNode> IndexNodes { get; set; }
         public byte[] Data { get; private set; }
 
         public int CompareTo(object obj)

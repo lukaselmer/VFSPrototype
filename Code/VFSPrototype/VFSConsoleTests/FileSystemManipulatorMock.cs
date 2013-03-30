@@ -12,13 +12,11 @@ namespace VFSConsoleTests
         }
 
         public bool FolderExists = false;
-        public Folder CurrentFolder;
+        public IEnumerable<string> _folders;
 
-        public ISet<Folder> Folders { get; private set; }
-
-        public Folder Folder(string path)
+        public IEnumerable<string> Folders(string path)
         {
-            return CurrentFolder;
+            return _folders;
         }
 
         public void CreateFolder(string path)
