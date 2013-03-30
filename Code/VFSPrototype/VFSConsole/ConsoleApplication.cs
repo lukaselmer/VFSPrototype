@@ -25,11 +25,18 @@ namespace VFSConsole
 
             _commands = new Dictionary<string, Action<string>>
                             {
+                                {"exists", Exists},
+                                {"exit", Exit},
                                 {"help", ShowHelp},
                                 {"ls", ListDirectory},
-                                {"exit", Exit},
                                 {"mkdir", Mkdir},
                             };
+        }
+
+        private void Exists(string parameters)
+        {
+            var exists = _fileSystemManipulator.DoesFolderExist(parameters);
+           _textWriter.WriteLine(exists ? "Yes" : "No"); 
         }
 
         private void Exit(string obj)
