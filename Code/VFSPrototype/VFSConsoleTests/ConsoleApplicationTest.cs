@@ -44,6 +44,8 @@ namespace VFSConsoleTests
                 Assert.AreEqual("help", mocks.FakeOutLine());
                 Assert.AreEqual("ls", mocks.FakeOutLine());
                 Assert.AreEqual("exit", mocks.FakeOutLine());
+                Assert.AreEqual("mkdir", mocks.FakeOutLine());
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
             }
         }
 
@@ -68,6 +70,7 @@ namespace VFSConsoleTests
                 Assert.AreEqual("Bla", mocks.FakeOutLine());
                 Assert.AreEqual("blurb", mocks.FakeOutLine());
                 Assert.AreEqual("xxx", mocks.FakeOutLine());
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
             }
         }
 
@@ -85,6 +88,7 @@ namespace VFSConsoleTests
                 var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
                 c.Run();
                 Assert.AreEqual("> File or directory does not exist", mocks.FakeOutLine(true));
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
             }
         }
 
@@ -99,23 +103,23 @@ namespace VFSConsoleTests
             }
         }
 
-        /*[TestMethod]
+        [TestMethod]
         public void TestMkdir()
         {
+            var fs = FileSystemMock();
+            fs.FolderExists = true;
+
             using (var mocks = new InOutMocks())
             {
-                mocks.FakeInLine("ls test");
-                mocks.FakeInLine("mkdir test");
+                mocks.FakeInLine("mkdir test/blub/bla");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out);
+                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
                 c.Run();
-                Assert.AreEqual("> File or directory does not exist.", mocks.FakeOutLine(true));
-                Assert.AreEqual("help", mocks.FakeOutLine());
-                Assert.AreEqual("ls", mocks.FakeOutLine());
-                Assert.AreEqual("exit", mocks.FakeOutLine());
+                Assert.AreEqual("> Directory test/blub/bla created", mocks.FakeOutLine(true));
+                Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
             }
-        }*/
+        }
 
     }
 }

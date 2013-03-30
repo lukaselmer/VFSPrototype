@@ -23,7 +23,6 @@ namespace VFSConsoleTests
 
         public void CreateFolder(string path)
         {
-
         }
 
         public bool DoesFolderExist(string path)
