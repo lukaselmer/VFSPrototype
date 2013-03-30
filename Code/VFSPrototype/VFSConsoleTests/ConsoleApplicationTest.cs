@@ -180,7 +180,7 @@ namespace VFSConsoleTests
 
                 var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
-                Assert.AreEqual(string.Format("{0}Deleted test/blub/bla", c.Prompt), mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}Deleted /test/blub/bla", c.Prompt), mocks.FakeOutLine(true));
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }

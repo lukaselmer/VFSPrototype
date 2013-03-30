@@ -37,13 +37,39 @@ namespace VFSConsole
                             };
         }
 
+        public void Run()
+        {
+            while (_running)
+            {
+                _textWriter.Write(Prompt);
+                var line = _textReader.ReadLine();
+                ProcessLine(line);
+            }
+            _textWriter.WriteLine("kthxbye");
+            _textReader.ReadLine();
+        }
+
+        private void ProcessLine(string line)
+        {
+            var commandAndArguments = line.Split(new[] { ' ' }, 2);
+            var command = commandAndArguments[0];
+            var arguments = commandAndArguments.Count() > 1 ? commandAndArguments[1] : "";
+
+            var func = _commands.ContainsKey(command) ? _commands[command] : CommandNotFound;
+            func(arguments);
+        }
+
         private void Import(string parameters)
         {
             try
             {
-                var options = ParseParams(parameters, 2);
-                _fileSystemManipulator.ImportFile(options[0], options[1]);
-                _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", options[0], options[1]);
+                var options = ParseMultipleParameters(parameters, 2);
+
+                var source = options[0];
+                var dest = PathFor(options[1]);
+
+                _fileSystemManipulator.ImportFile(source, dest);
+                _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)
             {
@@ -51,7 +77,8 @@ namespace VFSConsole
             }
         }
 
-        private static IList<string> ParseParams(string parameters, int parametersCount)
+        //NOTE: This method has poor performance.
+        private static IList<string> ParseMultipleParameters(string parameters, int parametersCount)
         {
             IList<string> l = new List<string>(parametersCount);
 
@@ -83,13 +110,14 @@ namespace VFSConsole
 
         private void Delete(string parameter)
         {
-            _fileSystemManipulator.Delete(parameter);
-            _textWriter.WriteLine("Deleted {0}", parameter);
+            var path = PathFor(parameter);
+            _fileSystemManipulator.Delete(path);
+            _textWriter.WriteLine("Deleted {0}", path);
         }
 
-        private void Exists(string parameters)
+        private void Exists(string parameter)
         {
-            var exists = _fileSystemManipulator.Exists(parameters);
+            var exists = _fileSystemManipulator.Exists(PathFor(parameter));
             _textWriter.WriteLine(exists ? "Yes" : "No");
         }
 
@@ -98,37 +126,16 @@ namespace VFSConsole
             _running = false;
         }
 
-        public void Run()
-        {
-            while (_running)
-            {
-                _textWriter.Write(Prompt);
-                var line = _textReader.ReadLine();
-                ProcessLine(line);
-            }
-            _textWriter.WriteLine("kthxbye");
-            _textReader.ReadLine();
-        }
-
-        private void ProcessLine(string line)
-        {
-            var commandAndArguments = line.Split(new[] { ' ' }, 2);
-            var command = commandAndArguments[0];
-            var arguments = commandAndArguments.Count() > 1 ? commandAndArguments[1] : "";
-
-            var func = _commands.ContainsKey(command) ? _commands[command] : CommandNotFound;
-            func(arguments);
-        }
-
         private void ListDirectory(string parameter)
         {
-            if (!_fileSystemManipulator.Exists(parameter))
+            var path = PathFor(parameter);
+            if (!_fileSystemManipulator.Exists(path))
             {
                 _textWriter.WriteLine("File or directory does not exist");
                 return;
             }
 
-            var folders = _fileSystemManipulator.Folders(parameter).ToList();
+            var folders = _fileSystemManipulator.Folders(path).ToList();
             _textWriter.WriteLine("Found {0} directories:", folders.Count);
 
             foreach (var folder in folders)
