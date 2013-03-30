@@ -23,7 +23,7 @@ namespace VFSConsoleTests
             {
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine(true));
             }
@@ -38,7 +38,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine("help");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("> Available commands:", mocks.FakeOutLine(true));
                 Assert.AreEqual("delete", mocks.FakeOutLine());
@@ -68,7 +68,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine("ls /");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("> Found 3 directories:", mocks.FakeOutLine(true));
                 Assert.AreEqual("Bla", mocks.FakeOutLine());
@@ -89,7 +89,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine("ls test");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("> File or directory does not exist", mocks.FakeOutLine(true));
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
@@ -103,7 +103,7 @@ namespace VFSConsoleTests
             using (var mocks = new InOutMocks())
             {
                 mocks.FakeInLine("exit", true);
-                new ConsoleApplication(mocks.In, mocks.Out, null);
+                new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), null);
             }
         }
 
@@ -118,7 +118,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine("mkdir test/blub/bla");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("> Directory test/blub/bla created", mocks.FakeOutLine(true));
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
@@ -136,7 +136,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine("exists test/blub/bla");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("> Yes", mocks.FakeOutLine(true));
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
@@ -154,7 +154,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine("exists test/blub/bla");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("> No", mocks.FakeOutLine(true));
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
@@ -172,7 +172,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine("delete test/blub/bla");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual("> Deleted test/blub/bla", mocks.FakeOutLine(true));
                 Assert.AreEqual("> kthxbye", mocks.FakeOutLine());
@@ -191,7 +191,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine(@"import bl""ub");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual(@"> Please provide two parameters. E.g. import ""C:\host system\path"" /to/dest", mocks.FakeOutLine(true));
                 Assert.AreEqual(@"> Please provide two parameters. E.g. import ""C:\host system\path"" /to/dest", mocks.FakeOutLine(true));
@@ -211,7 +211,7 @@ namespace VFSConsoleTests
                 mocks.FakeInLine(@"import ""C:\test folder\xxx"" /bla/xxx");
                 mocks.FakeInLine("exit", true);
 
-                var c = new ConsoleApplication(mocks.In, mocks.Out, fs);
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
                 Assert.AreEqual(@"> Imported ""C:\a"" to ""/bla/a""", mocks.FakeOutLine(true));
                 Assert.AreEqual(@"> Imported ""C:\test folder\xxx"" to ""/bla/xxx""", mocks.FakeOutLine());
