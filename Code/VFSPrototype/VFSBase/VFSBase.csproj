@@ -50,16 +50,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileSystemOptions.cs" />
-    <Compile Include="IFileSystem.cs" />
-    <Compile Include="IFileSystemManipulator.cs" />
-    <Compile Include="IIndexNode.cs" />
-    <Compile Include="VFSFile.cs" />
-    <Compile Include="FileSystem.cs" />
-    <Compile Include="FileSystemManipulator.cs" />
-    <Compile Include="Folder.cs" />
+    <Compile Include="Implementation\FileSystemOptions.cs" />
+    <Compile Include="Interfaces\IFileSystem.cs" />
+    <Compile Include="Interfaces\IFileSystemManipulator.cs" />
+    <Compile Include="Interfaces\IIndexNode.cs" />
+    <Compile Include="Implementation\VFSFile.cs" />
+    <Compile Include="Implementation\FileSystem.cs" />
+    <Compile Include="Implementation\FileSystemManipulator.cs" />
+    <Compile Include="Implementation\Folder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VFSException.cs" />
+    <Compile Include="Implementation\VFSException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using VFSBase.Interfaces;
 
-namespace VFSBase
+namespace VFSBase.Implementation
 {
     public class VFSFile : IComparable, IIndexNode
     {
@@ -14,7 +12,7 @@ namespace VFSBase
         {
         }
 
-        public VFSFile(string name, byte[] data)
+        private VFSFile(string name, byte[] data)
         {
             Name = name;
             Data = data;
