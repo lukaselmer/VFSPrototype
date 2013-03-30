@@ -21,7 +21,7 @@ namespace VFSBase
 
         public string Name { get; private set; }
 
-        public ISet<Folder> Folders { get; private set; }
+        public ISet<Folder> Folders { get; set; }
 
         public ISet<VFSFile> Files { get; private set; } 
 
