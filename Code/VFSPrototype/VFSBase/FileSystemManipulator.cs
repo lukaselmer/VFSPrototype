@@ -35,5 +35,23 @@ namespace VFSBase
             var folders = new Queue<string>(path.Split('/'));
             _fileSystem.Root.DeleteFolder(folders);
         }
+
+
+        public void ImportFile(string source, string dest)
+        {
+            var fileName = dest.Substring(dest.LastIndexOf('/'));
+            var path = dest.Substring(0, dest.LastIndexOf('/'));
+
+            var folders = new Queue<string>(path.Split('/'));   
+            if (!_fileSystem.Root.DoesFolderExist(folders)) 
+                _fileSystem.Root.CreateFolder(folders);
+
+            _fileSystem.Root.ImportFile(source, folders, fileName);
+        }
+
+        public bool FileExists(string path)
+        {
+            return false;
+        }
     }
 }
