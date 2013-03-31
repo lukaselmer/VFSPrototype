@@ -102,19 +102,19 @@ namespace VFSBaseTests
             var file = File.Create(testFileSource);
             file.Close();
 
-            m.ImportFile(testFileSource,   "test.txt");
+            m.ImportFile(testFileSource, "test.txt");
             Assert.IsTrue(m.Exists("test.txt"));
 
             m.CreateFolder("folder");
-            m.ImportFile(testFileSource,   "folder/test.txt");
+            m.ImportFile(testFileSource, "folder/test.txt");
             Assert.IsTrue(m.Exists("folder/test.txt"));
 
-            m.ImportFile(testFileSource,   "this/is/a/test/hello.txt");
+            m.ImportFile(testFileSource, "this/is/a/test/hello.txt");
             Assert.IsTrue(m.Exists("this/is/a/test/hello.txt"));
         }
-        
+
         [TestMethod]
-        [ExpectedException(typeof (FileNotFoundException))]
+        [ExpectedException(typeof(FileNotFoundException))]
         public void TestInvalidImportFile()
         {
             var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
@@ -146,7 +146,7 @@ namespace VFSBaseTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof (FileNotFoundException))]
+        [ExpectedException(typeof(FileNotFoundException))]
         public void TestInvalidExportFile()
         {
             var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
@@ -237,7 +237,7 @@ namespace VFSBaseTests
             m.Move("foo/bar.txt", "ta/da.txt");
             Assert.IsTrue(m.Exists("ta/da.txt"));
             Assert.IsFalse(m.Exists("foo/bar.txt"));
-            
+
         }
     }
 }
