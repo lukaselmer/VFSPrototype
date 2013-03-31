@@ -60,35 +60,53 @@ This document describes the design and implementation of the \emph{Personal Virt
 
 \subsection{File Format}
 
-\emph{
-The design of the file format is related to the Unix File System (UFS) and the New Technology File System (NTFS). The file is partitioned into two sections:
-* the super block
-* the normal blocks
+The design of the file format is related to the Unix File System (UFS) and the New Technology File System (NTFS). The file is partitioned into two sections (reference / citation needed):
+
+\begin{itemize}
+  \item oney super block
+  \item many normal blocks
+\end{itemize}
+
+\subsubsection{Super block}
 
 The super block has a constant size of 1 MB. Altough most of the space is not needed yet, it can be used to save meta information about the file system (e.g. version, date created, block size, compression algorithm,
 file encryption algorithm, seed for file encryption, etc.).
 
-The normal blocks consist of many blocks of a fixed block size. The block size is stored in the file system meta information, which is stored in the super block. The block size is the same for every block and cannot be
-changed after creating the file. Tough it is possible to change the block amount, which is known as growing or shrinking the virtual file.
+\subsubsection{Normal blocks}
+
+The normal blocks consist of many blocks of a fixed block size. The block size is stored in the file system meta information, which is stored in the super block. The block size is the same for every block and cannot be changed after creating the file. Tough it is possible to change the block amount, which is known as growing or shrinking the virtual file.\\
 
 One normal block can be of one of the following types:
-* Index Node
-* Indirect Node
-* File content
 
-The Index Node contains the file type (file or directory, 1 byte) and the name (max. 255 bytes, can contain any character excluding "/") of one object.
+\begin{itemize}
+  \item Index Node
+  \item Indirect Node
+  \item File content
+\end{itemize}
+
+
+The Index Node contains the file type (file or directory, 1 byte) and the name (max. 255 bytes, can contain any character excluding "/") of one object.\\
+
 Iff the file type is file, then there are two possibilities:
-1) Small file content
-The content of the file is very small (block size minus 1 type byte and 255 name bytes) and can be stored in the index node. Then the content of the file is stored in this very Index Node.
-2) Large file content
-The content of the file exceeds the block size (minus the type byte and the name bytes = 256 bytes).
-Each reference to a file content block (description of file content block: see below) is of size 2^(block reference size, n=8, TBD), which allows maximum virtual file sizes of 2^(block reference size, n=8, TBD) * block size + super block size.
-Then the first (n=10, TBD) block references directly refer to file content blocks. This is (n=10, TBD) * (block reference size, n=8, TBD) bytes of size.
-Single inderection: The next "block reference" references to one indirect node, which reference to (block size / (block reference size, n=8, TBD)) oher file content blocks each.
-Double indirection: The next "block reference" references to one inderect node, which reference to (block size / (block reference size, n=8, TBD)) indirect nodes each, which refernce to (block size / (block reference size, n=8, TBD)) other file contents each.
-Triple indirection: The next "block reference" references to one inderect node, which reference to (block size / (block reference size, n=8, TBD)) indirect nodes each, which reference to (block size / (block reference size, n=8, TBD)) indirect nodes each, which refernce to (block size / (block reference size, n=8, TBD)) other file contents each.
-Note: the rest of the file should contain the fibonacci numbers (just kidding)...
-In total, this gives a maximum file size of ((block size / (block reference size, n=8, TBD))^3 + (block size / (block reference size, n=8, TBD))^2 + (block size / (block reference size, n=8, TBD)) + (n=10, TBD)) * block size.
+
+\begin{enumerate}
+  \item Small file content\\
+  The content of the file is very small (block size minus 1 type byte and 255 name bytes) and can be stored in the index node. Then the content of the file is stored in this very Index Node.
+  \item Large file content\\
+The content of the file exceeds the block size (minus the type byte and the name bytes = 256 bytes).\\
+Each reference to a file content block (description of file content block: see below) is of size 2 \^ (block reference size, n=8, TBD), which allows maximum virtual file sizes of 2 \^ (block reference size, n=8, TBD) * block size + super block size.\\
+Then the first (n=10, TBD) block references directly refer to file content blocks. This is (n=10, TBD) * (block reference size, n=8, TBD) bytes of size.\\
+Single inderection: The next "block reference" references to one indirect node, which reference to (block size / (block reference size, n=8, TBD)) oher file content blocks each.\\
+Double indirection: The next "block reference" references to one inderect node, which reference to (block size / (block reference size, n=8, TBD)) indirect nodes each, which refernce to (block size / (block reference size, n=8, TBD)) other file contents each.\\
+Triple indirection: The next "block reference" references to one inderect node, which reference to (block size / (block reference size, n=8, TBD)) indirect nodes each, which reference to (block size / (block reference size, n=8, TBD)) indirect nodes each, which refernce to (block size / (block reference size, n=8, TBD)) other file contents each.\\
+\emph{Note: the rest of the file should contain the fibonacci numbers (just kidding)...}\\
+\end{enumerate}
+
+In total, this gives a maximum file size of\\
+$(block size / (block reference size, n=8, TBD))^{3} +$\\
+$(block size / (block reference size, n=8, TBD))^{2} +$\\
+$(block size / (block reference size, n=8, TBD)) + $\\
+$(n=10, TBD)) * block size$.
 
 Iff the file type is a directory, than the Index Node contains the references to the objects (files or directory). If the amount of directories is smaller or equal to (block size - 256 bytes) / (block reference size, n=8, TBD), 
 then all references are stored in that file. Otherwise, it works like the large files with Indirect Nodes.
@@ -114,7 +132,7 @@ For the filename search, it would be convenient if the file names were stored in
 find a file name in O(log(n)) time instead of O(n). Due to the complexity, this is not implemented (yet).
 
 
-}
+
 
 
 % PART II: VFS Browser
