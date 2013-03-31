@@ -26,7 +26,8 @@ namespace VFSBase.Implementation
         public ISet<Folder> Folders
         {
             get { return new SortedSet<Folder>(IndexNodes.OfType<Folder>()); }
-            set { 
+            set
+            {
                 var files = Files;
                 IndexNodes.Clear();
 
