@@ -2,25 +2,25 @@
 
 namespace VFSConsole
 {
-    public class ConsoleApplicationSettings
+    public class ConsoleApplicationSettings : IConsoleApplicationSettings
     {
-        private readonly TextReader _textReader;
-        private readonly TextWriter _textWriter;
+        private readonly TextReader _reader;
+        private readonly TextWriter _writer;
 
-        public ConsoleApplicationSettings(TextReader textReader, TextWriter textWriter)
+        public ConsoleApplicationSettings(TextReader reader, TextWriter writer)
         {
-            _textReader = textReader;
-            _textWriter = textWriter;
+            _reader = reader;
+            _writer = writer;
         }
 
-        public TextReader TextReader
+        public TextReader Reader
         {
-            get { return _textReader; }
+            get { return _reader; }
         }
 
-        public TextWriter TextWriter
+        public TextWriter Writer
         {
-            get { return _textWriter; }
+            get { return _writer; }
         }
     }
 }

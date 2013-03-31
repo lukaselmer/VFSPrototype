@@ -10,16 +10,21 @@ namespace VFSBase.Implementation
             Location = location;
             DiskSize = diskSize;
 
-            if (File.Exists(Location)) throw new VFSException("File already exists!");
-
-            File.WriteAllText(Location, "");
+            if (File.Exists(Location)) ImportFromFile(location);
+            else File.WriteAllText(Location, "");
 
             Root = new Folder();
         }
 
-        public FileSystem(FileSystemOptions fileSystemOptions) : this(fileSystemOptions.Path, fileSystemOptions.Size)
+        private void ImportFromFile(string location)
         {
-            
+            // TODO: implement this
+        }
+
+        public FileSystem(FileSystemOptions fileSystemOptions)
+            : this(fileSystemOptions.Path, fileSystemOptions.Size)
+        {
+
         }
 
         public ulong DiskSize { get; private set; }

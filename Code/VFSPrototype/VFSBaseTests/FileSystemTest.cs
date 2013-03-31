@@ -33,14 +33,6 @@ namespace VFSBaseTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(VFSException))]
-        public void TestInvalidLocationInConstructor()
-        {
-            File.WriteAllText(DefaultTestfilePath, "");
-            new FileSystem(new FileSystemOptions(DefaultTestfilePath, DefaultSize));
-        }
-
-        [TestMethod]
         public void TestDestroy()
         {
             var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);

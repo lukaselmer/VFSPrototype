@@ -16,14 +16,14 @@ namespace VFSConsole
         private readonly IFileSystemManipulator _fileSystemManipulator;
         private string _currentDirectory = "";
 
-        public ConsoleApplication(ConsoleApplicationSettings consoleApplicationSettings, IFileSystemManipulator fileSystemManipulator)
+        public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemManipulator fileSystemManipulator)
         {
             if (fileSystemManipulator == null) throw new ArgumentNullException("fileSystemManipulator", "fileSystem must not be null.");
 
             _fileSystemManipulator = fileSystemManipulator;
 
-            _textReader = consoleApplicationSettings.TextReader;
-            _textWriter = consoleApplicationSettings.TextWriter;
+            _textReader = consoleApplicationSettings.Reader;
+            _textWriter = consoleApplicationSettings.Writer;
 
             _commands = new Dictionary<string, Action<string>>
                 {

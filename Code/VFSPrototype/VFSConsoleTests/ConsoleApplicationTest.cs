@@ -305,5 +305,13 @@ namespace VFSConsoleTests
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
+
+        [TestMethod]
+        public void TestIOOfConfigFile()
+        {
+            var c = new ConsoleIOConsoleApplicationSettings();
+            Assert.AreSame(c.Reader, Console.In);
+            Assert.AreSame(c.Writer, Console.Out);
+        }
     }
 }
