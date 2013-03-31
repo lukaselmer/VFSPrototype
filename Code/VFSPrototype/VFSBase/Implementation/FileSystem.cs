@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
+using VFSBase.Interfaces;
 
-namespace VFSBase
+namespace VFSBase.Implementation
 {
     public class FileSystem : IFileSystem
     {
@@ -13,16 +10,21 @@ namespace VFSBase
             Location = location;
             DiskSize = diskSize;
 
-            if (File.Exists(Location)) throw new VFSException("File already exists!");
-
-            File.WriteAllText(Location, "");
+            if (File.Exists(Location)) ImportFromFile(location);
+            else File.WriteAllText(Location, "");
 
             Root = new Folder();
         }
 
-        public FileSystem(FileSystemOptions fileSystemOptions) : this(fileSystemOptions.Path, fileSystemOptions.Size)
+        private void ImportFromFile(string location)
         {
-            
+            // TODO: implement this
+        }
+
+        public FileSystem(FileSystemOptions fileSystemOptions)
+            : this(fileSystemOptions.Path, fileSystemOptions.Size)
+        {
+
         }
 
         public ulong DiskSize { get; private set; }
@@ -31,7 +33,7 @@ namespace VFSBase
 
         public string Location { get; private set; }
 
-        public Folder Root { get; private set; }
+        internal Folder Root { get; private set; }
 
         public void Destroy()
         {

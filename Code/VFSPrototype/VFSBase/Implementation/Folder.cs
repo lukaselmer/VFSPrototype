@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VFSBase.Interfaces;
 
-namespace VFSBase
+namespace VFSBase.Implementation
 {
-    public class Folder : IComparable, IIndexNode
+    internal class Folder : IComparable, IIndexNode
     {
         public Folder(string name)
             : this()
@@ -25,7 +26,8 @@ namespace VFSBase
         public ISet<Folder> Folders
         {
             get { return new SortedSet<Folder>(IndexNodes.OfType<Folder>()); }
-            set { 
+            set
+            {
                 var files = Files;
                 IndexNodes.Clear();
 

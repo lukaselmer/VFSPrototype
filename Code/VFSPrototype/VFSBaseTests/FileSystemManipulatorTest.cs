@@ -2,6 +2,8 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase;
+using VFSBase.Implementation;
+using VFSBase.Interfaces;
 
 namespace VFSBaseTests
 {
@@ -19,7 +21,7 @@ namespace VFSBaseTests
             return fileSystem;
         }
 
-        private static FileSystemManipulator InitTestFileSystemManipulator(FileSystem fileSystem)
+        private static IFileSystemManipulator InitTestFileSystemManipulator(FileSystem fileSystem)
         {
             return new FileSystemManipulator(fileSystem);
         }

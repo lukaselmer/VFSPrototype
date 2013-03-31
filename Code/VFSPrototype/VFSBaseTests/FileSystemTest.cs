@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase;
+using VFSBase.Implementation;
 
 namespace VFSBaseTests
 {
@@ -29,14 +30,6 @@ namespace VFSBaseTests
             Assert.AreEqual(DefaultSize, fs.DiskSize);
 
             fs.Destroy();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(VFSException))]
-        public void TestInvalidLocationInConstructor()
-        {
-            File.WriteAllText(DefaultTestfilePath, "");
-            new FileSystem(new FileSystemOptions(DefaultTestfilePath, DefaultSize));
         }
 
         [TestMethod]

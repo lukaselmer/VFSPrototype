@@ -1,4 +1,4 @@
-﻿namespace VFSBase
+﻿namespace VFSBase.Interfaces
 {
     public interface IFileSystem
     {
