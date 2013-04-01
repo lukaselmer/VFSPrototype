@@ -17,7 +17,7 @@ namespace VFSBaseTests
         {
             if (File.Exists(testfilePath)) File.Delete(testfilePath);
             var fileSystemData = new FileSystemOptions(testfilePath, size);
-            //Assert.IsTrue(File.Exists(testfilePath), String.Format("testfile {0} should exist!", testfilePath));
+            Assert.IsFalse(File.Exists(testfilePath), String.Format("testfile {0} should not exist!", testfilePath));
             return fileSystemData;
         }
 
