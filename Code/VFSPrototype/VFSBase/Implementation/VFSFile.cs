@@ -5,10 +5,10 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    internal class VFSFile : IComparable, IIndexNode
+    public class VFSFile : IComparable, IIndexNode
     {
         public VFSFile(string name, string source)
-            : this (name, File.ReadAllBytes(source))
+            : this(name, File.ReadAllBytes(source))
         {
         }
 
@@ -19,6 +19,9 @@ namespace VFSBase.Implementation
         }
 
         public string Name { get; set; }
+
+        public Folder Parent { get; set; }
+
         public IList<IIndexNode> IndexNodes { get; set; }
         public byte[] Data { get; private set; }
 

@@ -34,14 +34,16 @@ namespace VFSBase.Implementation
             return folder.Folders;
         }
 
-        public Folder FindFolder(Folder folder, string folderName)
+        public IIndexNode Find(Folder folder, string name)
         {
-            return Folders(folder).FirstOrDefault(f => f.Name == folderName);
+            return folder.IndexNodes.FirstOrDefault(f => f.Name == name);
         }
 
-        public void CreateFolder(Folder folder)
+        public void CreateFolder(Folder parentFolder, Folder folder)
         {
-            throw new NotImplementedException();
+            parentFolder.IndexNodes.Add(folder);
+            folder.Parent = parentFolder;
+            // TODO: persist
         }
 
         public void Import(string source, Folder dest, string nameOfNewElement)
@@ -61,7 +63,9 @@ namespace VFSBase.Implementation
 
         public void Delete(IIndexNode node)
         {
-            throw new NotImplementedException();
+            node.Parent.IndexNodes.Remove(node);
+            node.Parent = null;
+            // TODO: persist
         }
 
         public void Move(IIndexNode toMove, Folder dest, string nameOfMovedElement)

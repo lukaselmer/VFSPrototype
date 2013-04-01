@@ -59,7 +59,9 @@ namespace VFSBaseTests
         {
             var m = InitTestFileSystemManipulator();
 
+            Assert.IsFalse(m.Exists("test"));
             m.CreateFolder("test");
+            Assert.IsTrue(m.Exists("test"));
             m.Delete("test");
             Assert.IsFalse(m.Exists("test"));
 
