@@ -67,6 +67,7 @@
     <Compile Include="FileSystemManipulatorTest.cs" />
     <Compile Include="PositionCalculatorTest.cs" />
     <Compile Include="BlockParserTest.cs" />
+    <Compile Include="PathParserTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VFSBase\VFSBase.csproj">

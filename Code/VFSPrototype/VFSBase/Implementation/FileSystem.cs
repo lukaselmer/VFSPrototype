@@ -31,7 +31,7 @@ namespace VFSBase.Implementation
 
         public IEnumerable<Folder> Folders(Folder folder)
         {
-            throw new NotImplementedException();
+            return folder.Folders;
         }
 
         public bool IsDirectory(Folder folder)
