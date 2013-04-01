@@ -17,7 +17,7 @@ namespace VFSBase.Implementation
 
         public IList<string> Folders(string path)
         {
-            var node = FindNode(_fileSystem.Root, PathToQueue(path));
+            var node = FindNode(path);
 
             var folder = node as Folder;
             if (folder == null) throw new DirectoryNotFoundException();
@@ -40,7 +40,7 @@ namespace VFSBase.Implementation
 
         public bool IsDirectory(string path)
         {
-            return FindNode(_fileSystem.Root, PathToQueue(path)) as Folder != null;
+            return FindNode((path)) as Folder != null;
         }
 
         public void CreateFolder(string path)
@@ -59,7 +59,7 @@ namespace VFSBase.Implementation
 
         public void Delete(string path)
         {
-            var node = FindNode(_fileSystem.Root, PathToQueue(path));
+            var node = FindNode((path));
 
             if (node == null) throw new NotFoundException();
 
@@ -68,14 +68,14 @@ namespace VFSBase.Implementation
 
         public void Move(string source, string dest)
         {
-            var nodeToMove = FindNode(_fileSystem.Root, PathToQueue(source));
+            var nodeToMove = FindNode((source));
             if (nodeToMove == null) throw new NotFoundException();
 
             if (Exists(dest)) throw new VFSException("Element already exists");
 
             var destParentFolderPath = PathParser.GetParent(dest);
             CreateFolder(destParentFolderPath);
-            var parent = FindNode(_fileSystem.Root, PathToQueue(destParentFolderPath)) as Folder;
+            var parent = FindNode((destParentFolderPath)) as Folder;
 
             _fileSystem.Move(nodeToMove, parent, PathParser.GetNodeName(dest));
         }
@@ -88,7 +88,7 @@ namespace VFSBase.Implementation
             if (folders.Count == 0) return true;
 
             var parent = FindParentFolder(path);
-            if(parent == null) return false;
+            if (parent == null) return false;
 
             return _fileSystem.Exists(parent, PathParser.GetNodeName(path));
         }
@@ -127,8 +127,17 @@ namespace VFSBase.Implementation
 
             if (folders.Count == 0) return _fileSystem.Root;
 
-            return FindNode(_fileSystem.Root, PathToQueue(PathParser.GetParent(path))) as Folder;
+            return FindParentNode(path) as Folder;
         }
 
+        private IIndexNode FindNode(string path)
+        {
+            return FindNode(_fileSystem.Root, PathToQueue(path));
+        }
+
+        private IIndexNode FindParentNode(string path)
+        {
+            return FindNode(_fileSystem.Root, PathToQueue(PathParser.GetParent(path)));
+        }
     }
 }
