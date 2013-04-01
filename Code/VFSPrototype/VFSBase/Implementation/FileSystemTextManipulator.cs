@@ -8,19 +8,20 @@ namespace VFSBase.Implementation
 {
     public class FileSystemTextManipulator : IFileSystemTextManipulator
     {
-        private IFileSystem _fileSystem;
+        private readonly IFileSystem _fileSystem;
 
         public FileSystemTextManipulator(FileSystemOptions options)
         {
             _fileSystem = FileSystemFactory.CreateOrImport(options);
         }
 
-        public IEnumerable<string> Folders (string path)
+        public IList<string> Folders (string path)
         {
-            var folders = new Queue<string>(path.Split('/'));
+            var folders = new Queue<string>(path.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries));
 
-            return _fileSystem.Root.GetFolder(folders).Folders.Select(folder => folder.Name);
-            //return _fileSystemData.Root.GetFolder(folders).Folders.Select(folder => folder.Name);
+            //return _fileSystem.Folders(_fileSystem.Root).Select(folder => folder.Name).ToList();
+
+            return _fileSystem.Root.GetFolder(folders).Folders.Select(folder => folder.Name).ToList();
         }
 
         public bool IsDirectory(string path)
@@ -48,7 +49,7 @@ namespace VFSBase.Implementation
             var last = dest.LastIndexOf('/');
             var folder = last >= 0 ? dest.Substring(0, last) : "";
             var name = last >= 0 ? dest.Substring(last+1) : dest;
-            var destFolders = new Queue<string>(folder.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries));
+            var destFolders = new Queue<string>(folder.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries));
 
             node.Name = name;
             _fileSystem.Root.Insert(destFolders, node);

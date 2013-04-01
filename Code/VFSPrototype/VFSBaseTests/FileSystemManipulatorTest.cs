@@ -48,7 +48,6 @@ namespace VFSBaseTests
             Assert.IsTrue(m.Exists("test/xxx"));
         }
 
-
         [TestMethod]
         public void TestDeleteFolder()
         {
@@ -228,5 +227,90 @@ namespace VFSBaseTests
             Assert.IsFalse(m.Exists("foo/bar.txt"));
 
         }
+
+        [TestMethod]
+        public void TestListRootFolders()
+        {
+            var m = InitTestFileSystemManipulator();
+
+            Assert.AreEqual(0, m.Folders("").Count);
+            Assert.AreEqual(0, m.Folders("/").Count);
+
+            m.CreateFolder("test");
+
+            Assert.AreEqual(1, m.Folders("").Count);
+            Assert.AreEqual(1, m.Folders("/").Count);
+
+            m.CreateFolder("test");
+
+            Assert.AreEqual(1, m.Folders("").Count);
+            Assert.AreEqual(1, m.Folders("/").Count);
+
+            m.CreateFolder("foo");
+
+            Assert.AreEqual(2, m.Folders("").Count);
+            Assert.AreEqual(2, m.Folders("/").Count);
+
+            m.CreateFolder("bar");
+
+            Assert.AreEqual(3, m.Folders("").Count);
+            Assert.AreEqual(3, m.Folders("/").Count);
+
+        }
+
+        [TestMethod]
+        public void TestListDirectoryFolders()
+        {
+            var m = InitTestFileSystemManipulator();
+
+            m.CreateFolder("test");
+
+            Assert.AreEqual(0, m.Folders("test").Count);
+            Assert.AreEqual(0, m.Folders("/test").Count);
+
+            m.CreateFolder("test/foo");
+            Assert.AreEqual(1, m.Folders("test").Count);
+            m.CreateFolder("test/foo");
+            Assert.AreEqual(1, m.Folders("test").Count);
+            m.CreateFolder("test/bar");
+            Assert.AreEqual(2, m.Folders("test").Count);
+            m.CreateFolder("test/xxx");
+            Assert.AreEqual(3, m.Folders("test").Count);
+            m.Delete("test/xxx");
+            Assert.AreEqual(2, m.Folders("test").Count);
+
+            Assert.AreEqual(0, m.Folders("test/foo").Count);
+            m.CreateFolder("test/foo/bar");
+            Assert.AreEqual(1, m.Folders("test/foo").Count);
+            m.CreateFolder("test/foo/bar");
+            Assert.AreEqual(1, m.Folders("test/foo").Count);
+            m.CreateFolder("test/foo/foobar");
+            Assert.AreEqual(2, m.Folders("test/foo").Count);
+            m.CreateFolder("test/foo/xxx");
+            Assert.AreEqual(3, m.Folders("test/foo").Count);
+            m.Delete("test/foo/xxx");
+            Assert.AreEqual(2, m.Folders("test/foo").Count);
+        }
+
+        [TestMethod]
+        public void TestListSubdirectoryFolders()
+        {
+            var m = InitTestFileSystemManipulator();
+
+            m.CreateFolder("test/foo");
+            Assert.AreEqual(0, m.Folders("test/foo").Count);
+            Assert.AreEqual(0, m.Folders("test/foo").Count);
+            m.CreateFolder("test/foo/bar");
+            Assert.AreEqual(1, m.Folders("test/foo").Count);
+            m.CreateFolder("test/foo/bar");
+            Assert.AreEqual(1, m.Folders("test/foo").Count);
+            m.CreateFolder("test/foo/foobar");
+            Assert.AreEqual(2, m.Folders("test/foo").Count);
+            m.CreateFolder("test/foo/xxx");
+            Assert.AreEqual(3, m.Folders("test/foo").Count);
+            m.Delete("test/foo/xxx");
+            Assert.AreEqual(2, m.Folders("test/foo").Count);
+        }
+
     }
 }
