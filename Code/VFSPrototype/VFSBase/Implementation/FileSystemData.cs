@@ -24,8 +24,10 @@ namespace VFSBase.Implementation
         public FileSystemData(FileSystemOptions fileSystemOptions)
             : this(fileSystemOptions.Path, fileSystemOptions.Size)
         {
-
+            FileSystemOptions = fileSystemOptions;
         }
+
+        public FileSystemOptions FileSystemOptions { get; private set; }
 
         public ulong DiskSize { get; private set; }
         public ulong DiskFree { get; private set; }

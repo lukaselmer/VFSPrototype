@@ -11,10 +11,12 @@ namespace VFSBase.Implementation
     class FileSystem : IFileSystem
     {
         private IFileSystemData _fileSystemData;
+        private FileSystemOptions _options;
 
         internal FileSystem(FileSystemOptions options)
         {
-            throw new NotImplementedException();
+            _options = options;
+            Root = new Folder();
         }
 
         public static bool Delete(FileSystem fileSystem)
@@ -71,5 +73,7 @@ namespace VFSBase.Implementation
         {
             throw new NotImplementedException();
         }
+
+        public Folder Root { get; private set; }
     }
 }
