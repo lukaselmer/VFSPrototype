@@ -16,16 +16,16 @@ namespace VFSBase.Implementation
 
         public Folder()
         {
-            IndexNodes = new SortedSet<IIndexNode>();
+            IndexNodes = new List<IIndexNode>();
         }
 
         public string Name { get; set; }
 
-        public ISet<IIndexNode> IndexNodes { get; set; }
+        public IList<IIndexNode> IndexNodes { get; set; }
 
-        public ISet<Folder> Folders
+        public IList<Folder> Folders
         {
-            get { return new SortedSet<Folder>(IndexNodes.OfType<Folder>()); }
+            get { return new List<Folder>(IndexNodes.OfType<Folder>()); }
             set
             {
                 var files = Files;
@@ -41,9 +41,9 @@ namespace VFSBase.Implementation
                 }
             }
         }
-        public ISet<VFSFile> Files
+        public IList<VFSFile> Files
         {
-            get { return new SortedSet<VFSFile>(IndexNodes.OfType<VFSFile>()); }
+            get { return new List<VFSFile>(IndexNodes.OfType<VFSFile>()); }
             set
             {
                 var folders = Folders;
