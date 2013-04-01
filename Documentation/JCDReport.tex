@@ -67,10 +67,31 @@ The design of the file format is related to the Unix File System (UFS) and the N
   \item many normal blocks
 \end{itemize}
 
+\begin{figure}[h!]
+  \framebox(100,20){Super block}
+  \put(0,0){\framebox(290,20){Normal blocks}}
+  \put(0,-20){\framebox(15,20){$b_{1}$}}
+  \put(15,-20){\framebox(15,20){$b_{2}$}}
+  \put(30,-20){\framebox(15,20){$b_{3}$}}
+  \put(45,-20){\framebox(245,20){...}}
+  \put(275,-20){\framebox(15,20){$b_{n}$}}
+  \caption{Partitions of the virtual disk with $n$ normal blocks.}
+\end{figure}
+
+
 \subsubsection{Super block}
 
-The super block has a constant size of 1 MB. Altough most of the space is not needed yet, it can be used to save meta information about the file system (e.g. version, date created, block size, compression algorithm,
-file encryption algorithm, seed for file encryption, etc.).
+The super block has a constant size of 1 MB. Altough most of the space is not needed yet, it can be used to save meta information about the file system:
+\begin{itemize}
+  \item version of the file format
+  \item date created of the virtual disk
+  \item block size
+  \item compression algorithm(s)
+  \item file encryption algorithm(s)
+  \item encrypted key for file encryption
+  \item hashed seed/password for file encryption
+  \item etc.
+\end{itemize}
 
 \subsubsection{Normal blocks}
 
