@@ -361,5 +361,22 @@ namespace VFSBaseTests
             Assert.IsTrue(m.IsDirectory("test/foo"));
             Assert.IsTrue(m.IsDirectory("/test/foo"));
         }
+
+        [TestMethod]
+        public void TestLsDirectoryWithFiles()
+        {
+            var m = InitTestFileSystemManipulator();
+
+            const string testFileSource = "test";
+            if (File.Exists(testFileSource)) File.Delete(testFileSource);
+            File.WriteAllText(testFileSource, "");
+
+            Assert.IsFalse(m.Exists("test"));
+            m.ImportFile(testFileSource, "test");
+            Assert.IsTrue(m.Exists("test"));
+
+            Assert.IsFalse(m.IsDirectory("test"));
+            Assert.IsFalse(m.IsDirectory("/test"));
+        }
     }
 }

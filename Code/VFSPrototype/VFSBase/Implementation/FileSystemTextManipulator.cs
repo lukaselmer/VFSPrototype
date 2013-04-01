@@ -15,7 +15,7 @@ namespace VFSBase.Implementation
             _fileSystem = FileSystemFactory.CreateOrImport(options);
         }
 
-        public IList<string> Folders (string path)
+        public IList<string> Folders(string path)
         {
             var folder = FindFolder(_fileSystem.Root, ParsePath(path));
             return _fileSystem.Folders(folder).Select(f => f.Name).ToList();
@@ -24,10 +24,10 @@ namespace VFSBase.Implementation
         private Folder FindFolder(Folder folder, Queue<string> folders)
         {
             if (!folders.Any()) return folder;
-            
+
             var folderName = folders.Dequeue();
             var subFolder = _fileSystem.Folders(folder).FirstOrDefault(f => f.Name == folderName);
-            
+
             if (subFolder == null) throw new DirectoryNotFoundException();
 
             return FindFolder(subFolder, folders);
@@ -35,9 +35,13 @@ namespace VFSBase.Implementation
 
         public bool IsDirectory(string path)
         {
-            if(!Exists(path)) return false;
-            return true;
-            //return FindFolder()
+            if (!Exists(path)) return false;
+
+            var normalizedPath = PathParser.NormalizePath(path);
+            if (normalizedPath == "") return true;
+
+            var parentDirectory = FindFolder(_fileSystem.Root, ParsePath(PathParser.GetPathDirectory(path)));
+            return parentDirectory.Folders.Any(f => f.Name == PathParser.GetFilename(path));
         }
 
         public void CreateFolder(string path)
@@ -52,14 +56,14 @@ namespace VFSBase.Implementation
             _fileSystem.Root.Delete(folders);
         }
 
-        public void Move (string source, string dest)
+        public void Move(string source, string dest)
         {
             var sourceFolders = ParsePath(source);
             IIndexNode node = _fileSystem.Root.Delete(sourceFolders);
 
             var last = dest.LastIndexOf('/');
             var folder = last >= 0 ? dest.Substring(0, last) : "";
-            var name = last >= 0 ? dest.Substring(last+1) : dest;
+            var name = last >= 0 ? dest.Substring(last + 1) : dest;
             var destFolders = ParsePath(folder);
 
             node.Name = name;
