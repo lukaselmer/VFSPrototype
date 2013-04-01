@@ -35,7 +35,8 @@ namespace VFSBase.Implementation
 
         public bool IsDirectory(string path)
         {
-            return false;
+            if(!Exists(path)) return false;
+            return true;
             //return FindFolder()
         }
 
@@ -74,7 +75,7 @@ namespace VFSBase.Implementation
         public bool Exists(string path)
         {
             var folders = ParsePath(path);
-            return _fileSystem.Root.Exists(folders);
+            return folders.Count == 0 || _fileSystem.Root.Exists(folders);
         }
 
 
