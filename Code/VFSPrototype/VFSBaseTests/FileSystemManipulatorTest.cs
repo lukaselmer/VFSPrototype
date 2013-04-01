@@ -13,10 +13,10 @@ namespace VFSBaseTests
         const string DefaultTestfilePath = "./testfile.vhs";
         private const long DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
 
-        private static FileSystem InitTestFileSystem(string testfilePath, ulong size)
+        private static FileSystemData InitTestFileSystem(string testfilePath, ulong size)
         {
             if (File.Exists(testfilePath)) File.Delete(testfilePath);
-            var fileSystem = new FileSystem(new FileSystemOptions(testfilePath, size));
+            var fileSystem = new FileSystemData(new FileSystemOptions(testfilePath, size));
             Assert.IsTrue(File.Exists(testfilePath), String.Format("testfile {0} should exist!", testfilePath));
             return fileSystem;
         }
@@ -24,11 +24,6 @@ namespace VFSBaseTests
         private static IFileSystemManipulator InitTestFileSystemManipulator()
         {
             return new FileSystemManipulator(InitTestFileSystem(DefaultTestfilePath, DefaultSize));
-        }
-
-        private static IFileSystemManipulator InitTestFileSystemManipulator(FileSystem fileSystem)
-        {
-            return new FileSystemManipulator(fileSystem);
         }
 
         [TestMethod]
