@@ -30,27 +30,17 @@ namespace VFSBase.Implementation
             if (!folders.Any()) return node;
 
             var folder = node as Folder;
-            if(folder == null) throw new NotFoundException();
+            if(folder == null) return null;
 
             var folderName = folders.Dequeue();
             var subFolder = _fileSystem.Find(folder, folderName);
 
-            if (subFolder == null) return null;
-
-            return FindNode(subFolder, folders);
+            return subFolder == null ? null : FindNode(subFolder, folders);
         }
 
         public bool IsDirectory(string path)
         {
             return FindNode(_fileSystem.Root, ParsePath(path)) as Folder != null;
-
-            //if (!Exists(path)) return false;
-
-            //var normalizedPath = PathParser.NormalizePath(path);
-            //if (normalizedPath == "") return true;
-
-            //var parentDirectory = FindNode(_fileSystem.Root, ParsePath(PathParser.GetParent(path)));
-            //return parentDirectory.Folders.Any(f => f.Name == PathParser.GetFilename(path));
         }
 
         public void CreateFolder(string path)
@@ -74,9 +64,6 @@ namespace VFSBase.Implementation
             if (node == null) throw new NotFoundException();
 
             _fileSystem.Delete(node);
-
-            //var folders = ParsePath(path);
-            //_fileSystem.Root.Delete(folders);
         }
 
         public void Move(string source, string dest)
@@ -91,7 +78,6 @@ namespace VFSBase.Implementation
 
             node.Name = name;
             _fileSystem.Root.Insert(destFolders, node);
-
         }
 
         private static Queue<string> ParsePath(string path)
