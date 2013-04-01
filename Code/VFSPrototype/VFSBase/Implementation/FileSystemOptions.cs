@@ -1,4 +1,4 @@
-﻿namespace VFSBase
+﻿namespace VFSBase.Implementation
 {
     public class FileSystemOptions
     {
