@@ -100,8 +100,7 @@ namespace VFSBaseTests
             // Create test file
             const string testFileSource = "test.txt";
             if (File.Exists(testFileSource)) File.Delete(testFileSource);
-            var file = File.Create(testFileSource);
-            file.Close();
+            File.WriteAllText(testFileSource, "");
 
             m.ImportFile(testFileSource, "test.txt");
             Assert.IsTrue(m.Exists("test.txt"));
@@ -135,7 +134,7 @@ namespace VFSBaseTests
             // Create test file
             const string testFileSource = "test.txt";
             if (File.Exists(testFileSource)) File.Delete(testFileSource);
-            using (File.Create(testFileSource)) { }
+            File.WriteAllText(testFileSource, "");
 
             m.ImportFile(testFileSource, "test.txt");
             m.ExportFile("test.txt", "export.txt");
@@ -160,8 +159,7 @@ namespace VFSBaseTests
             // Create test file
             const string testFileSource = "test.txt";
             if (File.Exists(testFileSource)) File.Delete(testFileSource);
-            var file = File.Create(testFileSource);
-            file.Close();
+            File.WriteAllText(testFileSource, "");
 
             m.ImportFile(testFileSource, "test.txt");
             m.Delete("test.txt");
@@ -213,8 +211,7 @@ namespace VFSBaseTests
             // Create test file
             const string testFileSource = "test.txt";
             if (File.Exists(testFileSource)) File.Delete(testFileSource);
-            var file = File.Create(testFileSource);
-            file.Close();
+            File.WriteAllText(testFileSource, "");
 
             m.ImportFile(testFileSource, "you.txt");
             m.Move("you.txt", "me.txt");
@@ -331,24 +328,6 @@ namespace VFSBaseTests
         }
 
         [TestMethod]
-        public void TestIsDirectory()
-        {
-            var m = InitTestFileSystemManipulator();
-
-            Assert.IsTrue(m.IsDirectory(""));
-            Assert.IsTrue(m.IsDirectory("/"));
-            Assert.IsFalse(m.IsDirectory("test"));
-            m.CreateFolder("test");
-            Assert.IsTrue(m.IsDirectory("test"));
-            Assert.IsTrue(m.IsDirectory("/test"));
-
-            Assert.IsFalse(m.IsDirectory("test/foo"));
-            m.CreateFolder("test/foo");
-            Assert.IsTrue(m.IsDirectory("test/foo"));
-            Assert.IsTrue(m.IsDirectory("/test/foo"));
-        }
-
-        [TestMethod]
         public void TestExists()
         {
             var m = InitTestFileSystemManipulator();
@@ -363,6 +342,24 @@ namespace VFSBaseTests
 
             Assert.IsTrue(m.Exists("test"));
             Assert.IsTrue(m.Exists("/test"));
+        }
+
+        [TestMethod]
+        public void TestIsDirectorySimple()
+        {
+            var m = InitTestFileSystemManipulator();
+
+            Assert.IsTrue(m.IsDirectory(""));
+            Assert.IsTrue(m.IsDirectory("/"));
+            Assert.IsFalse(m.IsDirectory("test"));
+            m.CreateFolder("test");
+            Assert.IsTrue(m.IsDirectory("test"));
+            Assert.IsTrue(m.IsDirectory("/test"));
+
+            Assert.IsFalse(m.IsDirectory("test/foo"));
+            m.CreateFolder("test/foo");
+            Assert.IsTrue(m.IsDirectory("test/foo"));
+            Assert.IsTrue(m.IsDirectory("/test/foo"));
         }
     }
 }
