@@ -47,6 +47,11 @@ namespace VFSBaseTests
 
             m.CreateFolder("test/xxx");
             Assert.IsTrue(m.Exists("test/xxx"));
+
+            // TODO: fix this?
+            //m.CreateFolder("/test/foo/zzz");
+            //Assert.AreEqual(4, m.Folders("test/foo").Count);
+            //Assert.IsTrue(m.Folders("test/foo").Contains("zzz"));
         }
 
         [TestMethod]
@@ -325,5 +330,39 @@ namespace VFSBaseTests
             Assert.AreEqual(2, m.Folders("test/foo").Count);
         }
 
+        [TestMethod]
+        public void TestIsDirectory()
+        {
+            var m = InitTestFileSystemManipulator();
+
+            Assert.IsTrue(m.IsDirectory(""));
+            Assert.IsTrue(m.IsDirectory("/"));
+            Assert.IsFalse(m.IsDirectory("test"));
+            m.CreateFolder("test");
+            Assert.IsTrue(m.IsDirectory("test"));
+            Assert.IsTrue(m.IsDirectory("/test"));
+
+            Assert.IsFalse(m.IsDirectory("test/foo"));
+            m.CreateFolder("test/foo");
+            Assert.IsTrue(m.IsDirectory("test/foo"));
+            Assert.IsTrue(m.IsDirectory("/test/foo"));
+        }
+
+        [TestMethod]
+        public void TestExists()
+        {
+            var m = InitTestFileSystemManipulator();
+
+            Assert.IsTrue(m.Exists(""));
+            Assert.IsTrue(m.Exists("/"));
+
+            Assert.IsFalse(m.Exists("test"));
+            Assert.IsFalse(m.Exists("/test"));
+
+            m.CreateFolder("test");
+
+            Assert.IsTrue(m.Exists("test"));
+            Assert.IsTrue(m.Exists("/test"));
+        }
     }
 }
