@@ -33,14 +33,10 @@ namespace VFSBase.Implementation
             return FindFolder(subFolder, folders);
         }
 
-        private Folder FindFolderInFolder(Folder folder, string folderName)
-        {
-            return folder.Folders.FirstOrDefault(f => f.Name == folderName);
-        }
-
         public bool IsDirectory(string path)
         {
-            throw new NotImplementedException();
+            return false;
+            //return FindFolder()
         }
 
         public void CreateFolder(string path)
