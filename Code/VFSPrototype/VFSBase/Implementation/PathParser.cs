@@ -36,7 +36,7 @@ namespace VFSBase.Implementation
             return string.Join(PathSeperatorString, l);
         }
 
-        public static string GetFilename(string path)
+        public static string GetNodeName(string path)
         {
             return NormalizePath(path).Split(PathSeperator).Last();
         }

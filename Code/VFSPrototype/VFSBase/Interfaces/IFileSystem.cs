@@ -13,8 +13,8 @@ namespace VFSBase.Interfaces
         void Export(IIndexNode source, string dest);
         void Copy(IIndexNode toCopy, Folder dest, string nameOfCopiedElement);
         void Delete(IIndexNode node);
-        void Move(IIndexNode toMove, Folder dest, string nameOfMovedElement);
-        bool Exists(Folder folder, string nameOfTheElement);
+        void Move(IIndexNode toMove, Folder dest, string newName);
+        bool Exists(Folder folder, string name);
         Folder Root { get; }
     }
 }
