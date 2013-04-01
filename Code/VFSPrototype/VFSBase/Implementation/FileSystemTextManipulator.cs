@@ -17,43 +17,66 @@ namespace VFSBase.Implementation
 
         public IList<string> Folders(string path)
         {
-            var folder = FindFolder(_fileSystem.Root, ParsePath(path));
+            var node = FindNode(_fileSystem.Root, ParsePath(path));
+
+            var folder = node as Folder;
+            if (folder == null) throw new DirectoryNotFoundException();
+
             return _fileSystem.Folders(folder).Select(f => f.Name).ToList();
         }
 
-        private Folder FindFolder(Folder folder, Queue<string> folders)
+        private IIndexNode FindNode(IIndexNode node, Queue<string> folders)
         {
-            if (!folders.Any()) return folder;
+            if (!folders.Any()) return node;
+
+            var folder = node as Folder;
+            if(folder == null) throw new NotFoundException();
 
             var folderName = folders.Dequeue();
-            var subFolder = _fileSystem.FindFolder(folder, folderName);
+            var subFolder = _fileSystem.Find(folder, folderName);
 
-            if (subFolder == null) throw new DirectoryNotFoundException();
+            if (subFolder == null) return null;
 
-            return FindFolder(subFolder, folders);
+            return FindNode(subFolder, folders);
         }
 
         public bool IsDirectory(string path)
         {
-            if (!Exists(path)) return false;
+            return FindNode(_fileSystem.Root, ParsePath(path)) as Folder != null;
 
-            var normalizedPath = PathParser.NormalizePath(path);
-            if (normalizedPath == "") return true;
+            //if (!Exists(path)) return false;
 
-            var parentDirectory = FindFolder(_fileSystem.Root, ParsePath(PathParser.GetPathDirectory(path)));
-            return parentDirectory.Folders.Any(f => f.Name == PathParser.GetFilename(path));
+            //var normalizedPath = PathParser.NormalizePath(path);
+            //if (normalizedPath == "") return true;
+
+            //var parentDirectory = FindNode(_fileSystem.Root, ParsePath(PathParser.GetParent(path)));
+            //return parentDirectory.Folders.Any(f => f.Name == PathParser.GetFilename(path));
         }
 
         public void CreateFolder(string path)
         {
-            var folders = ParsePath(path);
-            _fileSystem.Root.CreateFolder(folders);
+            if (IsDirectory(path)) return;
+
+            var parentFolderPath = PathParser.GetParent(path);
+            CreateFolder(parentFolderPath);
+
+            var parentFolder = FindNode(_fileSystem.Root, ParsePath(PathParser.GetParent(path))) as Folder;
+
+            if (parentFolder == null) throw new DirectoryNotFoundException();
+
+            _fileSystem.CreateFolder(parentFolder, new Folder(PathParser.GetFilename(path)));
         }
 
         public void Delete(string path)
         {
-            var folders = ParsePath(path);
-            _fileSystem.Root.Delete(folders);
+            var node = FindNode(_fileSystem.Root, ParsePath(path));
+
+            if (node == null) throw new NotFoundException();
+
+            _fileSystem.Delete(node);
+
+            //var folders = ParsePath(path);
+            //_fileSystem.Root.Delete(folders);
         }
 
         public void Move(string source, string dest)
@@ -79,9 +102,9 @@ namespace VFSBase.Implementation
         public bool Exists(string path)
         {
             var folders = ParsePath(path);
-            
+
             var isRoot = folders.Count == 0;
-            
+
             return isRoot || _fileSystem.Root.Exists(folders);
         }
 

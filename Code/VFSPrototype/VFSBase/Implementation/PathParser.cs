@@ -29,7 +29,7 @@ namespace VFSBase.Implementation
             return path;
         }
 
-        public static string GetPathDirectory(string path)
+        public static string GetParent(string path)
         {
             var l = NormalizePath(path).Split(PathSeperator).ToList();
             l.RemoveAt(l.Count - 1);

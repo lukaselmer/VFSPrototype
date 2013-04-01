@@ -6,7 +6,7 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    internal class Folder : IComparable, IIndexNode
+    public class Folder : IComparable, IIndexNode
     {
         public Folder(string name)
             : this()
@@ -20,6 +20,8 @@ namespace VFSBase.Implementation
         }
 
         public string Name { get; set; }
+
+        public Folder Parent { get; set; }
 
         public IList<IIndexNode> IndexNodes { get; set; }
 
@@ -152,6 +154,7 @@ namespace VFSBase.Implementation
             {
                 var file = new VFSFile(path.Dequeue(), source);
                 IndexNodes.Add(file);
+                file.Parent = this;
                 return file;
             }
 
