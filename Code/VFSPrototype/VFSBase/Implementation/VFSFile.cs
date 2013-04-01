@@ -19,7 +19,7 @@ namespace VFSBase.Implementation
         }
 
         public string Name { get; set; }
-        public ISet<IIndexNode> IndexNodes { get; set; }
+        public IList<IIndexNode> IndexNodes { get; set; }
         public byte[] Data { get; private set; }
 
         public int CompareTo(object obj)

@@ -51,6 +51,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Implementation\FileSystem.cs" />
+    <Compile Include="Implementation\FileSystemFactory.cs" />
+    <Compile Include="Interfaces\IFileSystem.cs" />
     <Compile Include="Persistance\BinaryMathUtil.cs" />
     <Compile Include="Implementation\FileSystemOptions.cs" />
     <Compile Include="Implementation\NotFoundException.cs" />
