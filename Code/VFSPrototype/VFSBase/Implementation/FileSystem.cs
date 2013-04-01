@@ -68,14 +68,21 @@ namespace VFSBase.Implementation
             // TODO: persist
         }
 
-        public void Move(IIndexNode toMove, Folder dest, string nameOfMovedElement)
+        public void Move(IIndexNode toMove, Folder dest, string newName)
         {
-            throw new NotImplementedException();
+            toMove.Parent.IndexNodes.Remove(dest);
+            toMove.Parent = dest;
+            toMove.Name = newName;
+
+            toMove.Parent = dest;
+            dest.IndexNodes.Add(toMove);
+
+            // TODO: persist
         }
 
-        public bool Exists(Folder folder, string nameOfTheElement)
+        public bool Exists(Folder folder, string name)
         {
-            throw new NotImplementedException();
+            return folder.IndexNodes.Any(i => i.Name == name);
         }
 
         public Folder Root { get; private set; }
