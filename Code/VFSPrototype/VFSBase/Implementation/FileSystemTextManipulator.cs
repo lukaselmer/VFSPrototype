@@ -96,14 +96,12 @@ namespace VFSBase.Implementation
 
         public void ImportFile(string source, string dest)
         {
-            var path = new Queue<string>(PathParser.NormalizePath(dest).Split(PathParser.PathSeperator));
-            _fileSystem.Root.ImportFile(path, source);
+            _fileSystem.Root.ImportFile(ParsePath(dest), source);
         }
 
         public void ExportFile(string source, string dest)
         {
-            var path = new Queue<string>(PathParser.NormalizePath(source).Split(PathParser.PathSeperator));
-            _fileSystem.Root.ExportFile(path, dest);
+            _fileSystem.Root.ExportFile(ParsePath(source), dest);
         }
 
         public void Copy(string source, string dest)
