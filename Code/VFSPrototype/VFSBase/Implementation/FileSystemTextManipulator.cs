@@ -26,7 +26,7 @@ namespace VFSBase.Implementation
             if (!folders.Any()) return folder;
 
             var folderName = folders.Dequeue();
-            var subFolder = _fileSystem.Folders(folder).FirstOrDefault(f => f.Name == folderName);
+            var subFolder = _fileSystem.FindFolder(folder, folderName);
 
             if (subFolder == null) throw new DirectoryNotFoundException();
 
@@ -59,7 +59,7 @@ namespace VFSBase.Implementation
         public void Move(string source, string dest)
         {
             var sourceFolders = ParsePath(source);
-            IIndexNode node = _fileSystem.Root.Delete(sourceFolders);
+            var node = _fileSystem.Root.Delete(sourceFolders);
 
             var last = dest.LastIndexOf('/');
             var folder = last >= 0 ? dest.Substring(0, last) : "";
@@ -79,7 +79,10 @@ namespace VFSBase.Implementation
         public bool Exists(string path)
         {
             var folders = ParsePath(path);
-            return folders.Count == 0 || _fileSystem.Root.Exists(folders);
+            
+            var isRoot = folders.Count == 0;
+            
+            return isRoot || _fileSystem.Root.Exists(folders);
         }
 
 
