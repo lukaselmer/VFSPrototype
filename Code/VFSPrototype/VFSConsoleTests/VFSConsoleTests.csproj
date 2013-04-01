@@ -62,7 +62,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="FileSystemManipulatorMock.cs" />
+    <Compile Include="FileSystemTextManipulatorMock.cs" />
     <Compile Include="InOutMocks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ConsoleApplicationTest.cs" />

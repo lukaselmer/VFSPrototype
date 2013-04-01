@@ -21,9 +21,9 @@ namespace VFSBaseTests
             return fileSystem;
         }
 
-        private static IFileSystemManipulator InitTestFileSystemManipulator()
+        private static IFileSystemTextManipulator InitTestFileSystemManipulator()
         {
-            return new FileSystemManipulator(InitTestFileSystem(DefaultTestfilePath, DefaultSize));
+            return new FileSystemTextManipulator(InitTestFileSystem(DefaultTestfilePath, DefaultSize));
         }
 
         [TestMethod]

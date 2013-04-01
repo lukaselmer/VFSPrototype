@@ -55,11 +55,11 @@
     <Compile Include="Implementation\FileSystemOptions.cs" />
     <Compile Include="Implementation\NotFoundException.cs" />
     <Compile Include="Interfaces\IFileSystemData.cs" />
-    <Compile Include="Interfaces\IFileSystemManipulator.cs" />
+    <Compile Include="Interfaces\IFileSystemTextManipulator.cs" />
     <Compile Include="Interfaces\IIndexNode.cs" />
     <Compile Include="Implementation\VFSFile.cs" />
     <Compile Include="Implementation\FileSystemData.cs" />
-    <Compile Include="Implementation\FileSystemManipulator.cs" />
+    <Compile Include="Implementation\FileSystemTextManipulator.cs" />
     <Compile Include="Implementation\Folder.cs" />
     <Compile Include="Persistance\BlockParser.cs" />
     <Compile Include="Persistance\PositionCalculator.cs" />

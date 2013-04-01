@@ -10,9 +10,9 @@ namespace VFSConsoleTests
     [TestClass]
     public class ConsoleApplicationTest
     {
-        private static FileSystemManipulatorMock FileSystemMock()
+        private static FileSystemTextManipulatorMock FileSystemMock()
         {
-            return new FileSystemManipulatorMock();
+            return new FileSystemTextManipulatorMock();
         }
 
         [TestMethod]
