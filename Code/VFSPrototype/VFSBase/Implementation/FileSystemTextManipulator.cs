@@ -8,17 +8,19 @@ namespace VFSBase.Implementation
 {
     public class FileSystemTextManipulator : IFileSystemTextManipulator
     {
-        private readonly FileSystemData _fileSystemData;
+        private IFileSystem _fileSystem;
 
-        public FileSystemTextManipulator(FileSystemData fileSystemData)
+        public FileSystemTextManipulator(FileSystemOptions options)
         {
-            _fileSystemData = fileSystemData;
+            _fileSystem = FileSystemFactory.CreateOrImport(options);
         }
 
         public IEnumerable<string> Folders (string path)
         {
             var folders = new Queue<string>(path.Split('/'));
-            return _fileSystemData.Root.GetFolder(folders).Folders.Select(folder => folder.Name);
+
+            return _fileSystem.Root.GetFolder(folders).Folders.Select(folder => folder.Name);
+            //return _fileSystemData.Root.GetFolder(folders).Folders.Select(folder => folder.Name);
         }
 
         public bool IsDirectory(string path)
@@ -29,19 +31,19 @@ namespace VFSBase.Implementation
         public void CreateFolder(string path)
         {
             var folders = new Queue<string>(path.Split('/'));
-            _fileSystemData.Root.CreateFolder(folders);
+            _fileSystem.Root.CreateFolder(folders);
         }
 
         public void Delete(string path)
         {
             var folders = new Queue<string>(path.Split('/'));
-            _fileSystemData.Root.Delete(folders);
+            _fileSystem.Root.Delete(folders);
         }
 
         public void Move (string source, string dest)
         {
             var sourceFolders = new Queue<string>(source.Split('/'));
-            IIndexNode node = _fileSystemData.Root.Delete(sourceFolders);
+            IIndexNode node = _fileSystem.Root.Delete(sourceFolders);
 
             var last = dest.LastIndexOf('/');
             var folder = last >= 0 ? dest.Substring(0, last) : "";
@@ -49,7 +51,7 @@ namespace VFSBase.Implementation
             var destFolders = new Queue<string>(folder.Split(new char[] {'/'}, StringSplitOptions.RemoveEmptyEntries));
 
             node.Name = name;
-            _fileSystemData.Root.Insert(destFolders, node);
+            _fileSystem.Root.Insert(destFolders, node);
 
         }
 
@@ -57,20 +59,20 @@ namespace VFSBase.Implementation
         public bool Exists(string path)
         {
             var folders = new Queue<string>(path.Split('/'));
-            return _fileSystemData.Root.Exists(folders);
+            return _fileSystem.Root.Exists(folders);
         }
 
 
         public void ImportFile(string source, string dest)
         {
-            var path = new Queue<string>(dest.Split('/'));   
-            _fileSystemData.Root.ImportFile(path, source);
+            var path = new Queue<string>(dest.Split('/'));
+            _fileSystem.Root.ImportFile(path, source);
         }
 
         public void ExportFile(string source, string dest)
         {
             var path = new Queue<string>(source.Split('/'));
-            _fileSystemData.Root.ExportFile(path, dest);
+            _fileSystem.Root.ExportFile(path, dest);
         }
 
         public void Copy(string source, string dest)
