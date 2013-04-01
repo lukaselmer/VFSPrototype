@@ -9,7 +9,7 @@ namespace VFSBase.Interfaces
         IEnumerable<Folder> Folders(Folder folder);
         IIndexNode Find(Folder folder, string name);
         void CreateFolder(Folder parentFolder, Folder folder);
-        void Import(string source, Folder dest, string nameOfNewElement);
+        void Import(string source, Folder dest, string name);
         void Export(IIndexNode source, string dest);
         void Copy(IIndexNode toCopy, Folder dest, string nameOfCopiedElement);
         void Delete(IIndexNode node);

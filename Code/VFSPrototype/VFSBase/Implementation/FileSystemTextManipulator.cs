@@ -17,7 +17,7 @@ namespace VFSBase.Implementation
 
         public IList<string> Folders(string path)
         {
-            var node = FindNode(_fileSystem.Root, ParsePath(path));
+            var node = FindNode(_fileSystem.Root, PathToQueue(path));
 
             var folder = node as Folder;
             if (folder == null) throw new DirectoryNotFoundException();
@@ -40,7 +40,7 @@ namespace VFSBase.Implementation
 
         public bool IsDirectory(string path)
         {
-            return FindNode(_fileSystem.Root, ParsePath(path)) as Folder != null;
+            return FindNode(_fileSystem.Root, PathToQueue(path)) as Folder != null;
         }
 
         public void CreateFolder(string path)
@@ -59,7 +59,7 @@ namespace VFSBase.Implementation
 
         public void Delete(string path)
         {
-            var node = FindNode(_fileSystem.Root, ParsePath(path));
+            var node = FindNode(_fileSystem.Root, PathToQueue(path));
 
             if (node == null) throw new NotFoundException();
 
@@ -68,21 +68,21 @@ namespace VFSBase.Implementation
 
         public void Move(string source, string dest)
         {
-            var nodeToMove = FindNode(_fileSystem.Root, ParsePath(source));
+            var nodeToMove = FindNode(_fileSystem.Root, PathToQueue(source));
             if (nodeToMove == null) throw new NotFoundException();
 
             if (Exists(dest)) throw new VFSException("Element already exists");
 
             var destParentFolderPath = PathParser.GetParent(dest);
             CreateFolder(destParentFolderPath);
-            var parent = FindNode(_fileSystem.Root, ParsePath(destParentFolderPath)) as Folder;
+            var parent = FindNode(_fileSystem.Root, PathToQueue(destParentFolderPath)) as Folder;
 
             _fileSystem.Move(nodeToMove, parent, PathParser.GetNodeName(dest));
         }
 
         public bool Exists(string path)
         {
-            var folders = ParsePath(path);
+            var folders = PathToQueue(path);
 
             // the root folder always exists
             if (folders.Count == 0) return true;
@@ -96,12 +96,19 @@ namespace VFSBase.Implementation
 
         public void ImportFile(string source, string dest)
         {
-            _fileSystem.Root.ImportFile(ParsePath(dest), source);
+            var node = CreateParentFolder(dest);
+            _fileSystem.Import(source, node, PathParser.GetNodeName(dest));
+        }
+
+        private Folder CreateParentFolder(string dest)
+        {
+            CreateFolder(PathParser.GetParent(dest));
+            return FindParentFolder(dest);
         }
 
         public void ExportFile(string source, string dest)
         {
-            _fileSystem.Root.ExportFile(ParsePath(source), dest);
+            _fileSystem.Root.ExportFile(PathToQueue(source), dest);
         }
 
         public void Copy(string source, string dest)
@@ -109,18 +116,18 @@ namespace VFSBase.Implementation
             throw new System.NotImplementedException();
         }
 
-        private static Queue<string> ParsePath(string path)
+        private static Queue<string> PathToQueue(string path)
         {
             return new Queue<string>(PathParser.SplitPath(path));
         }
 
         private Folder FindParentFolder(string path)
         {
-            var folders = ParsePath(path);
+            var folders = PathToQueue(path);
 
             if (folders.Count == 0) return _fileSystem.Root;
 
-            return FindNode(_fileSystem.Root, ParsePath(PathParser.GetParent(path))) as Folder;
+            return FindNode(_fileSystem.Root, PathToQueue(PathParser.GetParent(path))) as Folder;
         }
 
     }

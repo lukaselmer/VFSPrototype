@@ -46,9 +46,11 @@ namespace VFSBase.Implementation
             // TODO: persist
         }
 
-        public void Import(string source, Folder dest, string nameOfNewElement)
+        public void Import(string source, Folder dest, string name)
         {
-            throw new NotImplementedException();
+            var file = new VFSFile(name, source);
+            dest.IndexNodes.Add(file);
+            file.Parent = dest;
         }
 
         public void Export(IIndexNode source, string dest)
