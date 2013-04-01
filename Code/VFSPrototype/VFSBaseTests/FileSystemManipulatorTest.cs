@@ -21,6 +21,11 @@ namespace VFSBaseTests
             return fileSystem;
         }
 
+        private static IFileSystemManipulator InitTestFileSystemManipulator()
+        {
+            return new FileSystemManipulator(InitTestFileSystem(DefaultTestfilePath, DefaultSize));
+        }
+
         private static IFileSystemManipulator InitTestFileSystemManipulator(FileSystem fileSystem)
         {
             return new FileSystemManipulator(fileSystem);
@@ -29,8 +34,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestCreateFolder()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             m.CreateFolder("test");
             Assert.IsTrue(m.Exists("test"));
@@ -53,8 +57,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestDeleteFolder()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             m.CreateFolder("test");
             m.Delete("test");
@@ -82,8 +85,7 @@ namespace VFSBaseTests
         [ExpectedException(typeof(NotFoundException))]
         public void TestInvalidDeleteFolder()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             Assert.IsFalse(m.Exists("test"));
             m.Delete("test");
@@ -93,8 +95,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestImportFile()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             // Create test file
             const string testFileSource = "test.txt";
@@ -117,8 +118,7 @@ namespace VFSBaseTests
         [ExpectedException(typeof(FileNotFoundException))]
         public void TestInvalidImportFile()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             // Delete test file
             const string testFileSource = "test.txt";
@@ -130,8 +130,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestExportFile()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             // Create test file
             const string testFileSource = "test.txt";
@@ -149,8 +148,7 @@ namespace VFSBaseTests
         [ExpectedException(typeof(FileNotFoundException))]
         public void TestInvalidExportFile()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             m.ExportFile("test.txt", "export.txt");
         }
@@ -158,8 +156,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestDeleteFile()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             // Create test file
             const string testFileSource = "test.txt";
@@ -180,8 +177,7 @@ namespace VFSBaseTests
         [ExpectedException(typeof(NotFoundException))]
         public void TestInvalidDeleteFile()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             m.Delete("test.txt");
         }
@@ -189,8 +185,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestMoveFolder()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
 
             m.CreateFolder("you");
@@ -214,8 +209,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestMoveFile()
         {
-            var fs = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
-            var m = InitTestFileSystemManipulator(fs);
+            var m = InitTestFileSystemManipulator();
 
             // Create test file
             const string testFileSource = "test.txt";
