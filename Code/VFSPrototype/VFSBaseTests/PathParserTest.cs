@@ -11,7 +11,21 @@ namespace VFSBaseTests
         public void TestNormalizePath()
         {
             Assert.AreEqual("a/b", PathParser.NormalizePath("/a/b"));
-            // TODO: enhance this!
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a/b/"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a////b/"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a/////b/"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a//////b/"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a///////b/"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a////////b/"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a////////b/ //"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a///// ///b/ //"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath(" a///// ///b/ //"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a / //// ///b/ //"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath(" a/b"));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("a/b "));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("//a/b "));
+            Assert.AreEqual("a/b", PathParser.NormalizePath("///   / //  /  a/ b    "));
+            Assert.AreEqual("a/b/c/d", PathParser.NormalizePath("///   / //  /  a/ b   //////c//  // d /// //// /// "));
         }
     }
 }

@@ -6,8 +6,8 @@ namespace VFSBase.Implementation
 {
     public static class PathParser
     {
-        public static char PathSeperator = '/';
-        public static string PathSeperatorString = "/";
+        public const char PathSeperator = '/';
+        public const string PathSeperatorString = "/";
 
         public static string NormalizePath(string path)
         {
