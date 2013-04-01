@@ -130,8 +130,7 @@ namespace VFSBaseTests
             // Create test file
             const string testFileSource = "test.txt";
             if (File.Exists(testFileSource)) File.Delete(testFileSource);
-            var file = File.Create(testFileSource);
-            file.Close();
+            using (File.Create(testFileSource)) { }
 
             m.ImportFile(testFileSource, "test.txt");
             m.ExportFile("test.txt", "export.txt");
