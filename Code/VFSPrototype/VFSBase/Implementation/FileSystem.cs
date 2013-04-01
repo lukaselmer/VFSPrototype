@@ -34,9 +34,9 @@ namespace VFSBase.Implementation
             return folder.Folders;
         }
 
-        public bool IsDirectory(Folder folder)
+        public Folder FindFolder(Folder folder, string folderName)
         {
-            throw new NotImplementedException();
+            return Folders(folder).FirstOrDefault(f => f.Name == folderName);
         }
 
         public void CreateFolder(Folder folder)
