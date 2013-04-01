@@ -14,11 +14,6 @@ namespace VFSBase.Implementation
             _fileSystemData = fileSystemData;
         }
 
-        private ISet<Folder> _folders
-        {
-            get { return _fileSystemData.Root.Folders; }
-        }
-
         public IEnumerable<string> Folders (string path)
         {
             var folders = new Queue<string>(path.Split('/'));
