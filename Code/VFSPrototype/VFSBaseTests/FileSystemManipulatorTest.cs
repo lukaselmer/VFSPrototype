@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase;
 using VFSBase.Implementation;
@@ -240,6 +241,8 @@ namespace VFSBaseTests
 
             Assert.AreEqual(1, m.Folders("").Count);
             Assert.AreEqual(1, m.Folders("/").Count);
+            Assert.IsTrue(m.Folders("").Contains("test"));
+            Assert.IsTrue(m.Folders("/").Contains("test"));
 
             m.CreateFolder("test");
 
@@ -270,6 +273,8 @@ namespace VFSBaseTests
 
             m.CreateFolder("test/foo");
             Assert.AreEqual(1, m.Folders("test").Count);
+            Assert.IsTrue(m.Folders("test").Contains("foo"));
+
             m.CreateFolder("test/foo");
             Assert.AreEqual(1, m.Folders("test").Count);
             m.CreateFolder("test/bar");
@@ -288,8 +293,17 @@ namespace VFSBaseTests
             Assert.AreEqual(2, m.Folders("test/foo").Count);
             m.CreateFolder("test/foo/xxx");
             Assert.AreEqual(3, m.Folders("test/foo").Count);
+
+            Assert.IsTrue(m.Folders("test/foo").Contains("bar"));
+            Assert.IsTrue(m.Folders("test/foo").Contains("foobar"));
+            Assert.IsTrue(m.Folders("test/foo").Contains("xxx"));
+
             m.Delete("test/foo/xxx");
             Assert.AreEqual(2, m.Folders("test/foo").Count);
+
+            Assert.IsTrue(m.Folders("test/foo").Contains("bar"));
+            Assert.IsTrue(m.Folders("test/foo").Contains("foobar"));
+            Assert.IsFalse(m.Folders("test/foo").Contains("xxx"));
         }
 
         [TestMethod]
