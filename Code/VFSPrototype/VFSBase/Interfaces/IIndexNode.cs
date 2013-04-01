@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VFSBase
+namespace VFSBase.Interfaces
 {
     public interface IIndexNode
     {

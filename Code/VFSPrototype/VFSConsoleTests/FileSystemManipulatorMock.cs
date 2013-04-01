@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VFSBase;
+using VFSBase.Interfaces;
 
 namespace VFSConsoleTests
 {

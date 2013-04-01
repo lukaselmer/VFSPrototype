@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace VFSConsoleTests
 {
@@ -32,21 +33,32 @@ namespace VFSConsoleTests
             if (seekToBeginning) _inWriter.BaseStream.Position = 0;
         }
 
-        public void Dispose()
-        {
-            In.Dispose();
-            _inWriter.Dispose();
-            Out.Dispose();
-            _outReader.Dispose();
-            _memoryIn.Dispose();
-            _memoryOut.Dispose();
-        }
-
         public string FakeOutLine(bool seekToBeginning = false)
         {
             Out.Flush();
             if (seekToBeginning) _outReader.BaseStream.Position = 0;
             return _outReader.ReadLine();
+        }
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+
+            // free managed resources
+            if (In != null) In.Dispose();
+            if (Out != null) Out.Dispose();
+            if (_outReader != null) _outReader.Dispose();
+            if (_inWriter != null) _inWriter.Dispose();
+            if (_memoryIn != null) _memoryIn.Dispose();
+            if (_memoryOut != null) _memoryOut.Dispose();
         }
     }
 }
