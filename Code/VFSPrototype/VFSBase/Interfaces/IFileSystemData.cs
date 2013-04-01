@@ -1,6 +1,6 @@
 ﻿namespace VFSBase.Interfaces
 {
-    public interface IFileSystem
+    public interface IFileSystemData
     {
         ulong DiskSize { get; }
         ulong DiskFree { get; }

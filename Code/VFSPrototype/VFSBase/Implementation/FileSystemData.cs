@@ -3,9 +3,9 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    public class FileSystem : IFileSystem
+    public class FileSystemData : IFileSystemData
     {
-        private FileSystem(string location, ulong diskSize)
+        private FileSystemData(string location, ulong diskSize)
         {
             Location = location;
             DiskSize = diskSize;
@@ -21,7 +21,7 @@ namespace VFSBase.Implementation
             // TODO: implement this
         }
 
-        public FileSystem(FileSystemOptions fileSystemOptions)
+        public FileSystemData(FileSystemOptions fileSystemOptions)
             : this(fileSystemOptions.Path, fileSystemOptions.Size)
         {
 
