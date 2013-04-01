@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    public class FileSystemManipulator : IFileSystemManipulator
+    public class FileSystemTextManipulator : IFileSystemTextManipulator
     {
         private readonly FileSystemData _fileSystemData;
 
-        public FileSystemManipulator(FileSystemData fileSystemData)
+        public FileSystemTextManipulator(FileSystemData fileSystemData)
         {
             _fileSystemData = fileSystemData;
         }
@@ -22,7 +23,7 @@ namespace VFSBase.Implementation
 
         public bool IsDirectory(string path)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void CreateFolder(string path)
