@@ -13,17 +13,18 @@ namespace VFSBaseTests
         {
             using (var m = new MemoryStream())
             {
-                var o1 = new FileSystemOptions("", 0);
+                const ulong size = 1001UL;
+                const uint masterBlockSize = 30000U;
 
-                o1.Size = 1001;
-                o1.MasterBlockSize = 30000;
+                var o1 = new FileSystemOptions("", 0) { Size = size, MasterBlockSize = masterBlockSize };
+
                 o1.Serialize(m);
 
                 m.Seek(0, SeekOrigin.Begin);
 
                 var o2 = FileSystemOptions.Deserialize(m);
-                Assert.AreEqual(1001UL, o2.Size);
-                Assert.AreEqual(30000U, o2.MasterBlockSize);
+                Assert.AreEqual(size, o2.Size);
+                Assert.AreEqual(masterBlockSize, o2.MasterBlockSize);
             }
         }
     }
