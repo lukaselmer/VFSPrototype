@@ -25,22 +25,9 @@ namespace VFSBase.Implementation
             return _fileSystem.Folders(folder).Select(f => f.Name).ToList();
         }
 
-        private IIndexNode FindNode(IIndexNode node, Queue<string> folders)
-        {
-            if (!folders.Any()) return node;
-
-            var folder = node as Folder;
-            if (folder == null) return null;
-
-            var folderName = folders.Dequeue();
-            var subFolder = _fileSystem.Find(folder, folderName);
-
-            return subFolder == null ? null : FindNode(subFolder, folders);
-        }
-
         public bool IsDirectory(string path)
         {
-            return FindNode((path)) as Folder != null;
+            return FindNode(path) as Folder != null;
         }
 
         public void CreateFolder(string path)
@@ -59,7 +46,7 @@ namespace VFSBase.Implementation
 
         public void Delete(string path)
         {
-            var node = FindNode((path));
+            var node = FindNode(path);
 
             if (node == null) throw new NotFoundException();
 
@@ -68,14 +55,14 @@ namespace VFSBase.Implementation
 
         public void Move(string source, string dest)
         {
-            var nodeToMove = FindNode((source));
+            var nodeToMove = FindNode(source);
             if (nodeToMove == null) throw new NotFoundException();
 
             if (Exists(dest)) throw new VFSException("Element already exists");
 
             var destParentFolderPath = PathParser.GetParent(dest);
             CreateFolder(destParentFolderPath);
-            var parent = FindNode((destParentFolderPath)) as Folder;
+            var parent = FindNode(destParentFolderPath) as Folder;
 
             _fileSystem.Move(nodeToMove, parent, PathParser.GetNodeName(dest));
         }
@@ -121,6 +108,29 @@ namespace VFSBase.Implementation
             return new Queue<string>(PathParser.SplitPath(path));
         }
 
+        private IIndexNode FindNode(string path)
+        {
+            return FindNode(PathToQueue(path), _fileSystem.Root);
+        }
+
+        private IIndexNode FindParentNode(string path)
+        {
+            return FindNode(PathToQueue(PathParser.GetParent(path)), _fileSystem.Root);
+        }
+
+        private IIndexNode FindNode(Queue<string> folders, IIndexNode node)
+        {
+            if (!folders.Any()) return node;
+
+            var folder = node as Folder;
+            if (folder == null) return null;
+
+            var folderName = folders.Dequeue();
+            var subFolder = _fileSystem.Find(folder, folderName);
+
+            return subFolder == null ? null : FindNode(folders, subFolder);
+        }
+
         private Folder FindParentFolder(string path)
         {
             var folders = PathToQueue(path);
@@ -130,14 +140,5 @@ namespace VFSBase.Implementation
             return FindParentNode(path) as Folder;
         }
 
-        private IIndexNode FindNode(string path)
-        {
-            return FindNode(_fileSystem.Root, PathToQueue(path));
-        }
-
-        private IIndexNode FindParentNode(string path)
-        {
-            return FindNode(_fileSystem.Root, PathToQueue(PathParser.GetParent(path)));
-        }
     }
 }
