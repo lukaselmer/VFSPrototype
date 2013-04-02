@@ -19,25 +19,10 @@ namespace VFSBase.Implementation
             Root = new Folder();
         }
 
-        public static bool Delete(FileSystem fileSystem)
+        /*public static bool Delete(FileSystem fileSystem)
         {
             return false;
-        }
-
-        public IFileSystemData FileSystemData
-        {
-            get { return _fileSystemData; }
-        }
-
-        public IEnumerable<Folder> Folders(Folder folder)
-        {
-            return folder.IndexNodes.OfType<Folder>();
-        }
-
-        public IIndexNode Find(Folder folder, string name)
-        {
-            return folder.IndexNodes.FirstOrDefault(f => f.Name == name);
-        }
+        }*/
 
         public void CreateFolder(Folder parentFolder, Folder folder)
         {
@@ -88,6 +73,21 @@ namespace VFSBase.Implementation
         public bool Exists(Folder folder, string name)
         {
             return folder.IndexNodes.Any(i => i.Name == name);
+        }
+
+        public IFileSystemData FileSystemData
+        {
+            get { return _fileSystemData; }
+        }
+
+        public IEnumerable<Folder> Folders(Folder folder)
+        {
+            return folder.IndexNodes.OfType<Folder>();
+        }
+
+        public IIndexNode Find(Folder folder, string name)
+        {
+            return folder.IndexNodes.FirstOrDefault(f => f.Name == name);
         }
 
         public Folder Root { get; private set; }
