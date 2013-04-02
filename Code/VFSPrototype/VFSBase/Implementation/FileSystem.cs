@@ -55,7 +55,9 @@ namespace VFSBase.Implementation
 
         public void Export(IIndexNode source, string dest)
         {
-            throw new NotImplementedException();
+            var file = source as VFSFile;
+            if (file == null) throw new FileNotFoundException();
+            File.WriteAllBytes(dest, file.Data);
         }
 
         public void Copy(IIndexNode toCopy, Folder dest, string nameOfCopiedElement)

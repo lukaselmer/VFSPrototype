@@ -95,7 +95,7 @@ namespace VFSBase.Implementation
 
         public void ExportFile(string source, string dest)
         {
-            _fileSystem.Root.ExportFile(PathToQueue(source), dest);
+            _fileSystem.Export(FindNode(source), dest);
         }
 
         public void Copy(string source, string dest)
