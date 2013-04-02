@@ -14,7 +14,9 @@ namespace VFSBase.Implementation
 
         private VFSFile(string name, byte[] data)
         {
-            Name = name;
+            Name = PathParser.NormalizeName(name);
+            if (Name.Length <= 0) throw new ArgumentException("Name must not be empty!");
+
             Data = data;
         }
 
