@@ -13,27 +13,57 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemFactoryTest
     {
-        const string DefaultTestfilePath = "./testfile.vhs";
+        const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
+        const string ExampleTestfilePath = "../../../Testfiles/example.vhs";
         private const ulong DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
 
-        private static FileSystemOptions InitTestFileSystem(string testfilePath, ulong size)
+        [TestCleanup]
+        public void RemoveTestfile()
         {
-            if (File.Exists(testfilePath)) File.Delete(testfilePath);
-            var fileSystem = new FileSystemOptions(testfilePath, size);
-            Assert.IsTrue(File.Exists(testfilePath), String.Format("testfile {0} should exist!", testfilePath));
-            return fileSystem;
+            File.Delete(DefaultTestfilePath);
         }
 
         [TestMethod]
-        public void TestCreateOrImport()
+        public void TestCreate()
         {
-            var fileSystemOptions = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
+            if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
+
+            var fileSystemOptions = new FileSystemOptions(DefaultTestfilePath, DefaultSize);
 
             Assert.IsFalse(File.Exists(DefaultTestfilePath));
 
+            // Should call create, because the file does not exist
             var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions);
+            fileSystemOptions = fileSystem.FileSystemOptions;
 
             Assert.IsTrue(File.Exists(DefaultTestfilePath), String.Format("testfile {0} should exist!", DefaultTestfilePath));
+            Assert.IsTrue(File.ReadAllText(DefaultTestfilePath).Length > 0);
+            Assert.AreEqual(DefaultTestfilePath, fileSystemOptions.Location);
+            Assert.AreEqual(DefaultSize, fileSystemOptions.DiskSize);
+
+            FileSystemFactory.Delete(fileSystem);
+
+        }
+
+        [TestMethod]
+        public void TestImport()
+        {
+            if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
+
+            Assert.IsTrue(File.Exists(ExampleTestfilePath), "Example test file must exist!");
+
+            File.Copy(ExampleTestfilePath, DefaultTestfilePath);
+
+            var fileSystemOptions = new FileSystemOptions(DefaultTestfilePath, DefaultSize);
+
+            Assert.IsTrue(File.Exists(DefaultTestfilePath));
+
+            // Should call import, because the file exists
+            var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions);
+            fileSystemOptions = fileSystem.FileSystemOptions;
+
+            Assert.IsTrue(File.Exists(DefaultTestfilePath), String.Format("testfile {0} should exist!", DefaultTestfilePath));
+            Assert.IsTrue(File.ReadAllText(DefaultTestfilePath).Length > 0);
             Assert.AreEqual(DefaultTestfilePath, fileSystemOptions.Location);
             Assert.AreEqual(DefaultSize, fileSystemOptions.DiskSize);
 
@@ -43,11 +73,16 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestDelete()
         {
-            var fileSystemOptions = InitTestFileSystem(DefaultTestfilePath, DefaultSize);
+            if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
+
+            var fileSystemOptions = new FileSystemOptions(DefaultTestfilePath, DefaultSize);
+
+            Assert.IsFalse(File.Exists(DefaultTestfilePath));
+
+            // Should call create, because the file does not exist
+            var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions);
 
             Assert.IsTrue(File.Exists(DefaultTestfilePath));
-
-            var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions);
 
             FileSystemFactory.Delete(fileSystem);
 

@@ -27,6 +27,12 @@ namespace VFSBaseTests
             return new FileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize));
         }
 
+        [TestCleanup]
+        public void RemoveTestfile()
+        {
+            File.Delete(DefaultTestfilePath);
+        }
+        
         [TestMethod]
         public void TestCreateFolder()
         {
