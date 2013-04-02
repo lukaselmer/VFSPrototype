@@ -70,6 +70,7 @@
     <Compile Include="BlockParserTest.cs" />
     <Compile Include="PathParserTest.cs" />
     <Compile Include="FileSystemOptionsTest.cs" />
+    <Compile Include="BinaryMathUtilTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VFSBase\VFSBase.csproj">

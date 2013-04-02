@@ -14,8 +14,7 @@ namespace VFSBaseTests
     public class FileSystemFactoryTest
     {
         const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
-        const string ExampleTestfilePath = "../../../Testfiles/example.vhs";
-        private const ulong DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
+        private const long DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
 
         [TestCleanup]
         public void RemoveTestfile()
@@ -49,11 +48,12 @@ namespace VFSBaseTests
         {
             if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
 
-            Assert.IsTrue(File.Exists(ExampleTestfilePath), "Example test file must exist!");
-
-            File.Copy(ExampleTestfilePath, DefaultTestfilePath);
-
             var fileSystemOptions = new FileSystemOptions(DefaultTestfilePath, DefaultSize);
+
+            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions))
+            {
+                fileSystemOptions = fileSystem.FileSystemOptions;
+            }
 
             Assert.IsTrue(File.Exists(DefaultTestfilePath));
 

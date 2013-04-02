@@ -12,6 +12,7 @@ namespace VFSBase.Persistance
     internal class BlockParser
     {
         private readonly FileSystemOptions _options;
+        private static IDictionary<int, Type> types = new Dictionary<int, Type> { { 1, typeof(Folder) }, { 2, typeof(VFSFile) } };
 
         public BlockParser(FileSystemOptions options)
         {
@@ -20,10 +21,10 @@ namespace VFSBase.Persistance
 
         public IIndexNode ParseBlock(byte[] bb)
         {
-            if (bb.Length != _options.BlockSize || bb[0] == 0) return new EmptyBlock();
+            if (bb.Length != _options.BlockSize || !types.ContainsKey(bb[0])) return EmptyBlock.Get();
 
-            var type = bb[0];
-            
+            var type = types[bb[0]];
+
 
             return null;
         }

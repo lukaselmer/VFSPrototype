@@ -11,7 +11,7 @@ namespace VFSBase.Implementation
     [Serializable]
     public class FileSystemOptions : IFileSystemOptions
     {
-        public FileSystemOptions(string location, ulong diskSize)
+        public FileSystemOptions(string location, long diskSize)
         {
             Location = location;
             DiskSize = diskSize;
@@ -20,7 +20,7 @@ namespace VFSBase.Implementation
 
         public string Location { get; set; }
 
-        public ulong DiskSize { get; set; }
+        public long DiskSize { get; set; }
 
         public uint MasterBlockSize { get; set; }
 
@@ -42,7 +42,7 @@ namespace VFSBase.Implementation
             get { return (int)BinaryMathUtil.KB(4); }
         }
 
-        public ulong DiskFree { get; private set; }
-        public ulong DiskOccupied { get; private set; }
+        public long DiskFree { get; private set; }
+        public long DiskOccupied { get; private set; }
     }
 }

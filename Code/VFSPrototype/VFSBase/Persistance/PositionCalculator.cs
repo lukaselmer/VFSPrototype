@@ -14,12 +14,12 @@
             get { return _settings; }
         }
 
-        public ulong StartBlock
+        public long StartBlock
         {
             get { return Settings.SuperBlockSize; }
         }
 
-        public ulong CalculateBlockStart(ulong position)
+        public long CalculateBlockStart(long position)
         {
             return StartBlock + position * Settings.BlockSize;
         }

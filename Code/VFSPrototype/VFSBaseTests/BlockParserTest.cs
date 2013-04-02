@@ -10,11 +10,40 @@ namespace VFSBaseTests
     public class BlockParserTest
     {
         [TestMethod]
+        public void TestParseEmptyDirectoryBlock()
+        {
+            var options = new FileSystemOptions("", 0);
+            var b = new BlockParser(options);
+            var b1 = new byte[1024];
+            Assert.AreSame(EmptyBlock.Get(), b.ParseBlock(b1));
+
+            var b2 = new byte[options.BlockSize];
+            Assert.AreSame(EmptyBlock.Get(), b.ParseBlock(b2));
+        }
+
+        [TestMethod]
         public void TestParseDirectoryBlock()
         {
-            var b = new BlockParser(new FileSystemOptions("", 0));
-            var bb = new byte[1024];
-            Assert.AreEqual(new EmptyBlock(), b.ParseBlock(bb));
+            var options = new FileSystemOptions("", 0);
+            var b = new BlockParser(options);
+
+            var bb = new byte[options.BlockSize];
+            bb[1] = 1;
+            Assert.IsInstanceOfType(b.ParseBlock(bb), typeof(Folder));
+
+
+        }
+
+        [TestMethod]
+        public void TestParseFileBlock()
+        {
+            var options = new FileSystemOptions("", 0);
+            var b = new BlockParser(options);
+
+            var bb = new byte[options.BlockSize];
+
+            bb[1] = 2;
+            Assert.IsInstanceOfType(b.ParseBlock(bb), typeof(VFSFile));
         }
     }
 }
