@@ -27,10 +27,12 @@ namespace VFSBase.Implementation
         private FileStream _disk;
         private BinaryReader _diskReader;
         private BinaryWriter _diskWriter;
+        private readonly BlockParser _blockParser;
 
         internal FileSystem(FileSystemOptions options)
         {
             _options = options;
+            _blockParser = new BlockParser(_options);
 
             _disk = new FileStream(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, _options.BlockSize, FileOptions.RandomAccess);
             _diskReader = new BinaryReader(_disk);
@@ -55,7 +57,7 @@ namespace VFSBase.Implementation
             // TODO: import root folder
             SeekToBlock(0);
             var b = _diskReader.ReadBytes(_options.BlockSize);
-            BlockParser.ParseBlock(b, _options);
+            _blockParser.ParseBlock(b);
 
             return new RootFolder();
         }

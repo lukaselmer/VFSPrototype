@@ -5,7 +5,7 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    internal class VFSFile : IComparable, IIndexNode
+    internal class VFSFile : IIndexNode
     {
         public VFSFile(string name, string source)
             : this(name, File.ReadAllBytes(source))
@@ -25,12 +25,5 @@ namespace VFSBase.Implementation
         public Folder Parent { get; set; }
 
         public byte[] Data { get; private set; }
-
-        public int CompareTo(object obj)
-        {
-            var node = obj as IIndexNode;
-            if (node == null) return -1;
-            return String.Compare(Name, node.Name, StringComparison.Ordinal);
-        }
     }
 }

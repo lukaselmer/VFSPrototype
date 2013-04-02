@@ -6,7 +6,7 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    internal class Folder : IComparable, IIndexNode
+    internal class Folder : IIndexNode
     {
         public Folder(string name)
             : this()
@@ -25,13 +25,5 @@ namespace VFSBase.Implementation
         public Folder Parent { get; set; }
 
         public IList<IIndexNode> IndexNodes { get; set; }
-
-        public int CompareTo(object obj)
-        {
-            var node = obj as IIndexNode;
-            if (node == null) return -1;
-            return String.Compare(Name, node.Name, StringComparison.Ordinal);
-        }
-
     }
 }
