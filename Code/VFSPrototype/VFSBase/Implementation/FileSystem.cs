@@ -51,6 +51,7 @@ namespace VFSBase.Implementation
             var file = new VFSFile(name, source);
             dest.IndexNodes.Add(file);
             file.Parent = dest;
+            // TODO: persist
         }
 
         public void Export(IIndexNode source, string dest)
