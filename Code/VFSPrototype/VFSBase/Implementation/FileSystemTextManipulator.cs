@@ -133,12 +133,7 @@ namespace VFSBase.Implementation
 
         private Folder FindParentFolder(string path)
         {
-            var folders = PathToQueue(path);
-
-            if (folders.Count == 0) return _fileSystem.Root;
-
             return FindParentNode(path) as Folder;
         }
-
     }
 }
