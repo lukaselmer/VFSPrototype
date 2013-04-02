@@ -10,9 +10,9 @@ namespace VFSConsoleTests
     [TestClass]
     public class ConsoleApplicationTest
     {
-        private static FileSystemManipulatorMock FileSystemMock()
+        private static FileSystemTextManipulatorMock FileSystemMock()
         {
-            return new FileSystemManipulatorMock();
+            return new FileSystemTextManipulatorMock();
         }
 
         [TestMethod]
@@ -59,7 +59,7 @@ namespace VFSConsoleTests
             var fs = FileSystemMock();
             fs.FolderExists = true;
 
-            fs.CurrentFolders = new SortedSet<string> { "Bla", "blurb", "xxx" };
+            fs.CurrentFolders = new List<string> { "Bla", "blurb", "xxx" };
 
             using (var mocks = new InOutMocks())
             {

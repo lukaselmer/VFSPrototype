@@ -2,9 +2,9 @@
 
 namespace VFSBase.Interfaces
 {
-    public interface IFileSystemManipulator
+    public interface IFileSystemTextManipulator
     {
-        IEnumerable<string> Folders(string path);
+        IList<string> Folders(string path);
         bool IsDirectory(string path);
         void CreateFolder(string path);
         void ImportFile(string source, string dest);

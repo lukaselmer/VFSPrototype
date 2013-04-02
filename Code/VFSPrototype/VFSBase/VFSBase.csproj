@@ -51,15 +51,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Implementation\FileSystem.cs" />
+    <Compile Include="Implementation\FileSystemFactory.cs" />
+    <Compile Include="Implementation\PathParser.cs" />
+    <Compile Include="Interfaces\IFileSystem.cs" />
+    <Compile Include="Persistance\BinaryMathUtil.cs" />
     <Compile Include="Implementation\FileSystemOptions.cs" />
     <Compile Include="Implementation\NotFoundException.cs" />
-    <Compile Include="Interfaces\IFileSystem.cs" />
-    <Compile Include="Interfaces\IFileSystemManipulator.cs" />
+    <Compile Include="Interfaces\IFileSystemData.cs" />
+    <Compile Include="Interfaces\IFileSystemTextManipulator.cs" />
     <Compile Include="Interfaces\IIndexNode.cs" />
     <Compile Include="Implementation\VFSFile.cs" />
-    <Compile Include="Implementation\FileSystem.cs" />
-    <Compile Include="Implementation\FileSystemManipulator.cs" />
+    <Compile Include="Implementation\FileSystemData.cs" />
+    <Compile Include="Implementation\FileSystemTextManipulator.cs" />
     <Compile Include="Implementation\Folder.cs" />
+    <Compile Include="Persistance\BlockParser.cs" />
+    <Compile Include="Persistance\PositionCalculator.cs" />
+    <Compile Include="Persistance\PositionCalculatorSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Implementation\VFSException.cs" />
   </ItemGroup>

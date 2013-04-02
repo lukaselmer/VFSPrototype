@@ -5,13 +5,13 @@ using VFSBase.Interfaces;
 
 namespace VFSConsoleTests
 {
-    internal class FileSystemManipulatorMock : IFileSystemManipulator
+    internal class FileSystemTextManipulatorMock : IFileSystemTextManipulator
     {
         public bool FolderExists = false;
-        public IEnumerable<string> CurrentFolders;
+        public IList<string> CurrentFolders;
         public bool IsCurrentDirectory = false;
 
-        public IEnumerable<string> Folders(string path)
+        public IList<string> Folders(string path)
         {
             return CurrentFolders;
         }

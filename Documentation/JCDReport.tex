@@ -6,6 +6,7 @@
 %\usepackage{graphicx}
 %\usepackage{xcolor}
 %\usepackage{hyperref}
+\usepackage{amsmath}
 
 
 % TODO: Add your group name
@@ -128,18 +129,18 @@ Each reference to a file content block (description of file content block: see b
 \end{enumerate}
 \end{enumerate}
 
-In total, this gives a maximum file size of\\
-$(block\_size / block\_reference\_size)^{3} +$\\
-$(block\_size / block\_reference\_size)^{2} +$\\
-$(block\_size / block\_reference\_size) + $\\
-$(n=10, TBD)) * block\_size$.\\
+TODO: add reference to formulas\\
 
 Iff (if and only if) the file type is a directory, then the Index Node contains the references to the objects (files or directory). If the amount of directories is smaller or equal to (block\_size - 256 bytes) / block\_reference\_size, 
 then all references are stored in that file. Otherwise, it works like the large files with Indirect Nodes.
 
-\paragraph{The block size} ~\\
+\paragraph{The Block Size} ~\\
 
 \noindent Because of the type and the name ($ = 1\ byte + 255\ bytes$), the block size must be larger than 256 bytes. In general, there is no good block size tough. If very many small files are stored and the block size is chosen  large (e.g. 32 KB), then there are huge losses because of the internal fragmentation (the rest of the block is unused). If the files are very large, the overhead to manage the data is huge, especially if the block size is very small (e.g. 512 bytes). So if rather few large files are stored in the VFS, the block size should be large, and if many small files are stored, the block size should be small. A good compromise is a block size of 2-8 KB (further literature/ links / reasoning / calculations / proofs required for these statements).
+
+\paragraph{The Block Reference Size} ~\\
+
+\noindent The block reference size determines, how many blocks can be addressed. There are $2^{block\_reference\_size}$ blocks that can be addressed.
 
 \subsection{Block Allocation}
 
@@ -176,7 +177,25 @@ To grow the disk, additional blocks are added at the end of the disk. Additional
 However, shrinking is more difficult, because the last block could be occupied, even if the disk is not full. Therefore, the last blocks have to be moved to free blocks, and the reference to this block has to be adjusted. This is very complex to implement efficiently and is therefore not implemented in this project (yet).\\
 Additionally, the normal block amount is decreased in the super block.
 
+\subsection{Formulas and Pseudocode}
+
+\begin{equation}
+\begin{split}
+maximal\_file\_size =
+  \bigg(\cfrac{block\ size}{block\ reference\ size}\bigg)^3 +\\
+  \bigg(\cfrac{block\ size}{block\ reference\ size}\bigg)^2 +\\
+  \bigg(\cfrac{block\ size}{block\ reference\ size}\bigg) +\\
+  (n=10, TBD)) * block\ size.
+\end{split}
+\end{equation}
+
+\begin{equation}
+maximal\ amount\ of\ blocks = 2^{block\ reference\ size}
+\end{equation}
+
 \subsection{Fault tolerance}
+
+No fault tolerance (e.g. on power loss) is implemented (yet). For this, journaling could be implemented.
 
 
 % PART II: VFS Browser
