@@ -6,6 +6,5 @@
         ulong DiskFree { get; }
         ulong DiskOccupied { get; }
         string Location { get; }
-        void Destroy();
     }
 }
