@@ -13,7 +13,7 @@ namespace VFSBaseTests
         {
             using (var m = new MemoryStream())
             {
-                const ulong size = 1001UL;
+                const long size = 1001L;
                 const uint masterBlockSize = 30000U;
 
                 var o1 = new FileSystemOptions("", 0) { DiskSize = size, MasterBlockSize = masterBlockSize };

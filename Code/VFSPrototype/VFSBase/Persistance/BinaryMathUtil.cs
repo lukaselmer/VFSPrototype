@@ -2,24 +2,19 @@
 {
     internal class BinaryMathUtil
     {
-        public static ulong MB(int i)
+        public static long MB(int i)
         {
             return KB(1) * KB(1) * Power2(i);
         }
 
-        public static ulong KB(int i)
+        public static long KB(int i)
         {
             return Power2(10);
         }
 
-        public static ulong Power2(int exponent)
+        public static long Power2(int exponent)
         {
-            const ulong b = 2;
-            ulong res = 1;
-            // Slow variant, could be done in O(log(n)), this is O(n)
-            for (var i = 0; i < exponent; i++) res *= b;
-
-            return res;
+            return 1L << exponent;
         }
     }
 }

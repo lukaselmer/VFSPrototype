@@ -3,10 +3,10 @@
     internal interface IFileSystemOptions
     {
         string Location { get; set; }
-        ulong DiskSize { get; set; }
+        long DiskSize { get; set; }
         uint MasterBlockSize { get; set; }
         int BlockSize { get; }
-        ulong DiskFree { get; }
-        ulong DiskOccupied { get; }
+        long DiskFree { get; }
+        long DiskOccupied { get; }
     }
 }
