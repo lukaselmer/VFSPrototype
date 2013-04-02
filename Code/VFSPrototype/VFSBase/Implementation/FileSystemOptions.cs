@@ -2,12 +2,13 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using VFSBase.Interfaces;
 using VFSBase.Persistance;
 
 namespace VFSBase.Implementation
 {
     [Serializable]
-    public class FileSystemOptions
+    public class FileSystemOptions : IFileSystemOptions
     {
         public FileSystemOptions(string location, ulong diskSize)
         {

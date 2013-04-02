@@ -53,12 +53,12 @@
   <ItemGroup>
     <Compile Include="Implementation\FileSystem.cs" />
     <Compile Include="Implementation\FileSystemFactory.cs" />
+    <Compile Include="Interfaces\IFileSystemOptions.cs" />
     <Compile Include="Implementation\PathParser.cs" />
     <Compile Include="Interfaces\IFileSystem.cs" />
     <Compile Include="Persistance\BinaryMathUtil.cs" />
     <Compile Include="Implementation\FileSystemOptions.cs" />
-    <Compile Include="Implementation\NotFoundException.cs" />
-    <Compile Include="Interfaces\IFileSystemData.cs" />
+    <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Interfaces\IFileSystemTextManipulator.cs" />
     <Compile Include="Interfaces\IIndexNode.cs" />
     <Compile Include="Implementation\VFSFile.cs" />
@@ -68,7 +68,7 @@
     <Compile Include="Persistance\PositionCalculator.cs" />
     <Compile Include="Persistance\PositionCalculatorSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Implementation\VFSException.cs" />
+    <Compile Include="Exceptions\VFSException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -4,10 +4,10 @@ using System.Linq;
 
 namespace VFSBase.Implementation
 {
-    public static class PathParser
+    internal static class PathParser
     {
-        public const char PathSeperator = '/';
-        public const string PathSeperatorString = "/";
+        private const char PathSeperator = '/';
+        private const string PathSeperatorString = "/";
 
         public static string NormalizePath(string path)
         {

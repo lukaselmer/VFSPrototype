@@ -1,6 +1,6 @@
 ﻿namespace VFSBase.Persistance
 {
-    public class PositionCalculator
+    internal class PositionCalculator
     {
         private readonly PositionCalculatorSettings _settings;
 

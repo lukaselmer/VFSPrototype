@@ -19,7 +19,7 @@ namespace VFSBase.Implementation
     //writer.Write(DiskSize);
     //writer.Write(MasterBlockSize);
 
-    sealed class FileSystem : IFileSystem
+    internal class FileSystem : IFileSystem
     {
         private readonly FileSystemOptions _options;
         private bool _disposed;
