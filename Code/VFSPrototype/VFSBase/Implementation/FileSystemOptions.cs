@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using VFSBase.Interfaces;
 using VFSBase.Persistance;
+using VFSBase.Persistance.Blocks;
 
 namespace VFSBase.Implementation
 {
@@ -43,6 +44,5 @@ namespace VFSBase.Implementation
 
         public ulong DiskFree { get; private set; }
         public ulong DiskOccupied { get; private set; }
-
     }
 }

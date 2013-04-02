@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Implementation;
 using VFSBase.Persistance;
+using VFSBase.Persistance.Blocks;
 
 namespace VFSBaseTests
 {
@@ -10,9 +12,9 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseDirectoryBlock()
         {
-            var b = new BlockParser();
+            var b = new BlockParser(new FileSystemOptions("", 0));
             var bb = new byte[1024];
-            b.ParseBlock(bb);
+            Assert.AreEqual(new EmptyBlock(), b.ParseBlock(bb));
         }
     }
 }
