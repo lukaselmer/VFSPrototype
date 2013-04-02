@@ -22,14 +22,13 @@ namespace VFSBase.Implementation
 
         public Folder Parent { get; set; }
 
-        public IList<IIndexNode> IndexNodes { get; set; }
         public byte[] Data { get; private set; }
 
         public int CompareTo(object obj)
         {
-            var file = obj as VFSFile;
-            if (file == null) return -1;
-            return String.Compare(Name, file.Name, StringComparison.Ordinal);
+            var node = obj as IIndexNode;
+            if (node == null) return -1;
+            return String.Compare(Name, node.Name, StringComparison.Ordinal);
         }
     }
 }
