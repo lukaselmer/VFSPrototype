@@ -29,19 +29,16 @@ namespace VFSBase.Implementation
         {
             _options = options;
 
-            _disk = new FileStream(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, _options.BlockSize);
+            _disk = new FileStream(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, _options.BlockSize, FileOptions.RandomAccess);
 
-            //_disk = File.Open(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
-            //File.
-
-            //InitializeFileSystem();
+            InitializeFileSystem();
 
             Root = ImportRootFolder();
         }
 
         private void InitializeFileSystem()
         {
-            //_disk.Seek()
+            _disk.Seek(_options.MasterBlockSize, SeekOrigin.Begin);
         }
 
 
@@ -160,7 +157,8 @@ namespace VFSBase.Implementation
 
             // free managed resources
             if (_disk == null) return;
-            
+
+            _disk.Flush(true);
             _disk.Dispose();
             _disk = null;
         }
