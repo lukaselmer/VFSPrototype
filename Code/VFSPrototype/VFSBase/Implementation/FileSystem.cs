@@ -27,7 +27,7 @@ namespace VFSBase.Implementation
         internal FileSystem(FileSystemOptions options)
         {
             _options = options;
-            Root = new Folder();
+            Root = new RootFolder();
         }
 
         public void CreateFolder(Folder parentFolder, Folder folder)

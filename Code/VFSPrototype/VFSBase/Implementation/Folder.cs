@@ -14,7 +14,7 @@ namespace VFSBase.Implementation
             Name = name;
         }
 
-        public Folder()
+        protected Folder()
         {
             IndexNodes = new List<IIndexNode>();
         }
