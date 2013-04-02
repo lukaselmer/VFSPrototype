@@ -7,7 +7,7 @@
             return KB(1) * KB(1) * Power2(i);
         }
 
-        private static ulong KB(int i)
+        public static ulong KB(int i)
         {
             return Power2(10);
         }

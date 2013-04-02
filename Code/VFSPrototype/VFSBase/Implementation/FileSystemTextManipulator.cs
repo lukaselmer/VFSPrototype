@@ -8,7 +8,7 @@ namespace VFSBase.Implementation
 {
     public class FileSystemTextManipulator : IFileSystemTextManipulator
     {
-        private readonly IFileSystem _fileSystem;
+        private IFileSystem _fileSystem;
 
         public FileSystemTextManipulator(FileSystemOptions options)
         {
@@ -134,6 +134,28 @@ namespace VFSBase.Implementation
         private Folder FindParentFolder(string path)
         {
             return FindParentNode(path) as Folder;
+        }
+
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            // If you need thread safety, use a lock around these  
+            // operations, as well as in your methods that use the resource.
+
+            if (!disposing) return;
+
+            // free managed resources
+            if (_fileSystem == null) return;
+
+            _fileSystem.Dispose();
+            _fileSystem = null;
         }
     }
 }

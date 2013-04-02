@@ -17,20 +17,22 @@ namespace VFSBase.Implementation
             return new FileSystem(options);
         }
 
-        private static FileSystem Import(FileSystemOptions options)
+        private static FileSystem Import(IFileSystemOptions options)
         {
             if (!File.Exists(options.Location)) throw new VFSException("File does not exist");
 
+            FileSystemOptions newOptions;
+
             using (var file = File.Open(options.Location, FileMode.Open, FileAccess.ReadWrite))
             {
-                var newOptions = FileSystemOptions.Deserialize(file);
+                newOptions = FileSystemOptions.Deserialize(file);
                 newOptions.Location = options.Location;
 
                 file.Seek(0, SeekOrigin.Begin);
                 newOptions.Serialize(file);
-
-                return new FileSystem(newOptions);
             }
+
+            return new FileSystem(newOptions);
         }
 
         public static IFileSystem CreateOrImport(FileSystemOptions options)
