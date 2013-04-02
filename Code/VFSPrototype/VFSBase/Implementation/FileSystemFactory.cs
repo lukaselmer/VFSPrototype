@@ -17,7 +17,7 @@ namespace VFSBase.Implementation
 
             using (var file = File.OpenRead(options.Path))
             {
-                options.Deserialize(file);
+                options = FileSystemOptions.Deserialize(file);
             }
 
             return new FileSystem(options);
