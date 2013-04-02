@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VFSBase.Implementation;
 
 namespace VFSBase.Interfaces
 {
-    internal interface IFileSystem
+    public interface IFileSystem : IDisposable
     {
-        IFileSystemData FileSystemData { get; }
+        FileSystemOptions FileSystemOptions { get; }
         IEnumerable<Folder> Folders(Folder folder);
         IIndexNode Find(Folder folder, string name);
         void CreateFolder(Folder parentFolder, Folder folder);

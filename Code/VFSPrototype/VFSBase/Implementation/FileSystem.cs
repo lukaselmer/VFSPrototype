@@ -10,8 +10,7 @@ namespace VFSBase.Implementation
 {
     class FileSystem : IFileSystem
     {
-        private IFileSystemData _fileSystemData;
-        private FileSystemOptions _options;
+        private readonly FileSystemOptions _options;
 
         internal FileSystem(FileSystemOptions options)
         {
@@ -26,6 +25,9 @@ namespace VFSBase.Implementation
 
         public void CreateFolder(Folder parentFolder, Folder folder)
         {
+           // if (_disposed)
+           //     throw new ObjectDisposedException("Resource was disposed.");
+
             parentFolder.IndexNodes.Add(folder);
             folder.Parent = parentFolder;
             // TODO: persist
@@ -75,9 +77,9 @@ namespace VFSBase.Implementation
             return folder.IndexNodes.Any(i => i.Name == name);
         }
 
-        public IFileSystemData FileSystemData
+        public FileSystemOptions FileSystemOptions
         {
-            get { return _fileSystemData; }
+            get { return _options; }
         }
 
         public IEnumerable<Folder> Folders(Folder folder)
@@ -91,5 +93,28 @@ namespace VFSBase.Implementation
         }
 
         public Folder Root { get; private set; }
+        public void Dispose()
+        {
+            //Dispose(true);
+           // GC.SuppressFinalize(this);    
+        }
+        /*protected void Dispose(bool disposing)
+        {
+            // If you need thread safety, use a lock around these  
+            // operations, as well as in your methods that use the resource. 
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    if (_resource != null)
+                        _resource.Dispose();
+                    Console.WriteLine("Object disposed.");
+                }
+
+                // Indicate that the instance has been disposed.
+                _resource = null;
+                _disposed = true;
+            }
+        }*/
     }
 }
