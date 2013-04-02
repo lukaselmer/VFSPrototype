@@ -31,7 +31,7 @@ namespace VFSBase.Implementation
 
         public IEnumerable<Folder> Folders(Folder folder)
         {
-            return folder.Folders;
+            return folder.IndexNodes.OfType<Folder>();
         }
 
         public IIndexNode Find(Folder folder, string name)
