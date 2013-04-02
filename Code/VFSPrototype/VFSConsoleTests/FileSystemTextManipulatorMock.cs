@@ -50,5 +50,9 @@ namespace VFSConsoleTests
             return FolderExists;
         }
 
+        public void Dispose()
+        {
+            
+        }
     }
 }

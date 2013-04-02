@@ -36,6 +36,11 @@ namespace VFSBase.Implementation
         }
 
 
+        public int BlockSize
+        {
+            get { return (int)BinaryMathUtil.KB(4); }
+        }
+
         public ulong DiskFree { get; private set; }
         public ulong DiskOccupied { get; private set; }
 

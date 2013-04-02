@@ -23,16 +23,56 @@ namespace VFSBase.Implementation
     {
         private readonly FileSystemOptions _options;
         private bool _disposed;
+        private FileStream _disk;
 
         internal FileSystem(FileSystemOptions options)
         {
             _options = options;
-            Root = new RootFolder();
+
+            _disk = new FileStream(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, _options.BlockSize);
+
+            //_disk = File.Open(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+            //File.
+
+            //InitializeFileSystem();
+
+            Root = ImportRootFolder();
         }
+
+        private void InitializeFileSystem()
+        {
+            //_disk.Seek()
+        }
+
+
+        private Folder ImportRootFolder()
+        {
+            // TODO: import root folder
+            return new RootFolder();
+        }
+
+        public IEnumerable<Folder> Folders(Folder folder)
+        {
+            CheckDisposed();
+
+            return folder.IndexNodes.OfType<Folder>();
+        }
+
+        public IIndexNode Find(Folder folder, string name)
+        {
+            CheckDisposed();
+
+            return folder.IndexNodes.FirstOrDefault(f => f.Name == name);
+        }
+
+        public Folder Root { get; private set; }
+
 
         public void CreateFolder(Folder parentFolder, Folder folder)
         {
             CheckDisposed();
+
+            if (Exists(parentFolder, folder.Name)) throw new ArgumentException("Folder already exists!");
 
             parentFolder.IndexNodes.Add(folder);
             folder.Parent = parentFolder;
@@ -74,13 +114,15 @@ namespace VFSBase.Implementation
             // TODO: persist
         }
 
-        public void Move(IIndexNode toMove, Folder dest, string newName)
+        public void Move(IIndexNode toMove, Folder dest, string name)
         {
             CheckDisposed();
 
+            if (Exists(dest, name)) throw new ArgumentException("Folder already exists!");
+
             toMove.Parent.IndexNodes.Remove(dest);
             toMove.Parent = dest;
-            toMove.Name = newName;
+            toMove.Name = name;
 
             toMove.Parent = dest;
             dest.IndexNodes.Add(toMove);
@@ -100,23 +142,6 @@ namespace VFSBase.Implementation
             get { return _options; }
         }
 
-        public IEnumerable<Folder> Folders(Folder folder)
-        {
-            CheckDisposed();
-
-            return folder.IndexNodes.OfType<Folder>();
-        }
-
-        public IIndexNode Find(Folder folder, string name)
-        {
-            CheckDisposed();
-
-            return folder.IndexNodes.FirstOrDefault(f => f.Name == name);
-        }
-
-        public Folder Root { get; private set; }
-
-
         public void Dispose()
         {
             Dispose(true);
@@ -124,7 +149,7 @@ namespace VFSBase.Implementation
 
         }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             // If you need thread safety, use a lock around these  
             // operations, as well as in your methods that use the resource.
@@ -133,8 +158,11 @@ namespace VFSBase.Implementation
 
             _disposed = true;
 
-            // TODO: free managed resources
-
+            // free managed resources
+            if (_disk == null) return;
+            
+            _disk.Dispose();
+            _disk = null;
         }
 
         private void CheckDisposed()
