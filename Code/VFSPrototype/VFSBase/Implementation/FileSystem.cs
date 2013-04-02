@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VFSBase.Interfaces;
+using VFSBase.Persistance;
 
 namespace VFSBase.Implementation
 {
@@ -24,27 +25,38 @@ namespace VFSBase.Implementation
         private readonly FileSystemOptions _options;
         private bool _disposed;
         private FileStream _disk;
+        private BinaryReader _diskReader;
+        private BinaryWriter _diskWriter;
 
         internal FileSystem(FileSystemOptions options)
         {
             _options = options;
 
             _disk = new FileStream(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, _options.BlockSize, FileOptions.RandomAccess);
+            _diskReader = new BinaryReader(_disk);
+            _diskWriter = new BinaryWriter(_disk);
 
             InitializeFileSystem();
-
-            Root = ImportRootFolder();
         }
 
         private void InitializeFileSystem()
         {
-            _disk.Seek(_options.MasterBlockSize, SeekOrigin.Begin);
+            Root = ImportRootFolder();
+        }
+
+        private void SeekToBlock(long blockNumber)
+        {
+            _disk.Seek(_options.MasterBlockSize + (blockNumber * _options.BlockSize), SeekOrigin.Begin);
         }
 
 
         private Folder ImportRootFolder()
         {
             // TODO: import root folder
+            SeekToBlock(0);
+            var b = _diskReader.ReadBytes(_options.BlockSize);
+            BlockParser.ParseBlock(b, _options);
+
             return new RootFolder();
         }
 
@@ -156,11 +168,25 @@ namespace VFSBase.Implementation
             _disposed = true;
 
             // free managed resources
-            if (_disk == null) return;
 
-            _disk.Flush(true);
-            _disk.Dispose();
-            _disk = null;
+            if (_disk != null)
+            {
+                _disk.Flush(true);
+                _disk.Dispose();
+                _disk = null;
+            }
+
+            if (_diskReader != null)
+            {
+                _diskReader.Dispose();
+                _diskReader = null;
+            }
+
+            if (_diskWriter != null)
+            {
+                _diskWriter.Dispose();
+                _diskWriter = null;
+            }
         }
 
         private void CheckDisposed()
