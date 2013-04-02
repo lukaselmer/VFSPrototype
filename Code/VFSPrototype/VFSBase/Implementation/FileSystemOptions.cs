@@ -43,5 +43,12 @@ namespace VFSBase.Implementation
             //writer.Write(MasterBlockSize);
         }
 
+
+        public ulong DiskSize { get; private set; }
+        public ulong DiskFree { get; private set; }
+        public ulong DiskOccupied { get; private set; }
+
+        public string Location { get; private set; }
+
     }
 }

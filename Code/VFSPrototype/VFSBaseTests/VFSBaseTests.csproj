@@ -62,8 +62,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="FileSystemFactoryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FileSystemTest.cs" />
     <Compile Include="FileSystemManipulatorTest.cs" />
     <Compile Include="PositionCalculatorTest.cs" />
     <Compile Include="BlockParserTest.cs" />

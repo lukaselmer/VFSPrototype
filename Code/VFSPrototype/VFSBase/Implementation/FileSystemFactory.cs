@@ -3,7 +3,7 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    internal static class FileSystemFactory
+    public static class FileSystemFactory
     {
         private static FileSystem Create(FileSystemOptions options)
         {
@@ -26,6 +26,12 @@ namespace VFSBase.Implementation
         public static IFileSystem CreateOrImport(FileSystemOptions options)
         {
             return File.Exists(options.Path) ? Import(options) : Create(options);
+        }
+
+        public static void Delete(IFileSystem fileSystem)
+        {
+            fileSystem.Dispose();
+            File.Delete(fileSystem.FileSystemOptions.Path);
         }
     }
 }
