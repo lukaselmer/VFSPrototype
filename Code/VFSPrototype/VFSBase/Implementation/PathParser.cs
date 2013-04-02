@@ -9,6 +9,11 @@ namespace VFSBase.Implementation
         private const char PathSeperator = '/';
         private const string PathSeperatorString = "/";
 
+        public static string NormalizeName(string path)
+        {
+            return NormalizePath(path.Replace(PathSeperatorString, ""));
+        }
+
         public static string NormalizePath(string path)
         {
             var doublePathSeperator = string.Format("{0}{0}", PathSeperatorString);

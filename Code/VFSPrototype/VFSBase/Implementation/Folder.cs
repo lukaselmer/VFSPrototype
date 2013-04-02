@@ -11,7 +11,8 @@ namespace VFSBase.Implementation
         public Folder(string name)
             : this()
         {
-            Name = name;
+            Name = PathParser.NormalizeName(name);
+            if (Name.Length <= 0) throw new ArgumentException("Name must not be empty!");
         }
 
         protected Folder()
