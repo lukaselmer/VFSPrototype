@@ -6,7 +6,7 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    public class Folder : IComparable, IIndexNode
+    internal class Folder : IComparable, IIndexNode
     {
         public Folder(string name)
             : this()

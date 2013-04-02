@@ -1,6 +1,6 @@
 ﻿namespace VFSBase.Persistance
 {
-    public class BinaryMathUtil
+    internal class BinaryMathUtil
     {
         public static ulong MB(int i)
         {

@@ -4,7 +4,7 @@ using VFSBase.Implementation;
 
 namespace VFSBase.Interfaces
 {
-    public interface IFileSystem : IDisposable
+    internal interface IFileSystem : IDisposable
     {
         FileSystemOptions FileSystemOptions { get; }
         IEnumerable<Folder> Folders(Folder folder);

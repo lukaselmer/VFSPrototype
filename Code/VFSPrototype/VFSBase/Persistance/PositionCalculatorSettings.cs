@@ -1,6 +1,6 @@
 ﻿namespace VFSBase.Persistance
 {
-    public struct PositionCalculatorSettings
+    internal struct PositionCalculatorSettings
     {
         public ulong SuperBlockSize { get; private set; }
         public ulong BlockSize { get; private set; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VFSBase.Persistance
 {
-    public class BlockParser
+    internal class BlockParser
     {
         public void ParseBlock(byte[] bb)
         {
