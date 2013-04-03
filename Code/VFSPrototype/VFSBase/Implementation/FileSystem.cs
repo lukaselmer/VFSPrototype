@@ -54,10 +54,10 @@ namespace VFSBase.Implementation
 
         private Folder ImportRootFolder()
         {
-            // TODO: import root folder
+            // TODO: import root file
             SeekToBlock(0);
             var b = _diskReader.ReadBytes(_options.BlockSize);
-            _blockParser.ParseBlock(b);
+            _blockParser.BytesToNode(b);
 
             return new RootFolder();
         }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using VFSBase.Implementation;
@@ -21,7 +23,7 @@ namespace VFSBase.Persistance
             _options = options;
         }
 
-        public IIndexNode ParseBlock(byte[] bb)
+        public IIndexNode BytesToNode(byte[] bb)
         {
             if (bb.Length != _options.BlockSize) return EmptyBlock.Get();
 
@@ -61,8 +63,32 @@ namespace VFSBase.Persistance
 
         private static string BytesToString(byte[] nameBytes)
         {
-            return Encoding.UTF8.GetString(nameBytes);
+            return new string(Encoding.UTF8.GetString(nameBytes).TakeWhile(c => c != '\0').ToArray());
         }
 
+        public byte[] NodeToBytes(Folder folder)
+        {
+            var bb = new byte[_options.BlockSize];
+            bb[0] = FolderType;
+            WriteNameToBuffer(ref bb, folder.Name);
+            //TODO: do some more things...
+            return bb;
+        }
+
+        public byte[] NodeToBytes(VFSFile file)
+        {
+            var bb = new byte[_options.BlockSize];
+            bb[0] = FileType;
+            WriteNameToBuffer(ref bb, file.Name);
+            //TODO: do some more things...
+            return bb;
+        }
+
+        private void WriteNameToBuffer(ref byte[] bb, string name)
+        {
+            var nameBytes = StringToBytes(name);
+            if (nameBytes.Length > _options.NameLength) throw new VFSException("Name is too long");
+            nameBytes.CopyTo(bb, 1);
+        }
     }
 }
