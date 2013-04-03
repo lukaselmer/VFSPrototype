@@ -77,6 +77,8 @@ namespace VFSBase.Implementation
 
             AddFromIndirectNode(ReadIndirectNode(folder.IndirectNodeNumber), l, 2);
 
+            l.ForEach(f => f.Parent = folder);
+
             return l.OfType<Folder>();
         }
 
@@ -95,6 +97,9 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
 
+            // TODO: implement this with persistence
+            // return Folders(folder).FirstOrDefault(f => f.Name == name);
+
             return folder.IndexNodes.FirstOrDefault(f => f.Name == name);
         }
 
@@ -108,14 +113,15 @@ namespace VFSBase.Implementation
             if (Exists(parentFolder, folder.Name)) throw new ArgumentException("Folder already exists!");
 
 
-            // remove this... (as soon as the other methods read from the persistent file)
+
+            // TODO: remove this... (as soon as the other methods read from the persistent file are implemented)
             parentFolder.IndexNodes.Add(folder);
-            folder.Parent = parentFolder;
             // until here
 
 
 
-            // Persistence from here on...
+            folder.Parent = parentFolder;
+
             var blockToStoreNewFolder = _nextFreeBlock++;
 
             var newFolderBytes = _blockParser.NodeToBytes(folder);
@@ -126,6 +132,8 @@ namespace VFSBase.Implementation
 
         public void Import(string source, Folder dest, string name)
         {
+            //TODO: implement this, with persistence
+
             CheckDisposed();
             CheckName(name);
 
@@ -137,6 +145,8 @@ namespace VFSBase.Implementation
 
         public void Export(IIndexNode source, string dest)
         {
+            //TODO: implement this, with persistence
+
             CheckDisposed();
 
             var file = source as VFSFile;
@@ -146,6 +156,8 @@ namespace VFSBase.Implementation
 
         public void Copy(IIndexNode toCopy, Folder dest, string name)
         {
+            //TODO: implement this, with persistence
+
             CheckDisposed();
             CheckName(name);
 
@@ -156,13 +168,38 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
 
-            node.Parent.IndexNodes.Remove(node);
-            node.Parent = null;
-            // TODO: persist
+            node.Parent.BlocksCount--;
+            if (node.Parent.BlocksCount == 0)
+            {
+                node.Parent.IndirectNodeNumber = 0;
+                Persist(node.Parent);
+                return;
+            }
+
+            WriteBlock(node.Parent.BlockNumber, _blockParser.NodeToBytes(node.Parent));
+
+            var blocksCount = node.Parent.BlocksCount;
+            var refsCount = _options.ReferencesPerIndirectNode;
+
+            var indexIndirection2 = (int)(blocksCount / (refsCount * refsCount));
+            var indexIndirection1 = (int)((blocksCount - (indexIndirection2 * refsCount * refsCount)) / refsCount);
+            var indexIndirection0 = (int)(blocksCount - (indexIndirection2 * refsCount * refsCount) - (refsCount * indexIndirection1));
+
+            var indirectNode3 = ReadIndirectNode(node.Parent.IndirectNodeNumber);
+            var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection2]);
+            var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection1]);
+
+            var refToMove = indirectNode1.BlockNumbers[indexIndirection1];
+
+            indirectNode1.BlockNumbers[indexIndirection0] = 0;
+            Persist(indirectNode1);
+
+            ReplaceInIndirectNode(indirectNode3, node.BlockNumber, refToMove, 2);
         }
 
         public void Move(IIndexNode toMove, Folder dest, string name)
         {
+            //TODO: implement this, with persistence
             CheckDisposed();
             CheckName(name);
 
@@ -181,8 +218,27 @@ namespace VFSBase.Implementation
         public bool Exists(Folder folder, string name)
         {
             CheckDisposed();
+            return Folders(folder).Any(i => i.Name == name);
+        }
 
-            return folder.IndexNodes.Any(i => i.Name == name);
+        private void ReplaceInIndirectNode(IndirectNode indirectNode, long toBeReplaced, long toReplace, int recursion)
+        {
+            for (var i = 0; i < indirectNode.BlockNumbers.Length; i++)
+            {
+                var blockNumber = indirectNode.BlockNumbers[i];
+                if (blockNumber == 0) return;
+
+                if (recursion == 0)
+                {
+                    if (blockNumber == toBeReplaced)
+                    {
+                        indirectNode.BlockNumbers[i] = toReplace;
+                        Persist(indirectNode);
+                        return;
+                    }
+                }
+                else ReplaceInIndirectNode(ReadIndirectNode(blockNumber), toBeReplaced, toReplace, recursion - 1);
+            }
         }
 
         private void AppendBlockReference(Folder parentFolder, long reference)
@@ -196,29 +252,29 @@ namespace VFSBase.Implementation
             var blocksCount = parentFolder.BlocksCount;
             var refsCount = _options.ReferencesPerIndirectNode;
 
-            var indexIndirection3 = (int)(blocksCount / (refsCount * refsCount));
-            var indexIndirection2 = (int)((blocksCount - (indexIndirection3 * refsCount * refsCount)) / refsCount);
-            var indexIndirection1 = (int)(blocksCount - (indexIndirection3 * refsCount * refsCount) - (refsCount * indexIndirection2));
+            var indexIndirection2 = (int)(blocksCount / (refsCount * refsCount));
+            var indexIndirection1 = (int)((blocksCount - (indexIndirection2 * refsCount * refsCount)) / refsCount);
+            var indexIndirection0 = (int)(blocksCount - (indexIndirection2 * refsCount * refsCount) - (refsCount * indexIndirection1));
 
             parentFolder.BlocksCount += 1;
             Persist(parentFolder);
 
             var indirectNode3 = ReadIndirectNode(parentFolder.IndirectNodeNumber);
-            if (indirectNode3.BlockNumbers[indexIndirection3] == 0)
+            if (indirectNode3.BlockNumbers[indexIndirection2] == 0)
             {
-                indirectNode3.BlockNumbers[indexIndirection3] = CreateIndirectNode().BlockNumber;
+                indirectNode3.BlockNumbers[indexIndirection2] = CreateIndirectNode().BlockNumber;
                 Persist(indirectNode3);
             }
 
-            var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection3]);
-            if (indirectNode2.BlockNumbers[indexIndirection2] == 0)
+            var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection2]);
+            if (indirectNode2.BlockNumbers[indexIndirection1] == 0)
             {
-                indirectNode2.BlockNumbers[indexIndirection2] = CreateIndirectNode().BlockNumber;
+                indirectNode2.BlockNumbers[indexIndirection1] = CreateIndirectNode().BlockNumber;
                 Persist(indirectNode2);
             }
 
-            var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection2]);
-            indirectNode1.BlockNumbers[indexIndirection1] = reference;
+            var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection1]);
+            indirectNode1.BlockNumbers[indexIndirection0] = reference;
             Persist(indirectNode1);
         }
 
@@ -236,7 +292,6 @@ namespace VFSBase.Implementation
             node.BlockNumber = indirectNodeNumber;
             return node;
         }
-
 
         private void WriteBlock(long blockNumber, byte[] block)
         {
