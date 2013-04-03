@@ -197,7 +197,6 @@ namespace VFSBase.Implementation
 
         public void Move(IIndexNode toMove, Folder dest, string name)
         {
-            //TODO: implement this, with persistence
             CheckDisposed();
             CheckName(name);
 
