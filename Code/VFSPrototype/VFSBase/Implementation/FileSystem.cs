@@ -56,7 +56,6 @@ namespace VFSBase.Implementation
             _disk.Seek(_options.MasterBlockSize + (blockNumber * _options.BlockSize), SeekOrigin.Begin);
         }
 
-
         private Folder ImportRootFolder()
         {
             var folder = _blockParser.ParseFolder(ReadBlock(0));
@@ -73,7 +72,23 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
 
-            return folder.IndexNodes.OfType<Folder>();
+            var l = new List<IIndexNode>((int)folder.BlocksCount);
+            if (folder.IndirectNodeNumber == 0) return l.OfType<Folder>();
+
+            AddFromIndirectNode(ReadIndirectNode(folder.IndirectNodeNumber), l, 2);
+
+            return l.OfType<Folder>();
+        }
+
+        private void AddFromIndirectNode(IndirectNode indirectNode, List<IIndexNode> l, int recursion)
+        {
+            foreach (var blockNumber in indirectNode.BlockNumbers)
+            {
+                if (blockNumber == 0) return;
+
+                if (recursion == 0) l.Add(_blockParser.BytesToNode(ReadBlock(blockNumber)));
+                else AddFromIndirectNode(ReadIndirectNode(blockNumber), l, recursion - 1);
+            }
         }
 
         public IIndexNode Find(Folder folder, string name)
@@ -92,19 +107,19 @@ namespace VFSBase.Implementation
 
             if (Exists(parentFolder, folder.Name)) throw new ArgumentException("Folder already exists!");
 
+
             // remove this... (as soon as the other methods read from the persistent file)
             parentFolder.IndexNodes.Add(folder);
+            folder.Parent = parentFolder;
             // until here
 
-            folder.Parent = parentFolder;
 
 
             // Persistence from here on...
             var blockToStoreNewFolder = _nextFreeBlock++;
 
-            SeekToBlock(blockToStoreNewFolder);
             var newFolderBytes = _blockParser.NodeToBytes(folder);
-            _diskWriter.Write(newFolderBytes);
+            WriteBlock(blockToStoreNewFolder, newFolderBytes);
 
             AppendBlockReference(parentFolder, blockToStoreNewFolder);
         }
@@ -183,7 +198,7 @@ namespace VFSBase.Implementation
 
             var indexIndirection3 = (int)(blocksCount / (refsCount * refsCount));
             var indexIndirection2 = (int)((blocksCount - (indexIndirection3 * refsCount * refsCount)) / refsCount);
-            var indexIndirection1 = (int)((blocksCount - (indexIndirection3 * refsCount * refsCount) - (refsCount * indexIndirection2)) / refsCount);
+            var indexIndirection1 = (int)(blocksCount - (indexIndirection3 * refsCount * refsCount) - (refsCount * indexIndirection2));
 
             parentFolder.BlocksCount += 1;
             Persist(parentFolder);
@@ -217,7 +232,9 @@ namespace VFSBase.Implementation
 
         private IndirectNode ReadIndirectNode(long indirectNodeNumber)
         {
-            return _blockParser.ParseIndirectNode(ReadBlock(indirectNodeNumber));
+            var node = _blockParser.ParseIndirectNode(ReadBlock(indirectNodeNumber));
+            node.BlockNumber = indirectNodeNumber;
+            return node;
         }
 
 
@@ -236,18 +253,13 @@ namespace VFSBase.Implementation
 
         private void Persist(Folder folder)
         {
-            SeekToBlock(folder.BlockNumber);
-            var parentFolderBytes = _blockParser.NodeToBytes(folder);
-            _diskWriter.Write(parentFolderBytes);
+            WriteBlock(folder.BlockNumber, _blockParser.NodeToBytes(folder));
         }
 
         private void Persist(IndirectNode indirectNode)
         {
-            SeekToBlock(indirectNode.BlockNumber);
-            var indirectNodeBytes = _blockParser.NodeToBytes(indirectNode);
-            _diskWriter.Write(indirectNodeBytes);
+            WriteBlock(indirectNode.BlockNumber, _blockParser.NodeToBytes(indirectNode));
         }
-
 
         public void Dispose()
         {
