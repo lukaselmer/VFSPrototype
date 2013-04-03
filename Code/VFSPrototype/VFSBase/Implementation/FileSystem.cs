@@ -203,25 +203,12 @@ namespace VFSBase.Implementation
 
             if (Exists(dest, name)) throw new ArgumentException("Folder already exists!");
 
-            var sourceFolder = toMove.Parent;
-
             var blockNumber = toMove.BlockNumber;
             Delete(toMove);
             AppendBlockReference(dest, blockNumber);
 
             toMove.Name = name;
             Persist(toMove);
-
-            //RemoveNode(sourceFolder, toMove);
-
-            /*toMove.Parent.IndexNodes.Remove(dest);
-            toMove.Parent = dest;
-            toMove.Name = name;
-
-            toMove.Parent = dest;
-            dest.IndexNodes.Add(toMove);*/
-
-            // TODO: persist
         }
 
         public bool Exists(Folder folder, string name)
