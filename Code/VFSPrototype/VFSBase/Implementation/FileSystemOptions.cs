@@ -15,7 +15,7 @@ namespace VFSBase.Implementation
         {
             Location = location;
             DiskSize = diskSize;
-            MasterBlockSize = (uint)BinaryMathUtil.MB(1);
+            MasterBlockSize = (uint)BinaryMathUtil.KB(1);
             NameLength = 255;
             BlockReferenceSize = 64;
         }

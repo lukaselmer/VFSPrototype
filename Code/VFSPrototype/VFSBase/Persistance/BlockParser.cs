@@ -42,10 +42,11 @@ namespace VFSBase.Persistance
 
             var name = ExtractName(bb);
 
-
-
-            // TODO: parse contents
-            return new Folder(name);
+            return new Folder(name)
+                        {
+                            BlocksCount = BitConverter.ToInt64(bb, _options.NameLength + 1),
+                            IndirectNodeNumber = BitConverter.ToInt64(bb, sizeof(long) + _options.NameLength + 1)
+                        };
         }
 
         public VFSFile ParseFile(byte[] bb)
