@@ -31,6 +31,7 @@ namespace VFSBase.Implementation
 
         public Folder Parent { get; set; }
 
+        // TODO: remove this... (as soon as the other methods read from the persistent file are implemented)
         public IList<IIndexNode> IndexNodes { get; set; }
 
         public long IndirectNodeNumber { get; set; }
