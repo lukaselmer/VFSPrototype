@@ -92,9 +92,14 @@ namespace VFSBase.Implementation
 
             if (Exists(parentFolder, folder.Name)) throw new ArgumentException("Folder already exists!");
 
+            // remove this... (as soon as the other methods read from the persistent file)
             parentFolder.IndexNodes.Add(folder);
+            // until here
+
             folder.Parent = parentFolder;
 
+
+            // Persistence from here on...
             var blockToStoreNewFolder = _nextFreeBlock++;
 
             SeekToBlock(blockToStoreNewFolder);
