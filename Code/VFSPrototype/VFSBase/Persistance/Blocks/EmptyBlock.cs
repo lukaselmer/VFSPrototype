@@ -19,5 +19,11 @@ namespace VFSBase.Persistance.Blocks
         private EmptyBlock() { }
         public string Name { get { return ""; } set { } }
         public Folder Parent { get { return null; } set { } }
+
+        public long BlockNumber
+        {
+            get { throw new NotFoundException(); }
+            set { throw new NotFoundException(); }
+        }
     }
 }

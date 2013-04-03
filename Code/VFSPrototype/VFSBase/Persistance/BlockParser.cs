@@ -29,30 +29,51 @@ namespace VFSBase.Persistance
 
             var typeByte = bb[0];
 
-            if (typeByte == FolderType) return ParseDirectory(bb);
+            if (typeByte == FolderType) return ParseFolder(bb);
 
             if (typeByte == FileType) return ParseFile(bb);
 
             return EmptyBlock.Get();
         }
 
-        private Folder ParseDirectory(byte[] bb)
+        public Folder ParseFolder(byte[] bb)
         {
+            if (bb.Length != _options.BlockSize) return null;
+
             var name = ExtractName(bb);
+
+
+
             // TODO: parse contents
             return new Folder(name);
         }
 
-        private VFSFile ParseFile(byte[] bb)
+        public VFSFile ParseFile(byte[] bb)
         {
+            if (bb.Length != _options.BlockSize) return null;
+
             var name = ExtractName(bb);
             // TODO: parse contents
             return new VFSFile(name, new byte[10]);
         }
 
-        private static string ExtractName(byte[] bb)
+        public IndirectNode ParseIndirectNode(byte[] bb)
         {
-            var nameBytes = bb.Skip(1).Take(255).ToArray();
+            var referenceAmount = _options.BlockSize / _options.BlockReferenceSize;
+            var references = new long[referenceAmount];
+            for (var i = 0; i < referenceAmount; i++)
+            {
+                var blockNumber = BitConverter.ToInt64(bb, i * _options.BlockReferenceSize);
+                if (blockNumber == 0) break;
+                references[i] = blockNumber;
+            }
+
+            return new IndirectNode(references);
+        }
+
+        private string ExtractName(byte[] bb)
+        {
+            var nameBytes = bb.Skip(1).Take(_options.NameLength).ToArray();
             return BytesToString(nameBytes);
         }
 
@@ -71,7 +92,8 @@ namespace VFSBase.Persistance
             var bb = new byte[_options.BlockSize];
             bb[0] = FolderType;
             WriteNameToBuffer(ref bb, folder.Name);
-            //TODO: do some more things...
+            BitConverter.GetBytes(folder.BlocksCount).CopyTo(bb, _options.NameLength + 1);
+            BitConverter.GetBytes(folder.IndirectNodeNumber).CopyTo(bb, sizeof(long) + _options.NameLength + 1);
             return bb;
         }
 
@@ -81,6 +103,20 @@ namespace VFSBase.Persistance
             bb[0] = FileType;
             WriteNameToBuffer(ref bb, file.Name);
             //TODO: do some more things...
+            return bb;
+        }
+
+        public byte[] NodeToBytes(IndirectNode indirectNode)
+        {
+            var bb = new byte[_options.BlockSize];
+
+            for (var i = 0; i < _options.ReferencesPerIndirectNode; i++)
+            {
+                var blockNumber = indirectNode.BlockNumbers[i];
+                if (blockNumber == 0) break;
+                BitConverter.GetBytes(blockNumber).CopyTo(bb, i * _options.BlockReferenceSize);
+            }
+
             return bb;
         }
 

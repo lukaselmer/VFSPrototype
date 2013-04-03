@@ -67,6 +67,7 @@
     <Compile Include="Implementation\Folder.cs" />
     <Compile Include="Persistance\BlockParser.cs" />
     <Compile Include="Persistance\Blocks\EmptyBlock.cs" />
+    <Compile Include="Persistance\Blocks\IndirectNode.cs" />
     <Compile Include="Persistance\PositionCalculator.cs" />
     <Compile Include="Persistance\PositionCalculatorSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
