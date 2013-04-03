@@ -10,17 +10,6 @@ using VFSBase.Persistance.Blocks;
 
 namespace VFSBase.Implementation
 {
-
-    /*using (var reader = new BinaryReader(stream))
-    {
-        DiskSize = reader.ReadUInt64();
-        MasterBlockSize = reader.ReadUInt32();
-    }*/
-
-    //var writer = new BinaryWriter(stream);
-    //writer.Write(DiskSize);
-    //writer.Write(MasterBlockSize);
-
     internal class FileSystem : IFileSystem
     {
         private readonly FileSystemOptions _options;
