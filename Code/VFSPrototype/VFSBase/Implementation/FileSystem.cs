@@ -98,6 +98,11 @@ namespace VFSBase.Implementation
 
         public RootFolder Root { get; private set; }
 
+        /* NOTE: this method appends the reference to the *unordered* list. It would be faster if
+         * the nodes would be sorted by name, so searching could be achieved in O(log(n)).
+         * 
+         * Possible improvement: implement an AVL tree!
+         */
         public void CreateFolder(Folder parentFolder, Folder folder)
         {
             CheckDisposed();
@@ -178,7 +183,10 @@ namespace VFSBase.Implementation
 
             var refToMove = indirectNode1.BlockNumbers[indexIndirection0];
 
-            WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
+            // The file contents could be destroyed, but it is not necessary.
+            // Disabled, so "Move" can be implemented simpler.
+            // WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
+
             indirectNode1.BlockNumbers[indexIndirection0] = 0;
             Persist(indirectNode1);
 
@@ -194,6 +202,17 @@ namespace VFSBase.Implementation
             CheckName(name);
 
             if (Exists(dest, name)) throw new ArgumentException("Folder already exists!");
+
+            var sourceFolder = toMove.Parent;
+
+            var blockNumber = toMove.BlockNumber;
+            Delete(toMove);
+            AppendBlockReference(dest, blockNumber);
+
+            toMove.Name = name;
+            Persist(toMove);
+
+            //RemoveNode(sourceFolder, toMove);
 
             /*toMove.Parent.IndexNodes.Remove(dest);
             toMove.Parent = dest;
@@ -297,9 +316,21 @@ namespace VFSBase.Implementation
             return block;
         }
 
+        private void Persist(IIndexNode node)
+        {
+            //NOTE: this could be better!
+            if (node is Folder) Persist(node as Folder);
+            else if (node is VFSFile) Persist(node as VFSFile);
+        }
+
         private void Persist(Folder folder)
         {
             WriteBlock(folder.BlockNumber, _blockParser.NodeToBytes(folder));
+        }
+
+        private void Persist(VFSFile file)
+        {
+            WriteBlock(file.BlockNumber, _blockParser.NodeToBytes(file));
         }
 
         private void Persist(IndirectNode indirectNode)

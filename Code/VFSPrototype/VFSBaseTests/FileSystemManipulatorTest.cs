@@ -12,7 +12,7 @@ namespace VFSBaseTests
     public class FileSystemManipulatorTest
     {
         const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
-        private const long DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
+        private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
 
         private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
         {
@@ -53,6 +53,24 @@ namespace VFSBaseTests
 
                 m.CreateFolder("test/xxx");
                 Assert.IsTrue(m.Exists("test/xxx"));
+
+                // TODO: fix this?
+                //m.CreateFolder("/test/foo/zzz");
+                //Assert.AreEqual(4, m.Folders("test/foo").Count);
+                //Assert.IsTrue(m.Folders("test/foo").Contains("zzz"));
+            }
+        }
+
+        [TestMethod]
+        public void TestCreateManyFolder()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    m.CreateFolder("test" + i);
+                    Assert.IsTrue(m.Exists("test" + i));
+                }
 
                 // TODO: fix this?
                 //m.CreateFolder("/test/foo/zzz");
