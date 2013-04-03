@@ -42,5 +42,24 @@ namespace VFSBaseTests
                 //TODO: make this true! Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
             }
         }
+
+        [TestMethod]
+        public void TestNamesShouldSupportUtf8()
+        {
+            var name = "∀α,β∈∑α≤β∧β≥α=>α=β";
+            using (var fs = GetFileSystem())
+            {
+                Assert.IsTrue(!fs.Folders(fs.Root).Any());
+                fs.CreateFolder(fs.Root, new Folder(name));
+                Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
+            }
+
+            using (var fs = GetFileSystem())
+            {
+                // TODO: make this true! Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
+                // TODO: make this true! Assert.IsTrue(fs.Folders(fs.Root).First().Name == name);
+            }
+        }
+        
     }
 }
