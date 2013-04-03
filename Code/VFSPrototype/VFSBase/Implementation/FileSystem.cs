@@ -45,9 +45,9 @@ namespace VFSBase.Implementation
             _disk.Seek(_options.MasterBlockSize + (blockNumber * _options.BlockSize), SeekOrigin.Begin);
         }
 
-        private Folder ImportRootFolder()
+        private RootFolder ImportRootFolder()
         {
-            var folder = _blockParser.ParseFolder(ReadBlock(0));
+            var folder = _blockParser.ParseRootFolder(ReadBlock(0));
 
             if (folder != null) return folder;
 
@@ -96,7 +96,7 @@ namespace VFSBase.Implementation
             return Folders(folder).FirstOrDefault(f => f.Name == name);
         }
 
-        public Folder Root { get; private set; }
+        public RootFolder Root { get; private set; }
 
         public void CreateFolder(Folder parentFolder, Folder folder)
         {
@@ -176,11 +176,13 @@ namespace VFSBase.Implementation
             var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection2]);
             var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection1]);
 
-            var refToMove = indirectNode1.BlockNumbers[indexIndirection1];
+            var refToMove = indirectNode1.BlockNumbers[indexIndirection0];
 
-            WriteBlock(indirectNode1.BlockNumbers[indexIndirection0], new byte[_options.BlockSize]);
+            WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
             indirectNode1.BlockNumbers[indexIndirection0] = 0;
             Persist(indirectNode1);
+
+            if (refToMove == node.BlockNumber) return;
 
             ReplaceInIndirectNode(indirectNode3, node.BlockNumber, refToMove, 2);
         }

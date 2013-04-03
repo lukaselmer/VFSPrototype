@@ -49,6 +49,12 @@ namespace VFSBase.Persistance
                         };
         }
 
+        public RootFolder ParseRootFolder(byte[] bb)
+        {
+            var f = ParseFolder(bb);
+            return new RootFolder { BlocksCount = f.BlocksCount, IndirectNodeNumber = f.IndirectNodeNumber };
+        }
+
         public VFSFile ParseFile(byte[] bb)
         {
             if (bb.Length != _options.BlockSize) return null;
@@ -127,5 +133,6 @@ namespace VFSBase.Persistance
             if (nameBytes.Length > _options.NameLength) throw new VFSException("Name is too long");
             nameBytes.CopyTo(bb, 1);
         }
+
     }
 }

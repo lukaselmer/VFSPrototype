@@ -16,6 +16,6 @@ namespace VFSBase.Interfaces
         void Delete(IIndexNode node);
         void Move(IIndexNode toMove, Folder dest, string name);
         bool Exists(Folder folder, string name);
-        Folder Root { get; }
+        RootFolder Root { get; }
     }
 }
