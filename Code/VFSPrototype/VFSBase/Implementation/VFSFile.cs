@@ -12,11 +12,9 @@ namespace VFSBase.Implementation
         {
         }
 
-        private VFSFile(string name, byte[] data)
+        public VFSFile(string name, byte[] data)
         {
-            Name = PathParser.NormalizeName(name);
-            if (Name.Length <= 0) throw new ArgumentException("Name must not be empty!");
-
+            Name = name;
             Data = data;
         }
 
