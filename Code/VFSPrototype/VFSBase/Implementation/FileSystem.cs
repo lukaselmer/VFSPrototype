@@ -77,19 +77,23 @@ namespace VFSBase.Implementation
             {
                 if (blockNumber == 0) return;
 
-                if (recursion == 0) l.Add(_blockParser.BytesToNode(ReadBlock(blockNumber)));
+                if (recursion == 0) l.Add(ReadIndexNode(blockNumber));
                 else AddFromIndirectNode(ReadIndirectNode(blockNumber), l, recursion - 1);
             }
+        }
+
+        private IIndexNode ReadIndexNode(long blockNumber)
+        {
+            var b = _blockParser.BytesToNode(ReadBlock(blockNumber));
+            b.BlockNumber = blockNumber;
+            return b;
         }
 
         public IIndexNode Find(Folder folder, string name)
         {
             CheckDisposed();
 
-            // TODO: implement this with persistence
-            // return Folders(folder).FirstOrDefault(f => f.Name == name);
-
-            return folder.IndexNodes.FirstOrDefault(f => f.Name == name);
+            return Folders(folder).FirstOrDefault(f => f.Name == name);
         }
 
         public Folder Root { get; private set; }
@@ -100,14 +104,6 @@ namespace VFSBase.Implementation
             CheckName(folder.Name);
 
             if (Exists(parentFolder, folder.Name)) throw new ArgumentException("Folder already exists!");
-
-
-
-            // TODO: remove this... (as soon as the other methods read from the persistent file are implemented)
-            parentFolder.IndexNodes.Add(folder);
-            // until here
-
-
 
             folder.Parent = parentFolder;
 
@@ -126,9 +122,9 @@ namespace VFSBase.Implementation
             CheckDisposed();
             CheckName(name);
 
-            var file = new VFSFile(name, source);
-            dest.IndexNodes.Add(file);
-            file.Parent = dest;
+            //var file = new VFSFile(name, source);
+            //dest.IndexNodes.Add(file);
+            //file.Parent = dest;
             // TODO: persist
         }
 
@@ -157,6 +153,8 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
 
+            if (node.Parent.BlocksCount == 0) return;
+
             node.Parent.BlocksCount--;
             if (node.Parent.BlocksCount == 0)
             {
@@ -180,6 +178,7 @@ namespace VFSBase.Implementation
 
             var refToMove = indirectNode1.BlockNumbers[indexIndirection1];
 
+            WriteBlock(indirectNode1.BlockNumbers[indexIndirection0], new byte[_options.BlockSize]);
             indirectNode1.BlockNumbers[indexIndirection0] = 0;
             Persist(indirectNode1);
 
@@ -194,12 +193,12 @@ namespace VFSBase.Implementation
 
             if (Exists(dest, name)) throw new ArgumentException("Folder already exists!");
 
-            toMove.Parent.IndexNodes.Remove(dest);
+            /*toMove.Parent.IndexNodes.Remove(dest);
             toMove.Parent = dest;
             toMove.Name = name;
 
             toMove.Parent = dest;
-            dest.IndexNodes.Add(toMove);
+            dest.IndexNodes.Add(toMove);*/
 
             // TODO: persist
         }
@@ -292,6 +291,7 @@ namespace VFSBase.Implementation
         {
             SeekToBlock(blockNumber);
             var block = _diskReader.ReadBytes(_options.BlockSize);
+            if (block.Length != _options.BlockSize) return new byte[_options.BlockSize];
             return block;
         }
 

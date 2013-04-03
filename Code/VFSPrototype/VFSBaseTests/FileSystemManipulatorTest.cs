@@ -32,7 +32,7 @@ namespace VFSBaseTests
         {
             File.Delete(DefaultTestfilePath);
         }
-        
+
         [TestMethod]
         public void TestCreateFolder()
         {
