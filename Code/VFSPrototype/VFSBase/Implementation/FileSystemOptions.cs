@@ -16,6 +16,7 @@ namespace VFSBase.Implementation
             Location = location;
             DiskSize = diskSize;
             MasterBlockSize = (uint)BinaryMathUtil.MB(1);
+            NameLength = 255;
         }
 
         public string Location { get; set; }
@@ -44,5 +45,7 @@ namespace VFSBase.Implementation
 
         public long DiskFree { get; private set; }
         public long DiskOccupied { get; private set; }
+
+        public int NameLength { get; private set; }
     }
 }

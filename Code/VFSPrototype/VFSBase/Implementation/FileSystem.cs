@@ -82,6 +82,7 @@ namespace VFSBase.Implementation
         public void CreateFolder(Folder parentFolder, Folder folder)
         {
             CheckDisposed();
+            CheckName(folder.Name);
 
             if (Exists(parentFolder, folder.Name)) throw new ArgumentException("Folder already exists!");
 
@@ -93,6 +94,7 @@ namespace VFSBase.Implementation
         public void Import(string source, Folder dest, string name)
         {
             CheckDisposed();
+            CheckName(name);
 
             var file = new VFSFile(name, source);
             dest.IndexNodes.Add(file);
@@ -109,9 +111,10 @@ namespace VFSBase.Implementation
             File.WriteAllBytes(dest, file.Data);
         }
 
-        public void Copy(IIndexNode toCopy, Folder dest, string nameOfCopiedElement)
+        public void Copy(IIndexNode toCopy, Folder dest, string name)
         {
             CheckDisposed();
+            CheckName(name);
 
             throw new NotImplementedException();
         }
@@ -128,6 +131,7 @@ namespace VFSBase.Implementation
         public void Move(IIndexNode toMove, Folder dest, string name)
         {
             CheckDisposed();
+            CheckName(name);
 
             if (Exists(dest, name)) throw new ArgumentException("Folder already exists!");
 
@@ -194,6 +198,13 @@ namespace VFSBase.Implementation
         private void CheckDisposed()
         {
             if (_disposed) throw new ObjectDisposedException("Resource was disposed.");
+        }
+
+        private void CheckName(string name)
+        {
+            if (name != PathParser.NormalizeName(name)) throw new VFSException("Name invalid");
+            if (name.Length <= 0) throw new VFSException("Name must not be empty!");
+            if (BlockParser.StringToBytes(name).Length > _options.NameLength) throw new VFSException(string.Format("Name too long, max {0}", 255));
         }
 
     }

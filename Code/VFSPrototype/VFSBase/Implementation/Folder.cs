@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using VFSBase.Interfaces;
+using VFSBase.Persistance;
 
 namespace VFSBase.Implementation
 {
@@ -11,8 +12,7 @@ namespace VFSBase.Implementation
         public Folder(string name)
             : this()
         {
-            Name = PathParser.NormalizeName(name);
-            if (Name.Length <= 0) throw new ArgumentException("Name must not be empty!");
+            Name = name;
         }
 
         protected Folder()

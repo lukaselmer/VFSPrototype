@@ -28,10 +28,8 @@ namespace VFSBaseTests
             var b = new BlockParser(options);
 
             var bb = new byte[options.BlockSize];
-            bb[1] = 1;
+            bb[0] = 1;
             Assert.IsInstanceOfType(b.ParseBlock(bb), typeof(Folder));
-
-
         }
 
         [TestMethod]
@@ -42,7 +40,7 @@ namespace VFSBaseTests
 
             var bb = new byte[options.BlockSize];
 
-            bb[1] = 2;
+            bb[0] = 2;
             Assert.IsInstanceOfType(b.ParseBlock(bb), typeof(VFSFile));
         }
     }
