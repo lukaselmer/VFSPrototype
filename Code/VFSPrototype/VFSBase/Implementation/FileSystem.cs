@@ -114,6 +114,7 @@ namespace VFSBase.Implementation
 
             var blockToStoreNewFolder = _nextFreeBlock++;
 
+            folder.BlockNumber = blockToStoreNewFolder;
             var newFolderBytes = _blockParser.NodeToBytes(folder);
             WriteBlock(blockToStoreNewFolder, newFolderBytes);
 
@@ -126,6 +127,27 @@ namespace VFSBase.Implementation
 
             CheckDisposed();
             CheckName(name);
+
+            if (Directory.Exists(source))
+            {
+                var info = new DirectoryInfo(source);
+
+                CreateFolder(dest, new Folder(name));
+                var newFolder = Find(dest, name) as Folder;
+
+                foreach (var directoryInfo in info.GetDirectories())
+                    Import(directoryInfo.FullName, newFolder, directoryInfo.Name);
+
+                foreach (var fileInfo in info.GetFiles())
+                    Import(fileInfo.FullName, newFolder, fileInfo.Name);
+
+            }
+            else if (File.Exists(source))
+            {
+                CreateFile(source, dest, name);
+            }
+
+            var i = new FileInfo(source);
 
             //var file = new VFSFile(name, source);
             //dest.IndexNodes.Add(file);
@@ -273,12 +295,19 @@ namespace VFSBase.Implementation
             Persist(indirectNode1);
         }
 
+
         private IndirectNode CreateIndirectNode()
         {
             var newNodeNumber = _nextFreeBlock++;
             var indirectNode = new IndirectNode(new long[_options.ReferencesPerIndirectNode]) { BlockNumber = newNodeNumber };
             Persist(indirectNode);
             return indirectNode;
+        }
+
+        private VFSFile CreateFile(string source, Folder dest, string name)
+        {
+            // TODO: implement this
+            throw new NotImplementedException();
         }
 
         private IndirectNode ReadIndirectNode(long indirectNodeNumber)
