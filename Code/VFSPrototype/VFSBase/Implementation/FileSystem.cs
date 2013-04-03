@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VFSBase.Interfaces;
 using VFSBase.Persistance;
+using VFSBase.Persistance.Blocks;
 
 namespace VFSBase.Implementation
 {
@@ -28,6 +29,9 @@ namespace VFSBase.Implementation
         private BinaryReader _diskReader;
         private BinaryWriter _diskWriter;
         private readonly BlockParser _blockParser;
+        private long _nextFreeBlock;
+
+        public FileSystemOptions FileSystemOptions { get { return _options; } }
 
         internal FileSystem(FileSystemOptions options)
         {
@@ -44,6 +48,7 @@ namespace VFSBase.Implementation
         private void InitializeFileSystem()
         {
             Root = ImportRootFolder();
+            _nextFreeBlock = 1;
         }
 
         private void SeekToBlock(long blockNumber)
@@ -54,12 +59,14 @@ namespace VFSBase.Implementation
 
         private Folder ImportRootFolder()
         {
-            // TODO: import root file
-            SeekToBlock(0);
-            var b = _diskReader.ReadBytes(_options.BlockSize);
-            _blockParser.BytesToNode(b);
+            var folder = _blockParser.ParseFolder(ReadBlock(0));
 
-            return new RootFolder();
+            if (folder != null) return folder;
+
+            var root = new RootFolder();
+            WriteBlock(0, _blockParser.NodeToBytes(root));
+
+            return root;
         }
 
         public IEnumerable<Folder> Folders(Folder folder)
@@ -78,7 +85,6 @@ namespace VFSBase.Implementation
 
         public Folder Root { get; private set; }
 
-
         public void CreateFolder(Folder parentFolder, Folder folder)
         {
             CheckDisposed();
@@ -88,7 +94,14 @@ namespace VFSBase.Implementation
 
             parentFolder.IndexNodes.Add(folder);
             folder.Parent = parentFolder;
-            // TODO: persist
+
+            var blockToStoreNewFolder = _nextFreeBlock++;
+
+            SeekToBlock(blockToStoreNewFolder);
+            var newFolderBytes = _blockParser.NodeToBytes(folder);
+            _diskWriter.Write(newFolderBytes);
+
+            AppendBlockReference(parentFolder, blockToStoreNewFolder);
         }
 
         public void Import(string source, Folder dest, string name)
@@ -152,10 +165,84 @@ namespace VFSBase.Implementation
             return folder.IndexNodes.Any(i => i.Name == name);
         }
 
-        public FileSystemOptions FileSystemOptions
+        private void AppendBlockReference(Folder parentFolder, long reference)
         {
-            get { return _options; }
+            var indirectNodeNumber = parentFolder.IndirectNodeNumber;
+            if (indirectNodeNumber == 0)
+            {
+                parentFolder.IndirectNodeNumber = CreateIndirectNode().BlockNumber;
+            }
+
+            var blocksCount = parentFolder.BlocksCount;
+            var refsCount = _options.ReferencesPerIndirectNode;
+
+            var indexIndirection3 = (int)(blocksCount / (refsCount * refsCount));
+            var indexIndirection2 = (int)((blocksCount - (indexIndirection3 * refsCount * refsCount)) / refsCount);
+            var indexIndirection1 = (int)((blocksCount - (indexIndirection3 * refsCount * refsCount) - (refsCount * indexIndirection2)) / refsCount);
+
+            parentFolder.BlocksCount += 1;
+            Persist(parentFolder);
+
+            var indirectNode3 = ReadIndirectNode(parentFolder.IndirectNodeNumber);
+            if (indirectNode3.BlockNumbers[indexIndirection3] == 0)
+            {
+                indirectNode3.BlockNumbers[indexIndirection3] = CreateIndirectNode().BlockNumber;
+                Persist(indirectNode3);
+            }
+
+            var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection3]);
+            if (indirectNode2.BlockNumbers[indexIndirection2] == 0)
+            {
+                indirectNode2.BlockNumbers[indexIndirection2] = CreateIndirectNode().BlockNumber;
+                Persist(indirectNode2);
+            }
+
+            var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection2]);
+            indirectNode1.BlockNumbers[indexIndirection1] = reference;
+            Persist(indirectNode1);
         }
+
+        private IndirectNode CreateIndirectNode()
+        {
+            var newNodeNumber = _nextFreeBlock++;
+            var indirectNode = new IndirectNode(new long[_options.ReferencesPerIndirectNode]) { BlockNumber = newNodeNumber };
+            Persist(indirectNode);
+            return indirectNode;
+        }
+
+        private IndirectNode ReadIndirectNode(long indirectNodeNumber)
+        {
+            return _blockParser.ParseIndirectNode(ReadBlock(indirectNodeNumber));
+        }
+
+
+        private void WriteBlock(long blockNumber, byte[] block)
+        {
+            SeekToBlock(blockNumber);
+            _diskWriter.Write(block);
+        }
+
+        private byte[] ReadBlock(long blockNumber)
+        {
+            SeekToBlock(blockNumber);
+            var block = _diskReader.ReadBytes(_options.BlockSize);
+            return block;
+        }
+
+        private void Persist(Folder folder)
+        {
+            SeekToBlock(folder.BlockNumber);
+            var parentFolderBytes = _blockParser.NodeToBytes(folder);
+            _diskWriter.Write(parentFolderBytes);
+        }
+
+        private void Persist(IndirectNode indirectNode)
+        {
+            SeekToBlock(indirectNode.BlockNumber);
+            var indirectNodeBytes = _blockParser.NodeToBytes(indirectNode);
+            _diskWriter.Write(indirectNodeBytes);
+        }
+
 
         public void Dispose()
         {

@@ -17,6 +17,7 @@ namespace VFSBase.Implementation
             DiskSize = diskSize;
             MasterBlockSize = (uint)BinaryMathUtil.MB(1);
             NameLength = 255;
+            BlockReferenceSize = 64;
         }
 
         public string Location { get; set; }
@@ -24,6 +25,13 @@ namespace VFSBase.Implementation
         public long DiskSize { get; set; }
 
         public uint MasterBlockSize { get; set; }
+
+        public int BlockReferenceSize { get; set; }
+
+        public int StartOfDirectBlock { get { return 1 /*type byte*/+ NameLength; } }
+        public int StartOfIndirectBlocks { get { return BlockSize - (3 * BlockReferenceSize); } }
+        public int DirectBlocksSpace { get { return StartOfIndirectBlocks - StartOfDirectBlock; } }
+        public int DirectBlocksAmount { get { return DirectBlocksSpace / BlockReferenceSize; } }
 
         public static FileSystemOptions Deserialize(Stream stream)
         {
@@ -47,5 +55,7 @@ namespace VFSBase.Implementation
         public long DiskOccupied { get; private set; }
 
         public int NameLength { get; private set; }
+
+        public int ReferencesPerIndirectNode { get { return BlockSize / BlockReferenceSize; } }
     }
 }
