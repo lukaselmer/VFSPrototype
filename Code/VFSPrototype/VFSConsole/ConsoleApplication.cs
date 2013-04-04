@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using VFSBase;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
 namespace VFSConsole
@@ -57,7 +58,15 @@ namespace VFSConsole
             var arguments = commandAndArguments.Count() > 1 ? commandAndArguments[1] : "";
 
             var func = _commands.ContainsKey(command) ? _commands[command] : CommandNotFound;
-            func(arguments);
+            try
+            {
+                func(arguments);
+            }
+            catch (VFSException exception)
+            {
+                // TODO: test this behaviour
+                _textWriter.WriteLine("An exception occurred: {0}", exception.Message);
+            }
         }
 
         private void Import(string parameters)
