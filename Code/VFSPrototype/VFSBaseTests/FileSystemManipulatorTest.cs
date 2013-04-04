@@ -52,11 +52,6 @@ namespace VFSBaseTests
 
                 m.CreateFolder("test/xxx");
                 Assert.IsTrue(m.Exists("test/xxx"));
-
-                // TODO: fix this?
-                //m.CreateFolder("/test/foo/zzz");
-                //Assert.AreEqual(4, m.Folders("test/foo").Count);
-                //Assert.IsTrue(m.Folders("test/foo").Contains("zzz"));
             }
         }
 
@@ -70,11 +65,6 @@ namespace VFSBaseTests
                     m.CreateFolder("test" + i);
                     Assert.IsTrue(m.Exists("test" + i));
                 }
-
-                // TODO: fix this?
-                //m.CreateFolder("/test/foo/zzz");
-                //Assert.AreEqual(4, m.Folders("test/foo").Count);
-                //Assert.IsTrue(m.Folders("test/foo").Contains("zzz"));
             }
         }
 
@@ -334,6 +324,10 @@ namespace VFSBaseTests
                 Assert.IsTrue(m.Folders("test/foo").Contains("bar"));
                 Assert.IsTrue(m.Folders("test/foo").Contains("foobar"));
                 Assert.IsFalse(m.Folders("test/foo").Contains("xxx"));
+
+                m.CreateFolder("/test/foo/zzz");
+                Assert.AreEqual(3, m.Folders("test/foo").Count);
+                Assert.IsTrue(m.Folders("test/foo").Contains("zzz"));
             }
         }
 
