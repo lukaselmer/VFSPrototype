@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
@@ -139,5 +141,37 @@ namespace VFSBase.Implementation
                 else ReplaceInIndirectNode(ReadIndirectNode(blockNumber), toBeReplaced, toReplace, recursion - 1);
             }
         }
+
+        public IEnumerable<IIndexNode> ToList()
+        {
+            var l = new List<IIndexNode>((int)_node.BlocksCount);
+            if (_node.IndirectNodeNumber == 0) return l;
+
+            AddFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), l, 2);
+
+            var folder = _node as Folder;
+            if (folder != null) l.ForEach(f => f.Parent = folder);
+
+            return l;
+        }
+
+        private void AddFromIndirectNode(IndirectNode indirectNode, List<IIndexNode> l, int recursion)
+        {
+            foreach (var blockNumber in indirectNode.BlockNumbers)
+            {
+                if (blockNumber == 0) return;
+
+                if (recursion == 0) l.Add(ReadIndexNode(blockNumber));
+                else AddFromIndirectNode(ReadIndirectNode(blockNumber), l, recursion - 1);
+            }
+        }
+
+        private IIndexNode ReadIndexNode(long blockNumber)
+        {
+            var b = _blockParser.BytesToNode(_blockManipulator.ReadBlock(blockNumber));
+            b.BlockNumber = blockNumber;
+            return b;
+        }
+
     }
 }

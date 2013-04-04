@@ -56,33 +56,9 @@ namespace VFSBase.Implementation
         public IEnumerable<Folder> Folders(Folder folder)
         {
             CheckDisposed();
-
-            var l = new List<IIndexNode>((int)folder.BlocksCount);
-            if (folder.IndirectNodeNumber == 0) return l.OfType<Folder>();
-
-            AddFromIndirectNode(ReadIndirectNode(folder.IndirectNodeNumber), l, 2);
-
-            l.ForEach(f => f.Parent = folder);
-
+            var x = GetBlockList(folder);
+            IEnumerable<IIndexNode> l = x.ToList();
             return l.OfType<Folder>();
-        }
-
-        private void AddFromIndirectNode(IndirectNode indirectNode, List<IIndexNode> l, int recursion)
-        {
-            foreach (var blockNumber in indirectNode.BlockNumbers)
-            {
-                if (blockNumber == 0) return;
-
-                if (recursion == 0) l.Add(ReadIndexNode(blockNumber));
-                else AddFromIndirectNode(ReadIndirectNode(blockNumber), l, recursion - 1);
-            }
-        }
-
-        private IIndexNode ReadIndexNode(long blockNumber)
-        {
-            var b = _blockParser.BytesToNode(_blockManipulator.ReadBlock(blockNumber));
-            b.BlockNumber = blockNumber;
-            return b;
         }
 
         public IIndexNode Find(Folder folder, string name)
@@ -181,8 +157,7 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
 
-            var l = new BlockList(node, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
-            l.Delete(node.IndirectNodeNumber);
+            GetBlockList(node).Delete(node.IndirectNodeNumber);
         }
 
         public void Move(IIndexNode toMove, Folder dest, string name)
@@ -206,11 +181,14 @@ namespace VFSBase.Implementation
             return Folders(folder).Any(i => i.Name == name);
         }
 
-
         private void AppendBlockReference(Folder parentFolder, long reference)
         {
-            var l = new BlockList(parentFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
-            l.Add(reference);
+            GetBlockList(parentFolder).Add(reference);
+        }
+
+        private BlockList GetBlockList(IIndexNode parentFolder)
+        {
+            return new BlockList(parentFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
         }
 
         private VFSFile CreateFile(string source, Folder dest, string name)
