@@ -233,8 +233,4 @@ namespace VFSBase.Implementation
         }
 
     }
-
-    internal class AlreadyExistsException : VFSException
-    {
-    }
 }
