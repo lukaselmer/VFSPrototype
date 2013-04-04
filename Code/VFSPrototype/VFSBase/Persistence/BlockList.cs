@@ -51,25 +51,25 @@ namespace VFSBase.Persistence
             _persistence.PersistFolder(parentFolder);
 
             var indirectNode3 = ReadIndirectNode(parentFolder.IndirectNodeNumber);
-            if (indirectNode3.BlockNumbers[indexIndirection2] == 0)
+            if (indirectNode3.IsFree(indexIndirection2))
             {
-                indirectNode3.BlockNumbers[indexIndirection2] = CreateIndirectNode().BlockNumber;
+                indirectNode3[indexIndirection2] = CreateIndirectNode().BlockNumber;
                 _persistence.Persist(indirectNode3);
             }
 
-            var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection2]);
-            if (indirectNode2.BlockNumbers[indexIndirection1] == 0)
+            var indirectNode2 = ReadIndirectNode(indirectNode3[indexIndirection2]);
+            if (indirectNode2.IsFree(indexIndirection1))
             {
-                indirectNode2.BlockNumbers[indexIndirection1] = CreateIndirectNode().BlockNumber;
+                indirectNode2[indexIndirection1] = CreateIndirectNode().BlockNumber;
                 _persistence.Persist(indirectNode2);
             }
 
-            var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection1]);
-            indirectNode1.BlockNumbers[indexIndirection0] = reference;
+            var indirectNode1 = ReadIndirectNode(indirectNode2[indexIndirection1]);
+            indirectNode1[indexIndirection0] = reference;
             _persistence.Persist(indirectNode1);
         }
 
-        public void Remove(IIndexNode nodeToDelete)
+        public void Remove(IIndexNode nodeToDelete, bool freeSpace)
         {
             var parentNode = _node as Folder;
             if (parentNode == null) throw new VFSException("Can only delete nodes from folders!");
@@ -94,21 +94,20 @@ namespace VFSBase.Persistence
             var indexIndirection0 = (int)(blocksCount - (indexIndirection2 * refsCount * refsCount) - (refsCount * indexIndirection1));
 
             var indirectNode3 = ReadIndirectNode(parentNode.IndirectNodeNumber);
-            var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection2]);
-            var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection1]);
+            var indirectNode2 = ReadIndirectNode(indirectNode3[indexIndirection2]);
+            var indirectNode1 = ReadIndirectNode(indirectNode2[indexIndirection1]);
 
-            var refToMove = indirectNode1.BlockNumbers[indexIndirection0];
+            var refToMove = indirectNode1[indexIndirection0];
 
-            // The file contents could be destroyed, but it is not necessary.
-            // Disabled, so "Move" can be implemented simpler.
-            // WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
+            // Free space is false, when called from "Move" method, true otherwise
+            if (freeSpace) FreeSpace(nodeToDelete);
 
-            indirectNode1.BlockNumbers[indexIndirection0] = 0;
+            indirectNode1[indexIndirection0] = 0;
             _persistence.Persist(indirectNode1);
 
             if (refToMove == nodeToDelete.BlockNumber) return;
 
-            ReplaceInIndirectNode(indirectNode3, nodeToDelete.BlockNumber, refToMove, 2);
+            ReplaceInIndirectNode(indirectNode3, nodeToDelete.BlockNumber, refToMove);
         }
 
         public IEnumerable<IIndexNode> AsEnumerable()
@@ -150,18 +149,17 @@ namespace VFSBase.Persistence
             return indirectNode;
         }
 
-        private void ReplaceInIndirectNode(IndirectNode indirectNode, long toBeReplaced, long toReplace, int recursion)
+        private void ReplaceInIndirectNode(IndirectNode indirectNode, long toBeReplaced, long toReplace, int recursion = 2)
         {
-            for (var i = 0; i < indirectNode.BlockNumbers.Length; i++)
+            for (var i = 0; i < indirectNode.UsedBlockNumbers().Count(); i++)
             {
-                var blockNumber = indirectNode.BlockNumbers[i];
-                if (blockNumber == 0) return;
+                var blockNumber = indirectNode[i];
 
                 if (recursion == 0)
                 {
                     if (blockNumber == toBeReplaced)
                     {
-                        indirectNode.BlockNumbers[i] = toReplace;
+                        indirectNode[i] = toReplace;
                         _persistence.Persist(indirectNode);
                         return;
                     }
@@ -172,10 +170,8 @@ namespace VFSBase.Persistence
 
         private void AddFromIndirectNode(IndirectNode indirectNode, List<IIndexNode> l, int recursion)
         {
-            foreach (var blockNumber in indirectNode.BlockNumbers)
+            foreach (var blockNumber in indirectNode.UsedBlockNumbers())
             {
-                if (blockNumber == 0) return;
-
                 if (recursion == 0) l.Add(ReadIndexNode(blockNumber));
                 else AddFromIndirectNode(ReadIndirectNode(blockNumber), l, recursion - 1);
             }
@@ -188,5 +184,31 @@ namespace VFSBase.Persistence
             return b;
         }
 
+        /// <summary>
+        /// Frees the space and destroys the file contents.
+        /// Note: File contents are not destroyed recursively.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        private void FreeSpace(IIndexNode node)
+        {
+            // The file contents could be destroyed, but it is not necessary.
+            // This would have to be done recursivly tough.
+            // This can be used to nullify a single block: WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
+
+            if (node.IndirectNodeNumber != 0) FreeSpace(ReadIndirectNode(node.IndirectNodeNumber));
+
+            _blockAllocation.Free(node.BlockNumber);
+        }
+
+        private void FreeSpace(IndirectNode node, int recursion = 2)
+        {
+            foreach (var blockNumber in node.UsedBlockNumbers())
+            {
+                if (recursion != 0) FreeSpace(ReadIndirectNode(blockNumber), recursion - 1);
+                _blockManipulator.WriteBlock(blockNumber, new byte[_options.BlockSize]);
+                _blockAllocation.Free(blockNumber);
+            }
+
+        }
     }
 }

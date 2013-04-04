@@ -116,7 +116,7 @@ namespace VFSBase.Persistence
 
             for (var i = 0; i < _options.ReferencesPerIndirectNode; i++)
             {
-                var blockNumber = indirectNode.BlockNumbers[i];
+                var blockNumber = indirectNode[i];
                 if (blockNumber == 0) break;
                 BitConverter.GetBytes(blockNumber).CopyTo(bb, i * _options.BlockReferenceSize);
             }

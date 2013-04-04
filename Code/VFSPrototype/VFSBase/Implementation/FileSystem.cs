@@ -156,7 +156,7 @@ namespace VFSBase.Implementation
             if (Exists(destination, name)) throw new ArgumentException("Folder already exists!");
 
             var blockNumber = node.BlockNumber;
-            Delete(node);
+            GetBlockList(node.Parent).Remove(node, false);
             AppendBlockReference(destination, blockNumber);
 
             node.Name = name;
