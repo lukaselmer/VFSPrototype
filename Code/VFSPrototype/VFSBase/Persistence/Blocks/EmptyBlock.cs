@@ -1,4 +1,5 @@
-﻿using VFSBase.Implementation;
+﻿using VFSBase.Exceptions;
+using VFSBase.Implementation;
 using VFSBase.Interfaces;
 
 namespace VFSBase.Persistence.Blocks
