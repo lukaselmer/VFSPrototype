@@ -22,5 +22,29 @@ namespace VFSBaseTests
             Assert.AreEqual(1024 * 1024 * 1024, BinaryMathUtil.Power2(30));
             Assert.AreEqual(1024L * 1024L * 1024L * 1024L, BinaryMathUtil.Power2(40));
         }
+
+        [TestMethod]
+        public void TestKB()
+        {
+            Assert.AreEqual(BinaryMathUtil.Power2(10), BinaryMathUtil.KB(1));
+            Assert.AreEqual(BinaryMathUtil.Power2(11), BinaryMathUtil.KB(2));
+            Assert.AreEqual(BinaryMathUtil.Power2(10) * 3, BinaryMathUtil.KB(3));
+        }
+
+        [TestMethod]
+        public void TestMB()
+        {
+            Assert.AreEqual(BinaryMathUtil.Power2(20), BinaryMathUtil.MB(1));
+            Assert.AreEqual(BinaryMathUtil.Power2(21), BinaryMathUtil.MB(2));
+            Assert.AreEqual(BinaryMathUtil.Power2(20) * 3, BinaryMathUtil.MB(3));
+        }
+
+        [TestMethod]
+        public void TestMBAndKBEquality()
+        {
+            Assert.AreEqual(BinaryMathUtil.KB(1) * BinaryMathUtil.KB(1), BinaryMathUtil.MB(1));
+            Assert.AreEqual(BinaryMathUtil.KB(5) * BinaryMathUtil.KB(1), BinaryMathUtil.MB(5));
+            Assert.AreEqual(BinaryMathUtil.KB(2) * BinaryMathUtil.KB(2), BinaryMathUtil.MB(4));
+        }
     }
 }
