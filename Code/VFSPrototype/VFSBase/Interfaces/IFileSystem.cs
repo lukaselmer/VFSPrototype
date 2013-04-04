@@ -8,6 +8,7 @@ namespace VFSBase.Interfaces
     {
         FileSystemOptions FileSystemOptions { get; }
         IEnumerable<Folder> Folders(Folder folder);
+        bool Exists(Folder folder, string name);
         IIndexNode Find(Folder folder, string name);
         Folder CreateFolder(Folder parentFolder, string name);
         void Import(string source, Folder dest, string name);
@@ -15,7 +16,6 @@ namespace VFSBase.Interfaces
         void Copy(IIndexNode toCopy, Folder dest, string nameOfCopiedElement);
         void Delete(IIndexNode node);
         void Move(IIndexNode toMove, Folder dest, string name);
-        bool Exists(Folder folder, string name);
         RootFolder Root { get; }
     }
 }
