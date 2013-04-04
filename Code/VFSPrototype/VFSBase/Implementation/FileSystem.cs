@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
-using VFSBase.Persistence.Blocks;
 
 namespace VFSBase.Implementation
 {
@@ -73,48 +70,21 @@ namespace VFSBase.Implementation
             if (Exists(parentFolder, name)) throw new AlreadyExistsException();
 
             var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate() };
-
             _persistence.PersistFolder(folder);
-
             AppendBlockReference(parentFolder, folder.BlockNumber);
 
             return folder;
         }
 
+        //TODO: test this method with recursive data
         public void Import(string source, Folder destination, string name)
         {
-            //TODO: test this method, recursivly
-
             CheckDisposed();
             CheckName(name);
 
-            if (Directory.Exists(source))
-            {
-
-                // TODO: test this
-                var info = new DirectoryInfo(source);
-
-                var newFolder = CreateFolder(destination, name);
-
-                // TODO: test this
-                foreach (var directoryInfo in info.GetDirectories())
-                    Import(directoryInfo.FullName, newFolder, directoryInfo.Name);
-
-                // TODO: test this
-                foreach (var fileInfo in info.GetFiles())
-                    Import(fileInfo.FullName, newFolder, fileInfo.Name);
-
-            }
-            else if (File.Exists(source))
-            {
-                // Note: this should be tested already
-                var file = CreateFile(source, destination, name);
-                AppendBlockReference(destination, file.BlockNumber);
-            }
-            else
-            {
-                throw new NotFoundException();
-            }
+            if (Directory.Exists(source)) ImportDirectory(source, destination, name);
+            else if (File.Exists(source)) ImportFile(source, destination, name);
+            else throw new NotFoundException();
         }
 
         public void Export(IIndexNode source, string destination)
@@ -172,6 +142,26 @@ namespace VFSBase.Implementation
             CheckDisposed();
 
             return GetBlockList(folder).Exists(name);
+        }
+
+        private void ImportFile(string source, Folder destination, string name)
+        {
+            var file = CreateFile(source, destination, name);
+            AppendBlockReference(destination, file.BlockNumber);
+        }
+
+        // TODO: test this
+        private void ImportDirectory(string source, Folder destination, string name)
+        {
+            var info = new DirectoryInfo(source);
+
+            var newFolder = CreateFolder(destination, name);
+
+            foreach (var directoryInfo in info.GetDirectories())
+                ImportDirectory(directoryInfo.FullName, newFolder, directoryInfo.Name);
+
+            foreach (var fileInfo in info.GetFiles())
+                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name);
         }
 
         private void AppendBlockReference(Folder parentFolder, long reference)
