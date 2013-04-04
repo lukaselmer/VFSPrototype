@@ -1,14 +1,12 @@
 ﻿using System;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Exceptions
 {
-    [SerializableAttribute] 
+    [Serializable]
     public class VFSException : Exception
     {
-        public VFSException(string message)
-            : base(message)
-        {
+        public VFSException(string message) : base(message) { }
 
-        }
+        protected VFSException() { }
     }
 }
