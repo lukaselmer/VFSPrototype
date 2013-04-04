@@ -1,4 +1,4 @@
-﻿namespace VFSBase.Persistance
+﻿namespace VFSBase.Persistence
 {
     internal struct PositionCalculatorSettings
     {

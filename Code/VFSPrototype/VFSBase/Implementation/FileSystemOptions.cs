@@ -3,8 +3,8 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using VFSBase.Interfaces;
-using VFSBase.Persistance;
-using VFSBase.Persistance.Blocks;
+
+using VFSBase.Persistence;
 
 namespace VFSBase.Implementation
 {

@@ -1,6 +1,7 @@
 ﻿using VFSBase.Interfaces;
-using VFSBase.Persistance;
-using VFSBase.Persistance.Blocks;
+
+using VFSBase.Persistence;
+using VFSBase.Persistence.Blocks;
 
 namespace VFSBase.Implementation
 {

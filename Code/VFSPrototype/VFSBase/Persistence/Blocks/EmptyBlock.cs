@@ -1,7 +1,7 @@
 ﻿using VFSBase.Implementation;
 using VFSBase.Interfaces;
 
-namespace VFSBase.Persistance.Blocks
+namespace VFSBase.Persistence.Blocks
 {
     /// <summary>
     /// Class EmptyBlock

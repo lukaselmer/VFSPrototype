@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VFSBase.Interfaces;
-using VFSBase.Persistance;
-using VFSBase.Persistance.Blocks;
+using VFSBase.Persistence;
+using VFSBase.Persistence.Blocks;
 
 namespace VFSBase.Implementation
 {
