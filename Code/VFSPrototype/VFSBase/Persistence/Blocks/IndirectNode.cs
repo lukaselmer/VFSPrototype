@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace VFSBase.Persistence.Blocks
 {
     internal class IndirectNode
     {
-        public long[] BlockNumbers { get; set; }
+        private long[] BlockNumbers { get; set; }
 
         public long BlockNumber { get; set; }
 
@@ -13,14 +15,20 @@ namespace VFSBase.Persistence.Blocks
             BlockNumbers = blockNumbers;
         }
 
-        public bool HasFreeNode()
+        public bool IsFree(long index)
         {
-            return BlockNumbers.Any(n => n == 0);
+            return BlockNumbers[index] == 0;
         }
 
-        public long LastUsedNodeNumber()
+        public IEnumerable<long> UsedBlockNumbers()
         {
-            return BlockNumbers[BlockNumbers.Count(i => i > 0)];
+            return BlockNumbers.Where(n => n != 0);
+        }
+
+        public long this[int index]
+        {
+            get { return BlockNumbers[index]; }
+            set { BlockNumbers[index] = value; }
         }
     }
 }

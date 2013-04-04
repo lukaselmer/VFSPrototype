@@ -12,7 +12,7 @@ namespace VFSBase.Persistence
     internal interface IBlockList
     {
         void Add(long reference);
-        void Remove(IIndexNode nodeToDelete);
+        void Remove(IIndexNode nodeToDelete, bool freeSpace = true);
         IEnumerable<IIndexNode> AsEnumerable();
         bool Exists(string name);
         IIndexNode Find(string name);
