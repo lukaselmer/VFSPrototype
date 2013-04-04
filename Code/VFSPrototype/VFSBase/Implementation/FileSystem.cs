@@ -117,8 +117,7 @@ namespace VFSBase.Implementation
 
             var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate() };
 
-            var newFolderBytes = _blockParser.NodeToBytes(folder);
-            WriteBlock(folder.BlockNumber, newFolderBytes);
+            Persist(folder);
 
             AppendBlockReference(parentFolder, folder.BlockNumber);
 
