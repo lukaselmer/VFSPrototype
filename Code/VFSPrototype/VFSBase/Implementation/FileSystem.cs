@@ -123,7 +123,7 @@ namespace VFSBase.Implementation
 
         public void Import(string source, Folder dest, string name)
         {
-            //TODO: implement this, with persistence
+            //TODO: test this method, recursivly
 
             CheckDisposed();
             CheckName(name);
@@ -144,15 +144,13 @@ namespace VFSBase.Implementation
             }
             else if (File.Exists(source))
             {
-                CreateFile(source, dest, name);
+                var file = CreateFile(source, dest, name);
+                AppendBlockReference(dest, file.BlockNumber);
             }
-
-            var i = new FileInfo(source);
-
-            //var file = new VFSFile(name, source);
-            //dest.IndexNodes.Add(file);
-            //file.Parent = dest;
-            // TODO: persist
+            else
+            {
+                throw new NotFoundException();
+            }
         }
 
         public void Export(IIndexNode source, string dest)
@@ -307,6 +305,10 @@ namespace VFSBase.Implementation
         private VFSFile CreateFile(string source, Folder dest, string name)
         {
             // TODO: implement this
+            //var file = new VFSFile(name, source);
+            //dest.IndexNodes.Add(file);
+            //file.Parent = dest;
+            // TODO: persist
             throw new NotImplementedException();
         }
 
