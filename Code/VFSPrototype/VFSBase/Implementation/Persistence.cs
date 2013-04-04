@@ -15,26 +15,14 @@ namespace VFSBase.Implementation
             _blockManipulator = blockManipulator;
         }
 
-        public void Persist(IIndexNode node)
-        {
-            //NOTE: this could (and should) be better, right!?
-            if (node is Folder) PersistFolder(node as Folder);
-            else if (node is VFSFile) Persist(node as VFSFile);
-        }
-
-        public void PersistFolder(Folder folder)
-        {
-            _blockManipulator.WriteBlock(folder.BlockNumber, _blockParser.NodeToBytes(folder));
-        }
-
-        public void Persist(VFSFile file)
-        {
-            _blockManipulator.WriteBlock(file.BlockNumber, _blockParser.NodeToBytes(file));
-        }
-
-        public void Persist(IndirectNode indirectNode)
+        public void PersistIndirectNode(IndirectNode indirectNode)
         {
             _blockManipulator.WriteBlock(indirectNode.BlockNumber, _blockParser.NodeToBytes(indirectNode));
+        }
+
+        public void Persist(IIndexNode node)
+        {
+            _blockManipulator.WriteBlock(node.BlockNumber, _blockParser.NodeToBytes(node));
         }
     }
 }

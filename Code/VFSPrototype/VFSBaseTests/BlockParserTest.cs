@@ -62,7 +62,7 @@ namespace VFSBaseTests
             var options = new FileSystemOptions("", 0);
             var b = new BlockParser(options);
 
-            var f = new VFSFile("blubα", new byte[1]);
+            var f = new VFSFile("αaαaαaαablubα");
 
             var bb = b.NodeToBytes(f);
 

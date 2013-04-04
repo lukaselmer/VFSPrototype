@@ -5,7 +5,7 @@ namespace VFSBase.Implementation
 {
     internal class VFSFile : IIndexNode
     {
-        public VFSFile(string name, string source)
+        /*public VFSFile(string name, string source)
             : this(name, File.ReadAllBytes(source))
         {
         }
@@ -14,6 +14,11 @@ namespace VFSBase.Implementation
         {
             Name = name;
             Data = data;
+        }*/
+
+        public VFSFile(string name)
+        {
+            Name = name;
         }
 
         public string Name { get; set; }
