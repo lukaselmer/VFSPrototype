@@ -25,5 +25,17 @@ namespace VFSBase.Persistance.Blocks
             get { throw new NotFoundException(); }
             set { throw new NotFoundException(); }
         }
+
+        public long IndirectNodeNumber
+        {
+            get { throw new System.NotImplementedException(); }
+            set { throw new System.NotImplementedException(); }
+        }
+
+        public long BlocksCount
+        {
+            get { throw new System.NotImplementedException(); }
+            set { throw new System.NotImplementedException(); }
+        }
     }
 }

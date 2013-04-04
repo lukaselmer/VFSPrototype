@@ -23,6 +23,8 @@ namespace VFSBase.Implementation
         public Folder Parent { get; set; }
 
         public long BlockNumber { get; set; }
+        public long IndirectNodeNumber { get; set; }
+        public long BlocksCount { get; set; }
 
         public byte[] Data { get; private set; }
     }
