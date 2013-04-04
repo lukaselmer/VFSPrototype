@@ -2,13 +2,7 @@
 {
     internal class BlockAllocation
     {
-        private readonly FileSystemOptions _options;
-        internal long _nextFreeBlock = 1;
-
-        public BlockAllocation(FileSystemOptions options)
-        {
-            _options = options;
-        }
+        private long _nextFreeBlock = 1;
 
         public long Allocate()
         {

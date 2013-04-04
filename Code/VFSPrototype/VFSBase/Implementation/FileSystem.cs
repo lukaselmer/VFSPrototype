@@ -29,7 +29,7 @@ namespace VFSBase.Implementation
             _blockManipulator = new BlockManipulator(_options);
             _blockParser = new BlockParser(_options);
             _persistence = new Persistence(_blockParser, _blockManipulator);
-            _blockAllocation = new BlockAllocation(_options);
+            _blockAllocation = new BlockAllocation();
 
             InitializeFileSystem();
 
