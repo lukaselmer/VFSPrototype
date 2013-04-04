@@ -142,7 +142,7 @@ namespace VFSBase.Implementation
             }
         }
 
-        public IEnumerable<IIndexNode> ToList()
+        public IEnumerable<IIndexNode> AsEnumerable()
         {
             var l = new List<IIndexNode>((int)_node.BlocksCount);
             if (_node.IndirectNodeNumber == 0) return l;

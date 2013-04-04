@@ -57,8 +57,7 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
             var x = GetBlockList(folder);
-            IEnumerable<IIndexNode> l = x.ToList();
-            return l.OfType<Folder>();
+            return x.AsEnumerable().OfType<Folder>();
         }
 
         public IIndexNode Find(Folder folder, string name)
