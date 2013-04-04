@@ -68,19 +68,9 @@ namespace VFSBase.Implementation
 
         public RootFolder Root { get; private set; }
 
-        public void CreateFolder(Folder parentFolder, string name)
+        public Folder CreateFolder(Folder parentFolder, string name)
         {
             CheckDisposed();
-            CreateFolderInternal(parentFolder, name);
-        }
-
-        /* NOTE: this method appends the reference to the *unordered* list. It would be faster if
-         * the nodes would be sorted by name, so searching could be achieved in O(log(n)).
-         * 
-         * Possible improvement: implement an AVL tree!
-         */
-        private Folder CreateFolderInternal(Folder parentFolder, string name)
-        {
             CheckName(name);
 
             if (Exists(parentFolder, name)) throw new ArgumentException("Folder already exists!");
@@ -107,7 +97,7 @@ namespace VFSBase.Implementation
                 // TODO: test this
                 var info = new DirectoryInfo(source);
 
-                var newFolder = CreateFolderInternal(dest, name);
+                var newFolder = CreateFolder(dest, name);
 
                 // TODO: test this
                 foreach (var directoryInfo in info.GetDirectories())
