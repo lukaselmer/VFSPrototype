@@ -106,21 +106,23 @@ namespace VFSBase.Implementation
         public void CreateFolder(Folder parentFolder, string name)
         {
             CheckDisposed();
+            CreateFolderInternal(parentFolder, name);
+        }
+
+        private Folder CreateFolderInternal(Folder parentFolder, string name)
+        {
             CheckName(name);
 
-            var folder = new Folder(name);
+            if (Exists(parentFolder, name)) throw new ArgumentException("Folder already exists!");
 
-            if (Exists(parentFolder, folder.Name)) throw new ArgumentException("Folder already exists!");
+            var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate() };
 
-            folder.Parent = parentFolder;
-
-            var blockToStoreNewFolder = _blockAllocation.Allocate();
-
-            folder.BlockNumber = blockToStoreNewFolder;
             var newFolderBytes = _blockParser.NodeToBytes(folder);
-            WriteBlock(blockToStoreNewFolder, newFolderBytes);
+            WriteBlock(folder.BlockNumber, newFolderBytes);
 
-            AppendBlockReference(parentFolder, blockToStoreNewFolder);
+            AppendBlockReference(parentFolder, folder.BlockNumber);
+
+            return folder;
         }
 
         public void Import(string source, Folder dest, string name)
@@ -136,9 +138,7 @@ namespace VFSBase.Implementation
                 // TODO: test this
                 var info = new DirectoryInfo(source);
 
-                // NOTE: May be there should be an internal create folder method, which returns the newly created folder?
-                CreateFolder(dest, name);
-                var newFolder = Find(dest, name) as Folder;
+                var newFolder = CreateFolderInternal(dest, name);
 
                 // TODO: test this
                 foreach (var directoryInfo in info.GetDirectories())
