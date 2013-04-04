@@ -3,13 +3,13 @@ using System.IO;
 
 namespace VFSBase.Implementation
 {
-    internal sealed class BlockManipulator :IDisposable
+    internal sealed class BlockManipulator : IDisposable
     {
         private FileStream _disk;
         private BinaryReader _diskReader;
         private BinaryWriter _diskWriter;
         private readonly FileSystemOptions _options;
-        
+
         public BlockManipulator(FileSystemOptions options)
         {
             _options = options;
@@ -71,6 +71,13 @@ namespace VFSBase.Implementation
                 _diskWriter.Dispose();
                 _diskWriter = null;
             }
+        }
+
+        public void SaveConfig(FileSystemOptions options, BlockAllocation blockAllocation)
+        {
+            _disk.Seek(0, SeekOrigin.Begin);
+            options.Serialize(_disk);
+            blockAllocation.Serialize(_disk);
         }
     }
 }

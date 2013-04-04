@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VFSBase.Exceptions;
 using VFSBase.Implementation;
 
 namespace VFSBase.Interfaces

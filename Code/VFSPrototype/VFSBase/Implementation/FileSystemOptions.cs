@@ -15,9 +15,10 @@ namespace VFSBase.Implementation
         {
             Location = location;
             DiskSize = diskSize;
-            MasterBlockSize = (uint)BinaryMathUtil.KB(1);
+            MasterBlockSize = (uint)BinaryMathUtil.KB(32);
             NameLength = 255;
             BlockReferenceSize = 64;
+            BlockAllocation = new BlockAllocation();
         }
 
         public string Location { get; set; }
@@ -45,7 +46,6 @@ namespace VFSBase.Implementation
             formatter.Serialize(stream, this);
         }
 
-
         public int BlockSize
         {
             get { return (int)BinaryMathUtil.KB(4); }
@@ -57,5 +57,7 @@ namespace VFSBase.Implementation
         public int NameLength { get; private set; }
 
         public int ReferencesPerIndirectNode { get { return BlockSize / BlockReferenceSize; } }
+
+        public BlockAllocation BlockAllocation { get; set; }
     }
 }
