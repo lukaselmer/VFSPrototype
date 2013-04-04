@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Implementation\BlockAllocation.cs" />
     <Compile Include="Implementation\FileSystem.cs" />
     <Compile Include="Implementation\FileSystemFactory.cs" />
     <Compile Include="Implementation\RootFolder.cs" />

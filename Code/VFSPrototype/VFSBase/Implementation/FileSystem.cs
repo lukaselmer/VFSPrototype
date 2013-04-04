@@ -18,7 +18,7 @@ namespace VFSBase.Implementation
         private BinaryReader _diskReader;
         private BinaryWriter _diskWriter;
         private readonly BlockParser _blockParser;
-        private long _nextFreeBlock;
+        private readonly BlockAllocation _blockAllocation;
 
         public FileSystemOptions FileSystemOptions { get { return _options; } }
 
@@ -32,12 +32,12 @@ namespace VFSBase.Implementation
             _diskWriter = new BinaryWriter(_disk);
 
             InitializeFileSystem();
+            _blockAllocation = new BlockAllocation(_options); //TODO: set the pointer to the next free block when imporing the file system
         }
 
         private void InitializeFileSystem()
         {
             Root = ImportRootFolder();
-            _nextFreeBlock = 1;
         }
 
         private void SeekToBlock(long blockNumber)
@@ -112,7 +112,7 @@ namespace VFSBase.Implementation
 
             folder.Parent = parentFolder;
 
-            var blockToStoreNewFolder = _nextFreeBlock++;
+            var blockToStoreNewFolder = _blockAllocation.Allocate();
 
             folder.BlockNumber = blockToStoreNewFolder;
             var newFolderBytes = _blockParser.NodeToBytes(folder);
@@ -298,7 +298,7 @@ namespace VFSBase.Implementation
 
         private IndirectNode CreateIndirectNode()
         {
-            var newNodeNumber = _nextFreeBlock++;
+            var newNodeNumber = _blockAllocation.Allocate();
             var indirectNode = new IndirectNode(new long[_options.ReferencesPerIndirectNode]) { BlockNumber = newNodeNumber };
             Persist(indirectNode);
             return indirectNode;
