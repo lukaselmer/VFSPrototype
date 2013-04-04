@@ -8,5 +8,7 @@ namespace VFSBase.Interfaces
         string Name { get; set; }
         Folder Parent { get; set; }
         long BlockNumber { get; set; }
+        long IndirectNodeNumber { get; set; }
+        long BlocksCount { get; set; }
     }
 }

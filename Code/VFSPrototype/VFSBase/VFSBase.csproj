@@ -52,8 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementation\BlockAllocation.cs" />
+    <Compile Include="Implementation\BlockList.cs" />
+    <Compile Include="Implementation\BlockManipulator.cs" />
     <Compile Include="Implementation\FileSystem.cs" />
     <Compile Include="Implementation\FileSystemFactory.cs" />
+    <Compile Include="Implementation\Persistence.cs" />
     <Compile Include="Implementation\RootFolder.cs" />
     <Compile Include="Interfaces\IFileSystemOptions.cs" />
     <Compile Include="Implementation\PathParser.cs" />

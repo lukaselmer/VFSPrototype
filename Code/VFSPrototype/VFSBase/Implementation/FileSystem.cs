@@ -10,29 +10,30 @@ using VFSBase.Persistance.Blocks;
 
 namespace VFSBase.Implementation
 {
-    internal class FileSystem : IFileSystem
+    internal sealed class FileSystem : IFileSystem
     {
         private readonly FileSystemOptions _options;
         private bool _disposed;
-        private FileStream _disk;
-        private BinaryReader _diskReader;
-        private BinaryWriter _diskWriter;
         private readonly BlockParser _blockParser;
         private readonly BlockAllocation _blockAllocation;
+        private readonly BlockManipulator _blockManipulator;
+        private readonly Persistence _persistence;
 
         public FileSystemOptions FileSystemOptions { get { return _options; } }
 
         internal FileSystem(FileSystemOptions options)
         {
             _options = options;
-            _blockParser = new BlockParser(_options);
 
-            _disk = new FileStream(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, _options.BlockSize, FileOptions.RandomAccess);
-            _diskReader = new BinaryReader(_disk);
-            _diskWriter = new BinaryWriter(_disk);
+            _blockManipulator = new BlockManipulator(_options);
+            _blockParser = new BlockParser(_options);
+            _persistence = new Persistence(_blockParser, _blockManipulator);
+            _blockAllocation = new BlockAllocation(_options);
 
             InitializeFileSystem();
-            _blockAllocation = new BlockAllocation(_options); //TODO: set the pointer to the next free block when imporing the file system
+
+            //TODO: set the pointer to the next free block when imporing the file system
+
         }
 
         private void InitializeFileSystem()
@@ -40,19 +41,14 @@ namespace VFSBase.Implementation
             Root = ImportRootFolder();
         }
 
-        private void SeekToBlock(long blockNumber)
-        {
-            _disk.Seek(_options.MasterBlockSize + (blockNumber * _options.BlockSize), SeekOrigin.Begin);
-        }
-
         private RootFolder ImportRootFolder()
         {
-            var folder = _blockParser.ParseRootFolder(ReadBlock(0));
+            var folder = _blockParser.ParseRootFolder(_blockManipulator.ReadBlock(0));
 
             if (folder != null) return folder;
 
             var root = new RootFolder();
-            WriteBlock(0, _blockParser.NodeToBytes(root));
+            _blockManipulator.WriteBlock(0, _blockParser.NodeToBytes(root));
 
             return root;
         }
@@ -84,7 +80,7 @@ namespace VFSBase.Implementation
 
         private IIndexNode ReadIndexNode(long blockNumber)
         {
-            var b = _blockParser.BytesToNode(ReadBlock(blockNumber));
+            var b = _blockParser.BytesToNode(_blockManipulator.ReadBlock(blockNumber));
             b.BlockNumber = blockNumber;
             return b;
         }
@@ -98,17 +94,17 @@ namespace VFSBase.Implementation
 
         public RootFolder Root { get; private set; }
 
-        /* NOTE: this method appends the reference to the *unordered* list. It would be faster if
-         * the nodes would be sorted by name, so searching could be achieved in O(log(n)).
-         * 
-         * Possible improvement: implement an AVL tree!
-         */
         public void CreateFolder(Folder parentFolder, string name)
         {
             CheckDisposed();
             CreateFolderInternal(parentFolder, name);
         }
 
+        /* NOTE: this method appends the reference to the *unordered* list. It would be faster if
+         * the nodes would be sorted by name, so searching could be achieved in O(log(n)).
+         * 
+         * Possible improvement: implement an AVL tree!
+         */
         private Folder CreateFolderInternal(Folder parentFolder, string name)
         {
             CheckName(name);
@@ -117,7 +113,7 @@ namespace VFSBase.Implementation
 
             var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate() };
 
-            Persist(folder);
+            _persistence.PersistFolder(folder);
 
             AppendBlockReference(parentFolder, folder.BlockNumber);
 
@@ -191,11 +187,11 @@ namespace VFSBase.Implementation
             if (node.Parent.BlocksCount == 0)
             {
                 node.Parent.IndirectNodeNumber = 0;
-                Persist(node.Parent);
+                _persistence.PersistFolder(node.Parent);
                 return;
             }
 
-            WriteBlock(node.Parent.BlockNumber, _blockParser.NodeToBytes(node.Parent));
+            _blockManipulator.WriteBlock(node.Parent.BlockNumber, _blockParser.NodeToBytes(node.Parent));
 
             var blocksCount = node.Parent.BlocksCount;
             var refsCount = _options.ReferencesPerIndirectNode;
@@ -215,7 +211,7 @@ namespace VFSBase.Implementation
             // WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
 
             indirectNode1.BlockNumbers[indexIndirection0] = 0;
-            Persist(indirectNode1);
+            _persistence.Persist(indirectNode1);
 
             if (refToMove == node.BlockNumber) return;
 
@@ -234,7 +230,7 @@ namespace VFSBase.Implementation
             AppendBlockReference(dest, blockNumber);
 
             toMove.Name = name;
-            Persist(toMove);
+            _persistence.Persist(toMove);
         }
 
         public bool Exists(Folder folder, string name)
@@ -255,7 +251,7 @@ namespace VFSBase.Implementation
                     if (blockNumber == toBeReplaced)
                     {
                         indirectNode.BlockNumbers[i] = toReplace;
-                        Persist(indirectNode);
+                        _persistence.Persist(indirectNode);
                         return;
                     }
                 }
@@ -265,48 +261,8 @@ namespace VFSBase.Implementation
 
         private void AppendBlockReference(Folder parentFolder, long reference)
         {
-            var indirectNodeNumber = parentFolder.IndirectNodeNumber;
-            if (indirectNodeNumber == 0)
-            {
-                parentFolder.IndirectNodeNumber = CreateIndirectNode().BlockNumber;
-            }
-
-            var blocksCount = parentFolder.BlocksCount;
-            var refsCount = _options.ReferencesPerIndirectNode;
-
-            var indexIndirection2 = (int)(blocksCount / (refsCount * refsCount));
-            var indexIndirection1 = (int)((blocksCount - (indexIndirection2 * refsCount * refsCount)) / refsCount);
-            var indexIndirection0 = (int)(blocksCount - (indexIndirection2 * refsCount * refsCount) - (refsCount * indexIndirection1));
-
-            parentFolder.BlocksCount += 1;
-            Persist(parentFolder);
-
-            var indirectNode3 = ReadIndirectNode(parentFolder.IndirectNodeNumber);
-            if (indirectNode3.BlockNumbers[indexIndirection2] == 0)
-            {
-                indirectNode3.BlockNumbers[indexIndirection2] = CreateIndirectNode().BlockNumber;
-                Persist(indirectNode3);
-            }
-
-            var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection2]);
-            if (indirectNode2.BlockNumbers[indexIndirection1] == 0)
-            {
-                indirectNode2.BlockNumbers[indexIndirection1] = CreateIndirectNode().BlockNumber;
-                Persist(indirectNode2);
-            }
-
-            var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection1]);
-            indirectNode1.BlockNumbers[indexIndirection0] = reference;
-            Persist(indirectNode1);
-        }
-
-
-        private IndirectNode CreateIndirectNode()
-        {
-            var newNodeNumber = _blockAllocation.Allocate();
-            var indirectNode = new IndirectNode(new long[_options.ReferencesPerIndirectNode]) { BlockNumber = newNodeNumber };
-            Persist(indirectNode);
-            return indirectNode;
+            BlockList l = new BlockList(parentFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
+            l.Add(reference);
         }
 
         private VFSFile CreateFile(string source, Folder dest, string name)
@@ -321,55 +277,24 @@ namespace VFSBase.Implementation
 
         private IndirectNode ReadIndirectNode(long indirectNodeNumber)
         {
-            var node = _blockParser.ParseIndirectNode(ReadBlock(indirectNodeNumber));
+            return ReadIndirectNodeStatic(_blockManipulator, _blockParser, indirectNodeNumber);
+        }
+
+        public static IndirectNode ReadIndirectNodeStatic(BlockManipulator blockManipulator, BlockParser blockParser, long indirectNodeNumber)
+        {
+            var readBlock = blockManipulator.ReadBlock(indirectNodeNumber);
+            var node = blockParser.ParseIndirectNode(readBlock);
             node.BlockNumber = indirectNodeNumber;
             return node;
-        }
-
-        private void WriteBlock(long blockNumber, byte[] block)
-        {
-            SeekToBlock(blockNumber);
-            _diskWriter.Write(block);
-        }
-
-        private byte[] ReadBlock(long blockNumber)
-        {
-            SeekToBlock(blockNumber);
-            var block = _diskReader.ReadBytes(_options.BlockSize);
-            if (block.Length != _options.BlockSize) return new byte[_options.BlockSize];
-            return block;
-        }
-
-        private void Persist(IIndexNode node)
-        {
-            //NOTE: this could be better!
-            if (node is Folder) Persist(node as Folder);
-            else if (node is VFSFile) Persist(node as VFSFile);
-        }
-
-        private void Persist(Folder folder)
-        {
-            WriteBlock(folder.BlockNumber, _blockParser.NodeToBytes(folder));
-        }
-
-        private void Persist(VFSFile file)
-        {
-            WriteBlock(file.BlockNumber, _blockParser.NodeToBytes(file));
-        }
-
-        private void Persist(IndirectNode indirectNode)
-        {
-            WriteBlock(indirectNode.BlockNumber, _blockParser.NodeToBytes(indirectNode));
         }
 
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             // If you need thread safety, use a lock around these  
             // operations, as well as in your methods that use the resource.
@@ -380,23 +305,9 @@ namespace VFSBase.Implementation
 
             // free managed resources
 
-            if (_disk != null)
+            if (_blockManipulator != null)
             {
-                _disk.Flush(true);
-                _disk.Dispose();
-                _disk = null;
-            }
-
-            if (_diskReader != null)
-            {
-                _diskReader.Dispose();
-                _diskReader = null;
-            }
-
-            if (_diskWriter != null)
-            {
-                _diskWriter.Dispose();
-                _diskWriter = null;
+                _blockManipulator.Dispose();
             }
         }
 

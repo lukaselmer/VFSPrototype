@@ -22,13 +22,13 @@ namespace VFSBase.Implementation
             BlocksCount = 0;
         }
 
-        public virtual long BlocksCount { get; set; }
-
         public string Name { get; set; }
 
         public virtual long BlockNumber { get; set; }
 
         public Folder Parent { get; set; }
+
+        public virtual long BlocksCount { get; set; }
 
         public long IndirectNodeNumber { get; set; }
     }
