@@ -84,7 +84,7 @@ namespace VFSBase.Implementation
             return folder;
         }
 
-        public void Import(string source, Folder dest, string name)
+        public void Import(string source, Folder destination, string name)
         {
             //TODO: test this method, recursivly
 
@@ -97,7 +97,7 @@ namespace VFSBase.Implementation
                 // TODO: test this
                 var info = new DirectoryInfo(source);
 
-                var newFolder = CreateFolder(dest, name);
+                var newFolder = CreateFolder(destination, name);
 
                 // TODO: test this
                 foreach (var directoryInfo in info.GetDirectories())
@@ -111,8 +111,8 @@ namespace VFSBase.Implementation
             else if (File.Exists(source))
             {
                 // Note: this should be tested already
-                var file = CreateFile(source, dest, name);
-                AppendBlockReference(dest, file.BlockNumber);
+                var file = CreateFile(source, destination, name);
+                AppendBlockReference(destination, file.BlockNumber);
             }
             else
             {
@@ -120,7 +120,7 @@ namespace VFSBase.Implementation
             }
         }
 
-        public void Export(IIndexNode source, string dest)
+        public void Export(IIndexNode source, string destination)
         {
             //TODO: implement this, with persistence
 
@@ -128,10 +128,10 @@ namespace VFSBase.Implementation
 
             var file = source as VFSFile;
             if (file == null) throw new FileNotFoundException();
-            File.WriteAllBytes(dest, file.Data);
+            File.WriteAllBytes(destination, file.Data);
         }
 
-        public void Copy(IIndexNode toCopy, Folder dest, string name)
+        public void Copy(IIndexNode node, Folder destination, string name)
         {
             //TODO: implement this, with persistence
 
@@ -148,19 +148,19 @@ namespace VFSBase.Implementation
             GetBlockList(node.Parent).Delete(node);
         }
 
-        public void Move(IIndexNode toMove, Folder dest, string name)
+        public void Move(IIndexNode node, Folder destination, string name)
         {
             CheckDisposed();
             CheckName(name);
 
-            if (Exists(dest, name)) throw new ArgumentException("Folder already exists!");
+            if (Exists(destination, name)) throw new ArgumentException("Folder already exists!");
 
-            var blockNumber = toMove.BlockNumber;
-            Delete(toMove);
-            AppendBlockReference(dest, blockNumber);
+            var blockNumber = node.BlockNumber;
+            Delete(node);
+            AppendBlockReference(destination, blockNumber);
 
-            toMove.Name = name;
-            _persistence.Persist(toMove);
+            node.Name = name;
+            _persistence.Persist(node);
         }
 
         public IIndexNode Find(Folder folder, string name)
@@ -191,8 +191,8 @@ namespace VFSBase.Implementation
         {
             // TODO: implement this
             //var file = new VFSFile(name, source);
-            //dest.IndexNodes.Add(file);
-            //file.Parent = dest;
+            //destination.IndexNodes.Add(file);
+            //file.Parent = destination;
             // TODO: persist
             throw new NotImplementedException();
         }
