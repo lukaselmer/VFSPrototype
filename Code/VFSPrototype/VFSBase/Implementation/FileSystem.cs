@@ -59,13 +59,6 @@ namespace VFSBase.Implementation
             return GetBlockList(folder).AsEnumerable().OfType<Folder>();
         }
 
-        public IIndexNode Find(Folder folder, string name)
-        {
-            CheckDisposed();
-
-            return Folders(folder).FirstOrDefault(f => f.Name == name);
-        }
-
         public RootFolder Root { get; private set; }
 
         public Folder CreateFolder(Folder parentFolder, string name)
@@ -161,6 +154,13 @@ namespace VFSBase.Implementation
 
             toMove.Name = name;
             _persistence.Persist(toMove);
+        }
+
+        public IIndexNode Find(Folder folder, string name)
+        {
+            CheckDisposed();
+
+            return GetBlockList(folder).Find(name);
         }
 
         public bool Exists(Folder folder, string name)

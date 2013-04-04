@@ -181,5 +181,10 @@ namespace VFSBase.Implementation
         {
             return AsEnumerable().Any(i => i.Name == name);
         }
+
+        public IIndexNode Find(string name)
+        {
+            return AsEnumerable().FirstOrDefault(i => i.Name == name);
+        }
     }
 }
