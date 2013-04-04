@@ -32,9 +32,6 @@ namespace VFSBase.Implementation
             _blockAllocation = _options.BlockAllocation;
 
             InitializeFileSystem();
-
-            //TODO: set the pointer to the next free block when imporing the file system
-
         }
 
         private void InitializeFileSystem()
