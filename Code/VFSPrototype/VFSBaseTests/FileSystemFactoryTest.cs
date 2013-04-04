@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
 
@@ -13,7 +11,7 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemFactoryTest
     {
-        const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
+        private const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
         private const long DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
 
         [TestCleanup]

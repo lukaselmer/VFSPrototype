@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using VFSBase.Implementation;
+﻿using VFSBase.Implementation;
 
 namespace VFSBase.Interfaces
 {

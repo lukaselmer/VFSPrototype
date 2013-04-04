@@ -101,7 +101,7 @@ namespace VFSBase.Implementation
 
         public void Copy(string source, string dest)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private static Queue<string> PathToQueue(string path)
@@ -142,7 +142,6 @@ namespace VFSBase.Implementation
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-
         }
 
         protected virtual void Dispose(bool disposing)

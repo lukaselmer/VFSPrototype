@@ -40,10 +40,10 @@ namespace VFSBase.Persistence
             var name = ExtractName(bb);
 
             return new Folder(name)
-                        {
-                            BlocksCount = BitConverter.ToInt64(bb, _options.NameLength + 1),
-                            IndirectNodeNumber = BitConverter.ToInt64(bb, sizeof(long) + _options.NameLength + 1)
-                        };
+                       {
+                           BlocksCount = BitConverter.ToInt64(bb, _options.NameLength + 1),
+                           IndirectNodeNumber = BitConverter.ToInt64(bb, sizeof(long) + _options.NameLength + 1)
+                       };
         }
 
         public RootFolder ParseRootFolder(byte[] bb)
@@ -130,6 +130,5 @@ namespace VFSBase.Persistence
             if (nameBytes.Length > _options.NameLength) throw new VFSException("Name is too long");
             nameBytes.CopyTo(bb, 1);
         }
-
     }
 }
