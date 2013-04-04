@@ -33,7 +33,7 @@ namespace VFSBaseTests
             using (var fs = GetFileSystem())
             {
                 Assert.IsTrue(!fs.Folders(fs.Root).Any());
-                fs.CreateFolder(fs.Root, new Folder("test"));
+                fs.CreateFolder(fs.Root, "test");
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
             }
 
@@ -50,14 +50,14 @@ namespace VFSBaseTests
             using (var fs = GetFileSystem())
             {
                 Assert.IsTrue(!fs.Folders(fs.Root).Any());
-                fs.CreateFolder(fs.Root, new Folder(name));
+                fs.CreateFolder(fs.Root, name);
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
             }
 
             using (var fs = GetFileSystem())
             {
-                // TODO: make this true! Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
-                // TODO: make this true! Assert.IsTrue(fs.Folders(fs.Root).First().Name == name);
+                Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
+                Assert.IsTrue(fs.Folders(fs.Root).First().Name == name);
             }
         }
         

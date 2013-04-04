@@ -103,10 +103,12 @@ namespace VFSBase.Implementation
          * 
          * Possible improvement: implement an AVL tree!
          */
-        public void CreateFolder(Folder parentFolder, Folder folder)
+        public void CreateFolder(Folder parentFolder, string name)
         {
             CheckDisposed();
-            CheckName(folder.Name);
+            CheckName(name);
+
+            var folder = new Folder(name);
 
             if (Exists(parentFolder, folder.Name)) throw new ArgumentException("Folder already exists!");
 
@@ -135,7 +137,7 @@ namespace VFSBase.Implementation
                 var info = new DirectoryInfo(source);
 
                 // NOTE: May be there should be an internal create folder method, which returns the newly created folder?
-                CreateFolder(dest, new Folder(name));
+                CreateFolder(dest, name);
                 var newFolder = Find(dest, name) as Folder;
 
                 // TODO: test this

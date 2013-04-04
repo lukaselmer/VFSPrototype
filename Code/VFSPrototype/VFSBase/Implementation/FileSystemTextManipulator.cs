@@ -41,7 +41,7 @@ namespace VFSBase.Implementation
 
             if (parentFolder == null) throw new DirectoryNotFoundException();
 
-            _fileSystem.CreateFolder(parentFolder, new Folder(PathParser.GetNodeName(path)));
+            _fileSystem.CreateFolder(parentFolder, PathParser.GetNodeName(path));
         }
 
         public void Delete(string path)
