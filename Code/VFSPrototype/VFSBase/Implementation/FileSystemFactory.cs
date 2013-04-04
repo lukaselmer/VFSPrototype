@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation

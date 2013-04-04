@@ -1,4 +1,5 @@
 ﻿using System;
+using VFSBase.Exceptions;
 
 namespace VFSBase.Implementation
 {

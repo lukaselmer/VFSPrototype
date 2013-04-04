@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
@@ -53,10 +54,16 @@ namespace VFSBase.Implementation
             return root;
         }
 
+        public IEnumerable<IIndexNode> AsEnumerable(Folder folder)
+        {
+            CheckDisposed();
+            return GetBlockList(folder).AsEnumerable();
+        }
+
         public IEnumerable<Folder> Folders(Folder folder)
         {
             CheckDisposed();
-            return GetBlockList(folder).AsEnumerable().OfType<Folder>();
+            return AsEnumerable(folder).OfType<Folder>();
         }
 
         public RootFolder Root { get; private set; }
@@ -66,7 +73,7 @@ namespace VFSBase.Implementation
             CheckDisposed();
             CheckName(name);
 
-            if (Exists(parentFolder, name)) throw new ArgumentException("Folder already exists!");
+            if (Exists(parentFolder, name)) throw new AlreadyExistsException();
 
             var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate() };
 
@@ -225,5 +232,9 @@ namespace VFSBase.Implementation
             if (BlockParser.StringToBytes(name).Length > _options.NameLength) throw new VFSException(string.Format("Name too long, max {0}", 255));
         }
 
+    }
+
+    internal class AlreadyExistsException : VFSException
+    {
     }
 }
