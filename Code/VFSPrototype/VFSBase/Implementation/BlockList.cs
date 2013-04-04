@@ -69,7 +69,10 @@ namespace VFSBase.Implementation
 
         private IndirectNode ReadIndirectNode(long reference)
         {
-            return FileSystem.ReadIndirectNodeStatic(_blockManipulator, _blockParser, reference);
+            var readBlock = _blockManipulator.ReadBlock(reference);
+            var node = _blockParser.ParseIndirectNode(readBlock);
+            node.BlockNumber = reference;
+            return node;
         }
 
         private IndirectNode CreateIndirectNode()
@@ -173,5 +176,9 @@ namespace VFSBase.Implementation
             return b;
         }
 
+        public bool Exists(string name)
+        {
+            return AsEnumerable().Any(i => i.Name == name);
+        }
     }
 }

@@ -56,8 +56,7 @@ namespace VFSBase.Implementation
         public IEnumerable<Folder> Folders(Folder folder)
         {
             CheckDisposed();
-            var x = GetBlockList(folder);
-            return x.AsEnumerable().OfType<Folder>();
+            return GetBlockList(folder).AsEnumerable().OfType<Folder>();
         }
 
         public IIndexNode Find(Folder folder, string name)
@@ -177,7 +176,8 @@ namespace VFSBase.Implementation
         public bool Exists(Folder folder, string name)
         {
             CheckDisposed();
-            return Folders(folder).Any(i => i.Name == name);
+
+            return GetBlockList(folder).Exists(name);
         }
 
         private void AppendBlockReference(Folder parentFolder, long reference)
@@ -198,19 +198,6 @@ namespace VFSBase.Implementation
             //file.Parent = dest;
             // TODO: persist
             throw new NotImplementedException();
-        }
-
-        private IndirectNode ReadIndirectNode(long indirectNodeNumber)
-        {
-            return ReadIndirectNodeStatic(_blockManipulator, _blockParser, indirectNodeNumber);
-        }
-
-        public static IndirectNode ReadIndirectNodeStatic(BlockManipulator blockManipulator, BlockParser blockParser, long indirectNodeNumber)
-        {
-            var readBlock = blockManipulator.ReadBlock(indirectNodeNumber);
-            var node = blockParser.ParseIndirectNode(readBlock);
-            node.BlockNumber = indirectNodeNumber;
-            return node;
         }
 
         public void Dispose()
