@@ -57,8 +57,13 @@ namespace VFSBase.Persistence
             if (bb.Length != _options.BlockSize) return null;
 
             var name = ExtractName(bb);
-            // TODO: parse contents
-            return new VFSFile(name);
+
+            return new VFSFile(name)
+            {
+                BlocksCount = BitConverter.ToInt64(bb, _options.NameLength + 1),
+                IndirectNodeNumber = BitConverter.ToInt64(bb, sizeof(long) + _options.NameLength + 1),
+                LastBlockSize = BitConverter.ToInt32(bb, sizeof(long) * 2 + _options.NameLength + 1)
+            };
         }
 
         public IndirectNode ParseIndirectNode(byte[] bb)

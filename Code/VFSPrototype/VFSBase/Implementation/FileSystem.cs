@@ -205,13 +205,14 @@ namespace VFSBase.Implementation
                 {
                     AddDataToFile(file, block);
                 }
-                //TODO: store last part (which may be < _options.BlockSize ==> Add some padding)
-
                 var lastBlockSize = block.Length;
 
-                var lastBlock = new byte[_options.BlockSize];
-                block.CopyTo(lastBlock, 0);
-                AddDataToFile(file, block);
+                if (block.Length > 0)
+                {
+                    var lastBlock = new byte[_options.BlockSize];
+                    block.CopyTo(lastBlock, 0);
+                    AddDataToFile(file, block);
+                }
 
                 file.LastBlockSize = lastBlockSize;
                 _persistence.Persist(file);

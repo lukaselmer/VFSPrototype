@@ -144,29 +144,66 @@ namespace VFSBaseTests
             }
         }
 
+
+        [TestMethod]
+        public void TestExportFileBasic()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                const string testFileSource = "test.txt";
+                byte[] testFileData = new byte[4096];
+                testFileData[0] = (byte)'\n';
+
+                if (File.Exists(testFileSource)) File.Delete(testFileSource);
+
+                File.WriteAllBytes(testFileSource, testFileData);
+
+                Assert.IsFalse(m.Exists(testFileSource));
+                Assert.IsFalse(m.Exists(testFileSource));
+
+                m.ImportFile(testFileSource, testFileSource);
+                if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
+                File.Delete(testFileSource);
+                Assert.IsTrue(m.Exists(testFileSource));
+                Assert.IsFalse(File.Exists(testFileSource));
+
+                m.ExportFile(testFileSource, testFileSource);
+
+                Assert.IsTrue(File.Exists(testFileSource));
+                Assert.IsTrue(m.Exists(testFileSource));
+                var readAllBytes = File.ReadAllBytes(testFileSource);
+
+                for (var i = 0; i < readAllBytes.Length; i++) Assert.AreEqual(testFileData[i], readAllBytes[i]);
+
+            }
+        }
+
         [TestMethod]
         public void TestExportFile()
         {
             using (var m = InitTestFileSystemManipulator())
             {
                 const string testFileSource = "test.txt";
-                const string testFileExport = "export.txt";
-                
-                if (File.Exists(testFileExport)) File.Delete(testFileExport);
+                const string testFileData = "xxx";
+
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
-                
-                File.WriteAllText(testFileSource, "");
+
+                File.WriteAllText(testFileSource, testFileData);
 
                 Assert.IsFalse(m.Exists(testFileSource));
-                Assert.IsFalse(m.Exists(testFileExport));
-                Assert.IsFalse(File.Exists(testFileExport));
+                Assert.IsFalse(m.Exists(testFileSource));
 
                 m.ImportFile(testFileSource, testFileSource);
-                if (!m.Exists(testFileSource)) Assert.Inconclusive();
-                m.ExportFile(testFileSource, testFileExport);
-
+                if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
+                File.Delete(testFileSource);
                 Assert.IsTrue(m.Exists(testFileSource));
-                Assert.IsTrue(m.Exists(testFileExport));
+                Assert.IsFalse(File.Exists(testFileSource));
+
+                m.ExportFile(testFileSource, testFileSource);
+
+                Assert.IsTrue(File.Exists(testFileSource));
+                Assert.IsTrue(m.Exists(testFileSource));
+                Assert.AreEqual(testFileData, File.ReadAllText(testFileSource));
             }
         }
 
