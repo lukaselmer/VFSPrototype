@@ -65,9 +65,6 @@ namespace VFSBaseTests
         {
             using (var m = new MemoryStream())
             {
-                const long size = 1001L;
-                const uint masterBlockSize = 30000U;
-
                 var b1 = new BlockAllocation();
                 Assert.AreEqual(1, b1.Allocate());
                 Assert.AreEqual(2, b1.Allocate());
