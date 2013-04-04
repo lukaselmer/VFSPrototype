@@ -130,20 +130,26 @@ namespace VFSBase.Implementation
 
             if (Directory.Exists(source))
             {
+
+                // TODO: test this
                 var info = new DirectoryInfo(source);
 
+                // NOTE: May be there should be an internal create folder method, which returns the newly created folder?
                 CreateFolder(dest, new Folder(name));
                 var newFolder = Find(dest, name) as Folder;
 
+                // TODO: test this
                 foreach (var directoryInfo in info.GetDirectories())
                     Import(directoryInfo.FullName, newFolder, directoryInfo.Name);
 
+                // TODO: test this
                 foreach (var fileInfo in info.GetFiles())
                     Import(fileInfo.FullName, newFolder, fileInfo.Name);
 
             }
             else if (File.Exists(source))
             {
+                // Note: this should be tested already
                 var file = CreateFile(source, dest, name);
                 AppendBlockReference(dest, file.BlockNumber);
             }
