@@ -1,8 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace VFSBase.Implementation
 {
-    internal class BlockAllocation
+    [Serializable]
+    public class BlockAllocation
     {
         private long _nextFreeBlock = 1;
         private readonly LinkedList<long> _freeList = new LinkedList<long>();
@@ -19,6 +24,18 @@ namespace VFSBase.Implementation
         public void Free(long blockNumber)
         {
             _freeList.AddFirst(blockNumber);
+        }
+
+        public static BlockAllocation Deserialize(Stream stream)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            return formatter.Deserialize(stream) as BlockAllocation;
+        }
+
+        public void Serialize(Stream stream)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(stream, this);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace VFSBase.Implementation
             _blockManipulator = new BlockManipulator(_options);
             _blockParser = new BlockParser(_options);
             _persistence = new Persistence(_blockParser, _blockManipulator);
-            _blockAllocation = new BlockAllocation();
+            _blockAllocation = _options.BlockAllocation;
 
             InitializeFileSystem();
 
@@ -216,8 +216,14 @@ namespace VFSBase.Implementation
 
             if (_blockManipulator != null)
             {
+                WriteConfig();
                 _blockManipulator.Dispose();
             }
+        }
+
+        private void WriteConfig()
+        {
+            _blockManipulator.SaveConfig(_options, _blockAllocation);
         }
 
         private void CheckDisposed()
