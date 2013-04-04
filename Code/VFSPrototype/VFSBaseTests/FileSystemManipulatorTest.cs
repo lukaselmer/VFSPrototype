@@ -142,7 +142,7 @@ namespace VFSBaseTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FileNotFoundException))]
+        [ExpectedException(typeof(NotFoundException))]
         public void TestInvalidImportFile()
         {
             using (var m = InitTestFileSystemManipulator())
