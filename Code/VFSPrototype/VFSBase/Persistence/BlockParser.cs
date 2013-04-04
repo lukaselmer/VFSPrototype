@@ -33,7 +33,7 @@ namespace VFSBase.Persistence
             return EmptyBlock.Get();
         }
 
-        public Folder ParseFolder(byte[] bb)
+        private Folder ParseFolder(byte[] bb)
         {
             if (bb.Length != _options.BlockSize) return null;
 
@@ -52,7 +52,7 @@ namespace VFSBase.Persistence
             return new RootFolder { BlocksCount = f.BlocksCount, IndirectNodeNumber = f.IndirectNodeNumber };
         }
 
-        public VFSFile ParseFile(byte[] bb)
+        private VFSFile ParseFile(byte[] bb)
         {
             if (bb.Length != _options.BlockSize) return null;
 

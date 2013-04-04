@@ -145,7 +145,7 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
 
-            GetBlockList(node.Parent).Delete(node);
+            GetBlockList(node.Parent).Remove(node);
         }
 
         public void Move(IIndexNode node, Folder destination, string name)
@@ -182,7 +182,7 @@ namespace VFSBase.Implementation
             GetBlockList(parentFolder).Add(reference);
         }
 
-        private BlockList GetBlockList(IIndexNode parentFolder)
+        private IBlockList GetBlockList(IIndexNode parentFolder)
         {
             return new BlockList(parentFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
         }

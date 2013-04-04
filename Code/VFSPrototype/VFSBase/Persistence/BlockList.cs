@@ -1,23 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using VFSBase.Exceptions;
+using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Persistence
 {
-    internal class BlockList
+    internal class BlockList : IBlockList
     {
         private readonly IIndexNode _node;
         private readonly BlockAllocation _blockAllocation;
         private readonly FileSystemOptions _options;
         private readonly BlockParser _blockParser;
         private readonly BlockManipulator _blockManipulator;
-        private readonly Persistence _persistence;
+        private readonly Implementation.Persistence _persistence;
 
-        public BlockList(IIndexNode node, BlockAllocation blockAllocation, FileSystemOptions options, BlockParser blockParser, BlockManipulator blockManipulator, Persistence persistence)
+        // NOTE: long parameter smell. Are they all needed? If yes: refactoring "introduce parameter object".
+        public BlockList(IIndexNode node, BlockAllocation blockAllocation, FileSystemOptions options, BlockParser blockParser,
+            BlockManipulator blockManipulator, Implementation.Persistence persistence)
         {
             _node = node;
             _blockAllocation = blockAllocation;
@@ -31,7 +32,7 @@ namespace VFSBase.Implementation
         {
             var parentFolder = _node as Folder;
 
-            if (parentFolder == null) throw new NotImplementedException();
+            if (parentFolder == null) throw new VFSException("Not implemented yet: can only add references to folders!");
 
             var indirectNodeNumber = parentFolder.IndirectNodeNumber;
             if (indirectNodeNumber == 0)
@@ -68,26 +69,10 @@ namespace VFSBase.Implementation
             _persistence.Persist(indirectNode1);
         }
 
-        private IndirectNode ReadIndirectNode(long reference)
-        {
-            var readBlock = _blockManipulator.ReadBlock(reference);
-            var node = _blockParser.ParseIndirectNode(readBlock);
-            node.BlockNumber = reference;
-            return node;
-        }
-
-        private IndirectNode CreateIndirectNode()
-        {
-            var newNodeNumber = _blockAllocation.Allocate();
-            var indirectNode = new IndirectNode(new long[_options.ReferencesPerIndirectNode]) { BlockNumber = newNodeNumber };
-            _persistence.Persist(indirectNode);
-            return indirectNode;
-        }
-
-        public void Delete(IIndexNode nodeToDelete)
+        public void Remove(IIndexNode nodeToDelete)
         {
             var parentNode = _node as Folder;
-            if(parentNode == null) throw new VFSException("Can only delete nodes from folders!");
+            if (parentNode == null) throw new VFSException("Can only delete nodes from folders!");
 
             if (parentNode.BlocksCount == 0) return;
 
@@ -126,6 +111,44 @@ namespace VFSBase.Implementation
             ReplaceInIndirectNode(indirectNode3, nodeToDelete.BlockNumber, refToMove, 2);
         }
 
+        public IEnumerable<IIndexNode> AsEnumerable()
+        {
+            var l = new List<IIndexNode>((int)_node.BlocksCount);
+            if (_node.IndirectNodeNumber == 0) return l;
+
+            AddFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), l, 2);
+
+            var folder = _node as Folder;
+            if (folder != null) l.ForEach(f => f.Parent = folder);
+
+            return l;
+        }
+
+        public bool Exists(string name)
+        {
+            return AsEnumerable().Any(i => i.Name == name);
+        }
+
+        public IIndexNode Find(string name)
+        {
+            return AsEnumerable().FirstOrDefault(i => i.Name == name);
+        }
+
+        private IndirectNode ReadIndirectNode(long reference)
+        {
+            var readBlock = _blockManipulator.ReadBlock(reference);
+            var node = _blockParser.ParseIndirectNode(readBlock);
+            node.BlockNumber = reference;
+            return node;
+        }
+
+        private IndirectNode CreateIndirectNode()
+        {
+            var newNodeNumber = _blockAllocation.Allocate();
+            var indirectNode = new IndirectNode(new long[_options.ReferencesPerIndirectNode]) { BlockNumber = newNodeNumber };
+            _persistence.Persist(indirectNode);
+            return indirectNode;
+        }
 
         private void ReplaceInIndirectNode(IndirectNode indirectNode, long toBeReplaced, long toReplace, int recursion)
         {
@@ -147,19 +170,6 @@ namespace VFSBase.Implementation
             }
         }
 
-        public IEnumerable<IIndexNode> AsEnumerable()
-        {
-            var l = new List<IIndexNode>((int)_node.BlocksCount);
-            if (_node.IndirectNodeNumber == 0) return l;
-
-            AddFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), l, 2);
-
-            var folder = _node as Folder;
-            if (folder != null) l.ForEach(f => f.Parent = folder);
-
-            return l;
-        }
-
         private void AddFromIndirectNode(IndirectNode indirectNode, List<IIndexNode> l, int recursion)
         {
             foreach (var blockNumber in indirectNode.BlockNumbers)
@@ -178,14 +188,5 @@ namespace VFSBase.Implementation
             return b;
         }
 
-        public bool Exists(string name)
-        {
-            return AsEnumerable().Any(i => i.Name == name);
-        }
-
-        public IIndexNode Find(string name)
-        {
-            return AsEnumerable().FirstOrDefault(i => i.Name == name);
-        }
     }
 }
