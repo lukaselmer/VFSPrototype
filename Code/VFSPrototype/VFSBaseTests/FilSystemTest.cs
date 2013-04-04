@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
@@ -11,8 +10,8 @@ namespace VFSBaseTests
     [TestClass]
     public class FilSystemTest
     {
-        const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
-        private long _defaultSize = BinaryMathUtil.MB(5);
+        private const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
+        private readonly long _defaultSize = BinaryMathUtil.MB(5);
 
         [TestCleanup]
         public void RemoveTestfile()
@@ -60,6 +59,5 @@ namespace VFSBaseTests
                 Assert.IsTrue(fs.Folders(fs.Root).First().Name == name);
             }
         }
-        
     }
 }

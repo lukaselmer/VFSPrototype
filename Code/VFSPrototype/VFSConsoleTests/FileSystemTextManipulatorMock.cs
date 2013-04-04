@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using VFSBase;
+﻿using System.Collections.Generic;
 using VFSBase.Interfaces;
 
 namespace VFSConsoleTests
@@ -52,7 +50,6 @@ namespace VFSConsoleTests
 
         public void Dispose()
         {
-            
         }
     }
 }

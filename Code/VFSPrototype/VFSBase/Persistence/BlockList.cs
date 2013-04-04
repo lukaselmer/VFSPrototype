@@ -18,7 +18,7 @@ namespace VFSBase.Persistence
 
         // NOTE: long parameter smell. Are they all needed? If yes: refactoring "introduce parameter object".
         public BlockList(IIndexNode node, BlockAllocation blockAllocation, FileSystemOptions options, BlockParser blockParser,
-            BlockManipulator blockManipulator, Implementation.Persistence persistence)
+                         BlockManipulator blockManipulator, Implementation.Persistence persistence)
         {
             _node = node;
             _blockAllocation = blockAllocation;
@@ -208,7 +208,6 @@ namespace VFSBase.Persistence
                 _blockManipulator.WriteBlock(blockNumber, new byte[_options.BlockSize]);
                 _blockAllocation.Free(blockNumber);
             }
-
         }
     }
 }

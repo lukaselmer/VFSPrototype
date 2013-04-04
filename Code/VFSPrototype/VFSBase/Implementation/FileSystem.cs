@@ -17,7 +17,10 @@ namespace VFSBase.Implementation
         private readonly BlockManipulator _blockManipulator;
         private readonly Persistence _persistence;
 
-        public FileSystemOptions FileSystemOptions { get { return _options; } }
+        public FileSystemOptions FileSystemOptions
+        {
+            get { return _options; }
+        }
 
         internal FileSystem(FileSystemOptions options)
         {
@@ -222,8 +225,8 @@ namespace VFSBase.Implementation
         {
             if (name != PathParser.NormalizeName(name)) throw new VFSException("Name invalid");
             if (name.Length <= 0) throw new VFSException("Name must not be empty!");
-            if (BlockParser.StringToBytes(name).Length > _options.NameLength) throw new VFSException(string.Format("Name too long, max {0}", 255));
+            if (BlockParser.StringToBytes(name).Length > _options.NameLength)
+                throw new VFSException(string.Format("Name too long, max {0}", 255));
         }
-
     }
 }

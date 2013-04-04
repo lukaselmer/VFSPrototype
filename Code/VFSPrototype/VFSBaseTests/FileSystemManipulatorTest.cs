@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VFSBase;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
@@ -12,7 +10,7 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemManipulatorTest
     {
-        const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
+        private const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
         private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
 
         private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
@@ -67,7 +65,7 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                for (int i = 0; i < 100; i++)
+                for (var i = 0; i < 100; i++)
                 {
                     m.CreateFolder("test" + i);
                     Assert.IsTrue(m.Exists("test" + i));

@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VFSBase;
 using VFSConsole;
 
 namespace VFSConsoleTests
@@ -199,8 +197,12 @@ namespace VFSConsoleTests
 
                 var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
-                Assert.AreEqual(string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt), mocks.FakeOutLine(true));
-                Assert.AreEqual(string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt), mocks.FakeOutLine(true));
+                Assert.AreEqual(
+                    string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt),
+                    mocks.FakeOutLine(true));
+                Assert.AreEqual(
+                    string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt),
+                    mocks.FakeOutLine(true));
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
