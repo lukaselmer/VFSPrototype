@@ -103,11 +103,17 @@ namespace VFSBase.Implementation
             else throw new ArgumentException("Source must be of type Folder or VFSFile", "source");
         }
 
-        private void ExportFile(VFSFile vfsFile, string destination)
+        private void ExportFile(VFSFile file, string destination)
         {
-            using (var w = new BinaryWriter(File.OpenWrite(destination)))
+            using (var stream = File.OpenWrite(destination))
+            using (var w = new BinaryWriter(stream))
             {
-                GetBlockList(vfsFile).WriteToStream(w);
+                GetBlockList(file).WriteToStream(w);
+                if (file.LastBlockSize > 0)
+                {
+                    w.Seek(_options.BlockSize - file.LastBlockSize, SeekOrigin.End);
+                    stream.SetLength(stream.Length + file.LastBlockSize - _options.BlockSize);
+                }
             }
         }
 
@@ -205,16 +211,15 @@ namespace VFSBase.Implementation
                 {
                     AddDataToFile(file, block);
                 }
-                var lastBlockSize = block.Length;
 
-                if (block.Length > 0)
+                file.LastBlockSize = block.Length;
+                if (file.LastBlockSize > 0)
                 {
                     var lastBlock = new byte[_options.BlockSize];
                     block.CopyTo(lastBlock, 0);
                     AddDataToFile(file, block);
                 }
 
-                file.LastBlockSize = lastBlockSize;
                 _persistence.Persist(file);
             }
 

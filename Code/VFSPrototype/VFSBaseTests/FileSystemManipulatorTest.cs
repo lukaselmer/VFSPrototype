@@ -174,7 +174,6 @@ namespace VFSBaseTests
                 var readAllBytes = File.ReadAllBytes(testFileSource);
 
                 for (var i = 0; i < readAllBytes.Length; i++) Assert.AreEqual(testFileData[i], readAllBytes[i]);
-
             }
         }
 
