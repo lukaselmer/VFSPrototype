@@ -28,29 +28,25 @@ namespace VFSBase.Persistence
             _persistence = persistence;
         }
 
-        public void Add(long reference)
+        public void AddReference(long reference)
         {
-            var parentFolder = _node as Folder;
-
-            if (parentFolder == null) throw new VFSException("Not implemented yet: can only add references to folders!");
-
-            var indirectNodeNumber = parentFolder.IndirectNodeNumber;
+            var indirectNodeNumber = _node.IndirectNodeNumber;
             if (indirectNodeNumber == 0)
             {
-                parentFolder.IndirectNodeNumber = CreateIndirectNode().BlockNumber;
+                _node.IndirectNodeNumber = CreateIndirectNode().BlockNumber;
             }
 
-            var blocksCount = parentFolder.BlocksCount;
+            var blocksCount = _node.BlocksCount;
             var refsCount = _options.ReferencesPerIndirectNode;
 
             var indexIndirection2 = (int)(blocksCount / (refsCount * refsCount));
             var indexIndirection1 = (int)((blocksCount - (indexIndirection2 * refsCount * refsCount)) / refsCount);
             var indexIndirection0 = (int)(blocksCount - (indexIndirection2 * refsCount * refsCount) - (refsCount * indexIndirection1));
 
-            parentFolder.BlocksCount += 1;
-            _persistence.Persist(parentFolder);
+            _node.BlocksCount += 1;
+            _persistence.Persist(_node);
 
-            var indirectNode3 = ReadIndirectNode(parentFolder.IndirectNodeNumber);
+            var indirectNode3 = ReadIndirectNode(_node.IndirectNodeNumber);
             if (indirectNode3.IsFree(indexIndirection2))
             {
                 indirectNode3[indexIndirection2] = CreateIndirectNode().BlockNumber;

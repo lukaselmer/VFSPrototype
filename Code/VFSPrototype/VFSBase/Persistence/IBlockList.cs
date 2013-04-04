@@ -16,7 +16,7 @@ namespace VFSBase.Persistence
         /// Adds the specified reference to the list.
         /// </summary>
         /// <param name="reference">The reference.</param>
-        void Add(long reference);
+        void AddReference(long reference);
 
         /// <summary>
         /// Removes the specified node from the list.

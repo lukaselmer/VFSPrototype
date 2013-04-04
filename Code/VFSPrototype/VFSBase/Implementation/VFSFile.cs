@@ -30,5 +30,7 @@ namespace VFSBase.Implementation
         public long BlocksCount { get; set; }
 
         public byte[] Data { get; private set; }
+
+        public int LastBlockSize { get; set; }
     }
 }

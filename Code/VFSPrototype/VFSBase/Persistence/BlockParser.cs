@@ -91,7 +91,7 @@ namespace VFSBase.Persistence
             return new string(Encoding.UTF8.GetString(nameBytes).TakeWhile(c => c != '\0').ToArray());
         }
 
-        private byte TypeBit(IIndexNode node)
+        private static byte TypeBit(IIndexNode node)
         {
             if (node is Folder) return FolderType;
             if (node is VFSFile) return FileType;
@@ -102,9 +102,19 @@ namespace VFSBase.Persistence
         {
             var bb = new byte[_options.BlockSize];
             bb[0] = TypeBit(node);
+
             WriteNameToBuffer(ref bb, node.Name);
-            BitConverter.GetBytes(node.BlocksCount).CopyTo(bb, _options.NameLength + 1);
-            BitConverter.GetBytes(node.IndirectNodeNumber).CopyTo(bb, sizeof(long) + _options.NameLength + 1);
+            var offset = _options.NameLength + 1;
+
+            BitConverter.GetBytes(node.BlocksCount).CopyTo(bb, offset);
+            offset += sizeof(long);
+
+            BitConverter.GetBytes(node.IndirectNodeNumber).CopyTo(bb, offset);
+            offset += sizeof(long);
+
+            var file= node as VFSFile;
+            if (file != null) BitConverter.GetBytes(file.LastBlockSize).CopyTo(bb, offset);
+
             return bb;
         }
 

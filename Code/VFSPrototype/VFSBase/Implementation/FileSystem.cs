@@ -168,9 +168,9 @@ namespace VFSBase.Implementation
                 ImportFile(fileInfo.FullName, newFolder, fileInfo.Name);
         }
 
-        private void AppendBlockReference(Folder parentFolder, long reference)
+        private void AppendBlockReference(IIndexNode parentFolder, long reference)
         {
-            GetBlockList(parentFolder).Add(reference);
+            GetBlockList(parentFolder).AddReference(reference);
         }
 
         private IBlockList GetBlockList(IIndexNode parentFolder)
@@ -178,20 +178,39 @@ namespace VFSBase.Implementation
             return new BlockList(parentFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
         }
 
-        private VFSFile CreateFile(string source, Folder dest, string name)
+        private VFSFile CreateFile(string source, Folder destination, string name)
         {
-            var file = new VFSFile(name);
-            //TODO: save some metadata?
+            var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
 
-            _persistence.Persist(file);
-            //AppendBlockReference(parentFolder, folder.BlockNumber);
+            using (var b = new BinaryReader(File.OpenRead(source)))
+            {
+                byte[] block;
+                while ((block = b.ReadBytes(_options.BlockSize)).Length == _options.BlockSize)
+                {
+                    AddDataToFile(file, block);
+                }
+                //TODO: store last part (which may be < _options.BlockSize ==> Add some padding)
 
-            // TODO: implement this
-            //var file = new VFSFile(name, source);
-            //destination.IndexNodes.Add(file);
-            //file.Parent = destination;
-            // TODO: persist
-            throw new NotImplementedException();
+                var lastBlockSize = block.Length;
+
+                var lastBlock = new byte[_options.BlockSize];
+                block.CopyTo(lastBlock, 0);
+                AddDataToFile(file, block);
+
+                file.LastBlockSize = lastBlockSize;
+                _persistence.Persist(file);
+            }
+
+            //Note: we could save some metadata too...
+
+            return file;
+        }
+
+        private void AddDataToFile(VFSFile file, byte[] block)
+        {
+            var nextBlockNumber = _blockAllocation.Allocate();
+            _blockManipulator.WriteBlock(nextBlockNumber, block);
+            AppendBlockReference(file, nextBlockNumber);
         }
 
         public void Dispose()
