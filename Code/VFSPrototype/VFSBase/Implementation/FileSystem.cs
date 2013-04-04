@@ -73,7 +73,7 @@ namespace VFSBase.Implementation
             if (Exists(parentFolder, name)) throw new AlreadyExistsException();
 
             var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate() };
-            _persistence.PersistFolder(folder);
+            _persistence.Persist(folder);
             AppendBlockReference(parentFolder, folder.BlockNumber);
 
             return folder;
@@ -130,6 +130,7 @@ namespace VFSBase.Implementation
             AppendBlockReference(destination, blockNumber);
 
             node.Name = name;
+
             _persistence.Persist(node);
         }
 
@@ -179,6 +180,12 @@ namespace VFSBase.Implementation
 
         private VFSFile CreateFile(string source, Folder dest, string name)
         {
+            var file = new VFSFile(name);
+            //TODO: save some metadata?
+
+            _persistence.Persist(file);
+            //AppendBlockReference(parentFolder, folder.BlockNumber);
+
             // TODO: implement this
             //var file = new VFSFile(name, source);
             //destination.IndexNodes.Add(file);

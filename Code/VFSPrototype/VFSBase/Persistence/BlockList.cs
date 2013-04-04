@@ -48,25 +48,25 @@ namespace VFSBase.Persistence
             var indexIndirection0 = (int)(blocksCount - (indexIndirection2 * refsCount * refsCount) - (refsCount * indexIndirection1));
 
             parentFolder.BlocksCount += 1;
-            _persistence.PersistFolder(parentFolder);
+            _persistence.Persist(parentFolder);
 
             var indirectNode3 = ReadIndirectNode(parentFolder.IndirectNodeNumber);
             if (indirectNode3.IsFree(indexIndirection2))
             {
                 indirectNode3[indexIndirection2] = CreateIndirectNode().BlockNumber;
-                _persistence.Persist(indirectNode3);
+                _persistence.PersistIndirectNode(indirectNode3);
             }
 
             var indirectNode2 = ReadIndirectNode(indirectNode3[indexIndirection2]);
             if (indirectNode2.IsFree(indexIndirection1))
             {
                 indirectNode2[indexIndirection1] = CreateIndirectNode().BlockNumber;
-                _persistence.Persist(indirectNode2);
+                _persistence.PersistIndirectNode(indirectNode2);
             }
 
             var indirectNode1 = ReadIndirectNode(indirectNode2[indexIndirection1]);
             indirectNode1[indexIndirection0] = reference;
-            _persistence.Persist(indirectNode1);
+            _persistence.PersistIndirectNode(indirectNode1);
         }
 
         public void Remove(IIndexNode nodeToDelete, bool freeSpace)
@@ -80,7 +80,7 @@ namespace VFSBase.Persistence
             if (parentNode.BlocksCount == 0)
             {
                 parentNode.IndirectNodeNumber = 0;
-                _persistence.PersistFolder(parentNode);
+                _persistence.Persist(parentNode);
                 return;
             }
 
@@ -103,7 +103,7 @@ namespace VFSBase.Persistence
             if (freeSpace) FreeSpace(nodeToDelete);
 
             indirectNode1[indexIndirection0] = 0;
-            _persistence.Persist(indirectNode1);
+            _persistence.PersistIndirectNode(indirectNode1);
 
             if (refToMove == nodeToDelete.BlockNumber) return;
 
@@ -145,7 +145,7 @@ namespace VFSBase.Persistence
         {
             var newNodeNumber = _blockAllocation.Allocate();
             var indirectNode = new IndirectNode(new long[_options.ReferencesPerIndirectNode]) { BlockNumber = newNodeNumber };
-            _persistence.Persist(indirectNode);
+            _persistence.PersistIndirectNode(indirectNode);
             return indirectNode;
         }
 
@@ -160,7 +160,7 @@ namespace VFSBase.Persistence
                     if (blockNumber == toBeReplaced)
                     {
                         indirectNode[i] = toReplace;
-                        _persistence.Persist(indirectNode);
+                        _persistence.PersistIndirectNode(indirectNode);
                         return;
                     }
                 }

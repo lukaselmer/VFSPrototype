@@ -58,7 +58,7 @@ namespace VFSBase.Persistence
 
             var name = ExtractName(bb);
             // TODO: parse contents
-            return new VFSFile(name, new byte[10]);
+            return new VFSFile(name);
         }
 
         public IndirectNode ParseIndirectNode(byte[] bb)
@@ -91,22 +91,20 @@ namespace VFSBase.Persistence
             return new string(Encoding.UTF8.GetString(nameBytes).TakeWhile(c => c != '\0').ToArray());
         }
 
-        public byte[] NodeToBytes(Folder folder)
+        private byte TypeBit(IIndexNode node)
         {
-            var bb = new byte[_options.BlockSize];
-            bb[0] = FolderType;
-            WriteNameToBuffer(ref bb, folder.Name);
-            BitConverter.GetBytes(folder.BlocksCount).CopyTo(bb, _options.NameLength + 1);
-            BitConverter.GetBytes(folder.IndirectNodeNumber).CopyTo(bb, sizeof(long) + _options.NameLength + 1);
-            return bb;
+            if (node is Folder) return FolderType;
+            if (node is VFSFile) return FileType;
+            throw new ArgumentException();
         }
 
-        public byte[] NodeToBytes(VFSFile file)
+        public byte[] NodeToBytes(IIndexNode node)
         {
             var bb = new byte[_options.BlockSize];
-            bb[0] = FileType;
-            WriteNameToBuffer(ref bb, file.Name);
-            //TODO: do some more things...
+            bb[0] = TypeBit(node);
+            WriteNameToBuffer(ref bb, node.Name);
+            BitConverter.GetBytes(node.BlocksCount).CopyTo(bb, _options.NameLength + 1);
+            BitConverter.GetBytes(node.IndirectNodeNumber).CopyTo(bb, sizeof(long) + _options.NameLength + 1);
             return bb;
         }
 
