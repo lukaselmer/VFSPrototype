@@ -1,6 +1,6 @@
-﻿namespace VFSBase.Persistance
+﻿namespace VFSBase.Persistence
 {
-    internal class BinaryMathUtil
+    internal static class BinaryMathUtil
     {
         public static long MB(int i)
         {

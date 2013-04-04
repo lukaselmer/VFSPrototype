@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBase.Persistance;
+using VFSBase.Persistence;
 
 namespace VFSBaseTests
 {

@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBase.Persistance.Blocks;
+using VFSBase.Persistence.Blocks;
 
-namespace VFSBase.Persistance
+namespace VFSBase.Persistence
 {
     internal class BlockParser
     {

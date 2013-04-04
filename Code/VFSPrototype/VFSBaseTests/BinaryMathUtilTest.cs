@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VFSBase.Persistance;
+using VFSBase.Persistence;
 
 namespace VFSBaseTests
 {

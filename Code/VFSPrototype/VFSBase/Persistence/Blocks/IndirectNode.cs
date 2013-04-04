@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
-namespace VFSBase.Persistance.Blocks
+namespace VFSBase.Persistence.Blocks
 {
     internal class IndirectNode
     {
