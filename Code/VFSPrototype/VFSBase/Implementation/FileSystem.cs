@@ -155,7 +155,7 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
 
-            GetBlockList(node).Delete(node.IndirectNodeNumber);
+            GetBlockList(node.Parent).Delete(node);
         }
 
         public void Move(IIndexNode toMove, Folder dest, string name)

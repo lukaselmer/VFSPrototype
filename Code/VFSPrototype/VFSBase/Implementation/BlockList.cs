@@ -83,30 +83,31 @@ namespace VFSBase.Implementation
             return indirectNode;
         }
 
-        public void Delete(long indirectNodeNumber)
+        public void Delete(IIndexNode nodeToDelete)
         {
-            var node = _node;
+            var parentNode = _node as Folder;
+            if(parentNode == null) throw new VFSException("Can only delete nodes from folders!");
 
-            if (node.Parent.BlocksCount == 0) return;
+            if (parentNode.BlocksCount == 0) return;
 
-            node.Parent.BlocksCount--;
-            if (node.Parent.BlocksCount == 0)
+            parentNode.BlocksCount--;
+            if (parentNode.BlocksCount == 0)
             {
-                node.Parent.IndirectNodeNumber = 0;
-                _persistence.PersistFolder(node.Parent);
+                parentNode.IndirectNodeNumber = 0;
+                _persistence.PersistFolder(parentNode);
                 return;
             }
 
-            _blockManipulator.WriteBlock(node.Parent.BlockNumber, _blockParser.NodeToBytes(node.Parent));
+            _blockManipulator.WriteBlock(parentNode.BlockNumber, _blockParser.NodeToBytes(parentNode));
 
-            var blocksCount = node.Parent.BlocksCount;
+            var blocksCount = parentNode.BlocksCount;
             var refsCount = _options.ReferencesPerIndirectNode;
 
             var indexIndirection2 = (int)(blocksCount / (refsCount * refsCount));
             var indexIndirection1 = (int)((blocksCount - (indexIndirection2 * refsCount * refsCount)) / refsCount);
             var indexIndirection0 = (int)(blocksCount - (indexIndirection2 * refsCount * refsCount) - (refsCount * indexIndirection1));
 
-            var indirectNode3 = ReadIndirectNode(node.Parent.IndirectNodeNumber);
+            var indirectNode3 = ReadIndirectNode(parentNode.IndirectNodeNumber);
             var indirectNode2 = ReadIndirectNode(indirectNode3.BlockNumbers[indexIndirection2]);
             var indirectNode1 = ReadIndirectNode(indirectNode2.BlockNumbers[indexIndirection1]);
 
@@ -119,9 +120,9 @@ namespace VFSBase.Implementation
             indirectNode1.BlockNumbers[indexIndirection0] = 0;
             _persistence.Persist(indirectNode1);
 
-            if (refToMove == node.BlockNumber) return;
+            if (refToMove == nodeToDelete.BlockNumber) return;
 
-            ReplaceInIndirectNode(indirectNode3, node.BlockNumber, refToMove, 2);
+            ReplaceInIndirectNode(indirectNode3, nodeToDelete.BlockNumber, refToMove, 2);
         }
 
 
