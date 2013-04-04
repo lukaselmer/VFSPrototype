@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
@@ -119,6 +120,13 @@ namespace VFSBase.Persistence
             return l;
         }
 
+        public void WriteToStream(BinaryWriter writer)
+        {
+            if (_node.IndirectNodeNumber == 0) return;
+
+            WriteFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), writer, 2);
+        }
+
         public bool Exists(string name)
         {
             return AsEnumerable().Any(i => i.Name == name);
@@ -170,6 +178,16 @@ namespace VFSBase.Persistence
             {
                 if (recursion == 0) l.Add(ReadIndexNode(blockNumber));
                 else AddFromIndirectNode(ReadIndirectNode(blockNumber), l, recursion - 1);
+            }
+        }
+
+        private void WriteFromIndirectNode(IndirectNode indirectNode, BinaryWriter writer, int recursion)
+        {
+            foreach (var blockNumber in indirectNode.UsedBlockNumbers())
+            {
+                //TODO: remove the padding of the very last block
+                if (recursion == 0) writer.Write(_blockManipulator.ReadBlock(blockNumber));
+                else WriteFromIndirectNode(ReadIndirectNode(blockNumber), writer, recursion - 1);
             }
         }
 

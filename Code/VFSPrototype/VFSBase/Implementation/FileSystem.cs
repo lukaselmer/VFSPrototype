@@ -92,13 +92,29 @@ namespace VFSBase.Implementation
 
         public void Export(IIndexNode source, string destination)
         {
-            //TODO: implement this, with persistence
-
             CheckDisposed();
 
-            var file = source as VFSFile;
-            if (file == null) throw new FileNotFoundException();
-            File.WriteAllBytes(destination, file.Data);
+            if (source == null) throw new NotFoundException();
+
+            if (File.Exists(destination) || Directory.Exists(destination)) throw new VFSException("Destination already exists!");
+
+            if (source is Folder) ExportFolder(source as Folder, destination);
+            else if (source is VFSFile) ExportFile(source as VFSFile, destination);
+            else throw new ArgumentException("Source must be of type Folder or VFSFile", "source");
+        }
+
+        private void ExportFile(VFSFile vfsFile, string destination)
+        {
+            using (var w = new BinaryWriter(File.OpenWrite(destination)))
+            {
+                GetBlockList(vfsFile).WriteToStream(w);
+            }
+        }
+
+        private void ExportFolder(Folder folder, string destination)
+        {
+            // TODO: implement this
+            throw new NotImplementedException();
         }
 
         public void Copy(IIndexNode node, Folder destination, string name)

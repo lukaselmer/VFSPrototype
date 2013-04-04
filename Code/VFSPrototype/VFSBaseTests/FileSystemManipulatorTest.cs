@@ -150,23 +150,33 @@ namespace VFSBaseTests
             using (var m = InitTestFileSystemManipulator())
             {
                 const string testFileSource = "test.txt";
+                const string testFileExport = "export.txt";
+                
+                if (File.Exists(testFileExport)) File.Delete(testFileExport);
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
+                
                 File.WriteAllText(testFileSource, "");
 
-                m.ImportFile(testFileSource, "test.txt");
-                m.ExportFile("test.txt", "export.txt");
-                Assert.IsTrue(m.Exists("test.txt"));
+                Assert.IsFalse(m.Exists(testFileSource));
+                Assert.IsFalse(m.Exists(testFileExport));
+                Assert.IsFalse(File.Exists(testFileExport));
+
+                m.ImportFile(testFileSource, testFileSource);
+                if (!m.Exists(testFileSource)) Assert.Inconclusive();
+                m.ExportFile(testFileSource, testFileExport);
+
+                Assert.IsTrue(m.Exists(testFileSource));
+                Assert.IsTrue(m.Exists(testFileExport));
             }
-            Assert.IsTrue(File.Exists("export.txt"));
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FileNotFoundException))]
+        [ExpectedException(typeof(NotFoundException))]
         public void TestInvalidExportFile()
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                m.ExportFile("test.txt", "export.txt");
+                m.ExportFile("test.txt", "export-xxx.txt");
             }
         }
 
