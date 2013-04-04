@@ -9,6 +9,8 @@ namespace VFSBase.Implementation
 {
     internal class Folder : IIndexNode
     {
+        private long _blocksCount;
+
         public Folder(string name)
             : this()
         {
@@ -18,7 +20,7 @@ namespace VFSBase.Implementation
         protected Folder()
         {
             Name = "";
-            BlocksCount = 0;
+            _blocksCount = 0;
         }
 
         public string Name { get; set; }
@@ -27,7 +29,11 @@ namespace VFSBase.Implementation
 
         public Folder Parent { get; set; }
 
-        public virtual long BlocksCount { get; set; }
+        public virtual long BlocksCount
+        {
+            get { return _blocksCount; }
+            set { _blocksCount = value; }
+        }
 
         public long IndirectNodeNumber { get; set; }
     }
