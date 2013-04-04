@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
@@ -26,7 +27,14 @@ namespace VFSBase.Implementation
 
             using (var file = File.Open(options.Location, FileMode.Open, FileAccess.ReadWrite))
             {
-                newOptions = FileSystemOptions.Deserialize(file);
+                try
+                {
+                    newOptions = FileSystemOptions.Deserialize(file);
+                }
+                catch (ArgumentException exception)
+                {
+                    throw new VFSException("Invalid virtual file", exception);
+                }
                 newOptions.Location = options.Location;
 
                 file.Seek(0, SeekOrigin.Begin);
