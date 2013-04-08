@@ -168,3 +168,7 @@ pip-log.txt
 Documentation/JCDReport.pdf
 
 *.synctex.gz
+
+Code/VFSPrototype/Testfiles/testfile.vhs
+
+

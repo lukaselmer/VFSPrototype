@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Practices.Unity;
 using Microsoft.Practices.Unity.Configuration;
 using VFSBase;
+using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 
@@ -15,9 +16,18 @@ namespace VFSConsole
     {
         static void Main(string[] args)
         {
-            var container = new UnityContainer().LoadConfiguration();
-            var c = container.Resolve<ConsoleApplication>();
-            c.Run();
+            try
+            {
+                var container = new UnityContainer().LoadConfiguration();
+                var c = container.Resolve<ConsoleApplication>();
+                c.Run();
+            }
+            catch (Exception exception)
+            {   
+                Console.WriteLine(exception.Message);
+                Console.WriteLine("Exit with any input...");
+                Console.ReadLine();
+            }
         }
     }
 }
