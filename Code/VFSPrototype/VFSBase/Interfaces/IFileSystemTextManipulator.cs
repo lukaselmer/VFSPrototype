@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace VFSBase.Interfaces
 {
-    public interface IFileSystemManipulator
+    public interface IFileSystemTextManipulator : IDisposable
     {
-        IEnumerable<string> Folders(string path);
+        IList<string> Folders(string path);
         bool IsDirectory(string path);
         void CreateFolder(string path);
         void ImportFile(string source, string dest);

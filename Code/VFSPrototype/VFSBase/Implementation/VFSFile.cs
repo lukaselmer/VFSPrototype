@@ -1,32 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    internal class VFSFile : IComparable, IIndexNode
+    internal class VFSFile : IIndexNode
     {
-        public VFSFile(string name, string source)
-            : this (name, File.ReadAllBytes(source))
+        /*public VFSFile(string name, string source)
+            : this(name, File.ReadAllBytes(source))
         {
         }
 
-        private VFSFile(string name, byte[] data)
+        public VFSFile(string name, byte[] data)
         {
             Name = name;
             Data = data;
+        }*/
+
+        public VFSFile(string name)
+        {
+            Name = name;
         }
 
         public string Name { get; set; }
-        public ISet<IIndexNode> IndexNodes { get; set; }
+
+        public Folder Parent { get; set; }
+
+        public long BlockNumber { get; set; }
+        public long IndirectNodeNumber { get; set; }
+        public long BlocksCount { get; set; }
+
         public byte[] Data { get; private set; }
 
-        public int CompareTo(object obj)
-        {
-            var file = obj as VFSFile;
-            if (file == null) return -1;
-            return String.Compare(Name, file.Name, StringComparison.Ordinal);
-        }
+        public int LastBlockSize { get; set; }
     }
 }
