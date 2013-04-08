@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using VFSBase;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
 namespace VFSConsole
@@ -13,14 +14,14 @@ namespace VFSConsole
         private readonly TextWriter _textWriter;
         private volatile bool _running = true;
         private readonly IDictionary<string, Action<string>> _commands;
-        private readonly IFileSystemManipulator _fileSystemManipulator;
+        private readonly IFileSystemTextManipulator _fileSystemTextManipulator;
         private string _currentDirectory = "";
 
-        public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemManipulator fileSystemManipulator)
+        public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemTextManipulator fileSystemTextManipulator)
         {
-            if (fileSystemManipulator == null) throw new ArgumentNullException("fileSystemManipulator", "fileSystem must not be null.");
+            if (fileSystemTextManipulator == null) throw new ArgumentNullException("fileSystemTextManipulator", "fileSystem must not be null.");
 
-            _fileSystemManipulator = fileSystemManipulator;
+            _fileSystemTextManipulator = fileSystemTextManipulator;
 
             _textReader = consoleApplicationSettings.Reader;
             _textWriter = consoleApplicationSettings.Writer;
@@ -57,7 +58,15 @@ namespace VFSConsole
             var arguments = commandAndArguments.Count() > 1 ? commandAndArguments[1] : "";
 
             var func = _commands.ContainsKey(command) ? _commands[command] : CommandNotFound;
-            func(arguments);
+            try
+            {
+                func(arguments);
+            }
+            catch (VFSException exception)
+            {
+                // TODO: test this behaviour
+                _textWriter.WriteLine("An exception occurred: {0}", exception.Message);
+            }
         }
 
         private void Import(string parameters)
@@ -69,7 +78,7 @@ namespace VFSConsole
                 var source = options[0];
                 var dest = PathFor(options[1]);
 
-                _fileSystemManipulator.ImportFile(source, dest);
+                _fileSystemTextManipulator.ImportFile(source, dest);
                 _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)
@@ -112,13 +121,13 @@ namespace VFSConsole
         private void Delete(string parameter)
         {
             var path = PathFor(parameter);
-            _fileSystemManipulator.Delete(path);
+            _fileSystemTextManipulator.Delete(path);
             _textWriter.WriteLine("Deleted {0}", path);
         }
 
         private void Exists(string parameter)
         {
-            var exists = _fileSystemManipulator.Exists(PathFor(parameter));
+            var exists = _fileSystemTextManipulator.Exists(PathFor(parameter));
             _textWriter.WriteLine(exists ? "Yes" : "No");
         }
 
@@ -130,13 +139,13 @@ namespace VFSConsole
         private void ListDirectory(string parameter)
         {
             var path = PathFor(parameter);
-            if (!_fileSystemManipulator.Exists(path))
+            if (!_fileSystemTextManipulator.Exists(path))
             {
                 _textWriter.WriteLine("File or directory does not exist");
                 return;
             }
 
-            var folders = _fileSystemManipulator.Folders(path).ToList();
+            var folders = _fileSystemTextManipulator.Folders(path).ToList();
             _textWriter.WriteLine("Found {0} directories:", folders.Count);
 
             foreach (var folder in folders)
@@ -147,7 +156,7 @@ namespace VFSConsole
 
         private void Mkdir(string parameter)
         {
-            _fileSystemManipulator.CreateFolder(PathFor(parameter));
+            _fileSystemTextManipulator.CreateFolder(PathFor(parameter));
             _textWriter.WriteLine("Directory {0} created", PathFor(parameter));
         }
 
@@ -180,7 +189,7 @@ namespace VFSConsole
 
         public void Cd(string parameter)
         {
-            if (!_fileSystemManipulator.IsDirectory(parameter))
+            if (!_fileSystemTextManipulator.IsDirectory(parameter))
             {
                 _textWriter.WriteLine("Directory {0} does not exist", parameter);
                 return;
