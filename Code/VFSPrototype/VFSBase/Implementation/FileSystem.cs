@@ -51,7 +51,7 @@ namespace VFSBase.Implementation
             return root;
         }
 
-        public IEnumerable<IIndexNode> AsEnumerable(Folder folder)
+        public IEnumerable<IIndexNode> List(Folder folder)
         {
             CheckDisposed();
             return GetBlockList(folder).AsEnumerable();
@@ -59,8 +59,12 @@ namespace VFSBase.Implementation
 
         public IEnumerable<Folder> Folders(Folder folder)
         {
-            CheckDisposed();
-            return AsEnumerable(folder).OfType<Folder>();
+            return List(folder).OfType<Folder>();
+        }
+
+        public IEnumerable<VFSFile> Files(Folder folder)
+        {
+            return List(folder).OfType<VFSFile>();
         }
 
         public RootFolder Root { get; private set; }
