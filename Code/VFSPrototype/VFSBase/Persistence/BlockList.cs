@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using VFSBase.Exceptions;
@@ -185,9 +186,27 @@ namespace VFSBase.Persistence
         {
             foreach (var blockNumber in indirectNode.UsedBlockNumbers())
             {
-                //TODO: remove the padding of the very last block
                 if (recursion == 0) writer.Write(_blockManipulator.ReadBlock(blockNumber));
                 else WriteFromIndirectNode(ReadIndirectNode(blockNumber), writer, recursion - 1);
+            }
+        }
+
+        public IEnumerable<byte[]> Blocks()
+        {
+            if (_node.IndirectNodeNumber == 0) yield break;
+
+            foreach (var bytes in Blocks(ReadIndirectNode(_node.IndirectNodeNumber)))
+            {
+                yield return bytes;
+            }
+        }
+
+        private IEnumerable<byte[]> Blocks(IndirectNode indirectNode, int recursion = 2)
+        {
+            foreach (var blockNumber in indirectNode.UsedBlockNumbers())
+            {
+                if (recursion == 0) yield return _blockManipulator.ReadBlock(blockNumber);
+                else foreach (var bytes in Blocks(ReadIndirectNode(blockNumber), recursion - 1)) yield return bytes;
             }
         }
 
