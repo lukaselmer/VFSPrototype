@@ -26,6 +26,16 @@ namespace VFSBase.Implementation
             return _fileSystem.Folders(folder).Select(f => f.Name).ToList();
         }
 
+        public IList<string> Files(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IList<string> List(string path)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool IsDirectory(string path)
         {
             return FindNode(path) as Folder != null;

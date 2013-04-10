@@ -35,7 +35,7 @@ namespace VFSConsole
                     {"export", Export},
                     {"help", ShowHelp},
                     {"import", Import},
-                    {"ls", ListDirectory},
+                    {"ls", List},
                     {"mkdir", Mkdir},
                 };
         }
@@ -155,7 +155,7 @@ namespace VFSConsole
             _running = false;
         }
 
-        private void ListDirectory(string parameter)
+        private void List(string parameter)
         {
             var path = PathFor(parameter);
             if (!_fileSystemTextManipulator.Exists(path))
@@ -170,6 +170,14 @@ namespace VFSConsole
             foreach (var folder in folders)
             {
                 _textWriter.WriteLine(folder);
+            }
+
+            var files = _fileSystemTextManipulator.Files(path).ToList();
+            _textWriter.WriteLine("Found {0} files:", files.Count);
+
+            foreach (var file in files)
+            {
+                _textWriter.WriteLine(file);
             }
         }
 

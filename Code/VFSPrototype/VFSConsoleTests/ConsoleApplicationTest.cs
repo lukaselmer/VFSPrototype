@@ -59,6 +59,7 @@ namespace VFSConsoleTests
             fs.FolderExists = true;
 
             fs.CurrentFolders = new List<string> { "Bla", "blurb", "xxx" };
+            fs.CurrentFiles = new List<string> { "Aaa", "Nanananana" };
 
             using (var mocks = new InOutMocks())
             {
@@ -71,6 +72,9 @@ namespace VFSConsoleTests
                 Assert.AreEqual("Bla", mocks.FakeOutLine());
                 Assert.AreEqual("blurb", mocks.FakeOutLine());
                 Assert.AreEqual("xxx", mocks.FakeOutLine());
+                Assert.AreEqual("Found 2 files:", mocks.FakeOutLine());
+                Assert.AreEqual("Aaa", mocks.FakeOutLine());
+                Assert.AreEqual("Nanananana", mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }

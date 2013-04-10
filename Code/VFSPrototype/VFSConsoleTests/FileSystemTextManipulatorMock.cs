@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using VFSBase.Interfaces;
 
 namespace VFSConsoleTests
@@ -6,8 +7,19 @@ namespace VFSConsoleTests
     internal class FileSystemTextManipulatorMock : IFileSystemTextManipulator
     {
         public bool FolderExists = false;
+        public IList<string> CurrentFiles;
         public IList<string> CurrentFolders;
         public bool IsCurrentDirectory = false;
+
+        public IList<string> Files(string path)
+        {
+            return CurrentFiles;
+        }
+
+        public IList<string> List(string path)
+        {
+            return CurrentFolders.Concat(CurrentFiles).ToList();
+        }
 
         public IList<string> Folders(string path)
         {
