@@ -81,8 +81,7 @@ namespace VFSBase.Implementation
             return _fileSystem.Exists(parent, PathParser.GetNodeName(path));
         }
 
-
-        public void ImportFile(string source, string dest)
+        public void Import(string source, string dest)
         {
             var node = CreateParentFolder(dest);
             _fileSystem.Import(source, node, PathParser.GetNodeName(dest));
@@ -94,7 +93,7 @@ namespace VFSBase.Implementation
             return FindParentFolder(dest);
         }
 
-        public void ExportFile(string source, string dest)
+        public void Export(string source, string dest)
         {
             _fileSystem.Export(FindNode(source), dest);
         }
