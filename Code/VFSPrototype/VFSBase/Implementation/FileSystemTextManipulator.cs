@@ -28,12 +28,22 @@ namespace VFSBase.Implementation
 
         public IList<string> Files(string path)
         {
-            throw new NotImplementedException();
+            var node = FindNode(path);
+
+            var folder = node as Folder;
+            if (folder == null) throw new DirectoryNotFoundException();
+
+            return _fileSystem.Files(folder).Select(f => f.Name).ToList();
         }
 
         public IList<string> List(string path)
         {
-            throw new NotImplementedException();
+            var node = FindNode(path);
+
+            var folder = node as Folder;
+            if (folder == null) throw new DirectoryNotFoundException();
+
+            return _fileSystem.List(folder).Select(f => f.Name).ToList();
         }
 
         public bool IsDirectory(string path)
