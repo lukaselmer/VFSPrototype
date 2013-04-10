@@ -96,19 +96,22 @@ namespace VFSBase.Implementation
 
         public void Export(IIndexNode source, string destination)
         {
+            var absoluteDestination = Path.GetFullPath(destination);
+            EnsureParentDirectoryExists(absoluteDestination);
             CheckDisposed();
 
             if (source == null) throw new NotFoundException();
 
-            if (File.Exists(destination) || Directory.Exists(destination)) throw new VFSException("Destination already exists!");
+            if (File.Exists(absoluteDestination) || Directory.Exists(absoluteDestination)) throw new VFSException("Destination already exists!");
 
-            if (source is Folder) ExportFolder(source as Folder, destination);
-            else if (source is VFSFile) ExportFile(source as VFSFile, destination);
+            if (source is Folder) ExportFolder(source as Folder, absoluteDestination);
+            else if (source is VFSFile) ExportFile(source as VFSFile, absoluteDestination);
             else throw new ArgumentException("Source must be of type Folder or VFSFile", "source");
         }
 
         private void ExportFile(VFSFile file, string destination)
         {
+            EnsureParentDirectoryExists(destination);
             using (var stream = File.OpenWrite(destination))
             using (var w = new BinaryWriter(stream))
             {
@@ -119,6 +122,15 @@ namespace VFSBase.Implementation
                     stream.SetLength(stream.Length + file.LastBlockSize - _options.BlockSize);
                 }
             }
+        }
+
+        private static void EnsureParentDirectoryExists(string destination)
+        {
+            var name = Path.GetFileName(destination);
+            if (name == null || name.Length <= 0) throw new VFSException("Name invalid");
+            var directoryName = Path.GetDirectoryName(destination);
+            if (directoryName == null || !Directory.Exists(directoryName))
+                throw new VFSException(string.Format("Directory {0} does not exist", directoryName));
         }
 
         private void ExportFolder(Folder folder, string destination)
