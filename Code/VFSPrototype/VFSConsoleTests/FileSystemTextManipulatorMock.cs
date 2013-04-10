@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
 namespace VFSConsoleTests
@@ -10,6 +11,7 @@ namespace VFSConsoleTests
         public IList<string> CurrentFiles;
         public IList<string> CurrentFolders;
         public bool IsCurrentDirectory = false;
+        public VFSException ThrowException;
 
         public IList<string> Files(string path)
         {
@@ -57,6 +59,7 @@ namespace VFSConsoleTests
 
         public bool Exists(string path)
         {
+            if (ThrowException != null) throw ThrowException;
             return FolderExists;
         }
 
