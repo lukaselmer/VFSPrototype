@@ -2,6 +2,11 @@
 {
     internal static class BinaryMathUtil
     {
+        public static long GB(int i)
+        {
+            return Power2(30) * i;
+        }
+
         public static long MB(int i)
         {
             return Power2(20) * i;
