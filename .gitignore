@@ -170,5 +170,5 @@ Documentation/JCDReport.pdf
 *.synctex.gz
 
 Code/VFSPrototype/Testfiles/testfile.vhs
-
+Code/VFSPrototype/Testfiles/virtual_disk.vfs
 
