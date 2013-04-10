@@ -153,7 +153,7 @@ namespace VFSBase.Implementation
         {
             CheckName(name);
 
-            var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
+            var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate(), LastBlockSize = fileToCopy.LastBlockSize };
 
             foreach (var block in GetBlockList(fileToCopy).Blocks()) AddDataToFile(file, block);
 
