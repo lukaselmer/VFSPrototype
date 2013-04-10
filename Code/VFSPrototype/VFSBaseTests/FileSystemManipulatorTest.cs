@@ -321,14 +321,12 @@ namespace VFSBaseTests
                 Assert.IsTrue(m.Exists("hello/universe"));
                 Assert.IsFalse(m.Exists("hello/world"));
 
-
                 m.CreateFolder("foo/bar");
                 m.Move("foo/bar", "ta/da");
                 Assert.IsTrue(m.Exists("ta/da"));
                 Assert.IsFalse(m.Exists("foo/bar"));
             }
         }
-
 
         [TestMethod]
         public void TestMoveFile()
@@ -353,6 +351,54 @@ namespace VFSBaseTests
                 m.Move("foo/bar.txt", "ta/da.txt");
                 Assert.IsTrue(m.Exists("ta/da.txt"));
                 Assert.IsFalse(m.Exists("foo/bar.txt"));
+            }
+        }
+
+        [TestMethod]
+        public void TestCopyFolder()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                m.CreateFolder("you");
+                m.Copy("you", "me");
+                Assert.IsTrue(m.Exists("me"));
+                Assert.IsTrue(m.Exists("you"));
+
+                m.CreateFolder("hello/world");
+                m.Copy("hello/world", "hello/universe");
+                Assert.IsTrue(m.Exists("hello/universe"));
+                Assert.IsTrue(m.Exists("hello/world"));
+
+                m.CreateFolder("foo/bar");
+                m.Copy("foo/bar", "ta/da");
+                Assert.IsTrue(m.Exists("ta/da"));
+                Assert.IsTrue(m.Exists("foo/bar"));
+            }
+        }
+
+        [TestMethod]
+        public void TestCopyFile()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                const string testFileSource = "test.txt";
+                if (File.Exists(testFileSource)) File.Delete(testFileSource);
+                File.WriteAllText(testFileSource, "");
+
+                m.Import(testFileSource, "you.txt");
+                m.Copy("you.txt", "me.txt");
+                Assert.IsTrue(m.Exists("me.txt"));
+                Assert.IsTrue(m.Exists("you.txt"));
+
+                m.Import(testFileSource, "hello/world.txt");
+                m.Copy("hello/world.txt", "hello/universe.txt");
+                Assert.IsTrue(m.Exists("hello/universe.txt"));
+                Assert.IsTrue(m.Exists("hello/world.txt"));
+
+                m.Import(testFileSource, "foo/bar.txt");
+                m.Copy("foo/bar.txt", "ta/da.txt");
+                Assert.IsTrue(m.Exists("ta/da.txt"));
+                Assert.IsTrue(m.Exists("foo/bar.txt"));
             }
         }
 
