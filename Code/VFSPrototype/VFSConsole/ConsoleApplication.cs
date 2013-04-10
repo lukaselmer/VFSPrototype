@@ -32,6 +32,7 @@ namespace VFSConsole
                     {"delete", Delete},
                     {"exists", Exists},
                     {"exit", Exit},
+                    {"export", Export},
                     {"help", ShowHelp},
                     {"import", Import},
                     {"ls", ListDirectory},
@@ -84,6 +85,24 @@ namespace VFSConsole
             catch (ArgumentException)
             {
                 _textWriter.WriteLine(@"Please provide two parameters. E.g. import ""C:\host system\path"" /to/dest");
+            }
+        }
+
+        private void Export(string parameters)
+        {
+            try
+            {
+                var options = ParseMultipleParameters(parameters, 2);
+
+                var source = PathFor(options[0]);
+                var dest = options[1];
+
+                _fileSystemTextManipulator.ExportFile(source, dest);
+                _textWriter.WriteLine("Exported \"{0}\" to \"{1}\"", source, dest);
+            }
+            catch (ArgumentException)
+            {
+                _textWriter.WriteLine(@"Please provide two parameters. E.g. export /from/src ""C:\host system\path""");
             }
         }
 
