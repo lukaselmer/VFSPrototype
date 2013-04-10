@@ -50,5 +50,12 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="writer">The binary writer.</param>
         void WriteToStream(BinaryWriter writer);
+
+
+        /// <summary>
+        /// Enumerates (lazily) through the blocks.
+        /// </summary>
+        /// <returns>IEnumerable{System.Byte[]}.</returns>
+        IEnumerable<byte[]> Blocks();
     }
 }
