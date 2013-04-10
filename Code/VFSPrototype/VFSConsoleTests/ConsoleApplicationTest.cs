@@ -367,7 +367,26 @@ namespace VFSConsoleTests
 
                 var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
-                Assert.AreEqual("/> An exception occurred: OMG! It's not a bug, it's a feature!", mocks.FakeOutLine(true));
+                Assert.AreEqual("/> An error occurred: OMG! It's not a bug, it's a feature!", mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestPrintException()
+        {
+            var fs = FileSystemMock();
+            fs.ThrowException = new Exception("OMG! It's not a bug, it's a feature!");
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("ls");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual("/> An unknown error occurred: OMG! It's not a bug, it's a feature!", mocks.FakeOutLine(true));
+                Assert.AreEqual("The system might be unstable, consider restarting", mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
