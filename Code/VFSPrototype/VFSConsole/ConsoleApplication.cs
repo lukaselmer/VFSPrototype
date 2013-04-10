@@ -65,7 +65,12 @@ namespace VFSConsole
             }
             catch (VFSException exception)
             {
-                _textWriter.WriteLine("An exception occurred: {0}", exception.Message);
+                _textWriter.WriteLine("An error occurred: {0}", exception.Message);
+            }
+            catch (Exception exception)
+            {
+                _textWriter.WriteLine("An unknown error occurred: {0}", exception.Message);
+                _textWriter.WriteLine("The system might be unstable, consider restarting");
             }
         }
 
