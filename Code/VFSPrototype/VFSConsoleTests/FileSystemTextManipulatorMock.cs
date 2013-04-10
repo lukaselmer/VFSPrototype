@@ -23,11 +23,11 @@ namespace VFSConsoleTests
         {
         }
 
-        public void ImportFile(string source, string dest)
+        public void Import(string source, string dest)
         {
         }
 
-        public void ExportFile(string source, string dest)
+        public void Export(string source, string dest)
         {
         }
 
