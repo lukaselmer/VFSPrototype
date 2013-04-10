@@ -139,14 +139,30 @@ namespace VFSBase.Implementation
             throw new NotImplementedException();
         }
 
-        public void Copy(IIndexNode node, Folder destination, string name)
+        public void Copy(IIndexNode nodeToCopy, Folder destination, string name)
         {
-            //TODO: implement this, with persistence
-
             CheckDisposed();
             CheckName(name);
 
+            if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name);
+            else if (nodeToCopy is VFSFile) CopyFile(nodeToCopy as VFSFile, destination, name);
+            else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
+        }
+
+        private void CopyFile(VFSFile nodeToCopy, Folder destination, string name)
+        {
+            //TODO: implement this, with persistence
+            CheckName(name);
+
             throw new NotImplementedException();
+        }
+
+        private void CopyFolder(Folder nodeToCopy, Folder destination, string name)
+        {
+            CheckName(name);
+
+            var newFolder = CreateFolder(destination, name);
+            foreach (var subNode in List(nodeToCopy)) Copy(subNode, newFolder, subNode.Name);
         }
 
         public void Delete(IIndexNode node)
