@@ -149,12 +149,17 @@ namespace VFSBase.Implementation
             else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
         }
 
-        private void CopyFile(VFSFile nodeToCopy, Folder destination, string name)
+        private void CopyFile(VFSFile fileToCopy, Folder destination, string name)
         {
-            //TODO: implement this, with persistence
             CheckName(name);
 
-            throw new NotImplementedException();
+            var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
+
+            foreach (var block in GetBlockList(fileToCopy).Blocks()) AddDataToFile(file, block);
+
+            _persistence.Persist(file);
+
+            AppendBlockReference(destination, file.BlockNumber);
         }
 
         private void CopyFolder(Folder nodeToCopy, Folder destination, string name)
