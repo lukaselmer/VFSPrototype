@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using VFSBase.Exceptions;
@@ -32,6 +33,9 @@ namespace VFSBase.Persistence
 
         public void AddReference(long reference)
         {
+            //TODO: make this dynamic, so _options.IndirectionCountForIndirectNodes can be adjusted dynamically
+            Debug.Assert(_options.IndirectionCountForIndirectNodes == 2, "This method works only with an indirection count of exactly 2");
+
             var indirectNodeNumber = _node.IndirectNodeNumber;
             if (indirectNodeNumber == 0)
             {
@@ -69,6 +73,9 @@ namespace VFSBase.Persistence
 
         public void Remove(IIndexNode nodeToDelete, bool freeSpace)
         {
+            //TODO: make this dynamic, so _options.IndirectionCountForIndirectNodes can be adjusted dynamically
+            Debug.Assert(_options.IndirectionCountForIndirectNodes == 2, "This method works only with an indirection count of exactly 2");
+
             var parentNode = _node as Folder;
             if (parentNode == null) throw new VFSException("Can only delete nodes from folders!");
 
@@ -105,7 +112,7 @@ namespace VFSBase.Persistence
 
             if (refToMove == nodeToDelete.BlockNumber) return;
 
-            ReplaceInIndirectNode(indirectNode3, nodeToDelete.BlockNumber, refToMove);
+            ReplaceInIndirectNode(indirectNode3, nodeToDelete.BlockNumber, refToMove, _options.IndirectionCountForIndirectNodes);
         }
 
         public IEnumerable<IIndexNode> AsEnumerable()
@@ -113,7 +120,7 @@ namespace VFSBase.Persistence
             var l = new List<IIndexNode>((int)_node.BlocksCount);
             if (_node.IndirectNodeNumber == 0) return l;
 
-            AddFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), l, 2);
+            AddFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), l, _options.IndirectionCountForIndirectNodes);
 
             var folder = _node as Folder;
             if (folder != null) l.ForEach(f => f.Parent = folder);
@@ -125,7 +132,7 @@ namespace VFSBase.Persistence
         {
             if (_node.IndirectNodeNumber == 0) return;
 
-            WriteFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), writer, 2);
+            WriteFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), writer, _options.IndirectionCountForIndirectNodes);
         }
 
         public bool Exists(string name)
@@ -154,7 +161,7 @@ namespace VFSBase.Persistence
             return indirectNode;
         }
 
-        private void ReplaceInIndirectNode(IndirectNode indirectNode, long toBeReplaced, long toReplace, int recursion = 2)
+        private void ReplaceInIndirectNode(IndirectNode indirectNode, long toBeReplaced, long toReplace, int recursion)
         {
             for (var i = 0; i < indirectNode.UsedBlockNumbers().Count(); i++)
             {
@@ -195,13 +202,13 @@ namespace VFSBase.Persistence
         {
             if (_node.IndirectNodeNumber == 0) yield break;
 
-            foreach (var bytes in Blocks(ReadIndirectNode(_node.IndirectNodeNumber)))
+            foreach (var bytes in Blocks(ReadIndirectNode(_node.IndirectNodeNumber), _options.IndirectionCountForIndirectNodes))
             {
                 yield return bytes;
             }
         }
 
-        private IEnumerable<byte[]> Blocks(IndirectNode indirectNode, int recursion = 2)
+        private IEnumerable<byte[]> Blocks(IndirectNode indirectNode, int recursion)
         {
             foreach (var blockNumber in indirectNode.UsedBlockNumbers())
             {
@@ -228,12 +235,12 @@ namespace VFSBase.Persistence
             // This would have to be done recursivly tough.
             // This can be used to nullify a single block: WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
 
-            if (node.IndirectNodeNumber != 0) FreeSpace(ReadIndirectNode(node.IndirectNodeNumber));
+            if (node.IndirectNodeNumber != 0) FreeSpace(ReadIndirectNode(node.IndirectNodeNumber), _options.IndirectionCountForIndirectNodes);
 
             _blockAllocation.Free(node.BlockNumber);
         }
 
-        private void FreeSpace(IndirectNode node, int recursion = 2)
+        private void FreeSpace(IndirectNode node, int recursion)
         {
             foreach (var blockNumber in node.UsedBlockNumbers())
             {

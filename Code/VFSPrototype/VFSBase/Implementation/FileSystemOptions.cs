@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
 using VFSBase.Persistence;
@@ -11,10 +12,13 @@ namespace VFSBase.Implementation
     [Serializable]
     public class FileSystemOptions : IFileSystemOptions
     {
+        private int _blockSize;
+
         public FileSystemOptions(string location, long diskSize)
         {
             Location = location;
             DiskSize = diskSize;
+            BlockSize = (int)BinaryMathUtil.KB(8);
             MasterBlockSize = (uint)BinaryMathUtil.KB(32);
             NameLength = 255;
             BlockReferenceSize = 64;
@@ -48,7 +52,20 @@ namespace VFSBase.Implementation
 
         public int BlockSize
         {
-            get { return (int)BinaryMathUtil.KB(4); }
+            get
+            {
+                return _blockSize;
+            }
+            set
+            {
+                if (value < (int)BinaryMathUtil.KB(2)) throw new VFSException("block size too small");
+                _blockSize = value;
+            }
+        }
+
+        public int IndirectionCountForIndirectNodes
+        {
+            get { return 2; }
         }
 
         public long DiskFree { get; private set; }
@@ -59,5 +76,13 @@ namespace VFSBase.Implementation
         public int ReferencesPerIndirectNode { get { return BlockSize / BlockReferenceSize; } }
 
         public BlockAllocation BlockAllocation { get; set; }
+
+        public long MaximumFileSize
+        {
+            get
+            {
+                return BinaryMathUtil.Power(ReferencesPerIndirectNode, IndirectionCountForIndirectNodes + 1) * BlockSize;
+            }
+        }
     }
 }

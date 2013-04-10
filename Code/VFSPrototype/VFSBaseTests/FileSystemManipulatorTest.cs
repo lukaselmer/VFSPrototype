@@ -63,7 +63,8 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                for (var i = 0; i < 100; i++)
+                // Could be set to more, but it is disabled, so the unit tests run fast
+                for (var i = 0; i < 50; i++)
                 {
                     m.CreateFolder("test" + i);
                     Assert.IsTrue(m.Exists("test" + i));
