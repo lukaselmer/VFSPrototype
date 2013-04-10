@@ -74,7 +74,6 @@ namespace VFSBase.Interfaces
         /// <param name="nodeToCopy">The nodeToCopy to copy.</param>
         /// <param name="destination">The destination where to copy the nodeToCopy to.</param>
         /// <param name="nameOfCopiedElement">The name of the copied element.</param>
-        /// TODO: implement this
         void Copy(IIndexNode nodeToCopy, Folder destination, string nameOfCopiedElement);
 
         /// <summary>
