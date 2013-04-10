@@ -8,13 +8,13 @@ using VFSBase.Interfaces;
 
 namespace VFSConsole
 {
-    public class ConsoleApplication
+    public class ConsoleApplication: IDisposable
     {
         private readonly TextReader _textReader;
         private readonly TextWriter _textWriter;
         private volatile bool _running = true;
         private readonly IDictionary<string, Action<string>> _commands;
-        private readonly IFileSystemTextManipulator _fileSystemTextManipulator;
+        private IFileSystemTextManipulator _fileSystemTextManipulator;
         private string _currentDirectory = "";
 
         public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemTextManipulator fileSystemTextManipulator)
@@ -231,5 +231,23 @@ namespace VFSConsole
 
             _textWriter.WriteLine("Directory changed");
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // free managed resources
+
+            if (_fileSystemTextManipulator != null)
+            {
+                _fileSystemTextManipulator.Dispose();
+                _fileSystemTextManipulator = null;
+            }
+        }
+
     }
 }
