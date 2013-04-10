@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Exceptions;
 using VFSConsole;
 
 namespace VFSConsoleTests
@@ -349,6 +350,24 @@ namespace VFSConsoleTests
                 c.Run();
                 Assert.AreEqual("/> Directory changed", mocks.FakeOutLine(true));
                 Assert.AreEqual("/a/b> Directory changed", mocks.FakeOutLine());
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestPrintVFSException()
+        {
+            var fs = FileSystemMock();
+            fs.ThrowException = new VFSException("OMG! It's not a bug, it's a feature!");
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("ls");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual("/> An exception occurred: OMG! It's not a bug, it's a feature!", mocks.FakeOutLine(true));
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }

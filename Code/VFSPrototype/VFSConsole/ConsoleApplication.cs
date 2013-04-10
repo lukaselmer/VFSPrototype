@@ -8,7 +8,7 @@ using VFSBase.Interfaces;
 
 namespace VFSConsole
 {
-    public class ConsoleApplication: IDisposable
+    public class ConsoleApplication : IDisposable
     {
         private readonly TextReader _textReader;
         private readonly TextWriter _textWriter;
@@ -65,7 +65,6 @@ namespace VFSConsole
             }
             catch (VFSException exception)
             {
-                // TODO: test this behaviour
                 _textWriter.WriteLine("An exception occurred: {0}", exception.Message);
             }
         }
