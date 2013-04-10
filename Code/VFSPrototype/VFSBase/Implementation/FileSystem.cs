@@ -14,7 +14,7 @@ namespace VFSBase.Implementation
         private bool _disposed;
         private readonly BlockParser _blockParser;
         private readonly BlockAllocation _blockAllocation;
-        private readonly BlockManipulator _blockManipulator;
+        private BlockManipulator _blockManipulator;
         private readonly Persistence _persistence;
 
         public FileSystemOptions FileSystemOptions
@@ -260,6 +260,7 @@ namespace VFSBase.Implementation
             {
                 WriteConfig();
                 _blockManipulator.Dispose();
+                _blockManipulator = null;
             }
         }
 
