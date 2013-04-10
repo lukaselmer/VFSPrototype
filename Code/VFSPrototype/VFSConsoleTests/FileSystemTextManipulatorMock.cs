@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
@@ -11,7 +12,7 @@ namespace VFSConsoleTests
         public IList<string> CurrentFiles;
         public IList<string> CurrentFolders;
         public bool IsCurrentDirectory = false;
-        public VFSException ThrowException;
+        public Exception ThrowException;
 
         public IList<string> Files(string path)
         {
