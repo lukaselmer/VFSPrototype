@@ -54,41 +54,41 @@ namespace VFSBase.Interfaces
         Folder CreateFolder(Folder parentFolder, string name);
 
         /// <summary>
-        /// Imports the specified source (file or folder) from the host system recursively into the folder <paramref name="destination"/>.
+        /// Imports the specified nodeToCopy (file or folder) from the host system recursively into the folder <paramref name="destination"/>.
         /// </summary>
-        /// <param name="source">The source.</param>
+        /// <param name="source">The nodeToCopy.</param>
         /// <param name="destination">The destination.</param>
         /// <param name="name">The name.</param>
         void Import(string source, Folder destination, string name);
 
         /// <summary>
-        /// Exports the specified source (file or folder) recursively to the specified destination on the host file system.
+        /// Exports the specified nodeToCopy (file or folder) recursively to the specified destination on the host file system.
         /// </summary>
-        /// <param name="source">The source.</param>
+        /// <param name="source">The nodeToCopy.</param>
         /// <param name="destination">The destination.</param>
         void Export(IIndexNode source, string destination);
 
         /// <summary>
-        /// Copies the specified node recursively to the destination folder.
+        /// Copies the specified nodeToCopy recursively to the destination folder.
         /// </summary>
-        /// <param name="node">The node to copy.</param>
-        /// <param name="destination">The destination where to copy the node to.</param>
+        /// <param name="nodeToCopy">The nodeToCopy to copy.</param>
+        /// <param name="destination">The destination where to copy the nodeToCopy to.</param>
         /// <param name="nameOfCopiedElement">The name of the copied element.</param>
         /// TODO: implement this
-        void Copy(IIndexNode node, Folder destination, string nameOfCopiedElement);
+        void Copy(IIndexNode nodeToCopy, Folder destination, string nameOfCopiedElement);
 
         /// <summary>
-        /// Deletes the specified node recursively.
+        /// Deletes the specified nodeToCopy recursively.
         /// </summary>
-        /// <param name="node">The node to be deleted.</param>
+        /// <param name="node">The nodeToCopy to be deleted.</param>
         void Delete(IIndexNode node);
 
         /// <summary>
-        /// Moves the specified node to the destination folder.
+        /// Moves the specified nodeToCopy to the destination folder.
         /// </summary>
         /// <param name="node">To move.</param>
         /// <param name="destination">The destination.</param>
-        /// <param name="name">The new name of the node (can be the same as node.Name).</param>
+        /// <param name="name">The new name of the nodeToCopy (can be the same as nodeToCopy.Name).</param>
         void Move(IIndexNode node, Folder destination, string name);
 
         /// <summary>

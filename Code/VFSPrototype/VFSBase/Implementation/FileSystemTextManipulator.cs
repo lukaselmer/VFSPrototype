@@ -120,7 +120,11 @@ namespace VFSBase.Implementation
 
         public void Copy(string source, string dest)
         {
-            throw new NotImplementedException();
+            if (!Exists(source)) throw new VFSException(string.Format("Source {0} does not exist", source));
+            if (Exists(dest)) throw new VFSException(string.Format("Destination {0} already exists", dest));
+
+            CreateParentFolder(dest);
+            _fileSystem.Copy(FindNode(source), FindParentFolder(dest), PathParser.GetNodeName(dest));
         }
 
         private static Queue<string> PathToQueue(string path)
