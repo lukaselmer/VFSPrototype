@@ -58,7 +58,7 @@
     <Compile Include="Implementation\BlockManipulator.cs" />
     <Compile Include="Implementation\FileSystem.cs" />
     <Compile Include="Implementation\FileSystemFactory.cs" />
-    <Compile Include="Persistence\IBlockList.cs" />
+    <Compile Include="Interfaces\IBlockList.cs" />
     <Compile Include="Implementation\Persistence.cs" />
     <Compile Include="Implementation\RootFolder.cs" />
     <Compile Include="Interfaces\IFileSystemOptions.cs" />
