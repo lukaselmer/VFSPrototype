@@ -266,7 +266,6 @@ namespace VFSBaseTests
             }
         }
 
-
         [TestMethod]
         public void TestImportCopyExportBigFile()
         {
@@ -318,7 +317,6 @@ namespace VFSBaseTests
                 for (var i = 0; i < b3.Length; i++) Assert.AreEqual(b3[i], b4[i]);
             }
         }
-
 
         [TestMethod]
         [ExpectedException(typeof(NotFoundException))]
