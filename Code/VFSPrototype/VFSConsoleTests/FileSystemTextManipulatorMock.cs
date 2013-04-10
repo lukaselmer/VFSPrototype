@@ -8,10 +8,10 @@ namespace VFSConsoleTests
 {
     internal class FileSystemTextManipulatorMock : IFileSystemTextManipulator
     {
-        public bool FolderExists = false;
+        public bool FolderExists;
         public IList<string> CurrentFiles;
         public IList<string> CurrentFolders;
-        public bool IsCurrentDirectory = false;
+        public bool IsCurrentDirectory;
         public Exception ThrowException;
 
         public IList<string> Files(string path)
