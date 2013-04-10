@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
@@ -203,6 +206,64 @@ namespace VFSBaseTests
                 Assert.IsTrue(File.Exists(testFileSource));
                 Assert.IsTrue(m.Exists(testFileSource));
                 Assert.AreEqual(testFileData, File.ReadAllText(testFileSource));
+            }
+        }
+
+        private byte[] Md5Hash(string filename)
+        {
+            using (var file = File.OpenRead(filename))
+            {
+                MD5 md5 = new MD5CryptoServiceProvider();
+                return md5.ComputeHash(file);
+            }
+        }
+
+        [TestMethod]
+        public void TestImportExportBigFile()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                const string testFileSource = "test.txt";
+                const string verifyTestFileSource = "verify.txt";
+
+                if (File.Exists(testFileSource)) File.Delete(testFileSource);
+                if (File.Exists(verifyTestFileSource)) File.Delete(verifyTestFileSource);
+
+                const int bufferLength = 263; // 263 is a prime number.
+                var rand = new Random(1);
+
+                using (var f = File.OpenWrite(testFileSource))
+                {
+                    var buffer = new byte[bufferLength];
+                    for (var i = 0; i < 10000; i++)
+                    {
+                        rand.NextBytes(buffer);
+                        f.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                File.Copy(testFileSource, verifyTestFileSource);
+
+                Assert.IsFalse(m.Exists(testFileSource));
+                Assert.IsFalse(m.Exists(testFileSource));
+
+                m.ImportFile(testFileSource, testFileSource);
+                if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
+                File.Delete(testFileSource);
+                Assert.IsTrue(m.Exists(testFileSource));
+                Assert.IsFalse(File.Exists(testFileSource));
+
+                m.ExportFile(testFileSource, testFileSource);
+
+                Assert.IsTrue(File.Exists(testFileSource));
+                Assert.IsTrue(m.Exists(testFileSource));
+
+                var b1 = Md5Hash(verifyTestFileSource);
+                var b2 = Md5Hash(testFileSource);
+                for (var i = 0; i < b1.Length; i++) Assert.AreEqual(b1[i], b2[i]);
+
+                var b3 = File.ReadAllBytes(verifyTestFileSource);
+                var b4 = File.ReadAllBytes(testFileSource);
+                for (var i = 0; i < b3.Length; i++) Assert.AreEqual(b3[i], b4[i]);
             }
         }
 
