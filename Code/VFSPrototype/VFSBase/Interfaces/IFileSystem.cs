@@ -12,7 +12,7 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="folder">The folder.</param>
         /// <returns>IEnumerable{Folder}.</returns>
-        IEnumerable<IIndexNode> AsEnumerable(Folder folder);
+        IEnumerable<IIndexNode> List(Folder folder);
 
         /// <summary>
         /// Enumerates all folders of the specified folder.
@@ -20,6 +20,13 @@ namespace VFSBase.Interfaces
         /// <param name="folder">The folder.</param>
         /// <returns>IEnumerable{Folder}.</returns>
         IEnumerable<Folder> Folders(Folder folder);
+
+        /// <summary>
+        /// Enumerates all files of the specified folder.
+        /// </summary>
+        /// <param name="folder">The folder.</param>
+        /// <returns>IEnumerable{VFSFile}.</returns>
+        IEnumerable<VFSFile> Files(Folder folder);
 
         /// <summary>
         /// Determines whether a file or folder with a specified name exists in a specified folder.
