@@ -209,6 +209,10 @@ namespace VFSBase.Implementation
 
         private void ImportFile(string source, Folder destination, string name)
         {
+            var f = new FileInfo(source);
+            if (f.Length > _options.MaximumFileSize) throw new VFSException(
+                 string.Format("File is too big. Maximum file size is {0}. You can adjust the BlockSize in the Options to allow bigger files.", _options.MaximumFileSize));
+
             var file = CreateFile(source, destination, name);
             AppendBlockReference(destination, file.BlockNumber);
         }

@@ -21,5 +21,12 @@
         {
             return 1L << exponent;
         }
+
+        public static long Power(int _base, int exponent)
+        {
+            long ret = 1;
+            for (var i = 0; i < exponent; i++) ret *= _base;
+            return ret;
+        }
     }
 }
