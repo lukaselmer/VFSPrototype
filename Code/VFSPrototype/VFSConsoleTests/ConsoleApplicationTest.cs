@@ -43,6 +43,7 @@ namespace VFSConsoleTests
                 Assert.AreEqual("delete", mocks.FakeOutLine());
                 Assert.AreEqual("exists", mocks.FakeOutLine());
                 Assert.AreEqual("exit", mocks.FakeOutLine());
+                Assert.AreEqual("export", mocks.FakeOutLine());
                 Assert.AreEqual("help", mocks.FakeOutLine());
                 Assert.AreEqual("import", mocks.FakeOutLine());
                 Assert.AreEqual("ls", mocks.FakeOutLine());
@@ -197,12 +198,8 @@ namespace VFSConsoleTests
 
                 var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
-                Assert.AreEqual(
-                    string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt),
-                    mocks.FakeOutLine(true));
-                Assert.AreEqual(
-                    string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt),
-                    mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt), mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt), mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
@@ -223,6 +220,50 @@ namespace VFSConsoleTests
                 c.Run();
                 Assert.AreEqual(string.Format("{0}Imported \"C:\\a\" to \"/bla/a\"", c.Prompt), mocks.FakeOutLine(true));
                 Assert.AreEqual(string.Format("{0}Imported \"C:\\test folder\\xxx\" to \"/bla/xxx\"", c.Prompt), mocks.FakeOutLine());
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestExportWrongParameters()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("export blub");
+                mocks.FakeInLine(@"export bl""ub");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual(
+                    string.Format("{0}Please provide two parameters. E.g. export /from/src \"C:\\host system\\path\"", c.Prompt),
+                    mocks.FakeOutLine(true));
+                Assert.AreEqual(
+                    string.Format("{0}Please provide two parameters. E.g. export /from/src \"C:\\host system\\path\"", c.Prompt),
+                    mocks.FakeOutLine());
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestExport()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine(@"export /bla/a C:\a");
+                mocks.FakeInLine(@"export /bla/xxx ""C:\test folder\xxx""");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual(string.Format("{0}Exported \"/bla/a\" to \"C:\\a\"", c.Prompt), mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}Exported \"/bla/xxx\" to \"C:\\test folder\\xxx\"", c.Prompt), mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
