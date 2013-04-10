@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using VFSBase.Interfaces;
 
-namespace VFSBase.Persistence
+namespace VFSBase.Interfaces
 {
     /// <summary>
     /// The Interface IBlockList abstracts away how the (file or folder) contents/blocks are stored
