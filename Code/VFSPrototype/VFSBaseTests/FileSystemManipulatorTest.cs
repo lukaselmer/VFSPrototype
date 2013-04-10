@@ -122,14 +122,14 @@ namespace VFSBaseTests
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
                 File.WriteAllText(testFileSource, "");
 
-                m.ImportFile(testFileSource, "test.txt");
+                m.Import(testFileSource, "test.txt");
                 Assert.IsTrue(m.Exists("test.txt"));
 
                 m.CreateFolder("folder");
-                m.ImportFile(testFileSource, "folder/test.txt");
+                m.Import(testFileSource, "folder/test.txt");
                 Assert.IsTrue(m.Exists("folder/test.txt"));
 
-                m.ImportFile(testFileSource, "this/is/a/test/hello.txt");
+                m.Import(testFileSource, "this/is/a/test/hello.txt");
                 Assert.IsTrue(m.Exists("this/is/a/test/hello.txt"));
             }
         }
@@ -143,7 +143,7 @@ namespace VFSBaseTests
                 const string testFileSource = "test.txt";
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
 
-                m.ImportFile(testFileSource, "test.txt");
+                m.Import(testFileSource, "test.txt");
             }
         }
 
@@ -164,13 +164,13 @@ namespace VFSBaseTests
                 Assert.IsFalse(m.Exists(testFileSource));
                 Assert.IsFalse(m.Exists(testFileSource));
 
-                m.ImportFile(testFileSource, testFileSource);
+                m.Import(testFileSource, testFileSource);
                 if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
                 File.Delete(testFileSource);
                 Assert.IsTrue(m.Exists(testFileSource));
                 Assert.IsFalse(File.Exists(testFileSource));
 
-                m.ExportFile(testFileSource, testFileSource);
+                m.Export(testFileSource, testFileSource);
 
                 Assert.IsTrue(File.Exists(testFileSource));
                 Assert.IsTrue(m.Exists(testFileSource));
@@ -195,13 +195,13 @@ namespace VFSBaseTests
                 Assert.IsFalse(m.Exists(testFileSource));
                 Assert.IsFalse(m.Exists(testFileSource));
 
-                m.ImportFile(testFileSource, testFileSource);
+                m.Import(testFileSource, testFileSource);
                 if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
                 File.Delete(testFileSource);
                 Assert.IsTrue(m.Exists(testFileSource));
                 Assert.IsFalse(File.Exists(testFileSource));
 
-                m.ExportFile(testFileSource, testFileSource);
+                m.Export(testFileSource, testFileSource);
 
                 Assert.IsTrue(File.Exists(testFileSource));
                 Assert.IsTrue(m.Exists(testFileSource));
@@ -246,13 +246,13 @@ namespace VFSBaseTests
                 Assert.IsFalse(m.Exists(testFileSource));
                 Assert.IsFalse(m.Exists(testFileSource));
 
-                m.ImportFile(testFileSource, testFileSource);
+                m.Import(testFileSource, testFileSource);
                 if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
                 File.Delete(testFileSource);
                 Assert.IsTrue(m.Exists(testFileSource));
                 Assert.IsFalse(File.Exists(testFileSource));
 
-                m.ExportFile(testFileSource, testFileSource);
+                m.Export(testFileSource, testFileSource);
 
                 Assert.IsTrue(File.Exists(testFileSource));
                 Assert.IsTrue(m.Exists(testFileSource));
@@ -273,7 +273,7 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                m.ExportFile("test.txt", "export-xxx.txt");
+                m.Export("test.txt", "export-xxx.txt");
             }
         }
 
@@ -286,11 +286,11 @@ namespace VFSBaseTests
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
                 File.WriteAllText(testFileSource, "");
 
-                m.ImportFile(testFileSource, "test.txt");
+                m.Import(testFileSource, "test.txt");
                 m.Delete("test.txt");
                 Assert.IsFalse(m.Exists("test.txt"));
 
-                m.ImportFile(testFileSource, "hello/test.txt");
+                m.Import(testFileSource, "hello/test.txt");
                 m.Delete("hello/test.txt");
                 Assert.IsFalse(m.Exists("hello/test.txt"));
             }
@@ -339,17 +339,17 @@ namespace VFSBaseTests
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
                 File.WriteAllText(testFileSource, "");
 
-                m.ImportFile(testFileSource, "you.txt");
+                m.Import(testFileSource, "you.txt");
                 m.Move("you.txt", "me.txt");
                 Assert.IsTrue(m.Exists("me.txt"));
                 Assert.IsFalse(m.Exists("you.txt"));
 
-                m.ImportFile(testFileSource, "hello/world.txt");
+                m.Import(testFileSource, "hello/world.txt");
                 m.Move("hello/world.txt", "hello/universe.txt");
                 Assert.IsTrue(m.Exists("hello/universe.txt"));
                 Assert.IsFalse(m.Exists("hello/world.txt"));
 
-                m.ImportFile(testFileSource, "foo/bar.txt");
+                m.Import(testFileSource, "foo/bar.txt");
                 m.Move("foo/bar.txt", "ta/da.txt");
                 Assert.IsTrue(m.Exists("ta/da.txt"));
                 Assert.IsFalse(m.Exists("foo/bar.txt"));
@@ -506,7 +506,7 @@ namespace VFSBaseTests
                 File.WriteAllText(testFileSource, "");
 
                 Assert.IsFalse(m.Exists("test"));
-                m.ImportFile(testFileSource, "test");
+                m.Import(testFileSource, "test");
                 Assert.IsTrue(m.Exists("test"));
 
                 Assert.IsFalse(m.IsDirectory("test"));
