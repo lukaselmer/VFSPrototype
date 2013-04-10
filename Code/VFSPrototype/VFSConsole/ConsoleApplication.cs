@@ -79,7 +79,7 @@ namespace VFSConsole
                 var source = options[0];
                 var dest = PathFor(options[1]);
 
-                _fileSystemTextManipulator.ImportFile(source, dest);
+                _fileSystemTextManipulator.Import(source, dest);
                 _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)
@@ -97,7 +97,7 @@ namespace VFSConsole
                 var source = PathFor(options[0]);
                 var dest = options[1];
 
-                _fileSystemTextManipulator.ExportFile(source, dest);
+                _fileSystemTextManipulator.Export(source, dest);
                 _textWriter.WriteLine("Exported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)
