@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
@@ -23,6 +24,13 @@ namespace VFSBase.Implementation
             NameLength = 255;
             BlockReferenceSize = 64;
             BlockAllocation = new BlockAllocation();
+
+            // TODO: request key on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
+            using (var r = Rijndael.Create())
+            {
+                EncryptionKey = r.Key;
+                EncryptionInitializationVector = r.IV;
+            }
         }
 
         public string Location { get; set; }
@@ -84,5 +92,9 @@ namespace VFSBase.Implementation
                 return BinaryMathUtil.Power(ReferencesPerIndirectNode, IndirectionCountForIndirectNodes + 1) * BlockSize;
             }
         }
+
+        public byte[] EncryptionKey { get; private set; }
+
+        public byte[] EncryptionInitializationVector { get; private set; }
     }
 }

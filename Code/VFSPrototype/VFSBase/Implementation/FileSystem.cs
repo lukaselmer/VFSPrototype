@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Security.Cryptography;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
@@ -112,7 +114,7 @@ namespace VFSBase.Implementation
         private void ExportFile(VFSFile file, string destination)
         {
             EnsureParentDirectoryExists(destination);
-            using (var stream = File.OpenWrite(destination))
+            using (var stream = DecorateOutStream(File.OpenWrite(destination)))
             using (var w = new BinaryWriter(stream))
             {
                 GetBlockList(file).WriteToStream(w);
@@ -245,7 +247,7 @@ namespace VFSBase.Implementation
         {
             var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
 
-            using (var b = new BinaryReader(File.OpenRead(source)))
+            using (var b = new BinaryReader(DecorateInStream(File.OpenRead(source))))
             {
                 byte[] block;
                 while ((block = b.ReadBytes(_options.BlockSize)).Length == _options.BlockSize)
@@ -267,6 +269,38 @@ namespace VFSBase.Implementation
             //Note: we could save some metadata too...
 
             return file;
+        }
+
+        private Stream DecorateInStream(FileStream originalStream)
+        {
+            return originalStream;
+
+            //TODO: implement this
+
+            /*var compressedStream = new DeflateStream(originalStream, CompressionMode.Compress);
+            return compressedStream;
+
+            var rijAlg = Rijndael.Create();
+            rijAlg.Key = _options.EncryptionKey;
+            rijAlg.IV = _options.EncryptionInitializationVector;
+            var encryptor = rijAlg.CreateEncryptor(rijAlg.Key, rijAlg.IV);
+            return new CryptoStream(compressedStream, encryptor, CryptoStreamMode.Write);*/
+        }
+
+        private Stream DecorateOutStream(FileStream originalStream)
+        {
+            return originalStream;
+
+            //TODO: implement this
+
+            /*var decompressedStream = new DeflateStream(originalStream, CompressionMode.Decompress);
+            return decompressedStream;
+
+            var rijAlg = Rijndael.Create();
+            rijAlg.Key = _options.EncryptionKey;
+            rijAlg.IV = _options.EncryptionInitializationVector;
+            var decryptor = rijAlg.CreateDecryptor(rijAlg.Key, rijAlg.IV);
+            return new CryptoStream(decompressedStream, decryptor, CryptoStreamMode.Read);*/
         }
 
         private void AddDataToFile(VFSFile file, byte[] block)
