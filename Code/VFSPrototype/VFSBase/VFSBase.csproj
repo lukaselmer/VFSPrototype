@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Implementation\BlockAllocation.cs" />
+    <Compile Include="Implementation\VFSFileStream.cs" />
     <Compile Include="Persistence\BlockList.cs" />
     <Compile Include="Implementation\BlockManipulator.cs" />
     <Compile Include="Implementation\FileSystem.cs" />
