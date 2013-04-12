@@ -247,9 +247,8 @@ namespace VFSBase.Implementation
         {
             var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
 
-            using (var b = new BinaryReader(DecorateWritingStream(File.OpenRead(source))))
-            using (var vfsWriter = new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence))
-            using (var w = DecorateWritingStream(vfsWriter))
+            using (var b = new BinaryReader(File.OpenRead(source)))
+            using (var w = DecorateWritingStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
             {
                 byte[] block;
                 while ((block = b.ReadBytes(_options.BlockSize)).Length > 0)
