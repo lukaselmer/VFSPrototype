@@ -247,23 +247,15 @@ namespace VFSBase.Implementation
         {
             var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
 
-            using (var b = new BinaryReader(DecorateInStream(File.OpenRead(source))))
+            using (var b = new BinaryReader(DecorateWritingStream(File.OpenRead(source))))
+            using (var vfsWriter = new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence))
+            using (var w = DecorateWritingStream(vfsWriter))
             {
                 byte[] block;
-                while ((block = b.ReadBytes(_options.BlockSize)).Length == _options.BlockSize)
+                while ((block = b.ReadBytes(_options.BlockSize)).Length > 0)
                 {
-                    AddDataToFile(file, block);
+                    w.Write(block, 0, _options.BlockSize);
                 }
-
-                file.LastBlockSize = block.Length;
-                if (file.LastBlockSize > 0)
-                {
-                    var lastBlock = new byte[_options.BlockSize];
-                    block.CopyTo(lastBlock, 0);
-                    AddDataToFile(file, block);
-                }
-
-                _persistence.Persist(file);
             }
 
             //Note: we could save some metadata too...
@@ -271,20 +263,20 @@ namespace VFSBase.Implementation
             return file;
         }
 
-        private Stream DecorateInStream(FileStream originalStream)
+        private Stream DecorateWritingStream(Stream originalStream)
         {
             return originalStream;
 
             //TODO: implement this
 
-            /*var compressedStream = new DeflateStream(originalStream, CompressionMode.Compress);
+            var compressedStream = new DeflateStream(originalStream, CompressionMode.Compress);
             return compressedStream;
 
             var rijAlg = Rijndael.Create();
             rijAlg.Key = _options.EncryptionKey;
             rijAlg.IV = _options.EncryptionInitializationVector;
             var encryptor = rijAlg.CreateEncryptor(rijAlg.Key, rijAlg.IV);
-            return new CryptoStream(compressedStream, encryptor, CryptoStreamMode.Write);*/
+            return new CryptoStream(compressedStream, encryptor, CryptoStreamMode.Write);
         }
 
         private Stream DecorateOutStream(FileStream originalStream)
