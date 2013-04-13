@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
 
@@ -13,11 +15,26 @@ namespace VFSBase.Implementation
         private readonly BlockAllocation _blockAllocation;
         private readonly BlockManipulator _blockManipulator;
         private readonly Persistence _persistence;
-        private byte[] _buffer;
 
-        private long _bufferPosition;
-        private bool _overwriteNextBlock = false;
-        private long _lastBlockNumber = 0;
+        #region Writing
+
+        private readonly byte[] _writeBuffer;
+        private long _writeBufferPosition;
+        private bool _overwriteNextBlock;
+        private long _lastBlockNumber;
+
+        #endregion
+
+        #region Reading
+
+        private IEnumerator<byte[]> _blocks;
+        private readonly byte[] _readBuffer;
+        private int _readBufferPosition;
+        private bool _canRead = true;
+        private bool _canWrite = true;
+
+        #endregion
+
 
         public VFSFileStream(VFSFile file, BlockParser blockParser, FileSystemOptions options, BlockAllocation blockAllocation, BlockManipulator blockManipulator, Persistence persistence)
         {
@@ -28,13 +45,16 @@ namespace VFSBase.Implementation
             _blockManipulator = blockManipulator;
             _persistence = persistence;
 
-            _buffer = new byte[_options.BlockSize];
+            _writeBuffer = new byte[_options.BlockSize];
+            _readBuffer = new byte[_options.BlockSize];
         }
 
         public override void Flush()
         {
+            if (!_canWrite) return;
+
             Persist(true);
-            _file.LastBlockSize = (int)_bufferPosition;
+            _file.LastBlockSize = (int)_writeBufferPosition;
             _persistence.Persist(_file);
         }
 
@@ -50,18 +70,55 @@ namespace VFSBase.Implementation
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            throw new NotSupportedException();
+            if (!_canRead) return 0;
+            if (_canWrite) _canWrite = false;
+
+            if (_blocks == null)
+            {
+                _blocks = GetBlockList(_file).Blocks().GetEnumerator();
+                _blocks.MoveNext();
+                _readBufferPosition = 0;
+            }
+
+            if (buffer.Length < count + offset) throw new ArgumentOutOfRangeException("buffer");
+
+            var readCount = 0;
+
+            while (count - readCount > 0)
+            {
+                if (_readBufferPosition == _blocks.Current.LongLength)
+                {
+                    if (!_blocks.MoveNext())
+                    {
+                        _canRead = false;
+                        _blocks = null;
+                        break;
+                    }
+                    _readBufferPosition = 0;
+                }
+
+                var toCopyCount = Math.Min(count, _blocks.Current.Length - _readBufferPosition);
+
+                Array.Copy(_blocks.Current, _readBufferPosition, buffer, offset + readCount, toCopyCount);
+                readCount += toCopyCount;
+                _readBufferPosition += toCopyCount;
+            }
+
+            return readCount;
         }
 
         public override void Write(byte[] toWrite, int offset, int count)
         {
+            if (!_canWrite) throw new VFSException("Stream is not writable");
+            if (_canRead) _canRead = false;
+
             long toWriteOffset = 0;
             while (toWriteOffset < toWrite.Length)
             {
-                var amountToCopy = Math.Min(_buffer.Length - _bufferPosition, toWrite.Length - toWriteOffset);
-                Array.Copy(toWrite, toWriteOffset, _buffer, _bufferPosition, amountToCopy);
+                var amountToCopy = Math.Min(_writeBuffer.Length - _writeBufferPosition, toWrite.Length - toWriteOffset);
+                Array.Copy(toWrite, toWriteOffset, _writeBuffer, _writeBufferPosition, amountToCopy);
                 toWriteOffset += amountToCopy;
-                _bufferPosition += amountToCopy;
+                _writeBufferPosition += amountToCopy;
                 Persist();
             }
         }
@@ -69,27 +126,27 @@ namespace VFSBase.Implementation
         private void Persist(bool forceFlush = false)
         {
             // No need to write it to the disk
-            if (_bufferPosition <= 0) return;
+            if (_writeBufferPosition <= 0) return;
 
             // No need to write it to the disk yet (lazy, only writes to disk when forced or buffer is full)
-            if (!forceFlush && _bufferPosition < _buffer.Length) return;
+            if (!forceFlush && _writeBufferPosition < _writeBuffer.Length) return;
 
             var overwriteThisBlock = _overwriteNextBlock;
             if (overwriteThisBlock)
             {
-                _blockManipulator.WriteBlock(_lastBlockNumber, _buffer);
+                _blockManipulator.WriteBlock(_lastBlockNumber, _writeBuffer);
             }
             else
             {
                 var blockNr = _blockAllocation.Allocate();
-                _blockManipulator.WriteBlock(blockNr, _buffer);
+                _blockManipulator.WriteBlock(blockNr, _writeBuffer);
                 AppendBlockReference(_file, blockNr);
                 _lastBlockNumber = blockNr;
             }
 
-            _overwriteNextBlock = _buffer.Length > _bufferPosition;
+            _overwriteNextBlock = _writeBuffer.Length > _writeBufferPosition;
 
-            if (!_overwriteNextBlock) _bufferPosition = 0;
+            if (!_overwriteNextBlock) _writeBufferPosition = 0;
         }
 
         private void AppendBlockReference(IIndexNode parentFolder, long reference)
@@ -104,7 +161,7 @@ namespace VFSBase.Implementation
 
         public override bool CanRead
         {
-            get { return true; }
+            get { return _canRead; }
         }
 
         public override bool CanSeek
@@ -114,7 +171,7 @@ namespace VFSBase.Implementation
 
         public override bool CanWrite
         {
-            get { return true; }
+            get { return _canWrite; }
         }
 
         public override long Length
