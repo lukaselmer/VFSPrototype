@@ -28,7 +28,8 @@ namespace VFSBase.Implementation
         #region Reading
 
         private IEnumerator<byte[]> _blocks;
-        private readonly byte[] _readBuffer;
+        private byte[] _readBuffer;
+        private byte[] _readBufferNext;
         private int _readBufferPosition;
         private bool _canRead = true;
         private bool _canWrite = true;
@@ -46,7 +47,6 @@ namespace VFSBase.Implementation
             _persistence = persistence;
 
             _writeBuffer = new byte[_options.BlockSize];
-            _readBuffer = new byte[_options.BlockSize];
         }
 
         public override void Flush()
@@ -70,41 +70,80 @@ namespace VFSBase.Implementation
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+            if (buffer.Length < count + offset) throw new ArgumentOutOfRangeException("buffer");
+
             if (!_canRead) return 0;
             if (_canWrite) _canWrite = false;
 
-            if (_blocks == null)
-            {
-                _blocks = GetBlockList(_file).Blocks().GetEnumerator();
-                _blocks.MoveNext();
-                _readBufferPosition = 0;
-            }
+            if (_blocks == null) InitRead();
 
-            if (buffer.Length < count + offset) throw new ArgumentOutOfRangeException("buffer");
 
             var readCount = 0;
 
             while (count - readCount > 0)
             {
-                if (_readBufferPosition == _blocks.Current.LongLength)
+                ReadNextBlockIfNecessary();
+                if (_readBuffer.Length == 0) break;
+
+                while (_readBuffer.Length > _readBufferPosition)
                 {
-                    if (!_blocks.MoveNext())
-                    {
-                        _canRead = false;
-                        _blocks = null;
-                        break;
-                    }
-                    _readBufferPosition = 0;
+                    var amountToCopy = Math.Min(count - readCount, _readBuffer.Length - _readBufferPosition);
+                    Array.Copy(_readBuffer, _readBufferPosition, buffer, offset, amountToCopy);
+                    _readBufferPosition += amountToCopy;
+                    readCount += amountToCopy;
                 }
-
-                var toCopyCount = Math.Min(count, _blocks.Current.Length - _readBufferPosition);
-
-                Array.Copy(_blocks.Current, _readBufferPosition, buffer, offset + readCount, toCopyCount);
-                readCount += toCopyCount;
-                _readBufferPosition += toCopyCount;
             }
 
             return readCount;
+        }
+
+        private void InitRead()
+        {
+            _blocks = GetBlockList(_file).Blocks().GetEnumerator();
+            _readBufferPosition = 0;
+            _readBuffer = new byte[0];
+
+            if (_blocks.MoveNext())
+            {
+                _readBufferNext = new byte[_blocks.Current.Length];
+                _blocks.Current.CopyTo(_readBufferNext, 0);
+            }
+            else
+            {
+                _readBufferNext = null;
+            }
+        }
+
+        private void ReadNextBlockIfNecessary()
+        {
+            if (_readBuffer.Length > _readBufferPosition) return;
+
+            _readBuffer = _readBufferNext;
+            _readBufferPosition = 0;
+
+            _readBufferNext = _blocks.MoveNext() ? CopyBytes(_blocks.Current) : null;
+
+            if (_readBuffer == null)
+            {
+                _readBuffer = new byte[0];
+                _readBufferPosition = 0;
+                return;
+            }
+
+            if (_readBufferNext != null) return;
+
+            if (_file.LastBlockSize <= 0) return;
+
+            var tmp = new byte[_file.LastBlockSize];
+            Array.Copy(_readBuffer, 0, tmp, 0, _file.LastBlockSize);
+            _readBuffer = tmp;
+        }
+
+        private static byte[] CopyBytes(byte[] toCopy)
+        {
+            var b = new byte[toCopy.Length];
+            toCopy.CopyTo(b, 0);
+            return b;
         }
 
         public override void Write(byte[] toWrite, int offset, int count)
@@ -113,9 +152,9 @@ namespace VFSBase.Implementation
             if (_canRead) _canRead = false;
 
             long toWriteOffset = 0;
-            while (toWriteOffset < toWrite.Length)
+            while (toWriteOffset < count)
             {
-                var amountToCopy = Math.Min(_writeBuffer.Length - _writeBufferPosition, toWrite.Length - toWriteOffset);
+                var amountToCopy = Math.Min(count, Math.Min(_writeBuffer.Length - _writeBufferPosition, toWrite.Length - toWriteOffset));
                 Array.Copy(toWrite, toWriteOffset, _writeBuffer, _writeBufferPosition, amountToCopy);
                 toWriteOffset += amountToCopy;
                 _writeBufferPosition += amountToCopy;

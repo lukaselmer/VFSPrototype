@@ -29,22 +29,22 @@ namespace VFSBase.Implementation
             BlockReferenceSize = 64;
             BlockAllocation = new BlockAllocation();
 
-            InitializeStreamCodingStrategy();
-
             // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
             using (var r = Rijndael.Create())
             {
                 EncryptionKey = r.Key;
                 EncryptionInitializationVector = r.IV;
             }
+
+            InitializeStreamCodingStrategy();
         }
 
         private void InitializeStreamCodingStrategy()
         {
-            //var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
-            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), encryptionStrategy);
+            var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
+            _streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), encryptionStrategy);
             //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), new NullStreamCodingStrategy());
-            _streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), new NullStreamCodingStrategy());
+            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), new NullStreamCodingStrategy());
         }
 
         public string Location { get; set; }
@@ -107,9 +107,9 @@ namespace VFSBase.Implementation
             }
         }
 
-        public byte[] EncryptionKey { get; private set; }
+        private byte[] EncryptionKey { get; set; }
 
-        public byte[] EncryptionInitializationVector { get; private set; }
+        private byte[] EncryptionInitializationVector { get; set; }
 
         public IStreamCodingStrategy StreamCodingStrategy
         {
