@@ -56,6 +56,7 @@
     <Compile Include="Implementation\BlockAllocation.cs" />
     <Compile Include="Persistence\Coding\EncryptionOptions.cs" />
     <Compile Include="Persistence\Coding\NullStreamCodingStrategy.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeStreamEncryptionStrategy.cs" />
     <Compile Include="Persistence\Coding\StreamCompressionEncryptionCodingStrategy.cs" />
     <Compile Include="Persistence\Coding\MicrosoftStreamCompressionStrategy.cs" />
     <Compile Include="Persistence\Coding\MicrosoftStreamEncryptionStrategy.cs" />
