@@ -96,6 +96,30 @@ namespace VFSBase.Implementation
             else throw new NotFoundException();
         }
 
+        private void ImportFile(string source, Folder destination, string name)
+        {
+            var f = new FileInfo(source);
+            if (f.Length > _options.MaximumFileSize) throw new VFSException(
+                 string.Format("File is too big. Maximum file size is {0}. You can adjust the BlockSize in the Options to allow bigger files.", _options.MaximumFileSize));
+
+            var file = CreateFile(source, destination, name);
+            AppendBlockReference(destination, file.BlockNumber);
+        }
+
+        // TODO: test this
+        private void ImportDirectory(string source, Folder destination, string name)
+        {
+            var info = new DirectoryInfo(source);
+
+            var newFolder = CreateFolder(destination, name);
+
+            foreach (var directoryInfo in info.GetDirectories())
+                ImportDirectory(directoryInfo.FullName, newFolder, directoryInfo.Name);
+
+            foreach (var fileInfo in info.GetFiles())
+                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name);
+        }
+
         public void Export(IIndexNode source, string destination)
         {
             var absoluteDestination = Path.GetFullPath(destination);
@@ -115,7 +139,6 @@ namespace VFSBase.Implementation
         {
             EnsureParentDirectoryExists(destination);
             using (var stream = File.OpenWrite(destination))
-            using (var w = new BinaryWriter(stream))
             {
                 using (var reader = DecorateToHostStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
                 {
@@ -124,14 +147,6 @@ namespace VFSBase.Implementation
                     while ((read = reader.Read(buffer, 0, _options.BlockSize)) > 0)
                     {
                         stream.Write(buffer, 0, read);
-                    }
-                }
-
-                if (file.LastBlockSize > 0)
-                {
-                    {
-                        w.Seek(_options.BlockSize - file.LastBlockSize, SeekOrigin.End);
-                        stream.SetLength(stream.Length + file.LastBlockSize - _options.BlockSize);
                     }
                 }
             }
@@ -220,30 +235,6 @@ namespace VFSBase.Implementation
             return GetBlockList(folder).Exists(name);
         }
 
-        private void ImportFile(string source, Folder destination, string name)
-        {
-            var f = new FileInfo(source);
-            if (f.Length > _options.MaximumFileSize) throw new VFSException(
-                 string.Format("File is too big. Maximum file size is {0}. You can adjust the BlockSize in the Options to allow bigger files.", _options.MaximumFileSize));
-
-            var file = CreateFile(source, destination, name);
-            AppendBlockReference(destination, file.BlockNumber);
-        }
-
-        // TODO: test this
-        private void ImportDirectory(string source, Folder destination, string name)
-        {
-            var info = new DirectoryInfo(source);
-
-            var newFolder = CreateFolder(destination, name);
-
-            foreach (var directoryInfo in info.GetDirectories())
-                ImportDirectory(directoryInfo.FullName, newFolder, directoryInfo.Name);
-
-            foreach (var fileInfo in info.GetFiles())
-                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name);
-        }
-
         private void AppendBlockReference(IIndexNode parentFolder, long reference)
         {
             GetBlockList(parentFolder).AddReference(reference);
@@ -264,7 +255,7 @@ namespace VFSBase.Implementation
                 byte[] block;
                 while ((block = b.ReadBytes(_options.BlockSize)).Length > 0)
                 {
-                    w.Write(block, 0, _options.BlockSize);
+                    w.Write(block, 0, block.Length);
                 }
             }
 
