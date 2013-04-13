@@ -7,6 +7,7 @@ using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.Persistence.Blocks;
+using VFSBase.Persistence.Coding;
 
 namespace VFSBase.Persistence
 {
@@ -128,13 +129,6 @@ namespace VFSBase.Persistence
             return l;
         }
 
-        public void WriteToStream(BinaryWriter writer)
-        {
-            if (_node.IndirectNodeNumber == 0) return;
-
-            WriteFromIndirectNode(ReadIndirectNode(_node.IndirectNodeNumber), writer, _options.IndirectionCountForIndirectNodes);
-        }
-
         public bool Exists(string name)
         {
             return AsEnumerable().Any(i => i.Name == name);
@@ -186,15 +180,6 @@ namespace VFSBase.Persistence
             {
                 if (recursion == 0) l.Add(ReadIndexNode(blockNumber));
                 else AddFromIndirectNode(ReadIndirectNode(blockNumber), l, recursion - 1);
-            }
-        }
-
-        private void WriteFromIndirectNode(IndirectNode indirectNode, BinaryWriter writer, int recursion)
-        {
-            foreach (var blockNumber in indirectNode.UsedBlockNumbers())
-            {
-                if (recursion == 0) writer.Write(_blockManipulator.ReadBlock(blockNumber));
-                else WriteFromIndirectNode(ReadIndirectNode(blockNumber), writer, recursion - 1);
             }
         }
 
