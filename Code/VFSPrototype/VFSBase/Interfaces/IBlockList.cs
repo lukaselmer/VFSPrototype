@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using VFSBase.Persistence.Coding;
 
 namespace VFSBase.Interfaces
 {
@@ -44,13 +45,6 @@ namespace VFSBase.Interfaces
         /// <param name="name">The name.</param>
         /// <returns>IIndexNode.</returns>
         IIndexNode Find(string name);
-
-        /// <summary>
-        /// Writes the data of a file to a stream.
-        /// </summary>
-        /// <param name="writer">The binary writer.</param>
-        void WriteToStream(BinaryWriter writer);
-
 
         /// <summary>
         /// Enumerates (lazily) through the blocks.

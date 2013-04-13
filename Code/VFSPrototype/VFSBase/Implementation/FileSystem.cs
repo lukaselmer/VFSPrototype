@@ -114,14 +114,25 @@ namespace VFSBase.Implementation
         private void ExportFile(VFSFile file, string destination)
         {
             EnsureParentDirectoryExists(destination);
-            using (var stream = DecorateOutStream(File.OpenWrite(destination)))
+            using (var stream = File.OpenWrite(destination))
             using (var w = new BinaryWriter(stream))
             {
-                GetBlockList(file).WriteToStream(w);
+                using (var reader = DecorateToHostStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
+                {
+                    var buffer = new byte[_options.BlockSize];
+                    int read;
+                    while ((read = reader.Read(buffer, 0, _options.BlockSize)) > 0)
+                    {
+                        stream.Write(buffer, 0, read);
+                    }
+                }
+
                 if (file.LastBlockSize > 0)
                 {
-                    w.Seek(_options.BlockSize - file.LastBlockSize, SeekOrigin.End);
-                    stream.SetLength(stream.Length + file.LastBlockSize - _options.BlockSize);
+                    {
+                        w.Seek(_options.BlockSize - file.LastBlockSize, SeekOrigin.End);
+                        stream.SetLength(stream.Length + file.LastBlockSize - _options.BlockSize);
+                    }
                 }
             }
         }
@@ -248,7 +259,7 @@ namespace VFSBase.Implementation
             var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
 
             using (var b = new BinaryReader(File.OpenRead(source)))
-            using (var w = DecorateWritingStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
+            using (var w = DecorateToVFSStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
             {
                 byte[] block;
                 while ((block = b.ReadBytes(_options.BlockSize)).Length > 0)
@@ -262,36 +273,14 @@ namespace VFSBase.Implementation
             return file;
         }
 
-        private Stream DecorateWritingStream(Stream originalStream)
+        private Stream DecorateToVFSStream(Stream originalStream)
         {
-            return originalStream;
-
-            //TODO: implement this
-
-            var compressedStream = new DeflateStream(originalStream, CompressionMode.Compress);
-            return compressedStream;
-
-            var rijAlg = Rijndael.Create();
-            rijAlg.Key = _options.EncryptionKey;
-            rijAlg.IV = _options.EncryptionInitializationVector;
-            var encryptor = rijAlg.CreateEncryptor(rijAlg.Key, rijAlg.IV);
-            return new CryptoStream(compressedStream, encryptor, CryptoStreamMode.Write);
+            return _options.StreamCodingStrategy.DecorateToVFS(originalStream);
         }
 
-        private Stream DecorateOutStream(FileStream originalStream)
+        private Stream DecorateToHostStream(Stream originalStream)
         {
-            return originalStream;
-
-            //TODO: implement this
-
-            /*var decompressedStream = new DeflateStream(originalStream, CompressionMode.Decompress);
-            return decompressedStream;
-
-            var rijAlg = Rijndael.Create();
-            rijAlg.Key = _options.EncryptionKey;
-            rijAlg.IV = _options.EncryptionInitializationVector;
-            var decryptor = rijAlg.CreateDecryptor(rijAlg.Key, rijAlg.IV);
-            return new CryptoStream(decompressedStream, decryptor, CryptoStreamMode.Read);*/
+            return _options.StreamCodingStrategy.DecorateToHost(originalStream);
         }
 
         private void AddDataToFile(VFSFile file, byte[] block)
