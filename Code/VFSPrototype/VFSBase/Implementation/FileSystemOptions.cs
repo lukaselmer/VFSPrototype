@@ -107,8 +107,12 @@ namespace VFSBase.Implementation
             }
         }
 
+        // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
+        // [NonSerialized]
         private byte[] EncryptionKey { get; set; }
 
+        // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
+        // [NonSerialized]
         private byte[] EncryptionInitializationVector { get; set; }
 
         public IStreamCodingStrategy StreamCodingStrategy
