@@ -1,0 +1,22 @@
+﻿<Window x:Class="VFSBrowser.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:VFSBrowser.View"
+        xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel"
+        Title="MainWindow" Height="350" Width="525">
+    <Window.DataContext>
+        <!-- Declaratively create an instance of our MainViewModel -->
+        <viewModel:MainViewModel />
+    </Window.DataContext>
+    <Grid>
+
+        <TreeView ItemsSource="{Binding RootFolders}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Folders}">
+                    
+                    <TextBlock Text="{Binding Name}"></TextBlock>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        
+    </Grid>
+</Window>
