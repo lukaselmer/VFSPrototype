@@ -15,6 +15,7 @@ namespace VFSBase.Persistence.Coding
         public Stream DecorateToVFS(Stream stream)
         {
             var encryptor = new SelfMadeSimpleCryptor(_options.Key, _options.InitializationVector, SelfMadeSimpleCryptor.CryptoDirection.Encrypt);
+            //var encryptor = new SelfMadeSimpleCryptor(_options.Key, _options.InitializationVector, SelfMadeSimpleCryptor.CryptoDirection.Encrypt);
             //var encryptor = new SelfMadeCaesarCryptor(_options.Key[0], SelfMadeCaesarCryptor.CryptoDirection.Encrypt);
             return new CryptoStream(stream, encryptor, CryptoStreamMode.Write);
         }
@@ -22,6 +23,7 @@ namespace VFSBase.Persistence.Coding
         public Stream DecorateToHost(Stream stream)
         {
             var decryptor = new SelfMadeSimpleCryptor(_options.Key, _options.InitializationVector, SelfMadeSimpleCryptor.CryptoDirection.Decrypt);
+            //var decryptor = new SelfMadeSimpleCryptor(_options.Key, _options.InitializationVector, SelfMadeSimpleCryptor.CryptoDirection.Decrypt);
             //var decryptor = new SelfMadeCaesarCryptor(_options.Key[0], SelfMadeCaesarCryptor.CryptoDirection.Decrypt);
             return new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
         }
