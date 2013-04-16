@@ -63,6 +63,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="BlockAllocationTest.cs" />
+    <Compile Include="Coding\CryptoTest.cs" />
     <Compile Include="FileSystemManipulatorLoadTest.cs" />
     <Compile Include="FileSystemFactoryTest.cs" />
     <Compile Include="FilSystemTest.cs" />
