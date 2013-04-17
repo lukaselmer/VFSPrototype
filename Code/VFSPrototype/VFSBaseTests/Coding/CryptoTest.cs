@@ -54,8 +54,8 @@ namespace VFSBaseTests.Coding
         {
             var options = GetEncryptionOptions();
             TestAlgorithm(
-                new SelfMadeAesCryptor(options.Key, options.InitializationVector, SelfMadeAesCryptor.CryptoDirection.Encrypt),
-                new SelfMadeAesCryptor(options.Key, options.InitializationVector, SelfMadeAesCryptor.CryptoDirection.Decrypt));
+                new SelfMadeAesCryptor(options.Key, options.InitializationVector, CryptoDirection.Encrypt),
+                new SelfMadeAesCryptor(options.Key, options.InitializationVector, CryptoDirection.Decrypt));
 
         }
 
@@ -64,8 +64,8 @@ namespace VFSBaseTests.Coding
         {
             var options = GetEncryptionOptions();
             TestAlgorithm(
-                new SelfMadeSimpleCryptor(options.Key, options.InitializationVector, SelfMadeSimpleCryptor.CryptoDirection.Encrypt),
-                new SelfMadeSimpleCryptor(options.Key, options.InitializationVector, SelfMadeSimpleCryptor.CryptoDirection.Decrypt));
+                new SelfMadeSimpleCryptor(options.Key, options.InitializationVector, CryptoDirection.Encrypt),
+                new SelfMadeSimpleCryptor(options.Key, options.InitializationVector, CryptoDirection.Decrypt));
 
         }
 
@@ -74,12 +74,12 @@ namespace VFSBaseTests.Coding
         public void TestSelfMadeCaesarCryptor()
         {
             TestAlgorithm(
-                new SelfMadeCaesarCryptor(3, SelfMadeCaesarCryptor.CryptoDirection.Encrypt),
-                new SelfMadeCaesarCryptor(3, SelfMadeCaesarCryptor.CryptoDirection.Decrypt));
+                new SelfMadeCaesarCryptor(3, CryptoDirection.Encrypt),
+                new SelfMadeCaesarCryptor(3, CryptoDirection.Decrypt));
 
             TestAlgorithm(
-                new SelfMadeCaesarCryptor(7, SelfMadeCaesarCryptor.CryptoDirection.Encrypt),
-                new SelfMadeCaesarCryptor(7, SelfMadeCaesarCryptor.CryptoDirection.Decrypt));
+                new SelfMadeCaesarCryptor(7, CryptoDirection.Encrypt),
+                new SelfMadeCaesarCryptor(7, CryptoDirection.Decrypt));
         }
     }
 }
