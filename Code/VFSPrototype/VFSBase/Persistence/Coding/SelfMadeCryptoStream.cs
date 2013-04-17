@@ -1,19 +1,34 @@
+using System;
 using System.IO;
+using System.Security.Cryptography;
 using VFSBase.Exceptions;
 
 namespace VFSBase.Persistence.Coding
 {
     internal class SelfMadeCryptoStream : Stream
     {
-        private readonly Stream _stream;
-        private readonly SelfMadeAesCryptor _encryptor;
+        private Stream _stream;
+        private readonly ICryptoTransform _cryptor;
         private readonly SelfMadeCryptoStreamMode _mode;
+        private readonly int _blockSize;
+        private byte[] _currentBuffer;
+        private byte[] _nextBuffer;
+        private bool _flushedFinalBlock = false;
 
-        public SelfMadeCryptoStream(Stream stream, SelfMadeAesCryptor encryptor, SelfMadeCryptoStreamMode mode)
+        public SelfMadeCryptoStream(Stream stream, ICryptoTransform cryptor, SelfMadeCryptoStreamMode mode)
         {
             _stream = stream;
-            _encryptor = encryptor;
+            _cryptor = cryptor;
             _mode = mode;
+            _blockSize = mode == SelfMadeCryptoStreamMode.Read ? _cryptor.InputBlockSize : _cryptor.OutputBlockSize;
+            _currentBuffer = new byte[_blockSize];
+            _nextBuffer = new byte[_blockSize];
+
+            if (_cryptor.InputBlockSize != _cryptor.OutputBlockSize)
+            {
+                throw new VFSException("Only encryption with same input and output block sizes are allowed in this implementation.");
+            }
+
         }
 
         public override void Flush()
@@ -23,7 +38,7 @@ namespace VFSBase.Persistence.Coding
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            return _stream.Seek(offset, origin);
+            throw new NotSupportedException();
         }
 
         public override void SetLength(long value)
@@ -35,6 +50,7 @@ namespace VFSBase.Persistence.Coding
         {
             if (!CanRead) throw new VFSException("Stream not readable");
             var readCount = _stream.Read(buffer, offset, count);
+
             return readCount;
         }
 
@@ -51,7 +67,7 @@ namespace VFSBase.Persistence.Coding
 
         public override bool CanSeek
         {
-            get { return _stream.CanSeek; }
+            get { return false; }
         }
 
         public override bool CanWrite
@@ -68,8 +84,23 @@ namespace VFSBase.Persistence.Coding
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-            _stream.Dispose();
+            if (!disposing) return;
+
+            if ((!_flushedFinalBlock) && (_mode == SelfMadeCryptoStreamMode.Write)) FlushFinalBlock();
+
+            if (_stream != null)
+            {
+                _stream.Dispose();
+                _stream = null;
+            }
+
+            base.Dispose(true);
+        }
+
+        public void FlushFinalBlock()
+        {
+            Flush();
+            //throw new NotImplementedException();
         }
     }
 }
