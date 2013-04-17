@@ -18,13 +18,13 @@ namespace VFSBaseTests.Coding
 
             using (var ms = new MemoryStream())
             {
-                var s = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
+                var s = new SelfMadeCryptoStream(ms, encryptor, SelfMadeCryptoStreamMode.Write);
                 s.Write(original, 0, original.Length);
                 s.FlushFinalBlock();
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                var ss = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
+                var ss = new SelfMadeCryptoStream(ms, decryptor, SelfMadeCryptoStreamMode.Read);
                 var read = 0;
                 var pos = 0;
                 while ((pos = ss.Read(result, pos, original.Length - read)) > 0)
@@ -47,6 +47,22 @@ namespace VFSBaseTests.Coding
             {
                 return new EncryptionOptions(r.Key, r.IV);
             }
+        }
+
+        [TestMethod]
+        public void TestMicrosoftAesCryptor()
+        {
+            using (var r = Rijndael.Create())
+            {
+                r.CreateEncryptor();
+                r.CreateDecryptor();
+                var options = new EncryptionOptions(r.Key, r.IV);
+
+                TestAlgorithm(
+                    new SelfMadeAesCryptor(options.Key, options.InitializationVector, CryptoDirection.Encrypt),
+                    new SelfMadeAesCryptor(options.Key, options.InitializationVector, CryptoDirection.Decrypt));
+            }
+
         }
 
         [TestMethod]
