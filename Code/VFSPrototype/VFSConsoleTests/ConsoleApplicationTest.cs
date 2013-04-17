@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Exceptions;
 using VFSConsole;
 
 namespace VFSConsoleTests
@@ -43,6 +44,7 @@ namespace VFSConsoleTests
                 Assert.AreEqual("delete", mocks.FakeOutLine());
                 Assert.AreEqual("exists", mocks.FakeOutLine());
                 Assert.AreEqual("exit", mocks.FakeOutLine());
+                Assert.AreEqual("export", mocks.FakeOutLine());
                 Assert.AreEqual("help", mocks.FakeOutLine());
                 Assert.AreEqual("import", mocks.FakeOutLine());
                 Assert.AreEqual("ls", mocks.FakeOutLine());
@@ -58,6 +60,7 @@ namespace VFSConsoleTests
             fs.FolderExists = true;
 
             fs.CurrentFolders = new List<string> { "Bla", "blurb", "xxx" };
+            fs.CurrentFiles = new List<string> { "Aaa", "Nanananana" };
 
             using (var mocks = new InOutMocks())
             {
@@ -70,6 +73,9 @@ namespace VFSConsoleTests
                 Assert.AreEqual("Bla", mocks.FakeOutLine());
                 Assert.AreEqual("blurb", mocks.FakeOutLine());
                 Assert.AreEqual("xxx", mocks.FakeOutLine());
+                Assert.AreEqual("Found 2 files:", mocks.FakeOutLine());
+                Assert.AreEqual("Aaa", mocks.FakeOutLine());
+                Assert.AreEqual("Nanananana", mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
@@ -197,12 +203,8 @@ namespace VFSConsoleTests
 
                 var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
                 c.Run();
-                Assert.AreEqual(
-                    string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt),
-                    mocks.FakeOutLine(true));
-                Assert.AreEqual(
-                    string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt),
-                    mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt), mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}Please provide two parameters. E.g. import \"C:\\host system\\path\" /to/dest", c.Prompt), mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
@@ -223,6 +225,50 @@ namespace VFSConsoleTests
                 c.Run();
                 Assert.AreEqual(string.Format("{0}Imported \"C:\\a\" to \"/bla/a\"", c.Prompt), mocks.FakeOutLine(true));
                 Assert.AreEqual(string.Format("{0}Imported \"C:\\test folder\\xxx\" to \"/bla/xxx\"", c.Prompt), mocks.FakeOutLine());
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestExportWrongParameters()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("export blub");
+                mocks.FakeInLine(@"export bl""ub");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual(
+                    string.Format("{0}Please provide two parameters. E.g. export /from/src \"C:\\host system\\path\"", c.Prompt),
+                    mocks.FakeOutLine(true));
+                Assert.AreEqual(
+                    string.Format("{0}Please provide two parameters. E.g. export /from/src \"C:\\host system\\path\"", c.Prompt),
+                    mocks.FakeOutLine());
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestExport()
+        {
+            var fs = FileSystemMock();
+            fs.FolderExists = false;
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine(@"export /bla/a C:\a");
+                mocks.FakeInLine(@"export /bla/xxx ""C:\test folder\xxx""");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual(string.Format("{0}Exported \"/bla/a\" to \"C:\\a\"", c.Prompt), mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}Exported \"/bla/xxx\" to \"C:\\test folder\\xxx\"", c.Prompt), mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
@@ -304,6 +350,43 @@ namespace VFSConsoleTests
                 c.Run();
                 Assert.AreEqual("/> Directory changed", mocks.FakeOutLine(true));
                 Assert.AreEqual("/a/b> Directory changed", mocks.FakeOutLine());
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestPrintVFSException()
+        {
+            var fs = FileSystemMock();
+            fs.ThrowException = new VFSException("OMG! It's not a bug, it's a feature!");
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("ls");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual("/> An error occurred: OMG! It's not a bug, it's a feature!", mocks.FakeOutLine(true));
+                Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
+            }
+        }
+
+        [TestMethod]
+        public void TestPrintException()
+        {
+            var fs = FileSystemMock();
+            fs.ThrowException = new Exception("OMG! It's not a bug, it's a feature!");
+
+            using (var mocks = new InOutMocks())
+            {
+                mocks.FakeInLine("ls");
+                mocks.FakeInLine("exit", true);
+
+                var c = new ConsoleApplication(new ConsoleApplicationSettings(mocks.In, mocks.Out), fs);
+                c.Run();
+                Assert.AreEqual("/> An unknown error occurred: OMG! It's not a bug, it's a feature!", mocks.FakeOutLine(true));
+                Assert.AreEqual("The system might be unstable, consider restarting", mocks.FakeOutLine());
                 Assert.AreEqual(string.Format("{0}kthxbye", c.Prompt), mocks.FakeOutLine());
             }
         }
