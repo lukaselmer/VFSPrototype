@@ -48,12 +48,6 @@ namespace VFSBase.Persistence.Coding
         public bool CanTransformMultipleBlocks { get { return true; } }
         public bool CanReuseTransform { get { return true; } }
 
-        internal enum CryptoDirection
-        {
-            Encrypt,
-            Decrypt
-        }
-
         public void Dispose() { }
     }
 }
