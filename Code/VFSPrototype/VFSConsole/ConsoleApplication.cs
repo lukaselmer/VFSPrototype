@@ -8,13 +8,13 @@ using VFSBase.Interfaces;
 
 namespace VFSConsole
 {
-    public class ConsoleApplication
+    public class ConsoleApplication : IDisposable
     {
         private readonly TextReader _textReader;
         private readonly TextWriter _textWriter;
         private volatile bool _running = true;
         private readonly IDictionary<string, Action<string>> _commands;
-        private readonly IFileSystemTextManipulator _fileSystemTextManipulator;
+        private IFileSystemTextManipulator _fileSystemTextManipulator;
         private string _currentDirectory = "";
 
         public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemTextManipulator fileSystemTextManipulator)
@@ -32,9 +32,10 @@ namespace VFSConsole
                     {"delete", Delete},
                     {"exists", Exists},
                     {"exit", Exit},
+                    {"export", Export},
                     {"help", ShowHelp},
                     {"import", Import},
-                    {"ls", ListDirectory},
+                    {"ls", List},
                     {"mkdir", Mkdir},
                 };
         }
@@ -64,8 +65,12 @@ namespace VFSConsole
             }
             catch (VFSException exception)
             {
-                // TODO: test this behaviour
-                _textWriter.WriteLine("An exception occurred: {0}", exception.Message);
+                _textWriter.WriteLine("An error occurred: {0}", exception.Message);
+            }
+            catch (Exception exception)
+            {
+                _textWriter.WriteLine("An unknown error occurred: {0}", exception.Message);
+                _textWriter.WriteLine("The system might be unstable, consider restarting");
             }
         }
 
@@ -78,12 +83,30 @@ namespace VFSConsole
                 var source = options[0];
                 var dest = PathFor(options[1]);
 
-                _fileSystemTextManipulator.ImportFile(source, dest);
+                _fileSystemTextManipulator.Import(source, dest);
                 _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)
             {
                 _textWriter.WriteLine(@"Please provide two parameters. E.g. import ""C:\host system\path"" /to/dest");
+            }
+        }
+
+        private void Export(string parameters)
+        {
+            try
+            {
+                var options = ParseMultipleParameters(parameters, 2);
+
+                var source = PathFor(options[0]);
+                var dest = options[1];
+
+                _fileSystemTextManipulator.Export(source, dest);
+                _textWriter.WriteLine("Exported \"{0}\" to \"{1}\"", source, dest);
+            }
+            catch (ArgumentException)
+            {
+                _textWriter.WriteLine(@"Please provide two parameters. E.g. export /from/src ""C:\host system\path""");
             }
         }
 
@@ -136,7 +159,7 @@ namespace VFSConsole
             _running = false;
         }
 
-        private void ListDirectory(string parameter)
+        private void List(string parameter)
         {
             var path = PathFor(parameter);
             if (!_fileSystemTextManipulator.Exists(path))
@@ -151,6 +174,14 @@ namespace VFSConsole
             foreach (var folder in folders)
             {
                 _textWriter.WriteLine(folder);
+            }
+
+            var files = _fileSystemTextManipulator.Files(path).ToList();
+            _textWriter.WriteLine("Found {0} files:", files.Count);
+
+            foreach (var file in files)
+            {
+                _textWriter.WriteLine(file);
             }
         }
 
@@ -204,5 +235,23 @@ namespace VFSConsole
 
             _textWriter.WriteLine("Directory changed");
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // free managed resources
+
+            if (_fileSystemTextManipulator != null)
+            {
+                _fileSystemTextManipulator.Dispose();
+                _fileSystemTextManipulator = null;
+            }
+        }
+
     }
 }

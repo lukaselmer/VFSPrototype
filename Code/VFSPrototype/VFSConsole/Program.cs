@@ -19,11 +19,13 @@ namespace VFSConsole
             try
             {
                 var container = new UnityContainer().LoadConfiguration();
-                var c = container.Resolve<ConsoleApplication>();
-                c.Run();
+                using (var c = container.Resolve<ConsoleApplication>())
+                {
+                    c.Run();
+                }
             }
             catch (Exception exception)
-            {   
+            {
                 Console.WriteLine(exception.Message);
                 Console.WriteLine("Exit with any input...");
                 Console.ReadLine();
