@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using VFSBase.Interfaces;
+using VFSBase.Persistence.Coding;
 
-namespace VFSBase.Persistence
+namespace VFSBase.Interfaces
 {
     /// <summary>
     /// The Interface IBlockList abstracts away how the (file or folder) contents/blocks are stored
@@ -47,9 +47,9 @@ namespace VFSBase.Persistence
         IIndexNode Find(string name);
 
         /// <summary>
-        /// Writes the data of a file to a stream.
+        /// Enumerates (lazily) through the blocks.
         /// </summary>
-        /// <param name="writer">The binary writer.</param>
-        void WriteToStream(BinaryWriter writer);
+        /// <returns>IEnumerable{System.Byte[]}.</returns>
+        IEnumerable<byte[]> Blocks();
     }
 }
