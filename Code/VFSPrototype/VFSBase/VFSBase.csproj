@@ -54,11 +54,24 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Implementation\BlockAllocation.cs" />
+    <Compile Include="Persistence\Coding\CryptoDirection.cs" />
+    <Compile Include="Persistence\Coding\EncryptionOptions.cs" />
+    <Compile Include="Persistence\Coding\NullStreamCodingStrategy.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeAesCryptor.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeCaesarCryptor.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeCryptoStream.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeCryptoStreamMode.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeSimpleCryptor.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeStreamEncryptionStrategy.cs" />
+    <Compile Include="Persistence\Coding\StreamCompressionEncryptionCodingStrategy.cs" />
+    <Compile Include="Persistence\Coding\MicrosoftStreamCompressionStrategy.cs" />
+    <Compile Include="Persistence\Coding\MicrosoftStreamEncryptionStrategy.cs" />
+    <Compile Include="Implementation\VFSFileStream.cs" />
     <Compile Include="Persistence\BlockList.cs" />
     <Compile Include="Implementation\BlockManipulator.cs" />
     <Compile Include="Implementation\FileSystem.cs" />
     <Compile Include="Implementation\FileSystemFactory.cs" />
-    <Compile Include="Persistence\IBlockList.cs" />
+    <Compile Include="Interfaces\IBlockList.cs" />
     <Compile Include="Implementation\Persistence.cs" />
     <Compile Include="Implementation\RootFolder.cs" />
     <Compile Include="Interfaces\IFileSystemOptions.cs" />
@@ -75,6 +88,7 @@
     <Compile Include="Persistence\BlockParser.cs" />
     <Compile Include="Persistence\Blocks\EmptyBlock.cs" />
     <Compile Include="Persistence\Blocks\IndirectNode.cs" />
+    <Compile Include="Persistence\Coding\IStreamCodingStrategy.cs" />
     <Compile Include="Persistence\PositionCalculator.cs" />
     <Compile Include="Persistence\PositionCalculatorSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -83,6 +97,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
