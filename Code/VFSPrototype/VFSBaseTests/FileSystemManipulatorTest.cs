@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
@@ -60,7 +63,8 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                for (var i = 0; i < 100; i++)
+                // Could be set to more, but it is disabled, so the unit tests run fast
+                for (var i = 0; i < 50; i++)
                 {
                     m.CreateFolder("test" + i);
                     Assert.IsTrue(m.Exists("test" + i));
@@ -119,14 +123,14 @@ namespace VFSBaseTests
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
                 File.WriteAllText(testFileSource, "");
 
-                m.ImportFile(testFileSource, "test.txt");
+                m.Import(testFileSource, "test.txt");
                 Assert.IsTrue(m.Exists("test.txt"));
 
                 m.CreateFolder("folder");
-                m.ImportFile(testFileSource, "folder/test.txt");
+                m.Import(testFileSource, "folder/test.txt");
                 Assert.IsTrue(m.Exists("folder/test.txt"));
 
-                m.ImportFile(testFileSource, "this/is/a/test/hello.txt");
+                m.Import(testFileSource, "this/is/a/test/hello.txt");
                 Assert.IsTrue(m.Exists("this/is/a/test/hello.txt"));
             }
         }
@@ -140,10 +144,9 @@ namespace VFSBaseTests
                 const string testFileSource = "test.txt";
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
 
-                m.ImportFile(testFileSource, "test.txt");
+                m.Import(testFileSource, "test.txt");
             }
         }
-
 
         [TestMethod]
         public void TestExportFileBasic()
@@ -161,13 +164,13 @@ namespace VFSBaseTests
                 Assert.IsFalse(m.Exists(testFileSource));
                 Assert.IsFalse(m.Exists(testFileSource));
 
-                m.ImportFile(testFileSource, testFileSource);
+                m.Import(testFileSource, testFileSource);
                 if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
                 File.Delete(testFileSource);
                 Assert.IsTrue(m.Exists(testFileSource));
                 Assert.IsFalse(File.Exists(testFileSource));
 
-                m.ExportFile(testFileSource, testFileSource);
+                m.Export(testFileSource, testFileSource);
 
                 Assert.IsTrue(File.Exists(testFileSource));
                 Assert.IsTrue(m.Exists(testFileSource));
@@ -192,17 +195,131 @@ namespace VFSBaseTests
                 Assert.IsFalse(m.Exists(testFileSource));
                 Assert.IsFalse(m.Exists(testFileSource));
 
-                m.ImportFile(testFileSource, testFileSource);
+                m.Import(testFileSource, testFileSource);
                 if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
                 File.Delete(testFileSource);
                 Assert.IsTrue(m.Exists(testFileSource));
                 Assert.IsFalse(File.Exists(testFileSource));
 
-                m.ExportFile(testFileSource, testFileSource);
+                m.Export(testFileSource, testFileSource);
 
                 Assert.IsTrue(File.Exists(testFileSource));
                 Assert.IsTrue(m.Exists(testFileSource));
                 Assert.AreEqual(testFileData, File.ReadAllText(testFileSource));
+            }
+        }
+
+        private byte[] Md5Hash(string filename)
+        {
+            using (var file = File.OpenRead(filename))
+            {
+                MD5 md5 = new MD5CryptoServiceProvider();
+                return md5.ComputeHash(file);
+            }
+        }
+
+        [TestMethod]
+        public void TestImportExportBigFile()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                const string testFileSource = "test.txt";
+                const string verifyTestFileSource = "verify.txt";
+
+                if (File.Exists(testFileSource)) File.Delete(testFileSource);
+                if (File.Exists(verifyTestFileSource)) File.Delete(verifyTestFileSource);
+
+                //const int bufferLength = 263; // 263 is a prime number.
+                const int bufferLength = 16384; // 263 is a prime number.
+                var rand = new Random(1);
+
+                using (var f = File.OpenWrite(testFileSource))
+                {
+                    var buffer = new byte[bufferLength];
+                    //for (var i = 0; i < 10000; i++)
+                    for (var i = 0; i < 1; i++) // TODO: set value to 10000
+                    {
+                        rand.NextBytes(buffer);
+                        f.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                File.Copy(testFileSource, verifyTestFileSource);
+
+                Assert.IsFalse(m.Exists(testFileSource));
+                Assert.IsFalse(m.Exists(testFileSource));
+
+                m.Import(testFileSource, testFileSource);
+                if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
+                File.Delete(testFileSource);
+                Assert.IsTrue(m.Exists(testFileSource));
+                Assert.IsFalse(File.Exists(testFileSource));
+
+                m.Export(testFileSource, testFileSource);
+
+                Assert.IsTrue(File.Exists(testFileSource));
+                Assert.IsTrue(m.Exists(testFileSource));
+
+                var b3 = File.ReadAllBytes(verifyTestFileSource);
+                var b4 = File.ReadAllBytes(testFileSource);
+                Assert.AreEqual(b3.Length, b4.Length);
+
+                //var b1 = Md5Hash(verifyTestFileSource);
+                //var b2 = Md5Hash(testFileSource);
+                //for (var i = 0; i < b1.Length; i++) Assert.AreEqual(b1[i], b2[i]);
+
+                for (var i = 0; i < b3.Length; i++) Assert.AreEqual(b3[i], b4[i]);
+            }
+        }
+
+        [TestMethod]
+        public void TestImportCopyExportBigFile()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                const string testFileSource = "test.txt";
+                const string copyFileSource = "copy.txt";
+                const string verifyTestFileSource = "verify.txt";
+
+                if (File.Exists(testFileSource)) File.Delete(testFileSource);
+                if (File.Exists(verifyTestFileSource)) File.Delete(verifyTestFileSource);
+
+                const int bufferLength = 263; // 263 is a prime number.
+                var rand = new Random(1);
+
+                using (var f = File.OpenWrite(testFileSource))
+                {
+                    var buffer = new byte[bufferLength];
+                    for (var i = 0; i < 10000; i++)
+                    {
+                        rand.NextBytes(buffer);
+                        f.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                File.Copy(testFileSource, verifyTestFileSource);
+
+                Assert.IsFalse(m.Exists(testFileSource));
+                Assert.IsFalse(m.Exists(testFileSource));
+
+                m.Import(testFileSource, testFileSource);
+                if (!m.Exists(testFileSource)) Assert.Inconclusive("Something with the import does not work correctly");
+                File.Delete(testFileSource);
+                Assert.IsTrue(m.Exists(testFileSource));
+                Assert.IsFalse(File.Exists(testFileSource));
+
+                m.Copy(testFileSource, copyFileSource);
+
+                m.Export(copyFileSource, testFileSource);
+
+                Assert.IsTrue(File.Exists(testFileSource));
+                Assert.IsTrue(m.Exists(testFileSource));
+
+                var b1 = Md5Hash(verifyTestFileSource);
+                var b2 = Md5Hash(testFileSource);
+                for (var i = 0; i < b1.Length; i++) Assert.AreEqual(b1[i], b2[i]);
+
+                var b3 = File.ReadAllBytes(verifyTestFileSource);
+                var b4 = File.ReadAllBytes(testFileSource);
+                for (var i = 0; i < b3.Length; i++) Assert.AreEqual(b3[i], b4[i]);
             }
         }
 
@@ -212,7 +329,7 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                m.ExportFile("test.txt", "export-xxx.txt");
+                m.Export("test.txt", "export-xxx.txt");
             }
         }
 
@@ -225,11 +342,11 @@ namespace VFSBaseTests
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
                 File.WriteAllText(testFileSource, "");
 
-                m.ImportFile(testFileSource, "test.txt");
+                m.Import(testFileSource, "test.txt");
                 m.Delete("test.txt");
                 Assert.IsFalse(m.Exists("test.txt"));
 
-                m.ImportFile(testFileSource, "hello/test.txt");
+                m.Import(testFileSource, "hello/test.txt");
                 m.Delete("hello/test.txt");
                 Assert.IsFalse(m.Exists("hello/test.txt"));
             }
@@ -260,14 +377,12 @@ namespace VFSBaseTests
                 Assert.IsTrue(m.Exists("hello/universe"));
                 Assert.IsFalse(m.Exists("hello/world"));
 
-
                 m.CreateFolder("foo/bar");
                 m.Move("foo/bar", "ta/da");
                 Assert.IsTrue(m.Exists("ta/da"));
                 Assert.IsFalse(m.Exists("foo/bar"));
             }
         }
-
 
         [TestMethod]
         public void TestMoveFile()
@@ -278,20 +393,68 @@ namespace VFSBaseTests
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
                 File.WriteAllText(testFileSource, "");
 
-                m.ImportFile(testFileSource, "you.txt");
+                m.Import(testFileSource, "you.txt");
                 m.Move("you.txt", "me.txt");
                 Assert.IsTrue(m.Exists("me.txt"));
                 Assert.IsFalse(m.Exists("you.txt"));
 
-                m.ImportFile(testFileSource, "hello/world.txt");
+                m.Import(testFileSource, "hello/world.txt");
                 m.Move("hello/world.txt", "hello/universe.txt");
                 Assert.IsTrue(m.Exists("hello/universe.txt"));
                 Assert.IsFalse(m.Exists("hello/world.txt"));
 
-                m.ImportFile(testFileSource, "foo/bar.txt");
+                m.Import(testFileSource, "foo/bar.txt");
                 m.Move("foo/bar.txt", "ta/da.txt");
                 Assert.IsTrue(m.Exists("ta/da.txt"));
                 Assert.IsFalse(m.Exists("foo/bar.txt"));
+            }
+        }
+
+        [TestMethod]
+        public void TestCopyFolder()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                m.CreateFolder("you");
+                m.Copy("you", "me");
+                Assert.IsTrue(m.Exists("me"));
+                Assert.IsTrue(m.Exists("you"));
+
+                m.CreateFolder("hello/world");
+                m.Copy("hello/world", "hello/universe");
+                Assert.IsTrue(m.Exists("hello/universe"));
+                Assert.IsTrue(m.Exists("hello/world"));
+
+                m.CreateFolder("foo/bar");
+                m.Copy("foo/bar", "ta/da");
+                Assert.IsTrue(m.Exists("ta/da"));
+                Assert.IsTrue(m.Exists("foo/bar"));
+            }
+        }
+
+        [TestMethod]
+        public void TestCopyFile()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                const string testFileSource = "test.txt";
+                if (File.Exists(testFileSource)) File.Delete(testFileSource);
+                File.WriteAllText(testFileSource, "");
+
+                m.Import(testFileSource, "you.txt");
+                m.Copy("you.txt", "me.txt");
+                Assert.IsTrue(m.Exists("me.txt"));
+                Assert.IsTrue(m.Exists("you.txt"));
+
+                m.Import(testFileSource, "hello/world.txt");
+                m.Copy("hello/world.txt", "hello/universe.txt");
+                Assert.IsTrue(m.Exists("hello/universe.txt"));
+                Assert.IsTrue(m.Exists("hello/world.txt"));
+
+                m.Import(testFileSource, "foo/bar.txt");
+                m.Copy("foo/bar.txt", "ta/da.txt");
+                Assert.IsTrue(m.Exists("ta/da.txt"));
+                Assert.IsTrue(m.Exists("foo/bar.txt"));
             }
         }
 
@@ -445,7 +608,7 @@ namespace VFSBaseTests
                 File.WriteAllText(testFileSource, "");
 
                 Assert.IsFalse(m.Exists("test"));
-                m.ImportFile(testFileSource, "test");
+                m.Import(testFileSource, "test");
                 Assert.IsTrue(m.Exists("test"));
 
                 Assert.IsFalse(m.IsDirectory("test"));
