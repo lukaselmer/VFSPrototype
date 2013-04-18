@@ -26,6 +26,26 @@ namespace VFSBase.Implementation
             return _fileSystem.Folders(folder).Select(f => f.Name).ToList();
         }
 
+        public IList<string> Files(string path)
+        {
+            var node = FindNode(path);
+
+            var folder = node as Folder;
+            if (folder == null) throw new DirectoryNotFoundException();
+
+            return _fileSystem.Files(folder).Select(f => f.Name).ToList();
+        }
+
+        public IList<string> List(string path)
+        {
+            var node = FindNode(path);
+
+            var folder = node as Folder;
+            if (folder == null) throw new DirectoryNotFoundException();
+
+            return _fileSystem.List(folder).Select(f => f.Name).ToList();
+        }
+
         public bool IsDirectory(string path)
         {
             return FindNode(path) as Folder != null;
@@ -81,8 +101,7 @@ namespace VFSBase.Implementation
             return _fileSystem.Exists(parent, PathParser.GetNodeName(path));
         }
 
-
-        public void ImportFile(string source, string dest)
+        public void Import(string source, string dest)
         {
             var node = CreateParentFolder(dest);
             _fileSystem.Import(source, node, PathParser.GetNodeName(dest));
@@ -94,14 +113,18 @@ namespace VFSBase.Implementation
             return FindParentFolder(dest);
         }
 
-        public void ExportFile(string source, string dest)
+        public void Export(string source, string dest)
         {
             _fileSystem.Export(FindNode(source), dest);
         }
 
         public void Copy(string source, string dest)
         {
-            throw new NotImplementedException();
+            if (!Exists(source)) throw new VFSException(string.Format("Source {0} does not exist", source));
+            if (Exists(dest)) throw new VFSException(string.Format("Destination {0} already exists", dest));
+
+            CreateParentFolder(dest);
+            _fileSystem.Copy(FindNode(source), FindParentFolder(dest), PathParser.GetNodeName(dest));
         }
 
         private static Queue<string> PathToQueue(string path)
