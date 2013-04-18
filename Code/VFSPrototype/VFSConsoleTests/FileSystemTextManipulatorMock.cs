@@ -1,13 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
 namespace VFSConsoleTests
 {
     internal class FileSystemTextManipulatorMock : IFileSystemTextManipulator
     {
-        public bool FolderExists = false;
+        public bool FolderExists;
+        public IList<string> CurrentFiles;
         public IList<string> CurrentFolders;
-        public bool IsCurrentDirectory = false;
+        public bool IsCurrentDirectory;
+        public Exception ThrowException;
+
+        public IList<string> Files(string path)
+        {
+            return CurrentFiles;
+        }
+
+        public IList<string> List(string path)
+        {
+            return CurrentFolders.Concat(CurrentFiles).ToList();
+        }
 
         public IList<string> Folders(string path)
         {
@@ -23,11 +38,11 @@ namespace VFSConsoleTests
         {
         }
 
-        public void ImportFile(string source, string dest)
+        public void Import(string source, string dest)
         {
         }
 
-        public void ExportFile(string source, string dest)
+        public void Export(string source, string dest)
         {
         }
 
@@ -45,6 +60,7 @@ namespace VFSConsoleTests
 
         public bool Exists(string path)
         {
+            if (ThrowException != null) throw ThrowException;
             return FolderExists;
         }
 
