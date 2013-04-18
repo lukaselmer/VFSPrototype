@@ -2,23 +2,50 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
+using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
 using VFSBase.Persistence;
+using VFSBase.Persistence.Coding;
 
 namespace VFSBase.Implementation
 {
     [Serializable]
     public class FileSystemOptions : IFileSystemOptions
     {
+        private int _blockSize;
+
+        [NonSerialized]
+        private IStreamCodingStrategy _streamCodingStrategy;
+
         public FileSystemOptions(string location, long diskSize)
         {
             Location = location;
             DiskSize = diskSize;
+            BlockSize = (int)BinaryMathUtil.KB(8);
             MasterBlockSize = (uint)BinaryMathUtil.KB(32);
             NameLength = 255;
             BlockReferenceSize = 64;
             BlockAllocation = new BlockAllocation();
+
+            // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
+            using (var r = Rijndael.Create())
+            {
+                EncryptionKey = r.Key;
+                EncryptionInitializationVector = r.IV;
+            }
+
+            InitializeStreamCodingStrategy();
+        }
+
+        private void InitializeStreamCodingStrategy()
+        {
+            //var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
+            var encryptionStrategy = new SelfMadeStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
+            _streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), encryptionStrategy);
+            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), new NullStreamCodingStrategy());
+            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), new NullStreamCodingStrategy());
         }
 
         public string Location { get; set; }
@@ -48,7 +75,20 @@ namespace VFSBase.Implementation
 
         public int BlockSize
         {
-            get { return (int)BinaryMathUtil.KB(4); }
+            get
+            {
+                return _blockSize;
+            }
+            set
+            {
+                if (value < (int)BinaryMathUtil.KB(2)) throw new VFSException("block size too small");
+                _blockSize = value;
+            }
+        }
+
+        public int IndirectionCountForIndirectNodes
+        {
+            get { return 2; }
         }
 
         public long DiskFree { get; private set; }
@@ -59,5 +99,33 @@ namespace VFSBase.Implementation
         public int ReferencesPerIndirectNode { get { return BlockSize / BlockReferenceSize; } }
 
         public BlockAllocation BlockAllocation { get; set; }
+
+        public long MaximumFileSize
+        {
+            get
+            {
+                return BinaryMathUtil.Power(ReferencesPerIndirectNode, IndirectionCountForIndirectNodes + 1) * BlockSize;
+            }
+        }
+
+        // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
+        // [NonSerialized]
+        private byte[] EncryptionKey { get; set; }
+
+        // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
+        // [NonSerialized]
+        private byte[] EncryptionInitializationVector { get; set; }
+
+        public IStreamCodingStrategy StreamCodingStrategy
+        {
+            get
+            {
+                lock (GetType())
+                {
+                    if (_streamCodingStrategy == null) InitializeStreamCodingStrategy();
+                }
+                return _streamCodingStrategy;
+            }
+        }
     }
 }
