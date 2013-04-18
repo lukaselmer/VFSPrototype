@@ -1,0 +1,19 @@
+﻿<Window x:Class="VFSBrowser.View.InputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:view="clr-namespace:VFSBrowser.View"
+        Title="InputDialog" Height="125" Width="309">
+
+    <StackPanel>
+        <Label Content="{Binding Path=Label, FallbackValue=Input}"></Label>
+        <TextBox Name="TextBox" Text="{Binding Text}">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding Path=OkCommand}" />
+            </TextBox.InputBindings>
+        </TextBox>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="75" Name="OkButton" Command="{Binding Path=OkCommand}" Content="OK" />
+            <Button Width="75" IsCancel="True" Content="Cancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>
