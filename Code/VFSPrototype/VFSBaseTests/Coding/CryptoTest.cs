@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
+using Microsoft.Practices.Unity.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Persistence.Coding;
 
@@ -9,10 +11,45 @@ namespace VFSBaseTests.Coding
     [TestClass]
     public class CryptoTest
     {
+        private struct TestConfig
+        {
+            public TestConfig(int dataAmount, int bufferSize)
+                : this()
+            {
+                DataAmount = dataAmount;
+                BufferSize = bufferSize;
+            }
+            public int DataAmount { get; set; }
+            public int BufferSize { get; set; }
+        }
+
         private static void TestAlgorithm(ICryptoTransform encryptor, ICryptoTransform decryptor)
         {
-            var original = new byte[100000];
-            var result = new byte[100000];
+            var configurations = new[] {
+                new TestConfig(3, 1),
+                new TestConfig(1000, 1),
+                new TestConfig(2000, 1),
+                new TestConfig(1023, 1023),
+                new TestConfig(1024, 1024),
+                new TestConfig(1025, 1025),
+                new TestConfig(2048, 2048),
+                new TestConfig(10000, 1023),
+                new TestConfig(10000, 1024),
+                new TestConfig(10000, 1025),
+                new TestConfig(100000, 100000),
+            };
+
+            foreach (var configuration in configurations)
+            {
+                ExecuteTest(encryptor, decryptor, configuration);
+            }
+
+        }
+
+        private static void ExecuteTest(ICryptoTransform encryptor, ICryptoTransform decryptor, TestConfig configuration)
+        {
+            var original = new byte[configuration.DataAmount];
+            var result = new byte[original.Length];
 
             new Random(1).NextBytes(original);
 
@@ -27,9 +64,9 @@ namespace VFSBaseTests.Coding
                 var ss = new SelfMadeCryptoStream(ms, decryptor, SelfMadeCryptoStreamMode.Read);
                 var read = 0;
                 var pos = 0;
-                while ((pos = ss.Read(result, pos, original.Length - read)) > 0)
+                while ((read = ss.Read(result, pos, Math.Min(original.Length - read, configuration.BufferSize))) > 0)
                 {
-                    read += pos;
+                    pos += read;
                 }
                 Console.WriteLine(pos);
             }
@@ -39,7 +76,6 @@ namespace VFSBaseTests.Coding
                 Assert.AreEqual(original[i], result[i]);
             }
         }
-
 
         private static EncryptionOptions GetEncryptionOptions()
         {
