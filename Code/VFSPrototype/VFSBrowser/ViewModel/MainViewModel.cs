@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using VFSBase.Implementation;
+using MessageBox = System.Windows.MessageBox;
 
 namespace VFSBrowser.ViewModel
 {
@@ -27,24 +28,32 @@ namespace VFSBrowser.ViewModel
             get { return _currentPath; } 
             set
             {
-                _currentPath = value;
-                Items.Clear();
-                Items.Add(Parent);
-                foreach (var name in _manipulator.List(CurrentPath))
-                {
-                    Items.Add(new ListItem(_currentPath, name, _manipulator.IsDirectory(_currentPath + name)));
+                try {
+                    Items.Clear();
+                    Items.Add(Parent);
+                    foreach (var name in _manipulator.List(value))
+                    {
+                        Items.Add(new ListItem(value, name, _manipulator.IsDirectory(value + name)));
+                    }
+
+                } catch (Exception e) {
+                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
+                _currentPath = value;
                 OnPropertyChanged("CurrentPath");
                 
             }
         }
+
+        public SearchOption SearchOption { get; set; }
 
         public ObservableCollection<ListItem> Items { get; set; }
 
         public MainViewModel()
         {
             Items = new ObservableCollection<ListItem>();
-
+            SearchOption = new SearchOption() { CaseSensitive = false, Recursive = true, SearchText = ""};
+           
             OpenVfsCommand = new Command(OpenVfs, null);
             NewVfsCommand = new Command(NewVfs, null);
             NewFolderCommand = new Command(NewFolder, p => (_manipulator != null));
@@ -56,6 +65,7 @@ namespace VFSBrowser.ViewModel
             MoveCommand = new Command(Move, p => (_manipulator != null && p != null));
             CopyCommand = new Command(Copy, p => (_manipulator != null && p != null));
             PasteCommand = new Command(Paste, p => (_manipulator != null));
+            SearchCommand = new Command(Search, p => (_manipulator != null));
         }
 
 
@@ -70,6 +80,43 @@ namespace VFSBrowser.ViewModel
         public Command MoveCommand { get; private set; }
         public Command PasteCommand { get; private set; }
         public Command DeleteCommand { get; private set; }
+        public Command SearchCommand { get; private set; }
+
+
+        private List<ListItem> SearchItems(string folder)
+        {
+            var items = new List<ListItem>();
+            foreach (var item in _manipulator.List(folder))
+            {
+                if (SearchOption.Recursive && _manipulator.IsDirectory(folder + item))
+                {
+                    items.AddRange(SearchItems(folder + item + "/"));
+                }
+
+                var name = item;
+                var searchName = SearchOption.SearchText;
+                if (SearchOption.CaseSensitive == false)
+                {
+                    name = name.ToLower();
+                    searchName = searchName.ToLower();
+                }
+
+                if (name.Contains(searchName))
+                {
+                    items.Add(new ListItem(folder, item, _manipulator.IsDirectory(folder + item)));
+                }
+            }
+            return items;
+        } 
+
+        private void Search(object parameter)
+        {
+            if (parameter != null)
+                SearchOption.SearchText = parameter as string;
+
+            Items.Clear();
+            SearchItems(CurrentPath).ForEach(i => Items.Add(i));
+        }
 
 
         private void Delete(object parameter)
@@ -100,10 +147,15 @@ namespace VFSBrowser.ViewModel
             if (items == null)
                 return;
 
-            _clipboard.Clear();
-            _copy = true;
-            foreach (ListItem item in items)
-                _clipboard.Add(item);
+            try {
+                _clipboard.Clear();
+                _copy = true;
+                foreach (ListItem item in items)
+                    _clipboard.Add(item);
+
+            } catch (Exception e) {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Move(object parameter)
@@ -113,32 +165,43 @@ namespace VFSBrowser.ViewModel
             if (items == null)
                 return;
 
-            _clipboard.Clear();
-            _copy = false;
-            foreach (ListItem item in items)
-                _clipboard.Add(item);
+            try {
+                _clipboard.Clear();
+                _copy = false;
+                foreach (ListItem item in items)
+                    _clipboard.Add(item);
+
+            } catch (Exception e) {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Paste(object parameter)
         {
-            foreach (var source in _clipboard)
+            try
             {
-                if (_manipulator.Exists(CurrentPath + source.Name))
+                foreach (var source in _clipboard)
                 {
-                    var result = System.Windows.MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
-                    if (result == MessageBoxResult.No)
-                        continue;
-                    _manipulator.Delete(CurrentPath + source.Name);
-                    var listItem = Items.First(l => l.Name == source.Name);
-                    Items.Remove(listItem);
+                    if (_manipulator.Exists(CurrentPath + source.Name))
+                    {
+                        var result = System.Windows.MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo,
+                                                                    MessageBoxImage.Information);
+                        if (result == MessageBoxResult.No)
+                            continue;
+                        _manipulator.Delete(CurrentPath + source.Name);
+                        var listItem = Items.First(l => l.Name == source.Name);
+                        Items.Remove(listItem);
+                    }
+
+                    if (_copy)
+                        _manipulator.Copy(source.Path + source.Name, CurrentPath + source.Name);
+                    else
+                        _manipulator.Move(source.Path + source.Name, CurrentPath + source.Name);
+
+                    Items.Add(new ListItem(CurrentPath, source.Name, _manipulator.IsDirectory(CurrentPath + source.Name)));
                 }
-
-                if (_copy)
-                    _manipulator.Copy(source.Path + source.Name, CurrentPath + source.Name);
-                else
-                    _manipulator.Move(source.Path + source.Name, CurrentPath + source.Name);
-
-                Items.Add(new ListItem(CurrentPath, source.Name, _manipulator.IsDirectory(CurrentPath + source.Name)));
+            } catch (Exception e) {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -152,9 +215,14 @@ namespace VFSBrowser.ViewModel
             var dlg = new FolderBrowserDialog() { ShowNewFolderButton = true };
 
             if (dlg.ShowDialog() == DialogResult.OK)
-            {
-                foreach (ListItem item in items)
-                    _manipulator.Export(CurrentPath + item.Name, dlg.SelectedPath + "\\" + item.Name);
+            { 
+                try {
+                    foreach (ListItem item in items)
+                        _manipulator.Export(CurrentPath + item.Name, dlg.SelectedPath + "\\" + item.Name);
+
+                } catch (Exception e) {
+                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -170,14 +238,20 @@ namespace VFSBrowser.ViewModel
           
             if (result == true && item.Name != dlg.Text)
             {
-                if (_manipulator.Exists(CurrentPath + dlg.Text))
+                try
                 {
-                    var res = System.Windows.MessageBox.Show("Choose an other name!", "Filename allready exists!", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    if (_manipulator.Exists(CurrentPath + dlg.Text))
+                    {
+                        var res = System.Windows.MessageBox.Show("Choose an other name!", "Filename allready exists!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    _manipulator.Move(CurrentPath + item.Name, CurrentPath + dlg.Text);
+                    item.Name = dlg.Text;
+                    OnPropertyChanged("Items");
+
+                } catch (Exception e) {
+                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-                _manipulator.Move(CurrentPath + item.Name, CurrentPath + dlg.Text);
-                item.Name = dlg.Text;
-                OnPropertyChanged("Items");
             }
         }
 
@@ -195,24 +269,30 @@ namespace VFSBrowser.ViewModel
                 var tmp = CurrentPath.TrimEnd('/');
                 CurrentPath = tmp.Substring(0, tmp.LastIndexOf("/")+1);
             } else { 
-                CurrentPath += item.Name + "/";
+                CurrentPath = item.Path + item.Name + "/";
             }
         }
 
         private void NewFolder(object parameter)
         {
-            var newFolderName = "New Folder";
-            
-            if (_manipulator.Exists(CurrentPath + newFolderName))
+            try
             {
-                var count = 1;
-                while (_manipulator.Exists(CurrentPath + newFolderName + " " + count))
-                    count++;
-                newFolderName += " " + count;
-            }
-            _manipulator.CreateFolder(CurrentPath + newFolderName);
+                var newFolderName = "New Folder";
+                if (_manipulator.Exists(CurrentPath + newFolderName))
+                {
+                    var count = 1;
+                    while (_manipulator.Exists(CurrentPath + newFolderName + " " + count))
+                        count++;
+                    newFolderName += " " + count;
+                }
+
+                _manipulator.CreateFolder(CurrentPath + newFolderName);
             
-            Items.Add(new ListItem(CurrentPath, newFolderName, true));
+                Items.Add(new ListItem(CurrentPath, newFolderName, true));
+
+            } catch (Exception e) {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
 
@@ -240,9 +320,14 @@ namespace VFSBrowser.ViewModel
                     int size;
                     if (int.TryParse(sizeDlg.Text, out size))
                     {
-                        var fileSystemData = new FileSystemOptions(dlg.FileName, size);
-                        _manipulator = new FileSystemTextManipulator(fileSystemData);
-                        CurrentPath = "/";
+                        try {
+                            var fileSystemData = new FileSystemOptions(dlg.FileName, size);
+                            _manipulator = new FileSystemTextManipulator(fileSystemData);
+                            CurrentPath = "/";
+
+                        } catch (Exception e) {
+                            MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
                 }
             }
@@ -259,9 +344,14 @@ namespace VFSBrowser.ViewModel
                 if (_manipulator != null)
                     _manipulator.Dispose();
 
-                var fileSystemData = new FileSystemOptions(dlg.FileName, 1000*1000*1000);
-                _manipulator = new FileSystemTextManipulator(fileSystemData);
-                CurrentPath = "/";
+                try {
+                    var fileSystemData = new FileSystemOptions(dlg.FileName, 1000*1000*1000);
+                    _manipulator = new FileSystemTextManipulator(fileSystemData);
+                    CurrentPath = "/";
+
+                } catch (Exception e) {
+                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -272,21 +362,25 @@ namespace VFSBrowser.ViewModel
 
             if (result == true)
             {
-                if (_manipulator.Exists(CurrentPath + dlg.SafeFileName))
-                {
-                    var res = System.Windows.MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
-                    if (res == MessageBoxResult.No)
-                        return;
-                    _manipulator.Delete(CurrentPath + dlg.SafeFileName);
-                    var listItem = Items.First(l => l.Name == dlg.SafeFileName);
-                    Items.Remove(listItem);
-                }
+                try {
+                    if (_manipulator.Exists(CurrentPath + dlg.SafeFileName))
+                    {
+                        var res = System.Windows.MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                        if (res == MessageBoxResult.No)
+                            return;
+                        _manipulator.Delete(CurrentPath + dlg.SafeFileName);
+                        var listItem = Items.First(l => l.Name == dlg.SafeFileName);
+                        Items.Remove(listItem);
+                    }
 
-                _manipulator.Import(dlg.FileName, CurrentPath + dlg.SafeFileName);
-                Items.Add(new ListItem(CurrentPath, dlg.SafeFileName, false));
+                    _manipulator.Import(dlg.FileName, CurrentPath + dlg.SafeFileName);
+                    Items.Add(new ListItem(CurrentPath, dlg.SafeFileName, false));
+
+                } catch (Exception e) {
+                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
-
 
     }
 }
