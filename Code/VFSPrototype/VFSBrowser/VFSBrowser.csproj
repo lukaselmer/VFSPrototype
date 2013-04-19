@@ -60,10 +60,6 @@
     <Compile Include="ViewModel\InputViewModel.cs" />
     <Compile Include="ViewModel\ListItem.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Page Include="Ressources.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="View\InputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -76,6 +72,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModel\SearchOption.cs" />
     <Compile Include="View\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
     </Compile>
