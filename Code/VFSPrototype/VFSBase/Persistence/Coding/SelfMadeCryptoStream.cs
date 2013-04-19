@@ -13,10 +13,11 @@ namespace VFSBase.Persistence.Coding
         private readonly int _blockSize;
         private byte[] _currentBuffer;
         private byte[] _nextBuffer;
-        private bool _flushedFinalBlock = false;
+        private bool _flushedFinalBlock;
         private int _currentBufferPosition;
         private byte[] _decryptedBlock;
         private int _decryptedBlockPosition;
+        private bool _lastBlockRead;
 
         public SelfMadeCryptoStream(Stream stream, ICryptoTransform cryptor, SelfMadeCryptoStreamMode mode)
         {
@@ -54,58 +55,70 @@ namespace VFSBase.Persistence.Coding
         {
             if (!CanRead) throw new VFSException("Stream not readable");
 
-            //var readCount = _stream.Read(_currentBuffer, offset, count);
-            //TODO: implement this
+            if (buffer.Length - offset < 0) throw new ArgumentException("offset not possible", "offset");
 
-            var toReadTotal = offset - count;
+            if (count <= 0) return 0;
+
+            var toReadTotal = count;
             var currentOffset = offset;
 
-            while (toReadTotal > 0)
+            if (_decryptedBlock == null)
             {
-                // Fill the current buffer
-                while (_currentBufferPosition < _currentBuffer.Length)
-                {
-                    var shouldReadNow = _currentBuffer.Length - _currentBufferPosition;
-                    var readCount = _stream.Read(_currentBuffer, _currentBufferPosition, shouldReadNow);
-
-                    // Handle last block
-                    if (readCount == 0)
-                    {
-                        if (_currentBufferPosition == 0) return 0;
-
-                        if (_decryptedBlock == null)
-                        {
-                            _decryptedBlock = _cryptor.TransformFinalBlock(_currentBuffer, 0, _currentBufferPosition);
-                            _decryptedBlockPosition = 0;
-                        }
-
-                        var toRead = Math.Min(_decryptedBlock.Length - _decryptedBlockPosition, toReadTotal);
-
-                        if (toRead == 0) return count - toReadTotal;
-
-                        Array.Copy(_decryptedBlock, _decryptedBlockPosition, buffer, currentOffset, toRead);
-                        toReadTotal -= toRead;
-                        currentOffset += toRead;
-                    }
-
-                    // Decrypted block empty, buffer is full => fill decrypted block
-                    if (_decryptedBlockPosition <= _decryptedBlock.Length && _currentBuffer.Length <= _currentBufferPosition)
-                    {
-                        _decryptedBlock = new byte[_blockSize];
-                        Array.Copy(_currentBuffer, 0, _decryptedBlock, 0, _blockSize);
-                        _decryptedBlockPosition = 0;
-                    }
-
-
-                }
-
-
-                // If current buffer is not full yet, fill the buffer
-                if (_currentBufferPosition != _currentBuffer.Length) continue;
+                _decryptedBlock = new byte[0];
+                _decryptedBlockPosition = 0;
             }
 
+            // while there is something to read
+            while (toReadTotal > 0)
+            {
+                //while can read from decrypted block and something more to read
+                while (toReadTotal > 0 && _decryptedBlock.Length > _decryptedBlockPosition)
+                {
+                    // read from decrypted block
+                    var toCopy = Math.Min(toReadTotal, _decryptedBlock.Length - _decryptedBlockPosition);
+                    Array.Copy(_decryptedBlock, _decryptedBlockPosition, buffer, currentOffset, toCopy);
+                    toReadTotal -= toCopy;
+                    _decryptedBlockPosition += toCopy;
+                    currentOffset += toCopy;
+                }
 
-            return readCount;
+                if (toReadTotal <= 0) break;
+
+                int read;
+                // while current buffer is full or nothing more to read
+                //   fill current buffer
+                while ((_currentBuffer.Length - _currentBufferPosition) > 0 &&
+                       (read = _stream.Read(_currentBuffer, _currentBufferPosition, _currentBuffer.Length - _currentBufferPosition)) > 0)
+                {
+                    _currentBufferPosition += read;
+                }
+
+                // if current buffer is full
+                if ((_currentBuffer.Length - _currentBufferPosition) == 0)
+                {
+                    // It's not the last block
+                    // Transform block, fill the decrypted block
+                    var tmp = new byte[_currentBuffer.Length];
+                    var readCrypted = _cryptor.TransformBlock(_currentBuffer, 0, tmp.Length, tmp, 0);
+                    _decryptedBlock = new byte[readCrypted];
+                    Array.Copy(tmp, 0, _decryptedBlock, 0, readCrypted);
+                    _decryptedBlockPosition = 0;
+                    _currentBufferPosition = 0;
+                }
+                else if (!_lastBlockRead)
+                {
+                    // Last block has been read
+                    // Transform the last block, write it to de decrypted stream
+                    _decryptedBlock = _cryptor.TransformFinalBlock(_currentBuffer, 0, _currentBufferPosition);
+                    _decryptedBlockPosition = 0;
+                    _lastBlockRead = true;
+                }
+
+                // If the decrypted block is fully read, there's nothing more to do
+                if (_decryptedBlock.Length <= _decryptedBlockPosition) break;
+            }
+
+            return count - toReadTotal;
         }
 
         public override void Write(byte[] buffer, int offset, int count)
