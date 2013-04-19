@@ -13,6 +13,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -26,9 +27,32 @@
             </MenuItem>
         </Menu>
 
-        <Label Grid.Row="1" Content="{Binding CurrentPath}" Height="30"></Label>
+        <Expander Grid.Row="1" Header="Search">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                
+                <TextBox Grid.Row="0" Grid.Column="0" Name="SearchTextBox" Text="{Binding Path=SearchOption.SearchText}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=SearchTextBox, Path=Text}" />
+                    </TextBox.InputBindings>
+                </TextBox>  
+                <Button  Grid.Row="0" Grid.Column="1"  Content="Search" Command="{Binding SearchCommand}" />
+                <CheckBox Grid.Row="1" Grid.Column="0" Content="Recrusive" IsChecked="{Binding SearchOption.Recursive}"/>
+                <CheckBox Grid.Row="2" Grid.Column="0" Content="Case Sensitive" IsChecked="{Binding SearchOption.CaseSensitive}" />
+            </Grid>
+        </Expander>
+        
+        <Label Grid.Row="2" Content="{Binding CurrentPath}" Height="30"></Label>
 
-        <ListView Grid.Row="2" ItemsSource="{Binding Items}" Name="ItemsList">
+        <ListView Grid.Row="3" ItemsSource="{Binding Items}" Name="ItemsList">
 
             <ListBox.InputBindings>
                 <KeyBinding Key="F2" Command="{Binding RenameCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItem}" />
@@ -69,7 +93,7 @@
                                 </Style>
                             </Image.Style>
                         </Image>
-                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding Name}" ToolTip="{Binding Path}" />
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
