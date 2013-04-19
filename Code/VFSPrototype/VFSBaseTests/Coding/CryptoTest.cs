@@ -19,8 +19,8 @@ namespace VFSBaseTests.Coding
                 DataAmount = dataAmount;
                 BufferSize = bufferSize;
             }
-            public int DataAmount { get; set; }
-            public int BufferSize { get; set; }
+            public int DataAmount { get; private set; }
+            public int BufferSize { get; private set; }
         }
 
         private static void TestAlgorithm(ICryptoTransform encryptor, ICryptoTransform decryptor)
