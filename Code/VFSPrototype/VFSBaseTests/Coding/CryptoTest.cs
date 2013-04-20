@@ -68,7 +68,6 @@ namespace VFSBaseTests.Coding
                 {
                     pos += read;
                 }
-                Console.WriteLine(pos);
             }
 
             for (var i = 0; i < original.Length; i++)
