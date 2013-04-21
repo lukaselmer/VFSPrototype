@@ -12,7 +12,7 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace VFSBrowser.ViewModel
 {
-    class MainViewModel : AbstractViewModel
+    sealed class MainViewModel : AbstractViewModel, IDisposable
     {
         private FileSystemTextManipulator _manipulator;
 
@@ -308,8 +308,7 @@ namespace VFSBrowser.ViewModel
             if (result == true)
             {
                 // Close last vfs
-                if (_manipulator != null)
-                    _manipulator.Dispose();
+                DisposeManipulator();
 
                 var sizeDlg = new InputViewModel("Size in MB", "10");
                 result = sizeDlg.ShowDialog();
@@ -341,8 +340,7 @@ namespace VFSBrowser.ViewModel
             if (result == true)
             {
                 // Close last vfs
-                if (_manipulator != null)
-                    _manipulator.Dispose();
+                DisposeManipulator();
 
                 try {
                     var fileSystemData = new FileSystemOptions(dlg.FileName, 1000*1000*1000);
@@ -382,5 +380,28 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        private void DisposeManipulator()
+        {
+            if (_manipulator != null)
+                _manipulator.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // If you need thread safety, use a lock around these  
+            // operations, as well as in your methods that use the resource.
+
+            if (!disposing) return;
+
+            // free managed resources
+
+            DisposeManipulator();
+        }
     }
 }
