@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSConsole", "VFSConsole\VF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSConsoleTests", "VFSConsoleTests\VFSConsoleTests.csproj", "{7257D820-BD1D-4B1F-87E4-8C0A7499AD1E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSBrowser", "VFSBrowser\VFSBrowser.csproj", "{7537DC1D-FE8B-4565-A020-70768CC37E2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{7257D820-BD1D-4B1F-87E4-8C0A7499AD1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7257D820-BD1D-4B1F-87E4-8C0A7499AD1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7257D820-BD1D-4B1F-87E4-8C0A7499AD1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7537DC1D-FE8B-4565-A020-70768CC37E2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7537DC1D-FE8B-4565-A020-70768CC37E2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7537DC1D-FE8B-4565-A020-70768CC37E2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7537DC1D-FE8B-4565-A020-70768CC37E2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
