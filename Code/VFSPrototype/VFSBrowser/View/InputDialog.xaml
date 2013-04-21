@@ -5,15 +5,15 @@
 
     <StackPanel>
         <Label Content="{Binding Path=Label, FallbackValue=Input}"></Label>
-        <TextBox Name="TextBox" Text="{Binding Text}">
+        <TextBox Name="TextBox" Text="{Binding Text}" Margin="0 0 0 5">
             <TextBox.InputBindings>
                 <KeyBinding Key="Enter" Command="{Binding Path=OkCommand}" />
             </TextBox.InputBindings>
         </TextBox>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Width="75" Name="OkButton" Command="{Binding Path=OkCommand}" Content="OK" />
-            <Button Width="75" IsCancel="True" Content="Cancel" />
+            <Button Margin="5" Width="75" Name="OkButton" Command="{Binding Path=OkCommand}" Content="OK" />
+            <Button Margin="5" Width="75" IsCancel="True" Content="Cancel" />
         </StackPanel>
     </StackPanel>
 </Window>
