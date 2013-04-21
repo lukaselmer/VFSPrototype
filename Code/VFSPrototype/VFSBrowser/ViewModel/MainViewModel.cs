@@ -52,7 +52,7 @@ namespace VFSBrowser.ViewModel
         public MainViewModel()
         {
             Items = new ObservableCollection<ListItem>();
-            SearchOption = new SearchOption() { CaseSensitive = false, Recursive = true, SearchText = ""};
+            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, SearchText = ""};
            
             OpenVfsCommand = new Command(OpenVfs, null);
             NewVfsCommand = new Command(NewVfs, null);
