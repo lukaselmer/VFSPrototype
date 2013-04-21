@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:VFSBrowser.View"
         xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel"
         Title="MainWindow" Height="350" Width="525">
-    <Window.DataContext>
-        <!-- Declaratively create an instance of our MainViewModel -->
+    <!--<Window.DataContext>
+        Declaratively create an instance of our MainViewModel
         <viewModel:MainViewModel />
-    </Window.DataContext>
+    </Window.DataContext>-->
     
 
     <Grid>
