@@ -37,6 +37,8 @@ namespace VFSBase.Persistence.Coding
 
         public SelfMadeAesCryptor(byte[] key, byte[] initializationVector, CryptoDirection cryptoDirection)
         {
+            if (key.Length != _keySize_256) throw new NotSupportedException("Key size must be 256 bit!");
+
             _key = key;
             _initializationVector = initializationVector;
             _cryptoDirection = cryptoDirection;
