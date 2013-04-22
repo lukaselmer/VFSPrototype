@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VFSBase;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
 namespace VFSConsole
 {
-    public class ConsoleApplication : IDisposable
+    internal class ConsoleApplication : IDisposable
     {
         private readonly TextReader _textReader;
         private readonly TextWriter _textWriter;
@@ -17,7 +16,7 @@ namespace VFSConsole
         private IFileSystemTextManipulator _fileSystemTextManipulator;
         private string _currentDirectory = "";
 
-        public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemTextManipulator fileSystemTextManipulator)
+        internal ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemTextManipulator fileSystemTextManipulator)
         {
             if (fileSystemTextManipulator == null) throw new ArgumentNullException("fileSystemTextManipulator", "fileSystem must not be null.");
 
@@ -40,7 +39,7 @@ namespace VFSConsole
                 };
         }
 
-        public void Run()
+        internal void Run()
         {
             while (_running)
             {
@@ -52,6 +51,7 @@ namespace VFSConsole
             _textReader.ReadLine();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void ProcessLine(string line)
         {
             var commandAndArguments = line.Split(new[] { ' ' }, 2);
@@ -68,6 +68,8 @@ namespace VFSConsole
                 _textWriter.WriteLine("An error occurred: {0}", exception.Message);
             }
             catch (Exception exception)
+            // This is a violation of the rule Microsoft.Design.CA1031:DoNotCatchGeneralExceptionTypes, but in this
+            // case, it is ok to violate this rule.
             {
                 _textWriter.WriteLine("An unknown error occurred: {0}", exception.Message);
                 _textWriter.WriteLine("The system might be unstable, consider restarting");
@@ -209,16 +211,16 @@ namespace VFSConsole
             foreach (var command in _commands) _textWriter.WriteLine(command.Key);
         }
 
-        public string Prompt
+        internal string Prompt
         {
             get
             {
-                var prefix = _currentDirectory == "" ? "/" : _currentDirectory;
+                var prefix = String.IsNullOrEmpty(_currentDirectory) ? "/" : _currentDirectory;
                 return string.Format("{0}> ", prefix);
             }
         }
 
-        public void Cd(string parameter)
+        private void Cd(string parameter)
         {
             if (!_fileSystemTextManipulator.IsDirectory(parameter))
             {
@@ -244,6 +246,8 @@ namespace VFSConsole
 
         private void Dispose(bool disposing)
         {
+            if (!disposing) return;
+
             // free managed resources
 
             if (_fileSystemTextManipulator != null)

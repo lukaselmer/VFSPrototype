@@ -70,6 +70,8 @@ namespace VFSBase.Implementation
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+            if(buffer == null) throw new ArgumentNullException("buffer");
+
             if (buffer.Length < count + offset) throw new ArgumentOutOfRangeException("buffer");
 
             if (!_canRead) return 0;
@@ -146,16 +148,18 @@ namespace VFSBase.Implementation
             return b;
         }
 
-        public override void Write(byte[] toWrite, int offset, int count)
+        public override void Write(byte[] buffer, int offset, int count)
         {
+            if (buffer == null) throw new ArgumentNullException("buffer");
+
             if (!_canWrite) throw new VFSException("Stream is not writable");
             if (_canRead) _canRead = false;
 
             long toWriteOffset = 0;
             while (toWriteOffset < count)
             {
-                var amountToCopy = Math.Min(count, Math.Min(_writeBuffer.Length - _writeBufferPosition, toWrite.Length - toWriteOffset));
-                Array.Copy(toWrite, toWriteOffset, _writeBuffer, _writeBufferPosition, amountToCopy);
+                var amountToCopy = Math.Min(count, Math.Min(_writeBuffer.Length - _writeBufferPosition, buffer.Length - toWriteOffset));
+                Array.Copy(buffer, toWriteOffset, _writeBuffer, _writeBufferPosition, amountToCopy);
                 toWriteOffset += amountToCopy;
                 _writeBufferPosition += amountToCopy;
                 Persist();

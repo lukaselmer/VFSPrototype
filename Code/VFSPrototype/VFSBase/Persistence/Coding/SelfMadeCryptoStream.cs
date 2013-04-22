@@ -11,8 +11,7 @@ namespace VFSBase.Persistence.Coding
         private readonly ICryptoTransform _cryptor;
         private readonly SelfMadeCryptoStreamMode _mode;
         private readonly int _blockSize;
-        private byte[] _currentBuffer;
-        private byte[] _nextBuffer;
+        private readonly byte[] _currentBuffer;
         private bool _flushedFinalBlock;
         private int _currentBufferPosition;
         private byte[] _decryptedBlock;
@@ -24,11 +23,10 @@ namespace VFSBase.Persistence.Coding
             _stream = stream;
             _cryptor = cryptor;
             _mode = mode;
-            _blockSize = mode == SelfMadeCryptoStreamMode.Read ? _cryptor.InputBlockSize : _cryptor.OutputBlockSize;
+            _blockSize = mode == SelfMadeCryptoStreamMode.Read ? _cryptor.InputBlockSize: _cryptor.OutputBlockSize;
             _currentBuffer = new byte[_blockSize];
             _currentBufferPosition = 0;
-            _nextBuffer = new byte[_blockSize];
-
+            
             if (_cryptor.InputBlockSize != _cryptor.OutputBlockSize)
             {
                 throw new VFSException("Only encryption with same input and output block sizes are allowed in this implementation.");
@@ -53,6 +51,8 @@ namespace VFSBase.Persistence.Coding
 
         public override int Read(byte[] buffer, int offset, int count)
         {
+            if (buffer == null) throw new ArgumentNullException("buffer");
+
             if (!CanRead) throw new VFSException("Stream not readable");
 
             if (buffer.Length - offset < 0) throw new ArgumentException("offset not possible", "offset");
@@ -100,10 +100,16 @@ namespace VFSBase.Persistence.Coding
                     // Transform block, fill the decrypted block
                     var tmp = new byte[_currentBuffer.Length];
                     var readCrypted = _cryptor.TransformBlock(_currentBuffer, 0, tmp.Length, tmp, 0);
+
+                    //if (readCrypted == 0) readCrypted = _cryptor.TransformBlock(_currentBuffer, 0, tmp.Length, tmp, 0);
+
+                    //while (0 == (readCrypted = _cryptor.TransformBlock(_currentBuffer, 0, tmp.Length, tmp, 0))) { }
+
                     _decryptedBlock = new byte[readCrypted];
                     Array.Copy(tmp, 0, _decryptedBlock, 0, readCrypted);
                     _decryptedBlockPosition = 0;
                     _currentBufferPosition = 0;
+
                 }
                 else if (!_lastBlockRead)
                 {
@@ -123,6 +129,8 @@ namespace VFSBase.Persistence.Coding
 
         public override void Write(byte[] buffer, int offset, int count)
         {
+            if (buffer == null) throw new ArgumentNullException("buffer");
+
             if (!CanWrite) throw new VFSException("Stream not writable");
 
             var bufferPosition = 0;
@@ -200,8 +208,6 @@ namespace VFSBase.Persistence.Coding
             _stream.Write(b, 0, b.Length);
 
             Flush();
-
-            //throw new NotImplementedException();
         }
     }
 }
