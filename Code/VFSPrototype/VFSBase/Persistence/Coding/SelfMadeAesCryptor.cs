@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace VFSBase.Persistence.Coding
@@ -13,34 +15,24 @@ namespace VFSBase.Persistence.Coding
         private readonly byte[] _initializationVector;
         private readonly CryptoDirection _cryptoDirection;
 
-        #region AES Variables
+        #region AES Implementation
 
-        // Sbox from section 5.1.1, Figure 7
-        static readonly int[] Sbox = {
-        0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
-        0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
-        0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
-        0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
-        0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
-        0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
-        0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
-        0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
-        0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
-        0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
-        0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
-        0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
-        0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
-        0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
-        0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
-        0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16};
+        private bool _firstRound = true;
+
+        private readonly Dictionary<int, int> _roundsMappingConfig = new Dictionary<int, int>
+                             {
+                                 { 16, 10 }, // AES-128
+                                 { 24, 12 }, // AES-192
+                                 { 32, 14 }, // AES-256
+                  };
+
+        private int _keySize_256 = 32;
 
 
-        private int Nk = 0;
-        private int Nr = 0;
-        private static int Nb = 4;
-        private int[] State = new int[Nb];
 
         #endregion
+
+
 
 
         public SelfMadeAesCryptor(byte[] key, byte[] initializationVector, CryptoDirection cryptoDirection)
@@ -48,27 +40,401 @@ namespace VFSBase.Persistence.Coding
             _key = key;
             _initializationVector = initializationVector;
             _cryptoDirection = cryptoDirection;
+
+            Prepare();
         }
+
+        private void Prepare()
+        {
+
+        }
+
+        private int Rounds()
+        {
+            try
+            {
+                return _roundsMappingConfig[_key.Length];
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new ArgumentException("Invalid key length", "nk");
+            }
+        }
+
 
         public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
-            Array.Copy(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+            if (inputBuffer == null) throw new ArgumentNullException("inputBuffer");
+            if (outputBuffer == null) throw new ArgumentNullException("outputBuffer");
+
+            //if (inputCount != InputBlockSize) throw new ArgumentException("inputBuffer");
+
+            //Array.Copy(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
+
             if (_cryptoDirection == CryptoDirection.Encrypt)
             {
-                for (var i = 0; i < outputBuffer.Length; i++)
-                {
-                    outputBuffer[i] = (byte)(outputBuffer[i] ^ _key[i % _key.Length] ^ _initializationVector[i % _initializationVector.Length] ^ i);
-                }
+                EncryptBlocks(inputBuffer, inputOffset, inputCount, outputBuffer, outputOffset);
             }
             else
             {
-                for (var i = 0; i < outputBuffer.Length; i++)
-                {
-                    outputBuffer[i] = (byte)(outputBuffer[i] ^ _key[i % _key.Length] ^ _initializationVector[i % _initializationVector.Length] ^ i);
-                }
+                DecryptBlocks(inputBuffer, inputOffset, inputCount, outputBuffer, outputOffset);
             }
 
             return inputCount;
+        }
+
+        private void EncryptBlocks(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+        {
+            var ciphertext = new byte[inputCount];
+            var input = new byte[inputCount];
+            Array.Copy(inputBuffer, inputOffset, input, 0, inputCount);
+
+            var outIndex = outputOffset;
+
+            for (var j = 0; j < inputCount / 16; j++)
+            {
+                var start = j * 16;
+                var end = start + 16;
+                if (end > inputCount) end = inputCount;
+
+                var byteArray = getPaddedBlock(inputBuffer, start, end);
+
+                for (var i = 0; i < 16; i++)
+                    input[i] = (byte)(byteArray[i] ^ (_firstRound ? _initializationVector[i] : ciphertext[i]));
+
+                _firstRound = false;
+                ciphertext = encryptBlock(input);
+
+                // always 16 bytes because of the padding for CBC
+                for (var k = 0; k < 16; k++)
+                    outputBuffer[outIndex++] = byteArray[k];
+            }
+        }
+
+        private byte[] encryptBlock(byte[] input)
+        {
+            var output = new byte[input.Length];
+            var block = new byte[input.Length]; /* the 128 bit block to encode */
+            int nbrRounds = Rounds();
+
+            /* Set the block values, for the block:
+             * a0,0 a0,1 a0,2 a0,3
+             * a1,0 a1,1 a1,2 a1,3
+             * a2,0 a2,1 a2,2 a2,3
+             * a3,0 a3,1 a3,2 a3,3
+             * the mapping order is a0,0 a1,0 a2,0 a3,0 a0,1 a1,1 ... a2,3 a3,3
+             */
+            for (var i = 0; i < 4; i++) /* iterate over the columns */
+                for (var j = 0; j < 4; j++) /* iterate over the rows */
+                    block[(i + (j * 4))] = input[(i * 4) + j];
+
+            /* expand the key into an 176, 208, 240 bytes key */
+            var expandedKey = ExpandKey(); /* the expanded key */
+
+            /* encrypt the block using the expandedKey */
+            block = Main(block, expandedKey, nbrRounds);
+            for (var k = 0; k < 4; k++) /* unmap the block again into the output */
+                for (var l = 0; l < 4; l++) /* iterate over the rows */
+                    output[(k * 4) + l] = block[(k + (l * 4))];
+            return output;
+        }
+
+        private byte[] Main(byte[] state, byte[] expandedKey, int nbrRounds)
+        {
+            AddRoundKey(state, CreateRoundKey(expandedKey, 0));
+            for (var i = 1; i < nbrRounds; i++)
+                Round(state, CreateRoundKey(expandedKey, 16 * i));
+            SubBytes(state, false);
+            ShiftRows(state, false);
+            AddRoundKey(state, CreateRoundKey(expandedKey, 16 * nbrRounds));
+            return state;
+        }
+
+        private void Round(byte[] state, byte[] roundKey)
+        {
+            SubBytes(state, false);
+            ShiftRows(state, false);
+            MixColumns(state, false);
+            AddRoundKey(state, roundKey);
+        }
+
+        private void MixColumns(byte[] state, bool isInv)
+        {
+            var column = new byte[16];
+            /* iterate over the 4 columns */
+            for (var i = 0; i < 4; i++)
+            {
+                /* construct one column by iterating over the 4 rows */
+                for (var j = 0; j < 4; j++)
+                    column[j] = state[(j * 4) + i];
+                /* apply the mixColumn on one column */
+                MixColumn(column, isInv);
+                /* put the values back into the state */
+                for (var k = 0; k < 4; k++)
+                    state[(k * 4) + i] = column[k];
+            }
+        }
+
+        // galois multipication of 1 column of the 4x4 matrix
+        private void MixColumn(byte[] column, bool isInv)
+        {
+            var mult = isInv ? new byte[] { 14, 9, 13, 11 } : new byte[] { 2, 1, 1, 3 };
+
+            var cpy = new byte[4];
+            for (var i = 0; i < 4; i++) cpy[i] = column[i];
+
+            column[0] = (byte)(GaloisMultiplication(cpy[0], mult[0]) ^
+                                GaloisMultiplication(cpy[3], mult[1]) ^
+                                GaloisMultiplication(cpy[2], mult[2]) ^
+                                GaloisMultiplication(cpy[1], mult[3]));
+            column[1] = (byte)(GaloisMultiplication(cpy[1], mult[0]) ^
+                                GaloisMultiplication(cpy[0], mult[1]) ^
+                                GaloisMultiplication(cpy[3], mult[2]) ^
+                                GaloisMultiplication(cpy[2], mult[3]));
+            column[2] = (byte)(GaloisMultiplication(cpy[2], mult[0]) ^
+                                GaloisMultiplication(cpy[1], mult[1]) ^
+                                GaloisMultiplication(cpy[0], mult[2]) ^
+                                GaloisMultiplication(cpy[3], mult[3]));
+            column[3] = (byte)(GaloisMultiplication(cpy[3], mult[0]) ^
+                                GaloisMultiplication(cpy[2], mult[1]) ^
+                                GaloisMultiplication(cpy[1], mult[2]) ^
+                                GaloisMultiplication(cpy[0], mult[3]));
+        }
+
+        private int GaloisMultiplication(int a, int b)
+        {
+            var p = 0;
+            for (var counter = 0; counter < 8; counter++)
+            {
+                if ((b & 1) == 1) p ^= a;
+
+                if (p > 0x100) p ^= 0x100;
+
+                var hi_bit_set = (a & 0x80); //keep p 8 bit
+                a <<= 1;
+                if (a > 0x100) a ^= 0x100; //keep a 8 bit
+                if (hi_bit_set == 0x80)
+                    a ^= 0x1b;
+                if (a > 0x100) a ^= 0x100; //keep a 8 bit
+                b >>= 1;
+                if (b > 0x100) b ^= 0x100; //keep b 8 bit
+            }
+            return p;
+        }
+
+        private void ShiftRows(byte[] state, bool isInv)
+        {
+            for (var i = 0; i < 4; i++)
+                ShiftRow(state, i * 4, i, isInv);
+        }
+
+        private void ShiftRow(byte[] state, int statePointer, int nbr, bool isInv)
+        {
+            for (var i = 0; i < nbr; i++)
+            {
+                if (isInv)
+                {
+                    var tmp = state[statePointer + 3];
+                    for (var j = 3; j > 0; j--)
+                        state[statePointer + j] = state[statePointer + j - 1];
+                    state[statePointer] = tmp;
+                }
+                else
+                {
+                    var tmp = state[statePointer];
+                    for (var j = 0; j < 3; j++)
+                        state[statePointer + j] = state[statePointer + j + 1];
+                    state[statePointer + 3] = tmp;
+                }
+            }
+        }
+
+        private void SubBytes(byte[] state, bool isInv)
+        {
+            for (var i = 0; i < 16; i++)
+                state[i] = (byte)(isInv ? Aes.Constants.Rsbox[state[i]] : Aes.Constants.Sbox[state[i]]);
+        }
+
+        private void AddRoundKey(byte[] state, byte[] roundKey)
+        {
+            for (var i = 0; i < 16; i++)
+                state[i] = (byte)(state[i] ^ roundKey[i]);
+        }
+
+        private byte[] CreateRoundKey(byte[] expandedKey, int roundKeyPointer)
+        {
+            var roundKey = new byte[16];
+            for (var i = 0; i < 4; i++)
+                for (var j = 0; j < 4; j++)
+                    roundKey[j * 4 + i] = expandedKey[roundKeyPointer + i * 4 + j];
+            return roundKey;
+        }
+
+        /* Rijndael's key expansion
+         * expands an 128,192,256 key into an 176,208,240 bytes key
+         *
+         * expandedKey is a pointer to an char array of large enough size
+         * key is a pointer to a non-expanded key
+         */
+        private byte[] ExpandKey()
+        {
+            var expandedKeySize = (16 * (Rounds() + 1));
+
+            /* current expanded keySize, in bytes */
+            var size = _key.Length;
+            var currentSize = 0;
+            var rconIteration = 1;
+            var t = new byte[4]; // temporary 4-byte variable
+
+            var expandedKey = new byte[expandedKeySize];
+            for (var i = 0; i < expandedKeySize; i++)
+                expandedKey[i] = 0;
+
+            /* set the 16,24,32 bytes of the expanded key to the input key */
+            for (var j = 0; j < size; j++)
+                expandedKey[j] = _key[j];
+            currentSize += size;
+
+            while (currentSize < expandedKeySize)
+            {
+                /* assign the previous 4 bytes to the temporary value t */
+                for (var k = 0; k < 4; k++)
+                    t[k] = expandedKey[(currentSize - 4) + k];
+
+                /* every 16,24,32 bytes we apply the core schedule to t
+                 * and increment rconIteration afterwards
+                 */
+                if (currentSize % size == 0) Core(t, rconIteration++);
+
+                /* For 256-bit keys, we add an extra sbox to the calculation */
+                if (size == _keySize_256 && ((currentSize % size) == 16))
+                    for (var l = 0; l < 4; l++)
+                        t[l] = (byte)Aes.Constants.Sbox[t[l]];
+
+                /* We XOR t with the four-byte block 16,24,32 bytes before the new expanded key.
+                 * This becomes the next four bytes in the expanded key.
+                 */
+                for (var m = 0; m < 4; m++)
+                {
+                    expandedKey[currentSize] = (byte)(expandedKey[currentSize - size] ^ t[m]);
+                    currentSize++;
+                }
+            }
+            return expandedKey;
+        }
+
+        // Key Schedule Core
+        private void Core(byte[] word, int iteration)
+        {
+            /* rotate the 32-bit word 8 bits to the left */
+            Rotate(word);
+            /* apply S-Box substitution on all 4 parts of the 32-bit word */
+            for (var i = 0; i < 4; ++i)
+                word[i] = (byte)Aes.Constants.Sbox[word[i]];
+            /* XOR the output of the rcon operation with i to the first part (leftmost) only */
+            word[0] = (byte)(word[0] ^ Aes.Constants.Rcon[iteration]);
+
+        }
+
+        private static void Rotate(byte[] word)
+        {
+            var c = word[0];
+            for (var i = 0; i < 3; i++) word[i] = word[i + 1];
+            word[3] = c;
+        }
+
+        private void DecryptBlocks(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+        {
+            var byteArray = new byte[inputCount];
+            var input = new byte[inputCount];
+            Array.Copy(inputBuffer, inputOffset, input, 0, inputCount);
+
+            var outIndex = outputOffset;
+
+            for (var j = 0; j < inputCount / 16; j++)
+            {
+                var start = (j * 16);
+                var end = start + 16;
+                if (end > inputCount) end = inputCount;
+
+                var ciphertext = getPaddedBlock(inputBuffer, start, end);
+
+                // Mode of operation: CBC
+
+                byte[] output = decryptBlock(ciphertext);
+                for (var i = 0; i < 16; i++)
+                    byteArray[i] = (byte)((_firstRound ? _initializationVector[i] : input[i]) ^ output[i]);
+
+                _firstRound = false;
+
+                if (inputCount < end)
+                    for (var k = 0; k < inputCount - start; k++)
+                        outputBuffer[outIndex++] = byteArray[k];
+                else
+                    for (var k = 0; k < end - start; k++)
+                        outputBuffer[outIndex++] = byteArray[k];
+                input = ciphertext;
+            }
+        }
+
+        private byte[] decryptBlock(byte[] input)
+        {
+            var output = new byte[input.Length];
+            var block = new byte[input.Length]; /* the 128 bit block to decode */
+            var nbrRounds = Rounds();
+            /* Set the block values, for the block:
+             * a0,0 a0,1 a0,2 a0,3
+             * a1,0 a1,1 a1,2 a1,3
+             * a2,0 a2,1 a2,2 a2,3
+             * a3,0 a3,1 a3,2 a3,3
+             * the mapping order is a0,0 a1,0 a2,0 a3,0 a0,1 a1,1 ... a2,3 a3,3
+             */
+            for (var i = 0; i < 4; i++) /* iterate over the columns */
+                for (var j = 0; j < 4; j++) /* iterate over the rows */
+                    block[(i + (j * 4))] = input[(i * 4) + j];
+
+            /* expand the key into an 176, 208, 240 bytes key */
+            var expandedKey = ExpandKey();
+
+            /* decrypt the block using the expandedKey */
+            InvMain(block, expandedKey, nbrRounds);
+            for (var k = 0; k < 4; k++) /* unmap the block again into the output */
+                for (var l = 0; l < 4; l++) /* iterate over the rows */
+                    output[(k * 4) + l] = block[(k + (l * 4))];
+            return output;
+        }
+
+        private void InvMain(byte[] state, byte[] expandedKey, int nbrRounds)
+        {
+            AddRoundKey(state, CreateRoundKey(expandedKey, 16 * nbrRounds));
+            for (var i = nbrRounds - 1; i > 0; i--)
+                InvRound(state, CreateRoundKey(expandedKey, 16 * i));
+            ShiftRows(state, true);
+            SubBytes(state, true);
+            AddRoundKey(state, CreateRoundKey(expandedKey, 0));
+        }
+
+        private void InvRound(byte[] state, byte[] roundKey)
+        {
+            ShiftRows(state, true);
+            SubBytes(state, true);
+            AddRoundKey(state, roundKey);
+            MixColumns(state, true);
+        }
+
+        private byte[] getPaddedBlock(byte[] input, int start, int end)
+        {
+            if (end - start > 16) end = start + 16;
+
+            var block = new byte[end - start];
+            Array.Copy(input, start, block, 0, end - start);
+
+            var cpad = (byte)(16 - block.Length);
+
+            var i = 0;
+            while (block.Length < 16) block[i++] = cpad;
+
+            return block;
         }
 
         public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
