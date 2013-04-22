@@ -28,6 +28,7 @@ namespace VFSBase.Implementation
             NameLength = 255;
             BlockReferenceSize = 64;
             BlockAllocation = new BlockAllocation();
+            IndirectionCountForIndirectNodes = 2;
 
             // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
             using (var r = Rijndael.Create())
@@ -86,10 +87,7 @@ namespace VFSBase.Implementation
             }
         }
 
-        public int IndirectionCountForIndirectNodes
-        {
-            get { return 2; }
-        }
+        public int IndirectionCountForIndirectNodes { get; private set; }
 
         public long DiskFree { get; private set; }
         public long DiskOccupied { get; private set; }
