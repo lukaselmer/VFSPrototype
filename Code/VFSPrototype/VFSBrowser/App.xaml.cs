@@ -11,7 +11,21 @@ namespace VFSBrowser
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
+        private ApplicationLifetimeManager _manager;
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            _manager = new ApplicationLifetimeManager();
+            _manager.Startup();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+            _manager.Exit();
+        }
     }
 }
