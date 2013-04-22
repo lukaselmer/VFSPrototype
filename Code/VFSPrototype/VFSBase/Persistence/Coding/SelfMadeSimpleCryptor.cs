@@ -18,6 +18,9 @@ namespace VFSBase.Persistence.Coding
 
         public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
+            if (inputBuffer == null) throw new ArgumentNullException("inputBuffer");
+            if (outputBuffer == null) throw new ArgumentNullException("outputBuffer");
+
             Array.Copy(inputBuffer, inputOffset, outputBuffer, outputOffset, inputCount);
             if (_cryptoDirection == CryptoDirection.Encrypt)
             {
