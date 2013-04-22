@@ -164,6 +164,8 @@ namespace VFSBase.Implementation
         private void ExportFolder(Folder folder, string destination)
         {
             // TODO: implement this
+            Console.WriteLine(folder);
+            Console.WriteLine(destination);
             throw new NotImplementedException();
         }
 
