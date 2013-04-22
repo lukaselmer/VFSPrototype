@@ -100,7 +100,7 @@ namespace VFSBase.Persistence
         {
             if (node is Folder) return FolderType;
             if (node is VFSFile) return FileType;
-            throw new ArgumentException();
+            throw new ArgumentException("is not a folder or file", "node");
         }
 
         public byte[] NodeToBytes(IIndexNode node)
