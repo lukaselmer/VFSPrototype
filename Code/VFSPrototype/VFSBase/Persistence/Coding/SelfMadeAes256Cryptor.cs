@@ -19,6 +19,7 @@ namespace VFSBase.Persistence.Coding
 
         private bool _firstRound = true;
         private byte[] _lastInput;
+        private byte[] _lastCipherBlock;
 
         private const int KeySize256 = 32; // AES-256
         private const int Rounds = 14; // AES-256
@@ -258,7 +259,6 @@ namespace VFSBase.Persistence.Coding
 
         private void EncryptBlocks(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
-            var ciphertext = new byte[inputCount];
             var input = new byte[inputCount];
             Array.Copy(inputBuffer, inputOffset, input, 0, inputCount);
 
@@ -273,14 +273,14 @@ namespace VFSBase.Persistence.Coding
                 var paddedInput = getPaddedBlock(inputBuffer, start, end);
 
                 for (var i = 0; i < 16; i++)
-                    input[i] = (byte)(paddedInput[i] ^ (_firstRound ? _initializationVector[i] : ciphertext[i]));
+                    input[i] = (byte)(paddedInput[i] ^ (_firstRound ? _initializationVector[i] : _lastCipherBlock[i]));
 
                 _firstRound = false;
-                ciphertext = EncryptBlock(input);
+                _lastCipherBlock = EncryptBlock(input);
 
                 // always 16 bytes because of the padding for CBC
                 for (var k = 0; k < 16; k++)
-                    outputBuffer[outIndex++] = ciphertext[k];
+                    outputBuffer[outIndex++] = _lastCipherBlock[k];
             }
         }
 

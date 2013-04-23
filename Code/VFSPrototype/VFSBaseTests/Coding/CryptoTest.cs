@@ -13,14 +13,16 @@ namespace VFSBaseTests.Coding
     {
         private struct TestConfig
         {
-            public TestConfig(int dataAmount, int bufferSize)
+            public TestConfig(int dataAmount, int readBufferSize, int writeBufferSize)
                 : this()
             {
                 DataAmount = dataAmount;
-                BufferSize = bufferSize;
+                ReadBufferSize = readBufferSize;
+                WriteBufferSize = writeBufferSize;
             }
             public int DataAmount { get; private set; }
-            public int BufferSize { get; private set; }
+            public int ReadBufferSize { get; private set; }
+            public int WriteBufferSize { get; private set; }
         }
 
         private interface IEncryptorFactory
@@ -62,19 +64,19 @@ namespace VFSBaseTests.Coding
         private static void TestAlgorithm(IEncryptorFactory factory)
         {
             var configurations = new[] {
-                new TestConfig(32, 1),
-                new TestConfig(16, 15),
-                new TestConfig(3, 1),
-                new TestConfig(1000, 1),
-                new TestConfig(2000, 1),
-                new TestConfig(1023, 1023),
-                new TestConfig(1024, 1024),
-                new TestConfig(1025, 1025),
-                new TestConfig(2048, 2048),
-                new TestConfig(10000, 1023),
-                new TestConfig(10000, 1024),
-                new TestConfig(10000, 1025),
-                new TestConfig(100000, 100000)
+                new TestConfig(32, 1, 1000),
+                new TestConfig(16, 15, 1000),
+                new TestConfig(3, 1, 1000),
+                new TestConfig(1000, 1, 1000),
+                new TestConfig(2000, 1, 1000),
+                new TestConfig(1023, 1023, 1000),
+                new TestConfig(1024, 1024, 1000),
+                new TestConfig(1025, 1025, 1000),
+                new TestConfig(2048, 2048, 1000),
+                new TestConfig(10000, 1023, 1000),
+                new TestConfig(10000, 1024, 1000),
+                new TestConfig(10000, 1025, 1000),
+                new TestConfig(100000, 100000, 1000)
             };
 
             foreach (var configuration in configurations)
@@ -94,6 +96,13 @@ namespace VFSBaseTests.Coding
             using (var ms = new MemoryStream())
             {
                 var s = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
+                var writePos = 0;
+                while (writePos < original.Length)
+                {
+                    var count = Math.Min(original.Length - writePos, original.Length);
+                    s.Write(original, writePos, count);
+                    writePos += count;
+                }
                 s.Write(original, 0, original.Length);
                 s.FlushFinalBlock();
 
@@ -102,10 +111,12 @@ namespace VFSBaseTests.Coding
                 var ss = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
                 int read;
                 var pos = 0;
-                while ((read = ss.Read(result, pos, Math.Min(original.Length - pos, configuration.BufferSize))) > 0)
+                while ((read = ss.Read(result, pos, Math.Min(original.Length - pos, configuration.ReadBufferSize))) > 0)
                 {
                     pos += read;
                 }
+                //var bb = new byte[1024];
+                //Assert.AreEqual(0, ss.Read(bb, 0, bb.Length));
             }
 
             for (var i = 0; i < original.Length; i++)
