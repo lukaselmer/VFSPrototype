@@ -20,6 +20,7 @@ namespace VFSBase.Persistence.Coding
         private bool _firstRound = true;
         private byte[] _lastInput;
         private byte[] _lastCipherBlock;
+        private byte[] _expandedKey;
 
         private const int KeySize256 = 32; // AES-256
         private const int Rounds = 14; // AES-256
@@ -31,6 +32,60 @@ namespace VFSBase.Persistence.Coding
             _key = key;
             _initializationVector = initializationVector;
             _cryptoDirection = cryptoDirection;
+
+            InitExpandedKey();
+        }
+
+        /* Rijndael's key expansion
+         * expands an 128,192,256 key into an 176,208,240 bytes key
+         *
+         * expandedKey is a pointer to an char array of large enough size
+         * key is a pointer to a non-expanded key
+         */
+        private void InitExpandedKey()
+        {
+            const int expandedKeySize = (16 * (Rounds + 1));
+
+            /* current expanded keySize, in bytes */
+            var size = _key.Length;
+            var currentSize = 0;
+            var rconIteration = 1;
+            var t = new byte[4]; // temporary 4-byte variable
+
+            _expandedKey = new byte[expandedKeySize];
+            for (var i = 0; i < expandedKeySize; i++)
+                _expandedKey[i] = 0;
+
+            /* set the 16,24,32 bytes of the expanded key to the input key */
+            for (var j = 0; j < size; j++)
+                _expandedKey[j] = _key[j];
+            currentSize += size;
+
+            while (currentSize < expandedKeySize)
+            {
+                /* assign the previous 4 bytes to the temporary value t */
+                for (var k = 0; k < 4; k++)
+                    t[k] = _expandedKey[(currentSize - 4) + k];
+
+                /* every 16,24,32 bytes we apply the core schedule to t
+                 * and increment rconIteration afterwards
+                 */
+                if (currentSize % size == 0) Core(t, rconIteration++);
+
+                /* For 256-bit keys, we add an extra sbox to the calculation */
+                if (size == KeySize256 && ((currentSize % size) == 16))
+                    for (var l = 0; l < 4; l++)
+                        t[l] = (byte)Aes.Constants.Sbox[t[l]];
+
+                /* We XOR t with the four-byte block 16,24,32 bytes before the new expanded key.
+                 * This becomes the next four bytes in the expanded key.
+                 */
+                for (var m = 0; m < 4; m++)
+                {
+                    _expandedKey[currentSize] = (byte)(_expandedKey[currentSize - size] ^ t[m]);
+                    currentSize++;
+                }
+            }
         }
 
         public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
@@ -54,7 +109,7 @@ namespace VFSBase.Persistence.Coding
             return inputCount;
         }
 
-        private void Main(byte[] state, byte[] expandedKey, int nbrRounds)
+        private static void Main(byte[] state, byte[] expandedKey, int nbrRounds)
         {
             AddRoundKey(state, CreateRoundKey(expandedKey, 0));
             for (var i = 1; i < nbrRounds; i++)
@@ -64,7 +119,7 @@ namespace VFSBase.Persistence.Coding
             AddRoundKey(state, CreateRoundKey(expandedKey, 16 * nbrRounds));
         }
 
-        private void Round(byte[] state, byte[] roundKey)
+        private static void Round(byte[] state, byte[] roundKey)
         {
             SubBytes(state, false);
             ShiftRows(state, false);
@@ -72,7 +127,7 @@ namespace VFSBase.Persistence.Coding
             AddRoundKey(state, roundKey);
         }
 
-        private void MixColumns(byte[] state, bool isInv)
+        private static void MixColumns(byte[] state, bool isInv)
         {
             var column = new byte[16];
             /* iterate over the 4 columns */
@@ -90,7 +145,7 @@ namespace VFSBase.Persistence.Coding
         }
 
         // galois multipication of 1 column of the 4x4 matrix
-        private void MixColumn(byte[] column, bool isInv)
+        private static void MixColumn(byte[] column, bool isInv)
         {
             var mult = isInv ? new byte[] { 14, 9, 13, 11 } : new byte[] { 2, 1, 1, 3 };
 
@@ -115,7 +170,7 @@ namespace VFSBase.Persistence.Coding
                                 GaloisMultiplication(cpy[0], mult[3]));
         }
 
-        private int GaloisMultiplication(int a, int b)
+        private static int GaloisMultiplication(int a, int b)
         {
             var p = 0;
             for (var counter = 0; counter < 8; counter++)
@@ -136,13 +191,13 @@ namespace VFSBase.Persistence.Coding
             return p;
         }
 
-        private void ShiftRows(byte[] state, bool isInv)
+        private static void ShiftRows(byte[] state, bool isInv)
         {
             for (var i = 0; i < 4; i++)
                 ShiftRow(state, i * 4, i, isInv);
         }
 
-        private void ShiftRow(byte[] state, int statePointer, int nbr, bool isInv)
+        private static void ShiftRow(byte[] state, int statePointer, int nbr, bool isInv)
         {
             for (var i = 0; i < nbr; i++)
             {
@@ -163,19 +218,19 @@ namespace VFSBase.Persistence.Coding
             }
         }
 
-        private void SubBytes(byte[] state, bool isInv)
+        private static void SubBytes(byte[] state, bool isInv)
         {
             for (var i = 0; i < 16; i++)
                 state[i] = (byte)(isInv ? Aes.Constants.Rsbox[state[i]] : Aes.Constants.Sbox[state[i]]);
         }
 
-        private void AddRoundKey(byte[] state, byte[] roundKey)
+        private static void AddRoundKey(byte[] state, byte[] roundKey)
         {
             for (var i = 0; i < 16; i++)
                 state[i] = (byte)(state[i] ^ roundKey[i]);
         }
 
-        private byte[] CreateRoundKey(byte[] expandedKey, int roundKeyPointer)
+        private static byte[] CreateRoundKey(byte[] expandedKey, int roundKeyPointer)
         {
             var roundKey = new byte[16];
             for (var i = 0; i < 4; i++)
@@ -184,61 +239,8 @@ namespace VFSBase.Persistence.Coding
             return roundKey;
         }
 
-        /* Rijndael's key expansion
-         * expands an 128,192,256 key into an 176,208,240 bytes key
-         *
-         * expandedKey is a pointer to an char array of large enough size
-         * key is a pointer to a non-expanded key
-         */
-        private byte[] ExpandKey()
-        {
-            var expandedKeySize = (16 * (Rounds + 1));
-
-            /* current expanded keySize, in bytes */
-            var size = _key.Length;
-            var currentSize = 0;
-            var rconIteration = 1;
-            var t = new byte[4]; // temporary 4-byte variable
-
-            var expandedKey = new byte[expandedKeySize];
-            for (var i = 0; i < expandedKeySize; i++)
-                expandedKey[i] = 0;
-
-            /* set the 16,24,32 bytes of the expanded key to the input key */
-            for (var j = 0; j < size; j++)
-                expandedKey[j] = _key[j];
-            currentSize += size;
-
-            while (currentSize < expandedKeySize)
-            {
-                /* assign the previous 4 bytes to the temporary value t */
-                for (var k = 0; k < 4; k++)
-                    t[k] = expandedKey[(currentSize - 4) + k];
-
-                /* every 16,24,32 bytes we apply the core schedule to t
-                 * and increment rconIteration afterwards
-                 */
-                if (currentSize % size == 0) Core(t, rconIteration++);
-
-                /* For 256-bit keys, we add an extra sbox to the calculation */
-                if (size == KeySize256 && ((currentSize % size) == 16))
-                    for (var l = 0; l < 4; l++)
-                        t[l] = (byte)Aes.Constants.Sbox[t[l]];
-
-                /* We XOR t with the four-byte block 16,24,32 bytes before the new expanded key.
-                 * This becomes the next four bytes in the expanded key.
-                 */
-                for (var m = 0; m < 4; m++)
-                {
-                    expandedKey[currentSize] = (byte)(expandedKey[currentSize - size] ^ t[m]);
-                    currentSize++;
-                }
-            }
-            return expandedKey;
-        }
-
         // Key Schedule Core
-        private void Core(byte[] word, int iteration)
+        private static void Core(byte[] word, int iteration)
         {
             /* rotate the 32-bit word 8 bits to the left */
             Rotate(word);
@@ -270,7 +272,7 @@ namespace VFSBase.Persistence.Coding
                 var end = start + 16;
                 if (end > inputCount) end = inputCount;
 
-                var paddedInput = getPaddedBlock(inputBuffer, start, end);
+                var paddedInput = PaddedBlock(inputBuffer, start, end);
 
                 for (var i = 0; i < 16; i++)
                     input[i] = (byte)(paddedInput[i] ^ (_firstRound ? _initializationVector[i] : _lastCipherBlock[i]));
@@ -298,7 +300,7 @@ namespace VFSBase.Persistence.Coding
                 var end = start + 16;
                 if (end > inputCount) end = inputCount;
 
-                var ciphertext = getPaddedBlock(inputBuffer, start, end);
+                var ciphertext = PaddedBlock(inputBuffer, start, end);
 
                 // Mode of operation: CBC
 
@@ -332,7 +334,7 @@ namespace VFSBase.Persistence.Coding
                     block[(i + (j * 4))] = input[(i * 4) + j];
 
             /* expand the key into an 240 bytes key */
-            var expandedKey = ExpandKey(); /* the expanded key */
+            var expandedKey = _expandedKey; /* the expanded key */
 
             /* encrypt the block using the expandedKey */
             Main(block, expandedKey, Rounds);
@@ -358,7 +360,7 @@ namespace VFSBase.Persistence.Coding
                     block[(i + (j * 4))] = input[(i * 4) + j];
 
             /* expand the key into an 176, 208, 240 bytes key */
-            var expandedKey = ExpandKey();
+            var expandedKey = _expandedKey;
 
             /* decrypt the block using the expandedKey */
             InvMain(block, expandedKey, Rounds);
@@ -386,7 +388,7 @@ namespace VFSBase.Persistence.Coding
             MixColumns(state, true);
         }
 
-        private byte[] getPaddedBlock(byte[] input, int start, int end)
+        private static byte[] PaddedBlock(byte[] input, int start, int end)
         {
             if (end - start > 16) end = start + 16;
 
@@ -397,7 +399,7 @@ namespace VFSBase.Persistence.Coding
 
             var i = 0;
             while (block.Length < 16) block[i++] = cpad;
-
+            
             return block;
         }
 
