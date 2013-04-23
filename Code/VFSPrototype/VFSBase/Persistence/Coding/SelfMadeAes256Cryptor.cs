@@ -8,61 +8,28 @@ namespace VFSBase.Persistence.Coding
     /// <summary>
     /// AES implementation. Algorithms taken from:
     /// http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+    /// 
+    /// Implements AES-256 and uses CBC as mode
     /// </summary>
-    internal class SelfMadeAesCryptor : ICryptoTransform
+    internal class SelfMadeAes256Cryptor : ICryptoTransform
     {
         private readonly byte[] _key;
         private readonly byte[] _initializationVector;
         private readonly CryptoDirection _cryptoDirection;
 
-        #region AES Implementation
-
         private bool _firstRound = true;
 
-        private readonly Dictionary<int, int> _roundsMappingConfig = new Dictionary<int, int>
-                             {
-                                 { 16, 10 }, // AES-128
-                                 { 24, 12 }, // AES-192
-                                 { 32, 14 }, // AES-256
-                  };
+        private const int KeySize256 = 32; // AES-256
+        private const int Rounds = 14; // AES-256
 
-        private int _keySize_256 = 32;
-
-
-
-        #endregion
-
-
-
-
-        public SelfMadeAesCryptor(byte[] key, byte[] initializationVector, CryptoDirection cryptoDirection)
+        public SelfMadeAes256Cryptor(byte[] key, byte[] initializationVector, CryptoDirection cryptoDirection)
         {
-            if (key.Length != _keySize_256) throw new NotSupportedException("Key size must be 256 bit!");
+            if (key.Length != KeySize256) throw new NotSupportedException("Key size must be 256 bit!");
 
             _key = key;
             _initializationVector = initializationVector;
             _cryptoDirection = cryptoDirection;
-
-            Prepare();
         }
-
-        private void Prepare()
-        {
-
-        }
-
-        private int Rounds()
-        {
-            try
-            {
-                return _roundsMappingConfig[_key.Length];
-            }
-            catch (KeyNotFoundException)
-            {
-                throw new ArgumentException("Invalid key length", "nk");
-            }
-        }
-
 
         public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
@@ -85,63 +52,7 @@ namespace VFSBase.Persistence.Coding
             return inputCount;
         }
 
-        private void EncryptBlocks(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
-        {
-            var ciphertext = new byte[inputCount];
-            var input = new byte[inputCount];
-            Array.Copy(inputBuffer, inputOffset, input, 0, inputCount);
-
-            var outIndex = outputOffset;
-
-            for (var j = 0; j < inputCount / 16; j++)
-            {
-                var start = j * 16;
-                var end = start + 16;
-                if (end > inputCount) end = inputCount;
-
-                var byteArray = getPaddedBlock(inputBuffer, start, end);
-
-                for (var i = 0; i < 16; i++)
-                    input[i] = (byte)(byteArray[i] ^ (_firstRound ? _initializationVector[i] : ciphertext[i]));
-
-                _firstRound = false;
-                ciphertext = encryptBlock(input);
-
-                // always 16 bytes because of the padding for CBC
-                for (var k = 0; k < 16; k++)
-                    outputBuffer[outIndex++] = byteArray[k];
-            }
-        }
-
-        private byte[] encryptBlock(byte[] input)
-        {
-            var output = new byte[input.Length];
-            var block = new byte[input.Length]; /* the 128 bit block to encode */
-            int nbrRounds = Rounds();
-
-            /* Set the block values, for the block:
-             * a0,0 a0,1 a0,2 a0,3
-             * a1,0 a1,1 a1,2 a1,3
-             * a2,0 a2,1 a2,2 a2,3
-             * a3,0 a3,1 a3,2 a3,3
-             * the mapping order is a0,0 a1,0 a2,0 a3,0 a0,1 a1,1 ... a2,3 a3,3
-             */
-            for (var i = 0; i < 4; i++) /* iterate over the columns */
-                for (var j = 0; j < 4; j++) /* iterate over the rows */
-                    block[(i + (j * 4))] = input[(i * 4) + j];
-
-            /* expand the key into an 176, 208, 240 bytes key */
-            var expandedKey = ExpandKey(); /* the expanded key */
-
-            /* encrypt the block using the expandedKey */
-            block = Main(block, expandedKey, nbrRounds);
-            for (var k = 0; k < 4; k++) /* unmap the block again into the output */
-                for (var l = 0; l < 4; l++) /* iterate over the rows */
-                    output[(k * 4) + l] = block[(k + (l * 4))];
-            return output;
-        }
-
-        private byte[] Main(byte[] state, byte[] expandedKey, int nbrRounds)
+        private void Main(byte[] state, byte[] expandedKey, int nbrRounds)
         {
             AddRoundKey(state, CreateRoundKey(expandedKey, 0));
             for (var i = 1; i < nbrRounds; i++)
@@ -149,7 +60,6 @@ namespace VFSBase.Persistence.Coding
             SubBytes(state, false);
             ShiftRows(state, false);
             AddRoundKey(state, CreateRoundKey(expandedKey, 16 * nbrRounds));
-            return state;
         }
 
         private void Round(byte[] state, byte[] roundKey)
@@ -212,10 +122,10 @@ namespace VFSBase.Persistence.Coding
 
                 if (p > 0x100) p ^= 0x100;
 
-                var hi_bit_set = (a & 0x80); //keep p 8 bit
+                var hiBitSet = (a & 0x80); //keep p 8 bit
                 a <<= 1;
                 if (a > 0x100) a ^= 0x100; //keep a 8 bit
-                if (hi_bit_set == 0x80)
+                if (hiBitSet == 0x80)
                     a ^= 0x1b;
                 if (a > 0x100) a ^= 0x100; //keep a 8 bit
                 b >>= 1;
@@ -280,7 +190,7 @@ namespace VFSBase.Persistence.Coding
          */
         private byte[] ExpandKey()
         {
-            var expandedKeySize = (16 * (Rounds() + 1));
+            var expandedKeySize = (16 * (Rounds + 1));
 
             /* current expanded keySize, in bytes */
             var size = _key.Length;
@@ -309,7 +219,7 @@ namespace VFSBase.Persistence.Coding
                 if (currentSize % size == 0) Core(t, rconIteration++);
 
                 /* For 256-bit keys, we add an extra sbox to the calculation */
-                if (size == _keySize_256 && ((currentSize % size) == 16))
+                if (size == KeySize256 && ((currentSize % size) == 16))
                     for (var l = 0; l < 4; l++)
                         t[l] = (byte)Aes.Constants.Sbox[t[l]];
 
@@ -345,6 +255,34 @@ namespace VFSBase.Persistence.Coding
             word[3] = c;
         }
 
+        private void EncryptBlocks(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
+        {
+            var ciphertext = new byte[inputCount];
+            var input = new byte[inputCount];
+            Array.Copy(inputBuffer, inputOffset, input, 0, inputCount);
+
+            var outIndex = outputOffset;
+
+            for (var j = 0; j < inputCount / 16; j++)
+            {
+                var start = j * 16;
+                var end = start + 16;
+                if (end > inputCount) end = inputCount;
+
+                var paddedInput = getPaddedBlock(inputBuffer, start, end);
+
+                for (var i = 0; i < 16; i++)
+                    input[i] = (byte)(paddedInput[i] ^ (_firstRound ? _initializationVector[i] : ciphertext[i]));
+
+                _firstRound = false;
+                ciphertext = EncryptBlock(input);
+
+                // always 16 bytes because of the padding for CBC
+                for (var k = 0; k < 16; k++)
+                    outputBuffer[outIndex++] = ciphertext[k];
+            }
+        }
+
         private void DecryptBlocks(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
             var byteArray = new byte[inputCount];
@@ -363,27 +301,51 @@ namespace VFSBase.Persistence.Coding
 
                 // Mode of operation: CBC
 
-                byte[] output = decryptBlock(ciphertext);
+                var output = decryptBlock(ciphertext);
                 for (var i = 0; i < 16; i++)
                     byteArray[i] = (byte)((_firstRound ? _initializationVector[i] : input[i]) ^ output[i]);
 
                 _firstRound = false;
 
-                if (inputCount < end)
-                    for (var k = 0; k < inputCount - start; k++)
-                        outputBuffer[outIndex++] = byteArray[k];
-                else
-                    for (var k = 0; k < end - start; k++)
+                var times = inputCount < end ? inputCount - start : end - start;
+                    for (var k = 0; k < times; k++)
                         outputBuffer[outIndex++] = byteArray[k];
                 input = ciphertext;
             }
+        }
+
+        private byte[] EncryptBlock(byte[] input)
+        {
+            var output = new byte[16];
+            var block = new byte[16]; /* the 128 bit block to encode */
+
+            /* Set the block values, for the block:
+             * a0,0 a0,1 a0,2 a0,3
+             * a1,0 a1,1 a1,2 a1,3
+             * a2,0 a2,1 a2,2 a2,3
+             * a3,0 a3,1 a3,2 a3,3
+             * the mapping order is a0,0 a1,0 a2,0 a3,0 a0,1 a1,1 ... a2,3 a3,3
+             */
+            for (var i = 0; i < 4; i++) /* iterate over the columns */
+                for (var j = 0; j < 4; j++) /* iterate over the rows */
+                    block[(i + (j * 4))] = input[(i * 4) + j];
+
+            /* expand the key into an 240 bytes key */
+            var expandedKey = ExpandKey(); /* the expanded key */
+
+            /* encrypt the block using the expandedKey */
+            Main(block, expandedKey, Rounds);
+            for (var k = 0; k < 4; k++) /* unmap the block again into the output */
+                for (var l = 0; l < 4; l++) /* iterate over the rows */
+                    output[(k * 4) + l] = block[(k + (l * 4))];
+            return output;
         }
 
         private byte[] decryptBlock(byte[] input)
         {
             var output = new byte[input.Length];
             var block = new byte[input.Length]; /* the 128 bit block to decode */
-            var nbrRounds = Rounds();
+            var nbrRounds = Rounds;
             /* Set the block values, for the block:
              * a0,0 a0,1 a0,2 a0,3
              * a1,0 a1,1 a1,2 a1,3
@@ -447,8 +409,8 @@ namespace VFSBase.Persistence.Coding
             return outputBuffer;
         }
 
-        public int InputBlockSize { get { return 1024; } }
-        public int OutputBlockSize { get { return 1024; } }
+        public int InputBlockSize { get { return 16; } }
+        public int OutputBlockSize { get { return 16; } }
         public bool CanTransformMultipleBlocks { get { return true; } }
         public bool CanReuseTransform { get { return true; } }
 

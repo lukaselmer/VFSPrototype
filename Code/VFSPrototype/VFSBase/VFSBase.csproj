@@ -58,7 +58,7 @@
     <Compile Include="Persistence\Coding\CryptoDirection.cs" />
     <Compile Include="Persistence\Coding\EncryptionOptions.cs" />
     <Compile Include="Persistence\Coding\NullStreamCodingStrategy.cs" />
-    <Compile Include="Persistence\Coding\SelfMadeAesCryptor.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeAes256Cryptor.cs" />
     <Compile Include="Persistence\Coding\SelfMadeCaesarCryptor.cs" />
     <Compile Include="Persistence\Coding\SelfMadeCryptoStream.cs" />
     <Compile Include="Persistence\Coding\SelfMadeCryptoStreamMode.cs" />

@@ -62,6 +62,8 @@ namespace VFSBaseTests.Coding
         private static void TestAlgorithm(IEncryptorFactory factory)
         {
             var configurations = new[] {
+                new TestConfig(32, 1),
+                new TestConfig(16, 15),
                 new TestConfig(3, 1),
                 new TestConfig(1000, 1),
                 new TestConfig(2000, 1),
@@ -98,7 +100,7 @@ namespace VFSBaseTests.Coding
                 ms.Seek(0, SeekOrigin.Begin);
 
                 var ss = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
-                var read = 0;
+                int read;
                 var pos = 0;
                 while ((read = ss.Read(result, pos, Math.Min(original.Length - pos, configuration.BufferSize))) > 0)
                 {
@@ -168,8 +170,8 @@ namespace VFSBaseTests.Coding
             {
             }
 
-            public ICryptoTransform Encryptor { get { return new SelfMadeAesCryptor(_options.Key, _options.InitializationVector, CryptoDirection.Encrypt); } }
-            public ICryptoTransform Decryptor { get { return new SelfMadeAesCryptor(_options.Key, _options.InitializationVector, CryptoDirection.Decrypt); } }
+            public ICryptoTransform Encryptor { get { return new SelfMadeAes256Cryptor(_options.Key, _options.InitializationVector, CryptoDirection.Encrypt); } }
+            public ICryptoTransform Decryptor { get { return new SelfMadeAes256Cryptor(_options.Key, _options.InitializationVector, CryptoDirection.Decrypt); } }
         }
 
         [TestMethod]
