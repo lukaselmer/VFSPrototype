@@ -302,7 +302,7 @@ namespace VFSBase.Persistence.Coding
 
                 // Mode of operation: CBC
 
-                var output = decryptBlock(ciphertext);
+                var output = DecryptBlock(ciphertext);
                 for (var i = 0; i < 16; i++)
                     byteArray[i] = (byte)((_firstRound ? _initializationVector[i] : _lastInput[i]) ^ output[i]);
 
@@ -342,11 +342,10 @@ namespace VFSBase.Persistence.Coding
             return output;
         }
 
-        private byte[] decryptBlock(byte[] input)
+        private byte[] DecryptBlock(byte[] input)
         {
             var output = new byte[input.Length];
             var block = new byte[input.Length]; /* the 128 bit block to decode */
-            var nbrRounds = Rounds;
             /* Set the block values, for the block:
              * a0,0 a0,1 a0,2 a0,3
              * a1,0 a1,1 a1,2 a1,3
@@ -362,7 +361,7 @@ namespace VFSBase.Persistence.Coding
             var expandedKey = ExpandKey();
 
             /* decrypt the block using the expandedKey */
-            InvMain(block, expandedKey, nbrRounds);
+            InvMain(block, expandedKey, Rounds);
             for (var k = 0; k < 4; k++) /* unmap the block again into the output */
                 for (var l = 0; l < 4; l++) /* iterate over the rows */
                     output[(k * 4) + l] = block[(k + (l * 4))];

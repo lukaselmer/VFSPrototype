@@ -64,6 +64,7 @@ namespace VFSBaseTests.Coding
         private static void TestAlgorithm(IEncryptorFactory factory)
         {
             var configurations = new[] {
+                new TestConfig(1, 1, 1),
                 new TestConfig(32, 1, 1000),
                 new TestConfig(16, 15, 1000),
                 new TestConfig(3, 1, 1000),
@@ -103,7 +104,6 @@ namespace VFSBaseTests.Coding
                     s.Write(original, writePos, count);
                     writePos += count;
                 }
-                s.Write(original, 0, original.Length);
                 s.FlushFinalBlock();
 
                 ms.Seek(0, SeekOrigin.Begin);
@@ -115,8 +115,8 @@ namespace VFSBaseTests.Coding
                 {
                     pos += read;
                 }
-                //var bb = new byte[1024];
-                //Assert.AreEqual(0, ss.Read(bb, 0, bb.Length));
+                var bb = new byte[1024];
+                Assert.AreEqual(0, ss.Read(bb, 0, bb.Length));
             }
 
             for (var i = 0; i < original.Length; i++)
