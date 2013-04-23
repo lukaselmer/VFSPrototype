@@ -54,14 +54,13 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Implementation\BlockAllocation.cs" />
+    <Compile Include="Persistence\Coding\AesHelperMethods.cs" />
     <Compile Include="Persistence\Coding\Aes\Constants.cs" />
     <Compile Include="Persistence\Coding\CryptoDirection.cs" />
     <Compile Include="Persistence\Coding\EncryptionOptions.cs" />
     <Compile Include="Persistence\Coding\NullStreamCodingStrategy.cs" />
-    <Compile Include="Persistence\Coding\SelfMadeAesCryptor.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeAes256Cryptor.cs" />
     <Compile Include="Persistence\Coding\SelfMadeCaesarCryptor.cs" />
-    <Compile Include="Persistence\Coding\SelfMadeCryptoStream.cs" />
-    <Compile Include="Persistence\Coding\SelfMadeCryptoStreamMode.cs" />
     <Compile Include="Persistence\Coding\SelfMadeSimpleCryptor.cs" />
     <Compile Include="Persistence\Coding\SelfMadeStreamEncryptionStrategy.cs" />
     <Compile Include="Persistence\Coding\StreamCompressionEncryptionCodingStrategy.cs" />
