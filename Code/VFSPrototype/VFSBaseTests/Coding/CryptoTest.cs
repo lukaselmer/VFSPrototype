@@ -114,10 +114,15 @@ namespace VFSBaseTests.Coding
 
         private static EncryptionOptions GetEncryptionOptions()
         {
-            using (var r = Rijndael.Create())
-            {
-                return new EncryptionOptions(r.Key, r.IV);
-            }
+            var key = new byte[32];
+            var iv = new byte[16];
+
+            var r = new Random(2);
+
+            r.NextBytes(key);
+            r.NextBytes(iv);
+
+            return new EncryptionOptions(key, iv);
         }
 
         [TestMethod]
