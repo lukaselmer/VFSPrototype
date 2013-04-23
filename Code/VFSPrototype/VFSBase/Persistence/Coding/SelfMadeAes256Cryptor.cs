@@ -18,6 +18,7 @@ namespace VFSBase.Persistence.Coding
         private readonly CryptoDirection _cryptoDirection;
 
         private bool _firstRound = true;
+        private byte[] _lastInput;
 
         private const int KeySize256 = 32; // AES-256
         private const int Rounds = 14; // AES-256
@@ -303,14 +304,14 @@ namespace VFSBase.Persistence.Coding
 
                 var output = decryptBlock(ciphertext);
                 for (var i = 0; i < 16; i++)
-                    byteArray[i] = (byte)((_firstRound ? _initializationVector[i] : input[i]) ^ output[i]);
+                    byteArray[i] = (byte)((_firstRound ? _initializationVector[i] : _lastInput[i]) ^ output[i]);
 
                 _firstRound = false;
 
                 var times = inputCount < end ? inputCount - start : end - start;
-                    for (var k = 0; k < times; k++)
-                        outputBuffer[outIndex++] = byteArray[k];
-                input = ciphertext;
+                for (var k = 0; k < times; k++)
+                    outputBuffer[outIndex++] = byteArray[k];
+                _lastInput = ciphertext;
             }
         }
 
