@@ -17,8 +17,8 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
 
         private bool _firstRound = true;
         private byte[] _lastInput;
-        private byte[] _lastCipherBlock;
-        private byte[] _expandedKey;
+        private readonly byte[] _lastCipherBlock;
+        private readonly byte[] _expandedKey;
 
         private const int KeySize256 = 32; // AES-256
         private const int Rounds = 14; // AES-256
@@ -33,7 +33,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
 
             _lastCipherBlock = new byte[16];
 
-            InitExpandedKey();
+            _expandedKey = InitExpandedKey();
         }
 
         /* Rijndael's key expansion
@@ -42,7 +42,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
          * expandedKey is a pointer to an char array of large enough size
          * key is a pointer to a non-expanded key
          */
-        private void InitExpandedKey()
+        private byte[] InitExpandedKey()
         {
             const int expandedKeySize = (16 * (Rounds + 1));
 
@@ -52,20 +52,20 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             var rconIteration = 1;
             var t = new byte[4]; // temporary 4-byte variable
 
-            _expandedKey = new byte[expandedKeySize];
+            var expandedKey = new byte[expandedKeySize];
             for (var i = 0; i < expandedKeySize; i++)
-                _expandedKey[i] = 0;
+                expandedKey[i] = 0;
 
             /* set the 16,24,32 bytes of the expanded key to the input key */
             for (var j = 0; j < size; j++)
-                _expandedKey[j] = _key[j];
+                expandedKey[j] = _key[j];
             currentSize += size;
 
             while (currentSize < expandedKeySize)
             {
                 /* assign the previous 4 bytes to the temporary value t */
                 for (var k = 0; k < 4; k++)
-                    t[k] = _expandedKey[(currentSize - 4) + k];
+                    t[k] = expandedKey[(currentSize - 4) + k];
 
                 /* every 16,24,32 bytes we apply the core schedule to t
                  * and increment rconIteration afterwards
@@ -82,10 +82,12 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
                  */
                 for (var m = 0; m < 4; m++)
                 {
-                    _expandedKey[currentSize] = (byte)(_expandedKey[currentSize - size] ^ t[m]);
+                    expandedKey[currentSize] = (byte)(expandedKey[currentSize - size] ^ t[m]);
                     currentSize++;
                 }
             }
+
+            return expandedKey;
         }
 
         public int TransformBlock(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
