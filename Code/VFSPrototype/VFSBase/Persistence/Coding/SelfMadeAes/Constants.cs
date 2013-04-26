@@ -1,6 +1,5 @@
 ﻿namespace VFSBase.Persistence.Coding.SelfMadeAes
 {
-
     /// <summary>
     /// AES implementation. Algorithms taken from paper [FIPS PUB 197]:
     /// http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
@@ -55,8 +54,6 @@
             0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
         };
 
-
-
         /// <summary>
         /// The round constant word array, Rcon.
         /// Rcon[i] = 2^(i-1) mod x^8 + x^4 + x^3 + x + 1
@@ -108,7 +105,19 @@
         /// </summary>
         internal static readonly byte[] GaloisMultInv = new byte[] { 14, 9, 13, 11 };
 
+        /// <summary>
+        /// The key size for AES-256
+        /// </summary>
         internal const int KeySize256 = 32; // AES-256
+
+        /// <summary>
+        /// The amount of rounds for AES-256
+        /// </summary>
         internal const int Rounds = 14; // AES-256
+
+        /// <summary>
+        /// The block size for AES
+        /// </summary>
+        internal const int BlockSize = 16;
     }
 }

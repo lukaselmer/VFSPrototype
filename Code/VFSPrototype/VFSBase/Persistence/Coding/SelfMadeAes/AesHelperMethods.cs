@@ -13,16 +13,45 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
     /// </summary>
     internal static class AesHelperMethods
     {
+        /// <summary>
+        /// The main AES method encrypt, see [FIPS PUB 197] figure 5
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="expandedKey">The expanded key.</param>
+        /// <param name="nbrRounds">The NBR rounds.</param>
         public static void AesMain(byte[] state, byte[] expandedKey, int nbrRounds)
         {
-            AddRoundKey(state, CreateRoundKey(expandedKey, 0));
+            var roundKey = new byte[16];
+            AddRoundKey(state, InitRoundKey(expandedKey, 0, roundKey));
             for (var i = 1; i < nbrRounds; i++)
-                AesRound(state, CreateRoundKey(expandedKey, 16 * i));
+                AesRound(state, InitRoundKey(expandedKey, 16 * i, roundKey));
             SubBytes(state, false);
             ShiftRows(state, false);
-            AddRoundKey(state, CreateRoundKey(expandedKey, 16 * nbrRounds));
+            AddRoundKey(state, InitRoundKey(expandedKey, 16 * nbrRounds, roundKey));
         }
 
+        /// <summary>
+        /// The main AES method decrypt, see [FIPS PUB 197] figure 12
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="expandedKey">The expanded key.</param>
+        /// <param name="nbrRounds">The NBR rounds.</param>
+        public static void AesMainInv(byte[] state, byte[] expandedKey, int nbrRounds)
+        {
+            var roundKey = new byte[16];
+            AddRoundKey(state, InitRoundKey(expandedKey, 16 * nbrRounds, roundKey));
+            for (var i = nbrRounds - 1; i > 0; i--)
+                AesRoundInv(state, InitRoundKey(expandedKey, 16 * i, roundKey));
+            ShiftRows(state, true);
+            SubBytes(state, true);
+            AddRoundKey(state, InitRoundKey(expandedKey, 0, roundKey));
+        }
+
+        /// <summary>
+        /// AES round, see [FIPS PUB 197] figure 5
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="roundKey">The round key.</param>
         private static void AesRound(byte[] state, byte[] roundKey)
         {
             SubBytes(state, false);
@@ -31,6 +60,24 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             AddRoundKey(state, roundKey);
         }
 
+        /// <summary>
+        /// Inverted AES round, see [FIPS PUB 197] figure 12
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="roundKey">The round key.</param>
+        private static void AesRoundInv(byte[] state, byte[] roundKey)
+        {
+            ShiftRows(state, true);
+            SubBytes(state, true);
+            AddRoundKey(state, roundKey);
+            MixColumns(state, true);
+        }
+
+        /// <summary>
+        /// Mixes the columns, see [FIPS PUB 197] 5.1.3
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="isInv">if set to <c>true</c> [is inv].</param>
         private static void MixColumns(byte[] state, bool isInv)
         {
             var column = new byte[16];
@@ -49,7 +96,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         }
 
         /// <summary>
-        /// Mixes the column. See paper 5.1.3.
+        /// Mixes the column. See [FIPS PUB 197] 5.1.3.
         /// </summary>
         /// <param name="column">The column.</param>
         /// <param name="isInv">if set to <c>true</c> [is inv].</param>
@@ -79,33 +126,53 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
                                GaloisMultiplication(cpy[0], mult[3]));
         }
 
+        /// <summary>
+        /// Galois multimplication in GF(2^8), see [FIPS PUB 197] 4.2, especially 4.2.1
+        /// </summary>
+        /// <param name="a">A.</param>
+        /// <param name="b">The b.</param>
+        /// <returns></returns>
         private static int GaloisMultiplication(int a, int b)
         {
-            var p = 0;
-            for (var counter = 0; counter < 8; counter++)
+            var ret = 0;
+            const int max = 0x100;
+
+            // Caluculate b_i * x^(i+1) mod m(x) for 0..8
+            // m(x) = x^8 + x^4 + x^3 + x + 1, see [FIPS PUB 197] equation 4.1
+            for (var i = 0; i < 8; i++)
             {
-                if ((b & 1) == 1) p ^= a;
-
-                if (p > 0x100) p ^= 0x100;
-
-                var hiBitSet = (a & 0x80); //keep p 8 bit
+                if ((b & 1) == 1) ret ^= a;
+                if (ret > max) ret ^= max;
+                var hiBitSet = (a & 0x80);
                 a <<= 1;
-                if (a > 0x100) a ^= 0x100; //keep a 8 bit
-                if (hiBitSet == 0x80)
-                    a ^= 0x1b;
-                if (a > 0x100) a ^= 0x100; //keep a 8 bit
+                if (a > max) a ^= max;
+                // "Multiplication can be implemented as left shift and a subsequent conditional bitwise XOR with {1b}"
+                if (hiBitSet == 0x80) a ^= 0x1b;
+                if (a > max) a ^= max;
                 b >>= 1;
-                if (b > 0x100) b ^= 0x100; //keep b 8 bit
+                if (b > max) b ^= max;
             }
-            return p;
+            return ret;
         }
 
+        /// <summary>
+        /// Shifts the rows.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="isInv">if set to <c>true</c> [is inv].</param>
         private static void ShiftRows(byte[] state, bool isInv)
         {
             for (var i = 0; i < 4; i++)
                 ShiftRow(state, i * 4, i, isInv);
         }
 
+        /// <summary>
+        /// Shifts the row, see [FIPS PUB 197] 5.1.2
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="statePointer">The state pointer.</param>
+        /// <param name="nbr">The NBR.</param>
+        /// <param name="isInv">if set to <c>true</c> [is inv].</param>
         private static void ShiftRow(byte[] state, int statePointer, int nbr, bool isInv)
         {
             for (var i = 0; i < nbr; i++)
@@ -127,40 +194,62 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             }
         }
 
+        /// <summary>
+        /// Subs the bytes, see [FIPS PUB 197] 5.1.1.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="isInv">if set to <c>true</c> [is inv].</param>
         private static void SubBytes(byte[] state, bool isInv)
         {
             for (var i = 0; i < 16; i++)
                 state[i] = (byte)(isInv ? Constants.InvertedSbox[state[i]] : Constants.Sbox[state[i]]);
         }
 
+        /// <summary>
+        /// Adds the round key, see [FIPS PUB 197] 5.1.4.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="roundKey">The round key.</param>
         private static void AddRoundKey(byte[] state, byte[] roundKey)
         {
             for (var i = 0; i < 16; i++)
                 state[i] = (byte)(state[i] ^ roundKey[i]);
         }
 
-        private static byte[] CreateRoundKey(byte[] expandedKey, int roundKeyPointer)
+        /// <summary>
+        /// Initializes the round key, see [FIPS PUB 197] 5.1.4.
+        /// </summary>
+        /// <param name="expandedKey">The expanded key.</param>
+        /// <param name="roundKeyPointer">The round key pointer.</param>
+        /// <param name="roundKey">The round key.</param>
+        /// <returns></returns>
+        private static byte[] InitRoundKey(byte[] expandedKey, int roundKeyPointer, byte[] roundKey)
         {
-            var roundKey = new byte[16];
             for (var i = 0; i < 4; i++)
                 for (var j = 0; j < 4; j++)
                     roundKey[j * 4 + i] = expandedKey[roundKeyPointer + i * 4 + j];
             return roundKey;
         }
 
-        public static void Core(byte[] word, int iteration)
+        /// <summary>
+        /// The key schedule
+        /// </summary>
+        /// <param name="word">The word.</param>
+        /// <param name="iteration">The iteration.</param>
+        public static void KeySchedule(byte[] word, int iteration)
         {
-            // Key Schedule Core
-            /* rotate the 32-bit word 8 bits to the left */
             Rotate(word);
-            /* apply S-Box substitution on all 4 parts of the 32-bit word */
+            // Use Sbox to substitute the four parts of the 32bit word
             for (var i = 0; i < 4; ++i)
                 word[i] = (byte)Constants.Sbox[word[i]];
-            /* XOR the output of the rcon operation with i to the first part (leftmost) only */
             word[0] = (byte)(word[0] ^ Constants.Rcon[iteration]);
 
         }
 
+        /// <summary>
+        /// Rotates the specified word.
+        /// </summary>
+        /// <param name="word">The word.</param>
         private static void Rotate(byte[] word)
         {
             var c = word[0];
@@ -168,24 +257,13 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             word[3] = c;
         }
 
-        public static void AesMainInv(byte[] state, byte[] expandedKey, int nbrRounds)
-        {
-            AddRoundKey(state, CreateRoundKey(expandedKey, 16 * nbrRounds));
-            for (var i = nbrRounds - 1; i > 0; i--)
-                AesRoundInv(state, CreateRoundKey(expandedKey, 16 * i));
-            ShiftRows(state, true);
-            SubBytes(state, true);
-            AddRoundKey(state, CreateRoundKey(expandedKey, 0));
-        }
-
-        private static void AesRoundInv(byte[] state, byte[] roundKey)
-        {
-            ShiftRows(state, true);
-            SubBytes(state, true);
-            AddRoundKey(state, roundKey);
-            MixColumns(state, true);
-        }
-
+        /// <summary>
+        /// Paddes the block.
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="start">The start.</param>
+        /// <param name="end">The end.</param>
+        /// <returns></returns>
         public static byte[] PaddedBlock(byte[] input, int start, int end)
         {
             if (end - start > 16) end = start + 16;
@@ -211,43 +289,32 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         {
             const int expandedKeySize = (16 * (Constants.Rounds + 1));
 
-            /* current expanded keySize, in bytes */
-            var size = key.Length;
             var currentSize = 0;
             var rconIteration = 1;
-            var t = new byte[4]; // temporary 4-byte variable
+            var t = new byte[4];
 
             var expandedKey = new byte[expandedKeySize];
             for (var i = 0; i < expandedKeySize; i++)
                 expandedKey[i] = 0;
 
-            /* set the 16,24,32 bytes of the expanded key to the input key */
-            for (var j = 0; j < size; j++)
+            for (var j = 0; j < Constants.KeySize256; j++)
                 expandedKey[j] = key[j];
-            currentSize += size;
+            currentSize += Constants.KeySize256;
 
             while (currentSize < expandedKeySize)
             {
-                /* assign the previous 4 bytes to the temporary value t */
                 for (var k = 0; k < 4; k++)
                     t[k] = expandedKey[(currentSize - 4) + k];
 
-                /* every 16,24,32 bytes we apply the core schedule to t
-                 * and increment rconIteration afterwards
-                 */
-                if (currentSize % size == 0) Core(t, rconIteration++);
+                if (currentSize % Constants.KeySize256 == 0) KeySchedule(t, rconIteration++);
 
-                /* For 256-bit keys, we add an extra sbox to the calculation */
-                if (size == Constants.KeySize256 && ((currentSize % size) == 16))
+                if (currentSize % Constants.KeySize256 == 16)
                     for (var l = 0; l < 4; l++)
                         t[l] = (byte)Constants.Sbox[t[l]];
 
-                /* We XOR t with the four-byte block 16,24,32 bytes before the new expanded key.
-                 * This becomes the next four bytes in the expanded key.
-                 */
                 for (var m = 0; m < 4; m++)
                 {
-                    expandedKey[currentSize] = (byte)(expandedKey[currentSize - size] ^ t[m]);
+                    expandedKey[currentSize] = (byte)(expandedKey[currentSize - Constants.KeySize256] ^ t[m]);
                     currentSize++;
                 }
             }

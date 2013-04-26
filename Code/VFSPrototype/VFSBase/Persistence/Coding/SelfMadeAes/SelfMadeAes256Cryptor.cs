@@ -11,6 +11,9 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
     /// Implements AES-256 and uses CBC as mode.
     /// 
     /// Cryptor, implements the ICryptoTransform interface.
+    /// 
+    /// This class could be highly optimized (probably best written in C) 
+    /// and is provided already by the .NET framework
     /// </summary>
     internal class SelfMadeAes256Cryptor : ICryptoTransform
     {
@@ -18,19 +21,43 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         private readonly byte[] _initializationVector;
         private readonly CryptoDirection _cryptoDirection;
 
+        /// <summary>
+        /// Indicates whether the first round has run already
+        /// </summary>
         private bool _firstRound = true;
-        private byte[] _lastInput;
-        private readonly byte[] _lastCipherBlock;
+
+        /// <summary>
+        /// The expanded key
+        /// </summary>
         private readonly byte[] _expandedKey;
+
+        /// <summary>
+        /// The last input
+        /// 
+        /// Needed for decryption
+        /// </summary>
+        private byte[] _lastInput;
+
+        /// <summary>
+        /// The last cipher block
+        /// 
+        /// Needed for encryption
+        /// </summary>
+        private readonly byte[] _lastCipherBlock = new byte[Constants.BlockSize];
 
         /// <summary>
         /// The current block
         /// 
         /// Initialized once here, so it does not have to be created every time a block is encrypted.
         /// </summary>
-        private readonly byte[] _currentBlock = new byte[16];
+        private readonly byte[] _currentBlock = new byte[Constants.BlockSize];
 
-        private byte[] _currentDecryptBlock = new byte[16];
+        /// <summary>
+        /// The current decrypt block
+        /// 
+        /// Initialized once here, so it does not have to be created every time a block is encrypted.
+        /// </summary>
+        private readonly byte[] _currentDecryptBlock = new byte[Constants.BlockSize];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SelfMadeAes256Cryptor"/> class.
@@ -46,8 +73,6 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             _key = key;
             _initializationVector = initializationVector;
             _cryptoDirection = cryptoDirection;
-
-            _lastCipherBlock = new byte[16];
 
             _expandedKey = AesHelperMethods.CalculateExpandedKey(_key);
         }
@@ -108,18 +133,19 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
 
             var outIndex = outputOffset;
 
-            for (var j = 0; j < inputCount / 16; j++)
+            for (var j = 0; j < inputCount / Constants.BlockSize; j++)
             {
-                var start = j * 16;
-                var end = start + 16;
+                var start = j * Constants.BlockSize;
+                var end = start + Constants.BlockSize;
                 if (end > inputCount) end = inputCount;
 
                 var paddedInput = AesHelperMethods.PaddedBlock(inputBuffer, start, end);
 
-                for (var i = 0; i < 16; i++)
+                for (var i = 0; i < Constants.BlockSize; i++)
                     input[i] = (byte)(paddedInput[i] ^ (_firstRound ? _initializationVector[i] : _lastCipherBlock[i]));
 
                 _firstRound = false;
+
                 EncryptBlock(input, _lastCipherBlock);
 
                 // CBC padding => _lastCipherBlock is always full
@@ -138,16 +164,15 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         /// <param name="outputOffset">The output offset.</param>
         private void DecryptBlocks(byte[] inputBuffer, int inputOffset, int inputCount, byte[] outputBuffer, int outputOffset)
         {
-            var byteArray = new byte[16];
             var input = new byte[inputCount];
             Array.Copy(inputBuffer, inputOffset, input, 0, inputCount);
 
             var outIndex = outputOffset;
 
-            for (var j = 0; j < inputCount / 16; j++)
+            for (var j = 0; j < inputCount / Constants.BlockSize; j++)
             {
-                var start = (j * 16);
-                var end = start + 16;
+                var start = (j * Constants.BlockSize);
+                var end = start + Constants.BlockSize;
                 if (end > inputCount) end = inputCount;
 
                 var ciphertext = AesHelperMethods.PaddedBlock(inputBuffer, start, end);
@@ -198,20 +223,53 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             AesHelperMethods.TransformFromMatrix(_currentBlock, output);
         }
 
-
+        /// <summary>
+        /// Transforms the specified region of the specified byte array.
+        /// </summary>
+        /// <param name="inputBuffer">The input for which to compute the transform.</param>
+        /// <param name="inputOffset">The offset into the byte array from which to begin using data.</param>
+        /// <param name="inputCount">The number of bytes in the byte array to use as data.</param>
+        /// <returns>
+        /// The computed transform.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">inputBuffer</exception>
         public byte[] TransformFinalBlock(byte[] inputBuffer, int inputOffset, int inputCount)
         {
+            if (inputBuffer == null) throw new ArgumentNullException("inputBuffer");
+
             var outputBuffer = new byte[inputCount];
             Array.Copy(inputBuffer, inputOffset, outputBuffer, 0, inputCount);
             TransformBlock(inputBuffer, inputOffset, inputCount, outputBuffer, 0);
             return outputBuffer;
         }
 
-        public int InputBlockSize { get { return 16; } }
-        public int OutputBlockSize { get { return 16; } }
-        public bool CanTransformMultipleBlocks { get { return true; } }
-        public bool CanReuseTransform { get { return true; } }
+        /// <summary>
+        /// Gets the input block size.
+        /// </summary>
+        /// <returns>The size of the input data blocks in bytes.</returns>
+        public int InputBlockSize { get { return Constants.BlockSize; } }
 
+        /// <summary>
+        /// Gets the output block size.
+        /// </summary>
+        /// <returns>The size of the output data blocks in bytes.</returns>
+        public int OutputBlockSize { get { return Constants.BlockSize; } }
+
+        /// <summary>
+        /// Gets a value indicating whether multiple blocks can be transformed.
+        /// </summary>
+        /// <returns>true if multiple blocks can be transformed; otherwise, false.</returns>
+        public bool CanTransformMultipleBlocks { get { return true; } }
+
+        /// <summary>
+        /// Gets a value indicating whether the current transform can be reused.
+        /// </summary>
+        /// <returns>true if the current transform can be reused; otherwise, false.</returns>
+        public bool CanReuseTransform { get { return false; } }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose() { }
     }
 }
