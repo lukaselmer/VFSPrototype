@@ -31,6 +31,8 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             _initializationVector = initializationVector;
             _cryptoDirection = cryptoDirection;
 
+            _lastCipherBlock = new byte[16];
+
             InitExpandedKey();
         }
 
@@ -126,11 +128,11 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
                     input[i] = (byte)(paddedInput[i] ^ (_firstRound ? _initializationVector[i] : _lastCipherBlock[i]));
 
                 _firstRound = false;
-                _lastCipherBlock = EncryptBlock(input);
+                EncryptBlock(input, _lastCipherBlock);
 
-                // always 16 bytes because of the padding for CBC
-                for (var k = 0; k < 16; k++)
-                    outputBuffer[outIndex++] = _lastCipherBlock[k];
+                // CBC padding => _lastCipherBlock is always full
+                Array.Copy(_lastCipherBlock, 0, outputBuffer, outIndex, _lastCipherBlock.Length);
+                outIndex += _lastCipherBlock.Length;
             }
         }
 
@@ -165,9 +167,8 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             }
         }
 
-        private byte[] EncryptBlock(byte[] input)
+        private void EncryptBlock(byte[] input, byte[] output)
         {
-            var output = new byte[16];
             var block = new byte[16]; /* the 128 bit block to encode */
 
             /* Set the block values, for the block:
@@ -189,7 +190,6 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             for (var k = 0; k < 4; k++) /* unmap the block again into the output */
                 for (var l = 0; l < 4; l++) /* iterate over the rows */
                     output[(k * 4) + l] = block[(k + (l * 4))];
-            return output;
         }
 
         private byte[] DecryptBlock(byte[] input)
