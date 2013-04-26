@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace VFSBase.Persistence.Coding
+namespace VFSBase.Persistence.Coding.General
 {
     /// <summary>
     /// Class NullStreamCodingStrategy

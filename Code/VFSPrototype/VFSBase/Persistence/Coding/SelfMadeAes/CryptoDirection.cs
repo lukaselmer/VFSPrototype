@@ -1,4 +1,4 @@
-namespace VFSBase.Persistence.Coding
+namespace VFSBase.Persistence.Coding.SelfMadeAes
 {
     internal enum CryptoDirection
     {

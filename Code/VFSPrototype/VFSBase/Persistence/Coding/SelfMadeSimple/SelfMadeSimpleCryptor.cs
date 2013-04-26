@@ -1,16 +1,19 @@
 using System;
 using System.Security.Cryptography;
+using VFSBase.Persistence.Coding.SelfMadeAes;
 
-namespace VFSBase.Persistence.Coding
+namespace VFSBase.Persistence.Coding.SelfMadeSimple
 {
-    internal class SelfMadeCaesarCryptor : ICryptoTransform
+    internal class SelfMadeSimpleCryptor : ICryptoTransform
     {
-        private readonly int _key;
+        private readonly byte[] _key;
+        private readonly byte[] _initializationVector;
         private readonly CryptoDirection _cryptoDirection;
 
-        public SelfMadeCaesarCryptor(int key, CryptoDirection cryptoDirection)
+        public SelfMadeSimpleCryptor(byte[] key, byte[] initializationVector, CryptoDirection cryptoDirection)
         {
             _key = key;
+            _initializationVector = initializationVector;
             _cryptoDirection = cryptoDirection;
         }
 
@@ -24,14 +27,14 @@ namespace VFSBase.Persistence.Coding
             {
                 for (var i = 0; i < outputBuffer.Length; i++)
                 {
-                    outputBuffer[i] = (byte)((outputBuffer[i] + _key));
+                    outputBuffer[i] = (byte)(outputBuffer[i] ^ _key[i % _key.Length] ^ _initializationVector[i % _initializationVector.Length] ^ i);
                 }
             }
             else
             {
                 for (var i = 0; i < outputBuffer.Length; i++)
                 {
-                    outputBuffer[i] = (byte)((outputBuffer[i] - _key));
+                    outputBuffer[i] = (byte)(outputBuffer[i] ^ _key[i % _key.Length] ^ _initializationVector[i % _initializationVector.Length] ^ i);
                 }
             }
 

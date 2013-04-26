@@ -1,7 +1,6 @@
 ﻿using System.IO;
-using VFSBase.Implementation;
 
-namespace VFSBase.Persistence.Coding
+namespace VFSBase.Persistence.Coding.General
 {
     public class StreamCompressionEncryptionCodingStrategy : IStreamCodingStrategy
     {
