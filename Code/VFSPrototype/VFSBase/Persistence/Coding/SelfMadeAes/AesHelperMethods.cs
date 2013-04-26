@@ -2,6 +2,14 @@ using System;
 
 namespace VFSBase.Persistence.Coding.SelfMadeAes
 {
+    /// <summary>
+    /// AES implementation. Algorithms taken from paper [FIPS PUB 197]:
+    /// http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf
+    /// 
+    /// Implements AES-256 and uses CBC as mode.
+    /// 
+    /// Helper Methods
+    /// </summary>
     internal static class AesHelperMethods
     {
         public static void AesMain(byte[] state, byte[] expandedKey, int nbrRounds)
@@ -39,10 +47,15 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             }
         }
 
+        /// <summary>
+        /// Mixes the column. See paper 5.1.3.
+        /// </summary>
+        /// <param name="column">The column.</param>
+        /// <param name="isInv">if set to <c>true</c> [is inv].</param>
         private static void MixColumn(byte[] column, bool isInv)
         {
-            // galois multipication of 1 column of the 4x4 matrix
-            var mult = isInv ? new byte[] { 14, 9, 13, 11 } : new byte[] { 2, 1, 1, 3 };
+            // galois multipication of 1 column of the 4x4 matrix, GF(2^8)
+            var mult = isInv ? Constants.GaloisMultInv : Constants.GaloisMult;
 
             var cpy = new byte[4];
             for (var i = 0; i < 4; i++) cpy[i] = column[i];
@@ -116,7 +129,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         private static void SubBytes(byte[] state, bool isInv)
         {
             for (var i = 0; i < 16; i++)
-                state[i] = (byte)(isInv ? Constants.Rsbox[state[i]] : Constants.Sbox[state[i]]);
+                state[i] = (byte)(isInv ? Constants.InvertedSbox[state[i]] : Constants.Sbox[state[i]]);
         }
 
         private static void AddRoundKey(byte[] state, byte[] roundKey)
@@ -185,6 +198,60 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             while (block.Length < 16) block[i++] = cpad;
 
             return block;
+        }
+
+        /// <summary>
+        /// Calculates the expanded key for a given key.
+        /// Implements the key expansion alogrithm, see [FIPS PUB 197], figure 11.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        internal static byte[] CalculateExpandedKey(byte[] key)
+        {
+            const int expandedKeySize = (16 * (Constants.Rounds + 1));
+
+            /* current expanded keySize, in bytes */
+            var size = key.Length;
+            var currentSize = 0;
+            var rconIteration = 1;
+            var t = new byte[4]; // temporary 4-byte variable
+
+            var expandedKey = new byte[expandedKeySize];
+            for (var i = 0; i < expandedKeySize; i++)
+                expandedKey[i] = 0;
+
+            /* set the 16,24,32 bytes of the expanded key to the input key */
+            for (var j = 0; j < size; j++)
+                expandedKey[j] = key[j];
+            currentSize += size;
+
+            while (currentSize < expandedKeySize)
+            {
+                /* assign the previous 4 bytes to the temporary value t */
+                for (var k = 0; k < 4; k++)
+                    t[k] = expandedKey[(currentSize - 4) + k];
+
+                /* every 16,24,32 bytes we apply the core schedule to t
+                 * and increment rconIteration afterwards
+                 */
+                if (currentSize % size == 0) Core(t, rconIteration++);
+
+                /* For 256-bit keys, we add an extra sbox to the calculation */
+                if (size == Constants.KeySize256 && ((currentSize % size) == 16))
+                    for (var l = 0; l < 4; l++)
+                        t[l] = (byte)Constants.Sbox[t[l]];
+
+                /* We XOR t with the four-byte block 16,24,32 bytes before the new expanded key.
+                 * This becomes the next four bytes in the expanded key.
+                 */
+                for (var m = 0; m < 4; m++)
+                {
+                    expandedKey[currentSize] = (byte)(expandedKey[currentSize - size] ^ t[m]);
+                    currentSize++;
+                }
+            }
+
+            return expandedKey;
         }
     }
 }
