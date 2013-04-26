@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace VFSBase.Persistence.Coding.SelfMadeAes
 {
@@ -252,6 +253,43 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             }
 
             return expandedKey;
+        }
+
+        /// <summary>
+        /// Transforms a block to a matrix like this:
+        /// a0,0 a0,1 a0,2 a0,3
+        /// a1,0 a1,1 a1,2 a1,3
+        /// a2,0 a2,1 a2,2 a2,3
+        /// a3,0 a3,1 a3,2 a3,3
+        /// 
+        /// The output looks like this: a0,0 a1,0 a2,0 a3,0 a0,1 a1,1, ..., a1,3, a2,3 a3,3
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="output">The output.</param>
+        internal static void TransformToMatrix(byte[] input, byte[] output)
+        {
+            Debug.Assert(input.Length >= 16);
+            Debug.Assert(output.Length >= 16);
+
+            /* Set the block values, for the block:
+             * 
+             * the mapping order is 
+             */
+            for (var i = 0; i < 4; i++) /* iterate over the columns */
+                for (var j = 0; j < 4; j++) /* iterate over the rows */
+                    output[(i + (j * 4))] = input[(i * 4) + j];
+        }
+
+        /// <summary>
+        /// Inverse method of TransformToMatrix
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <param name="output">The output.</param>
+        internal static void TransformFromMatrix(byte[] input, byte[] output)
+        {
+            for (var i = 0; i < 4; i++)
+                for (var j = 0; j < 4; j++)
+                    output[(i * 4) + j] = input[(i + (j * 4))];
         }
     }
 }
