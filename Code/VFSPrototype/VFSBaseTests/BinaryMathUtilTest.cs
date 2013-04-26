@@ -9,75 +9,75 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestPower2()
         {
-            Assert.AreEqual(1, BinaryMathUtil.Power2(0));
-            Assert.AreEqual(2, BinaryMathUtil.Power2(1));
-            Assert.AreEqual(4, BinaryMathUtil.Power2(2));
-            Assert.AreEqual(8, BinaryMathUtil.Power2(3));
-            Assert.AreEqual(16, BinaryMathUtil.Power2(4));
-            Assert.AreEqual(32, BinaryMathUtil.Power2(5));
-            Assert.AreEqual(64, BinaryMathUtil.Power2(6));
-            Assert.AreEqual(1024, BinaryMathUtil.Power2(10));
-            Assert.AreEqual(1024 * 1024, BinaryMathUtil.Power2(20));
-            Assert.AreEqual(1024 * 1024 * 1024, BinaryMathUtil.Power2(30));
-            Assert.AreEqual(1024L * 1024L * 1024L * 1024L, BinaryMathUtil.Power2(40));
+            Assert.AreEqual(1, MathUtil.Power2(0));
+            Assert.AreEqual(2, MathUtil.Power2(1));
+            Assert.AreEqual(4, MathUtil.Power2(2));
+            Assert.AreEqual(8, MathUtil.Power2(3));
+            Assert.AreEqual(16, MathUtil.Power2(4));
+            Assert.AreEqual(32, MathUtil.Power2(5));
+            Assert.AreEqual(64, MathUtil.Power2(6));
+            Assert.AreEqual(1024, MathUtil.Power2(10));
+            Assert.AreEqual(1024 * 1024, MathUtil.Power2(20));
+            Assert.AreEqual(1024 * 1024 * 1024, MathUtil.Power2(30));
+            Assert.AreEqual(1024L * 1024L * 1024L * 1024L, MathUtil.Power2(40));
         }
 
         [TestMethod]
         public void TestPower()
         {
-            Assert.AreEqual(1, BinaryMathUtil.Power(2, 0));
-            Assert.AreEqual(2, BinaryMathUtil.Power(2, 1));
-            Assert.AreEqual(4, BinaryMathUtil.Power(2, 2));
-            Assert.AreEqual(8, BinaryMathUtil.Power(2, 3));
-            Assert.AreEqual(16, BinaryMathUtil.Power(2, 4));
-            Assert.AreEqual(32, BinaryMathUtil.Power(2, 5));
+            Assert.AreEqual(1, MathUtil.Power(2, 0));
+            Assert.AreEqual(2, MathUtil.Power(2, 1));
+            Assert.AreEqual(4, MathUtil.Power(2, 2));
+            Assert.AreEqual(8, MathUtil.Power(2, 3));
+            Assert.AreEqual(16, MathUtil.Power(2, 4));
+            Assert.AreEqual(32, MathUtil.Power(2, 5));
 
-            Assert.AreEqual(1, BinaryMathUtil.Power(3, 0));
-            Assert.AreEqual(3, BinaryMathUtil.Power(3, 1));
-            Assert.AreEqual(3 * 3, BinaryMathUtil.Power(3, 2));
-            Assert.AreEqual(3 * 3 * 3, BinaryMathUtil.Power(3, 3));
-            Assert.AreEqual(3 * 3 * 3 * 3, BinaryMathUtil.Power(3, 4));
-            Assert.AreEqual(3 * 3 * 3 * 3 * 3, BinaryMathUtil.Power(3, 5));
+            Assert.AreEqual(1, MathUtil.Power(3, 0));
+            Assert.AreEqual(3, MathUtil.Power(3, 1));
+            Assert.AreEqual(3 * 3, MathUtil.Power(3, 2));
+            Assert.AreEqual(3 * 3 * 3, MathUtil.Power(3, 3));
+            Assert.AreEqual(3 * 3 * 3 * 3, MathUtil.Power(3, 4));
+            Assert.AreEqual(3 * 3 * 3 * 3 * 3, MathUtil.Power(3, 5));
         }
 
         [TestMethod]
         public void TestKB()
         {
-            Assert.AreEqual(BinaryMathUtil.Power2(10), BinaryMathUtil.KB(1));
-            Assert.AreEqual(BinaryMathUtil.Power2(11), BinaryMathUtil.KB(2));
-            Assert.AreEqual(BinaryMathUtil.Power2(10) * 3, BinaryMathUtil.KB(3));
+            Assert.AreEqual(MathUtil.Power2(10), MathUtil.KB(1));
+            Assert.AreEqual(MathUtil.Power2(11), MathUtil.KB(2));
+            Assert.AreEqual(MathUtil.Power2(10) * 3, MathUtil.KB(3));
         }
 
         [TestMethod]
         public void TestMB()
         {
-            Assert.AreEqual(BinaryMathUtil.Power2(20), BinaryMathUtil.MB(1));
-            Assert.AreEqual(BinaryMathUtil.Power2(21), BinaryMathUtil.MB(2));
-            Assert.AreEqual(BinaryMathUtil.Power2(20) * 3, BinaryMathUtil.MB(3));
+            Assert.AreEqual(MathUtil.Power2(20), MathUtil.MB(1));
+            Assert.AreEqual(MathUtil.Power2(21), MathUtil.MB(2));
+            Assert.AreEqual(MathUtil.Power2(20) * 3, MathUtil.MB(3));
         }
 
         [TestMethod]
         public void TestGB()
         {
-            Assert.AreEqual(BinaryMathUtil.Power2(30), BinaryMathUtil.GB(1));
-            Assert.AreEqual(BinaryMathUtil.Power2(31), BinaryMathUtil.GB(2));
-            Assert.AreEqual(BinaryMathUtil.Power2(30) * 3, BinaryMathUtil.GB(3));
+            Assert.AreEqual(MathUtil.Power2(30), MathUtil.GB(1));
+            Assert.AreEqual(MathUtil.Power2(31), MathUtil.GB(2));
+            Assert.AreEqual(MathUtil.Power2(30) * 3, MathUtil.GB(3));
         }
 
         [TestMethod]
         public void TestMBAndKBEquality()
         {
-            Assert.AreEqual(BinaryMathUtil.KB(1) * BinaryMathUtil.KB(1), BinaryMathUtil.MB(1));
-            Assert.AreEqual(BinaryMathUtil.KB(5) * BinaryMathUtil.KB(1), BinaryMathUtil.MB(5));
-            Assert.AreEqual(BinaryMathUtil.KB(2) * BinaryMathUtil.KB(2), BinaryMathUtil.MB(4));
+            Assert.AreEqual(MathUtil.KB(1) * MathUtil.KB(1), MathUtil.MB(1));
+            Assert.AreEqual(MathUtil.KB(5) * MathUtil.KB(1), MathUtil.MB(5));
+            Assert.AreEqual(MathUtil.KB(2) * MathUtil.KB(2), MathUtil.MB(4));
         }
 
         [TestMethod]
         public void TestMbKbGbEquality()
         {
-            Assert.AreEqual(BinaryMathUtil.MB(1) * BinaryMathUtil.KB(1), BinaryMathUtil.GB(1));
-            Assert.AreEqual(BinaryMathUtil.MB(5) * BinaryMathUtil.KB(1), BinaryMathUtil.GB(5));
-            Assert.AreEqual(BinaryMathUtil.MB(2) * BinaryMathUtil.KB(2), BinaryMathUtil.GB(4));
+            Assert.AreEqual(MathUtil.MB(1) * MathUtil.KB(1), MathUtil.GB(1));
+            Assert.AreEqual(MathUtil.MB(5) * MathUtil.KB(1), MathUtil.GB(5));
+            Assert.AreEqual(MathUtil.MB(2) * MathUtil.KB(2), MathUtil.GB(4));
         }
     }
 }

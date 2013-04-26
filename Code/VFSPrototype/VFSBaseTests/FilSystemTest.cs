@@ -11,7 +11,7 @@ namespace VFSBaseTests
     public class FilSystemTest
     {
         private const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
-        private readonly long _defaultSize = BinaryMathUtil.MB(5);
+        private readonly long _defaultSize = MathUtil.MB(5);
 
         [TestCleanup]
         public void RemoveTestfile()

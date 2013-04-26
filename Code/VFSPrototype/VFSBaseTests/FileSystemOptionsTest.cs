@@ -65,14 +65,14 @@ namespace VFSBaseTests
             const long size = 1001L;
             const uint masterBlockSize = 30000U;
             var o = new FileSystemOptions("", 0) { DiskSize = size, MasterBlockSize = masterBlockSize };
-            o.BlockSize = (int) BinaryMathUtil.KB(4);
-            Assert.AreEqual(BinaryMathUtil.GB(1), o.MaximumFileSize);
-            o.BlockSize = (int)BinaryMathUtil.KB(8);
-            Assert.AreEqual(BinaryMathUtil.GB(16), o.MaximumFileSize);
-            o.BlockSize = (int)BinaryMathUtil.KB(16);
-            Assert.AreEqual(BinaryMathUtil.GB(256), o.MaximumFileSize);
-            o.BlockSize = (int)BinaryMathUtil.KB(32);
-            Assert.AreEqual(BinaryMathUtil.GB(4096), o.MaximumFileSize);
+            o.BlockSize = (int) MathUtil.KB(4);
+            Assert.AreEqual(MathUtil.GB(1), o.MaximumFileSize);
+            o.BlockSize = (int)MathUtil.KB(8);
+            Assert.AreEqual(MathUtil.GB(16), o.MaximumFileSize);
+            o.BlockSize = (int)MathUtil.KB(16);
+            Assert.AreEqual(MathUtil.GB(256), o.MaximumFileSize);
+            o.BlockSize = (int)MathUtil.KB(32);
+            Assert.AreEqual(MathUtil.GB(4096), o.MaximumFileSize);
         }
     }
 }
