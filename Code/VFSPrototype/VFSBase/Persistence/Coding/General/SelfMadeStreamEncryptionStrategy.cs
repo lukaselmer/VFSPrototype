@@ -1,8 +1,8 @@
-using System;
 using System.IO;
 using System.Security.Cryptography;
+using VFSBase.Persistence.Coding.SelfMadeAes;
 
-namespace VFSBase.Persistence.Coding
+namespace VFSBase.Persistence.Coding.General
 {
     internal class SelfMadeStreamEncryptionStrategy : IStreamCodingStrategy
     {

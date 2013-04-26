@@ -1,6 +1,6 @@
 using System;
 
-namespace VFSBase.Persistence.Coding
+namespace VFSBase.Persistence.Coding.SelfMadeAes
 {
     internal static class AesHelperMethods
     {
@@ -116,7 +116,7 @@ namespace VFSBase.Persistence.Coding
         private static void SubBytes(byte[] state, bool isInv)
         {
             for (var i = 0; i < 16; i++)
-                state[i] = (byte)(isInv ? Aes.Constants.Rsbox[state[i]] : Aes.Constants.Sbox[state[i]]);
+                state[i] = (byte)(isInv ? Constants.Rsbox[state[i]] : Constants.Sbox[state[i]]);
         }
 
         private static void AddRoundKey(byte[] state, byte[] roundKey)
@@ -141,9 +141,9 @@ namespace VFSBase.Persistence.Coding
             Rotate(word);
             /* apply S-Box substitution on all 4 parts of the 32-bit word */
             for (var i = 0; i < 4; ++i)
-                word[i] = (byte)Aes.Constants.Sbox[word[i]];
+                word[i] = (byte)Constants.Sbox[word[i]];
             /* XOR the output of the rcon operation with i to the first part (leftmost) only */
-            word[0] = (byte)(word[0] ^ Aes.Constants.Rcon[iteration]);
+            word[0] = (byte)(word[0] ^ Constants.Rcon[iteration]);
 
         }
 

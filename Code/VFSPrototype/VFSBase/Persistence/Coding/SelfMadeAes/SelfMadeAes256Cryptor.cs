@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
 
-namespace VFSBase.Persistence.Coding
+namespace VFSBase.Persistence.Coding.SelfMadeAes
 {
     /// <summary>
     /// AES implementation. Algorithms taken from:
@@ -75,7 +73,7 @@ namespace VFSBase.Persistence.Coding
                 /* For 256-bit keys, we add an extra sbox to the calculation */
                 if (size == KeySize256 && ((currentSize % size) == 16))
                     for (var l = 0; l < 4; l++)
-                        t[l] = (byte)Aes.Constants.Sbox[t[l]];
+                        t[l] = (byte)Constants.Sbox[t[l]];
 
                 /* We XOR t with the four-byte block 16,24,32 bytes before the new expanded key.
                  * This becomes the next four bytes in the expanded key.

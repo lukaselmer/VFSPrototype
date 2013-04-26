@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
+using VFSBase.Persistence.Coding.General;
 
-namespace VFSBase.Persistence.Coding
+namespace VFSBase.Persistence.Coding.MicrosoftCompression
 {
     public class MicrosoftStreamCompressionStrategy : IStreamCodingStrategy
     {

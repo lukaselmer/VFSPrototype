@@ -1,4 +1,4 @@
-﻿namespace VFSBase.Persistence.Coding
+﻿namespace VFSBase.Persistence.Coding.General
 {
     internal class EncryptionOptions
     {
