@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides some math utility methods on long values
     /// </summary>
-    internal static class BinaryMathUtil
+    internal static class MathUtil
     {
         /// <summary>
         /// Gigabyte helper.

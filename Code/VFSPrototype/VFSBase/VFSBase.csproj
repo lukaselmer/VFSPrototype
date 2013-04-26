@@ -77,7 +77,7 @@
     <Compile Include="Interfaces\IFileSystemOptions.cs" />
     <Compile Include="Implementation\PathParser.cs" />
     <Compile Include="Interfaces\IFileSystem.cs" />
-    <Compile Include="Persistence\BinaryMathUtil.cs" />
+    <Compile Include="Persistence\MathUtil.cs" />
     <Compile Include="Implementation\FileSystemOptions.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Interfaces\IFileSystemTextManipulator.cs" />
