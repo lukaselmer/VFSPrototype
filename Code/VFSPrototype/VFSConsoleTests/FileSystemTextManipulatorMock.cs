@@ -38,15 +38,15 @@ namespace VFSConsoleTests
         {
         }
 
-        public void Import(string source, string dest)
+        public void Import(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null, Action<int> totalToProcessChanged = null, Action<int> currentlyProcessedChanged = null)
         {
         }
 
-        public void Export(string source, string dest)
+        public void Export(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null, Action<int> totalToProcessChanged = null, Action<int> currentlyProcessedChanged = null)
         {
         }
 
-        public void Copy(string source, string dest)
+        public void Copy(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null)
         {
         }
 

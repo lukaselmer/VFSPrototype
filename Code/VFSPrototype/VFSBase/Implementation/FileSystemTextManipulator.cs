@@ -101,7 +101,7 @@ namespace VFSBase.Implementation
             return _fileSystem.Exists(parent, PathParser.GetNodeName(path));
         }
 
-        public void Import(string source, string dest)
+        public void Import(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null, Action<int> totalToProcessChanged = null, Action<int> currentlyProcessedChanged = null)
         {
             var node = CreateParentFolder(dest);
             _fileSystem.Import(source, node, PathParser.GetNodeName(dest));
@@ -113,12 +113,12 @@ namespace VFSBase.Implementation
             return FindParentFolder(dest);
         }
 
-        public void Export(string source, string dest)
+        public void Export(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null, Action<int> totalToProcessChanged = null, Action<int> currentlyProcessedChanged = null)
         {
             _fileSystem.Export(FindNode(source), dest);
         }
 
-        public void Copy(string source, string dest)
+        public void Copy(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null)
         {
             if (!Exists(source)) throw new VFSException(string.Format("Source {0} does not exist", source));
             if (Exists(dest)) throw new VFSException(string.Format("Destination {0} already exists", dest));
