@@ -15,7 +15,7 @@ namespace VFSBrowser.ViewModel
 {
     sealed class MainViewModel : AbstractViewModel, IDisposable
     {
-        private FileSystemTextManipulator _manipulator;
+        private IFileSystemTextManipulator _manipulator;
 
         private readonly ListItem _parent = new ListItem(null, "..", true);
         public ListItem Parent
@@ -335,7 +335,7 @@ namespace VFSBrowser.ViewModel
 
         private void OpenVfs(object parameter)
         {
-            var dlg = new Microsoft.Win32.OpenFileDialog() { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
+            var dlg = new Microsoft.Win32.OpenFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
             var result = dlg.ShowDialog();
 
             if (result == true)
