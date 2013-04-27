@@ -91,33 +91,58 @@ namespace VFSBase.Implementation
             CheckDisposed();
             CheckName(name);
 
-            if (Directory.Exists(source)) ImportDirectory(source, destination, name);
-            else if (File.Exists(source)) ImportFile(source, destination, name);
+            if (Directory.Exists(source)) CollectImportDirectoryTotals(source, importCallbacks);
+            else if (File.Exists(source)) importCallbacks.TotalToProcess++;
             else throw new NotFoundException();
+
+            if (Directory.Exists(source)) ImportDirectory(source, destination, name, importCallbacks);
+            else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks);
+            else throw new NotFoundException();
+
+            importCallbacks.OperationCompleted(!importCallbacks.ShouldAbort());
         }
 
-        private void ImportFile(string source, Folder destination, string name)
+        private static void CollectImportDirectoryTotals(string source, ImportCallbacks importCallbacks)
         {
+            var info = new DirectoryInfo(source);
+            importCallbacks.TotalToProcess++;
+
+            foreach (var directoryInfo in info.GetDirectories())
+                CollectImportDirectoryTotals(directoryInfo.FullName, importCallbacks);
+
+            importCallbacks.TotalToProcess += info.GetFiles().Length;
+        }
+
+        private void ImportFile(string source, Folder destination, string name, ImportCallbacks importCallbacks)
+        {
+            if(importCallbacks.ShouldAbort()) return;
+
             var f = new FileInfo(source);
             if (f.Length > _options.MaximumFileSize) throw new VFSException(
                  string.Format("File is too big. Maximum file size is {0}. You can adjust the BlockSize in the Options to allow bigger files.", _options.MaximumFileSize));
 
             var file = CreateFile(source, destination, name);
             AppendBlockReference(destination, file.BlockNumber);
+
+            importCallbacks.CurrentlyProcessed++;
         }
 
         // TODO: test this
-        private void ImportDirectory(string source, Folder destination, string name)
+        private void ImportDirectory(string source, Folder destination, string name, ImportCallbacks importCallbacks)
         {
+            if (importCallbacks.ShouldAbort()) return;
+
             var info = new DirectoryInfo(source);
 
             var newFolder = CreateFolder(destination, name);
 
+            importCallbacks.CurrentlyProcessed++;
+
             foreach (var directoryInfo in info.GetDirectories())
-                ImportDirectory(directoryInfo.FullName, newFolder, directoryInfo.Name);
+                ImportDirectory(directoryInfo.FullName, newFolder, directoryInfo.Name, importCallbacks);
 
             foreach (var fileInfo in info.GetFiles())
-                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name);
+                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name, importCallbacks);
         }
 
         public void Export(IIndexNode source, string destination, ExportCallbacks exportCallbacks)

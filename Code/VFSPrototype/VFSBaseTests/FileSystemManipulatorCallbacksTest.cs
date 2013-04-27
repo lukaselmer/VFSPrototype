@@ -30,8 +30,8 @@ namespace VFSBaseTests
         [TestInitialize]
         public void CreateDummyfiles()
         {
-            Directory.Delete(DummyImportFolderPath, true);
-            Directory.Delete(DummyExportFolderPath, true);
+            if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
+            if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
             Directory.CreateDirectory(DummyImportFolderPath);
             File.WriteAllText(DummyImportFolderPath + "/a", "bli");
             File.WriteAllText(DummyImportFolderPath + "/b", "bla");
@@ -41,13 +41,8 @@ namespace VFSBaseTests
         [TestCleanup]
         public void RemoveDummyfiles()
         {
-            Directory.Delete(DummyImportFolderPath, true);
-            Directory.Delete(DummyExportFolderPath, true);
-        }
-
-        [TestCleanup]
-        public void RemoveTestfile()
-        {
+            if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
+            if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
             File.Delete(DefaultTestfilePath);
         }
 
@@ -58,8 +53,6 @@ namespace VFSBaseTests
             {
                 var completed = false;
                 var success = false;
-
-                var totalCounter = new CountTester(3);
 
                 m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks(() => true, b => { completed = true; success = b; }));
                 Assert.IsFalse(m.Exists("dummy"));
@@ -77,11 +70,11 @@ namespace VFSBaseTests
                 var completed = false;
                 var success = false;
 
-                var totalCounter = new CountTester(3);
+                var totalCounter = new CountTester(4);
                 Action<int> testTotalToProcess = totalCounter.Up;
-                Action<int> testCurrentlyProcessed = new CountTester(3, totalCounter).Up;
+                Action<int> testCurrentlyProcessed = new CountTester(4, totalCounter).Up;
 
-                m.Import(DummyExportFolderPath, "dummy", new ImportCallbacks(() => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed));
+                m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks(() => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed));
                 Assert.IsTrue(m.Exists("dummy"));
 
                 Assert.AreEqual(completed, true);
@@ -135,14 +128,12 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                Directory.Delete(DummyExportFolderPath, true);
-
                 var completed = false;
                 var success = false;
 
                 m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks());
                 m.Copy("dummy", "dummy2", new CopyCallbacks(() => true, b => { completed = true; success = b; }));
-                Assert.IsFalse(m.Exists("dummy"));
+                Assert.IsFalse(m.Exists("dummy2"));
 
                 Assert.AreEqual(completed, true);
                 Assert.AreEqual(success, false);
@@ -160,7 +151,7 @@ namespace VFSBaseTests
                 var success = false;
 
                 m.Copy("dummy", "dummy2", new CopyCallbacks(() => false, b => { completed = true; success = b; }));
-                Assert.IsTrue(m.Exists("dummy"));
+                Assert.IsTrue(m.Exists("dummy2"));
 
                 Assert.AreEqual(completed, true);
                 Assert.AreEqual(success, true);
@@ -192,8 +183,8 @@ namespace VFSBaseTests
                 }
 
                 if (actual > _max) Assert.Fail("Too many calls");
-                Assert.AreEqual(Expected, actual);
-                Expected += 1;
+                Assert.IsTrue(actual >= Expected);
+                Expected = actual;
             }
 
             private void FreezeTotal()
