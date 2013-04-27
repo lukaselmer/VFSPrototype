@@ -63,6 +63,8 @@ namespace VFSBaseTests.Coding
         private static void TestAlgorithm(ICryptoTransform encryptor, ICryptoTransform decryptor)
         {
             TestAlgorithm(new SimpleEncryptorFactory(encryptor, decryptor));
+            encryptor.Dispose();
+            decryptor.Dispose();
         }
 
         private static void TestAlgorithm(IEncryptorFactory factory)
@@ -209,6 +211,34 @@ namespace VFSBaseTests.Coding
             TestAlgorithm(
                 new SelfMadeCaesarCryptor(7, CryptoDirection.Encrypt),
                 new SelfMadeCaesarCryptor(7, CryptoDirection.Decrypt));
+
+        }
+
+
+        [TestMethod]
+        public void SelfMadeCaesarCryptorReusable()
+        {
+            var selfMadeCaesarCryptor = new SelfMadeCaesarCryptor(3, CryptoDirection.Encrypt);
+            Assert.AreEqual(true, selfMadeCaesarCryptor.CanReuseTransform);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestInputNullSelfMadeCaesarCryptor()
+        {
+            
+            var selfMadeCaesarCryptor = new SelfMadeCaesarCryptor(3, CryptoDirection.Encrypt);
+            selfMadeCaesarCryptor.TransformBlock(null, 0, 0, null, 0);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestOutputNullSelfMadeCaesarCryptor()
+        {
+            var selfMadeCaesarCryptor = new SelfMadeCaesarCryptor(3, CryptoDirection.Encrypt);
+            Assert.AreEqual(true, selfMadeCaesarCryptor.CanReuseTransform);
+
+            selfMadeCaesarCryptor.TransformBlock(new byte[0], 0, 0, null, 0);
         }
     }
 }
