@@ -58,7 +58,7 @@ namespace VFSBase.Implementation
 
         public uint MasterBlockSize { get; set; }
 
-        public int BlockReferenceSize { get; set; }
+        public int BlockReferenceSize { get; private set; }
 
         //public int StartOfDirectBlock { get { return 1 /*type byte*/+ NameLength; } }
         //public int StartOfIndirectBlocks { get { return BlockSize - (3 * BlockReferenceSize); } }
@@ -99,7 +99,7 @@ namespace VFSBase.Implementation
 
         public int ReferencesPerIndirectNode { get { return BlockSize / BlockReferenceSize; } }
 
-        public BlockAllocation BlockAllocation { get; set; }
+        public BlockAllocation BlockAllocation { get; private set; }
 
         public long MaximumFileSize
         {
