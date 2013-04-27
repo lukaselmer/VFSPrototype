@@ -37,9 +37,12 @@ namespace VFSBaseTests
             if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
             if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
             Directory.CreateDirectory(DummyImportFolderPath);
-            File.WriteAllText(DummyImportFolderPath + "/a", "bli");
-            File.WriteAllText(DummyImportFolderPath + "/b", "bla");
-            File.WriteAllText(DummyImportFolderPath + "/c", "blub");
+            File.WriteAllText(Path.Combine(DummyImportFolderPath, "a"), "bli");
+            File.WriteAllText(Path.Combine(DummyImportFolderPath, "b"), "bla");
+            File.WriteAllText(Path.Combine(DummyImportFolderPath, "c"), "blub");
+            Directory.CreateDirectory(Path.Combine(DummyImportFolderPath, "foo"));
+            Directory.CreateDirectory(Path.Combine(DummyImportFolderPath, "bar"));
+            File.WriteAllText(Path.Combine(DummyImportFolderPath, "foo", "d"), "ddd");
         }
 
         [TestCleanup]
@@ -305,6 +308,9 @@ namespace VFSBaseTests
                 Assert.IsFalse(m.Exists("dummy/a"));
                 Assert.IsFalse(m.Exists("dummy/b"));
                 Assert.IsFalse(m.Exists("dummy/c"));
+                Assert.IsFalse(m.Exists("dummy/foo"));
+                Assert.IsFalse(m.Exists("dummy/bar"));
+                Assert.IsFalse(m.Exists("dummy/foo/d"));
 
                 m.Import(DummyImportFolderPath, "dummy");
                 
@@ -312,6 +318,10 @@ namespace VFSBaseTests
                 Assert.IsTrue(m.Exists("dummy/a"));
                 Assert.IsTrue(m.Exists("dummy/b"));
                 Assert.IsTrue(m.Exists("dummy/c"));
+                Assert.IsTrue(m.Exists("dummy/foo"));
+                Assert.IsTrue(m.Exists("dummy/bar"));
+                Assert.IsTrue(m.Exists("dummy/foo/d"));
+
                 Assert.IsFalse(m.Exists("dummy/d"));
             }
         }
@@ -325,11 +335,7 @@ namespace VFSBaseTests
 
                 m.Import(DummyImportFolderPath, "dummy");
 
-                Assert.IsTrue(m.Exists("dummy"));
-                Assert.IsTrue(m.Exists("dummy/a"));
-                Assert.IsTrue(m.Exists("dummy/b"));
-                Assert.IsTrue(m.Exists("dummy/c"));
-                Assert.IsFalse(m.Exists("dummy/d"));
+                if(!m.Exists("dummy")) Assert.Inconclusive();
 
                 Assert.IsFalse(Directory.Exists(DummyExportFolderPath));
 
@@ -339,11 +345,16 @@ namespace VFSBaseTests
                 Assert.IsTrue(File.Exists(Path.Combine(DummyExportFolderPath, "a")));
                 Assert.IsTrue(File.Exists(Path.Combine(DummyExportFolderPath, "b")));
                 Assert.IsTrue(File.Exists(Path.Combine(DummyExportFolderPath, "c")));
+                Assert.IsTrue(Directory.Exists(Path.Combine(DummyExportFolderPath, "foo")));
+                Assert.IsTrue(Directory.Exists(Path.Combine(DummyExportFolderPath, "bar")));
+                Assert.IsTrue(File.Exists(Path.Combine(DummyExportFolderPath, "foo", "d")));
+
                 Assert.IsFalse(File.Exists(Path.Combine(DummyExportFolderPath, "d")));
 
                 Assert.AreEqual("bli", File.ReadAllText(Path.Combine(DummyExportFolderPath, "a")));
                 Assert.AreEqual("bla", File.ReadAllText(Path.Combine(DummyExportFolderPath, "b")));
                 Assert.AreEqual("blub", File.ReadAllText(Path.Combine(DummyExportFolderPath, "c")));
+                Assert.AreEqual("ddd", File.ReadAllText(Path.Combine(DummyExportFolderPath, "foo", "d")));
             }
         }
     }
