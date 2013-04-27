@@ -60,7 +60,7 @@ namespace VFSBase.Interfaces
         /// <param name="destination">The destination.</param>
         /// <param name="name">The name.</param>
         /// <param name="importCallbacks"></param>
-        void Import(string source, Folder destination, string name, ImportCallbacks importCallbacks);
+        void Import(string source, Folder destination, string name, CallbacksBase importCallbacks);
 
         /// <summary>
         /// Exports the specified nodeToCopy (file or folder) recursively to the specified destination on the host file system.
@@ -68,7 +68,7 @@ namespace VFSBase.Interfaces
         /// <param name="source">The nodeToCopy.</param>
         /// <param name="destination">The destination.</param>
         /// <param name="exportCallbacks"></param>
-        void Export(IIndexNode source, string destination, ExportCallbacks exportCallbacks);
+        void Export(IIndexNode source, string destination, CallbacksBase exportCallbacks);
 
         /// <summary>
         /// Copies the specified nodeToCopy recursively to the destination folder.
@@ -77,7 +77,7 @@ namespace VFSBase.Interfaces
         /// <param name="destination">The destination where to copy the nodeToCopy to.</param>
         /// <param name="nameOfCopiedElement">The name of the copied element.</param>
         /// <param name="copyCallbacks"></param>
-        void Copy(IIndexNode nodeToCopy, Folder destination, string nameOfCopiedElement, CopyCallbacks copyCallbacks);
+        void Copy(IIndexNode nodeToCopy, Folder destination, string nameOfCopiedElement, CallbacksBase copyCallbacks);
 
         /// <summary>
         /// Deletes the specified nodeToCopy recursively.
