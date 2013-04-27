@@ -370,5 +370,15 @@ namespace VFSBaseTests
                 Assert.IsFalse(m.IsDirectory("/test"));
             }
         }
+
+        [TestMethod]
+        public void TestQueryFreeSpace()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                Assert.IsTrue(m.QueryFreeDiskSpace() > 0);
+                Assert.AreEqual(DriveInfo.GetDrives().First(d => d.Name == @"C:\").TotalFreeSpace, m.QueryFreeDiskSpace(), 10000.0);
+            }
+        }
     }
 }
