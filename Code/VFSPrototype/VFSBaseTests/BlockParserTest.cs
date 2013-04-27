@@ -1,6 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
+using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
 
@@ -9,7 +11,7 @@ namespace VFSBaseTests
     [TestClass]
     public class BlockParserTest
     {
-        [ExpectedException(typeof (VFSException))]
+        [ExpectedException(typeof(VFSException))]
         [TestMethod]
         public void TestParseTooSmallDirectoryBlock()
         {
@@ -19,8 +21,8 @@ namespace VFSBaseTests
             b.BytesToNode(b1);
         }
 
-        
-        [ExpectedException(typeof (VFSException))]
+
+        [ExpectedException(typeof(VFSException))]
         [TestMethod]
         public void TestParseEmptyDirectoryBlock()
         {
@@ -94,6 +96,52 @@ namespace VFSBaseTests
 
             Assert.AreEqual(name, f2.Name);
             Assert.IsInstanceOfType(f2, typeof(Folder));
+        }
+
+
+        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
+        public void TestInvalidNode()
+        {
+            var options = new FileSystemOptions("", 0);
+            var p = new BlockParser(options);
+            p.NodeToBytes(new MyType());
+        }
+
+        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
+        public void TestInvalidBlockSizeForFile()
+        {
+            var options = new FileSystemOptions("", 0);
+            var p = new BlockParser(options);
+            p.NodeToBytes(new MyType());
+        }
+
+        [ExpectedException(typeof(VFSException))]
+        [TestMethod]
+        public void TestNameTooLong()
+        {
+            var f = new VFSFile("0123456789");
+            try
+            {
+                var p1 = new BlockParser(new FileSystemOptions("", 0) { NameLength = f.Name.Length });
+                p1.NodeToBytes(f);
+            }
+            catch (VFSException)
+            {
+                Assert.Fail("Exception unexpected yet");
+            }
+            var p2 = new BlockParser(new FileSystemOptions("", 0) { NameLength = f.Name.Length - 1 });
+            p2.NodeToBytes(f);
+        }
+
+        private class MyType : IIndexNode
+        {
+            public string Name { get; set; }
+            public Folder Parent { get; set; }
+            public long BlockNumber { get; set; }
+            public long IndirectNodeNumber { get; set; }
+            public long BlocksCount { get; set; }
         }
     }
 }

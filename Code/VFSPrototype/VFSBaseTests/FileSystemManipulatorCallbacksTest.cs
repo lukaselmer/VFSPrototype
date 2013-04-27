@@ -9,7 +9,7 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemManipulatorCallbacksTest
     {
-        private const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
+        private const string DefaultTestfilePath = "../../../Testfiles/TestfileFileSystemManipulatorCallbacks.vhs";
         private const string DummyImportFolderPath = "../../../Testfiles/DummyfolderImport";
         private const string DummyExportFolderPath = "../../../Testfiles/DummyfolderExport";
         private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
