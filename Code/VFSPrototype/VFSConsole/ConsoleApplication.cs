@@ -16,6 +16,11 @@ namespace VFSConsole
         private IFileSystemTextManipulator _fileSystemTextManipulator;
         private string _currentDirectory = "";
 
+        private readonly Action<int> _currentlyProcessedChanged;
+        private readonly Func<bool> _shouldAbort;
+        private readonly Action<bool> _operationCompleted;
+        private readonly Action<int> _totalToProcessChanged;
+
         internal ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemTextManipulator fileSystemTextManipulator)
         {
             if (fileSystemTextManipulator == null) throw new ArgumentNullException("fileSystemTextManipulator", "fileSystem must not be null.");
@@ -37,6 +42,12 @@ namespace VFSConsole
                     {"ls", List},
                     {"mkdir", Mkdir},
                 };
+
+
+            _shouldAbort = () => false;
+            _operationCompleted = success => _textWriter.WriteLine("operation completed");
+            _totalToProcessChanged = i => _textWriter.WriteLine("total to process: {0}", i);
+            _currentlyProcessedChanged = i => _textWriter.WriteLine("total to process: {0}", i);
         }
 
         internal void Run()
@@ -85,7 +96,7 @@ namespace VFSConsole
                 var source = options[0];
                 var dest = PathFor(options[1]);
 
-                _fileSystemTextManipulator.Import(source, dest);
+                _fileSystemTextManipulator.Import(source, dest, _shouldAbort, _operationCompleted, _totalToProcessChanged, _currentlyProcessedChanged);
                 _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)
@@ -103,7 +114,7 @@ namespace VFSConsole
                 var source = PathFor(options[0]);
                 var dest = options[1];
 
-                _fileSystemTextManipulator.Export(source, dest);
+                _fileSystemTextManipulator.Export(source, dest, _shouldAbort, _operationCompleted, _totalToProcessChanged, _currentlyProcessedChanged);
                 _textWriter.WriteLine("Exported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)
