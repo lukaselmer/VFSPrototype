@@ -14,6 +14,8 @@ namespace VFSBaseTests
     public class FileSystemManipulatorFoldersTest
     {
         private const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
+        private const string DummyImportFolderPath = "../../../Testfiles/DummyfolderImportFolders";
+        private const string DummyExportFolderPath = "../../../Testfiles/DummyfolderExportFolders";
         private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
 
         private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
@@ -29,9 +31,22 @@ namespace VFSBaseTests
             return new FileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize));
         }
 
+        [TestInitialize]
+        public void CreateDummyfiles()
+        {
+            if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
+            if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
+            Directory.CreateDirectory(DummyImportFolderPath);
+            File.WriteAllText(DummyImportFolderPath + "/a", "bli");
+            File.WriteAllText(DummyImportFolderPath + "/b", "bla");
+            File.WriteAllText(DummyImportFolderPath + "/c", "blub");
+        }
+
         [TestCleanup]
         public void RemoveTestfile()
         {
+            if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
+            if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
             File.Delete(DefaultTestfilePath);
         }
 
@@ -278,6 +293,57 @@ namespace VFSBaseTests
             {
                 Assert.IsFalse(m.Exists("test"));
                 m.Delete("test");
+            }
+        }
+
+        [TestMethod]
+        public void TestImportFolder()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                Assert.IsFalse(m.Exists("dummy"));
+                Assert.IsFalse(m.Exists("dummy/a"));
+                Assert.IsFalse(m.Exists("dummy/b"));
+                Assert.IsFalse(m.Exists("dummy/c"));
+
+                m.Import(DummyImportFolderPath, "dummy");
+                
+                Assert.IsTrue(m.Exists("dummy"));
+                Assert.IsTrue(m.Exists("dummy/a"));
+                Assert.IsTrue(m.Exists("dummy/b"));
+                Assert.IsTrue(m.Exists("dummy/c"));
+                Assert.IsFalse(m.Exists("dummy/d"));
+            }
+        }
+
+        [TestMethod]
+        public void TestExportFolder()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
+
+                m.Import(DummyImportFolderPath, "dummy");
+
+                Assert.IsTrue(m.Exists("dummy"));
+                Assert.IsTrue(m.Exists("dummy/a"));
+                Assert.IsTrue(m.Exists("dummy/b"));
+                Assert.IsTrue(m.Exists("dummy/c"));
+                Assert.IsFalse(m.Exists("dummy/d"));
+
+                Assert.IsFalse(Directory.Exists(DummyExportFolderPath));
+
+                m.Export("dummy", DummyExportFolderPath);
+
+                Assert.IsTrue(Directory.Exists(DummyExportFolderPath));
+                Assert.IsTrue(File.Exists(Path.Combine(DummyExportFolderPath, "a")));
+                Assert.IsTrue(File.Exists(Path.Combine(DummyExportFolderPath, "b")));
+                Assert.IsTrue(File.Exists(Path.Combine(DummyExportFolderPath, "c")));
+                Assert.IsFalse(File.Exists(Path.Combine(DummyExportFolderPath, "d")));
+
+                Assert.AreEqual("bli", File.ReadAllText(Path.Combine(DummyExportFolderPath, "a")));
+                Assert.AreEqual("bla", File.ReadAllText(Path.Combine(DummyExportFolderPath, "b")));
+                Assert.AreEqual("blub", File.ReadAllText(Path.Combine(DummyExportFolderPath, "c")));
             }
         }
     }

@@ -202,7 +202,7 @@ namespace VFSBase.Implementation
 
             foreach (var vfsFile in Files(folder))
             {
-                ExportFile(vfsFile, Path.Combine(destination, folder.Name), exportCallbacks);
+                ExportFile(vfsFile, Path.Combine(destination, vfsFile.Name), exportCallbacks);
             }
             foreach (var f in Folders(folder))
             {
