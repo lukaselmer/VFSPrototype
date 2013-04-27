@@ -90,7 +90,6 @@
     <Compile Include="Implementation\FileSystemTextManipulator.cs" />
     <Compile Include="Implementation\Folder.cs" />
     <Compile Include="Persistence\BlockParser.cs" />
-    <Compile Include="Persistence\Blocks\EmptyBlock.cs" />
     <Compile Include="Persistence\Blocks\IndirectNode.cs" />
     <Compile Include="Persistence\Coding\General\IStreamCodingStrategy.cs" />
     <Compile Include="Persistence\PositionCalculator.cs" />
