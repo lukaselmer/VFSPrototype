@@ -101,10 +101,10 @@ namespace VFSBase.Implementation
             return _fileSystem.Exists(parent, PathParser.GetNodeName(path));
         }
 
-        public void Import(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null, Action<int> totalToProcessChanged = null, Action<int> currentlyProcessedChanged = null)
+        public void Import(string source, string dest, ImportCallbacks importCallbacks)
         {
             var node = CreateParentFolder(dest);
-            _fileSystem.Import(source, node, PathParser.GetNodeName(dest));
+            _fileSystem.Import(source, node, PathParser.GetNodeName(dest), importCallbacks);
         }
 
         private Folder CreateParentFolder(string dest)
@@ -113,18 +113,18 @@ namespace VFSBase.Implementation
             return FindParentFolder(dest);
         }
 
-        public void Export(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null, Action<int> totalToProcessChanged = null, Action<int> currentlyProcessedChanged = null)
+        public void Export(string source, string dest, ExportCallbacks exportCallbacks)
         {
-            _fileSystem.Export(FindNode(source), dest);
+            _fileSystem.Export(FindNode(source), dest, exportCallbacks);
         }
 
-        public void Copy(string source, string dest, Func<bool> shouldAbort = null, Action<bool> operationCompleted = null)
+        public void Copy(string source, string dest, CopyCallbacks copyCallbacks)
         {
             if (!Exists(source)) throw new VFSException(string.Format("Source {0} does not exist", source));
             if (Exists(dest)) throw new VFSException(string.Format("Destination {0} already exists", dest));
 
             CreateParentFolder(dest);
-            _fileSystem.Copy(FindNode(source), FindParentFolder(dest), PathParser.GetNodeName(dest));
+            _fileSystem.Copy(FindNode(source), FindParentFolder(dest), PathParser.GetNodeName(dest), copyCallbacks);
         }
 
         private static Queue<string> PathToQueue(string path)
