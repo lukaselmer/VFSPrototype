@@ -166,12 +166,16 @@ namespace VFSBase.Implementation
             if (File.Exists(absoluteDestination) || Directory.Exists(absoluteDestination))
                 throw new VFSException("Destination already exists!");
 
+            // Gather totals
             if (source is Folder) CollectExportDirectoryTotals(source as Folder, exportCallbacks);
             else if (source is VFSFile) exportCallbacks.TotalToProcess++;
             else throw new ArgumentException("Source must be of type Folder or VFSFile", "source");
 
-            if (source is Folder) ExportFolder(source as Folder, absoluteDestination);
-            else ExportFile(source as VFSFile, absoluteDestination);
+            // Do the real export
+            if (source is Folder) ExportFolder(source as Folder, absoluteDestination, exportCallbacks);
+            else ExportFile(source as VFSFile, absoluteDestination, exportCallbacks);
+
+            exportCallbacks.OperationCompleted(!exportCallbacks.ShouldAbort());
         }
 
         private void CollectExportDirectoryTotals(Folder source, ExportCallbacks exportCallbacks)
@@ -187,22 +191,27 @@ namespace VFSBase.Implementation
         }
 
         //TODO: test this
-        private void ExportFolder(Folder folder, string destination)
+        private void ExportFolder(Folder folder, string destination, ExportCallbacks exportCallbacks)
         {
+            if (exportCallbacks.ShouldAbort()) return;
+
             Directory.CreateDirectory(destination);
+            exportCallbacks.CurrentlyProcessed++;
 
             foreach (var vfsFile in Files(folder))
             {
-                ExportFile(vfsFile, Path.Combine(destination, folder.Name));
+                ExportFile(vfsFile, Path.Combine(destination, folder.Name), exportCallbacks);
             }
             foreach (var f in Folders(folder))
             {
-                ExportFolder(f, Path.Combine(destination, folder.Name));
+                ExportFolder(f, Path.Combine(destination, folder.Name), exportCallbacks);
             }
         }
 
-        private void ExportFile(VFSFile file, string destination)
+        private void ExportFile(VFSFile file, string destination, ExportCallbacks exportCallbacks)
         {
+            if (exportCallbacks.ShouldAbort()) return;
+
             EnsureParentDirectoryExists(destination);
             using (var stream = File.OpenWrite(destination))
             {
@@ -219,6 +228,7 @@ namespace VFSBase.Implementation
                     }
                 }
             }
+            exportCallbacks.CurrentlyProcessed++;
         }
 
         private static void EnsureParentDirectoryExists(string destination)

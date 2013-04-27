@@ -87,7 +87,7 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                Directory.Delete(DummyExportFolderPath, true);
+                if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
 
                 var completed = false;
                 var success = false;
@@ -106,16 +106,17 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                Directory.Delete(DummyExportFolderPath, true);
+                if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
 
                 var completed = false;
                 var success = false;
 
-                var totalCounter = new CountTester(3);
+                var totalCounter = new CountTester(4);
                 Action<int> testTotalToProcess = totalCounter.Up;
-                Action<int> testCurrentlyProcessed = new CountTester(3, totalCounter).Up;
+                Action<int> testCurrentlyProcessed = new CountTester(4, totalCounter).Up;
 
-                m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks(() => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed));
+                m.Import(DummyImportFolderPath, "dummy");
+                m.Export("dummy", DummyExportFolderPath, new ExportCallbacks(() => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed));
                 Assert.IsTrue(Directory.Exists(DummyExportFolderPath));
 
                 Assert.AreEqual(completed, true);
