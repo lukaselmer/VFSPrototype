@@ -8,6 +8,8 @@ using VFSBase.Interfaces;
 
 using VFSBase.Persistence;
 using VFSBase.Persistence.Coding;
+using VFSBase.Persistence.Coding.General;
+using VFSBase.Persistence.Coding.MicrosoftCompression;
 
 namespace VFSBase.Implementation
 {
@@ -23,8 +25,8 @@ namespace VFSBase.Implementation
         {
             Location = location;
             DiskSize = diskSize;
-            BlockSize = (int)BinaryMathUtil.KB(8);
-            MasterBlockSize = (uint)BinaryMathUtil.KB(32);
+            BlockSize = (int)MathUtil.KB(8);
+            MasterBlockSize = (uint)MathUtil.KB(32);
             NameLength = 255;
             BlockReferenceSize = 64;
             BlockAllocation = new BlockAllocation();
@@ -82,7 +84,7 @@ namespace VFSBase.Implementation
             }
             set
             {
-                if (value < (int)BinaryMathUtil.KB(2)) throw new VFSException("block size too small");
+                if (value < (int)MathUtil.KB(2)) throw new VFSException("block size too small");
                 _blockSize = value;
             }
         }
@@ -102,7 +104,7 @@ namespace VFSBase.Implementation
         {
             get
             {
-                return BinaryMathUtil.Power(ReferencesPerIndirectNode, IndirectionCountForIndirectNodes + 1) * BlockSize;
+                return MathUtil.Power(ReferencesPerIndirectNode, IndirectionCountForIndirectNodes + 1) * BlockSize;
             }
         }
 

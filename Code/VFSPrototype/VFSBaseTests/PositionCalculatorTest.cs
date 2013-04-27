@@ -16,8 +16,8 @@ namespace VFSBaseTests
 
         private static PositionCalculatorSettings PositionCalculatorSettings()
         {
-            var superBlockSize = BinaryMathUtil.MB(1);
-            var blockSize = BinaryMathUtil.Power2(9);
+            var superBlockSize = MathUtil.MB(1);
+            var blockSize = MathUtil.Power2(9);
             var s = new PositionCalculatorSettings(superBlockSize, blockSize);
             return s;
         }
