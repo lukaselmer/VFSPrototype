@@ -16,7 +16,7 @@ namespace VFSBaseTests
     {
         private const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
         private const string DummyFilePath = "../../../Testfiles/dummy.dat";
-        private readonly long _dummyFileSize = BinaryMathUtil.MB(1); // Could be BinaryMathUtil.GB(1), but it is disabled, so the unit tests run fast
+        private readonly long _dummyFileSize = MathUtil.KB(100); // TODO: increase this value. Could be MathUtil.GB(1), but it is disabled, so the unit tests run fast
         private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
 
         private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)

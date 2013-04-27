@@ -1,5 +1,8 @@
 ﻿namespace VFSBase.Persistence
 {
+    /// <summary>
+    /// The position calculator settings
+    /// </summary>
     internal struct PositionCalculatorSettings
     {
         public long SuperBlockSize { get; private set; }
