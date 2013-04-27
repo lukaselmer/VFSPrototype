@@ -2,25 +2,11 @@
 
 namespace VFSBase.Interfaces
 {
-    public class CopyCallbacks
+    public class CopyCallbacks : CallbacksBase
     {
-        private readonly Func<bool> _shouldAbort;
-        private readonly Action<bool> _operationCompleted;
-
         public CopyCallbacks(Func<bool> shouldAbort = null, Action<bool> operationCompleted = null)
+            : base(shouldAbort, operationCompleted, null, null)
         {
-            _shouldAbort = shouldAbort;
-            _operationCompleted = operationCompleted;
-        }
-
-        public Func<bool> ShouldAbort
-        {
-            get { return _shouldAbort; }
-        }
-
-        public Action<bool> OperationCompleted
-        {
-            get { return _operationCompleted; }
         }
     }
 }

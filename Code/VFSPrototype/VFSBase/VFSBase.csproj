@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Implementation\BlockAllocation.cs" />
+    <Compile Include="Interfaces\CallbacksBase.cs" />
     <Compile Include="Interfaces\CopyCallbacks.cs" />
     <Compile Include="Interfaces\ExportCallbacks.cs" />
     <Compile Include="Interfaces\ImportCallbacks.cs" />
