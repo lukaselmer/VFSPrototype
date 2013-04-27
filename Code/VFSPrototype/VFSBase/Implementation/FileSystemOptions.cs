@@ -9,6 +9,7 @@ using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Coding;
 using VFSBase.Persistence.Coding.General;
+using VFSBase.Persistence.Coding.MicrosoftAes;
 using VFSBase.Persistence.Coding.MicrosoftCompression;
 
 namespace VFSBase.Implementation
@@ -44,8 +45,8 @@ namespace VFSBase.Implementation
 
         private void InitializeStreamCodingStrategy()
         {
-            //var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
-            var encryptionStrategy = new SelfMadeStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
+            var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
+            //var encryptionStrategy = new SelfMadeStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
             _streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), encryptionStrategy);
             //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), new NullStreamCodingStrategy());
             //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), new NullStreamCodingStrategy());
