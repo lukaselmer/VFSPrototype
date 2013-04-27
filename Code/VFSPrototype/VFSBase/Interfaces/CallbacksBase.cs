@@ -49,7 +49,7 @@ namespace VFSBase.Interfaces
         /// <param name="operationCompleted">The operation completed action is called when the operation completes.</param>
         /// <param name="totalToProcessChanged">The total to process changed action is called when the total count has changed.</param>
         /// <param name="currentlyProcessedChanged">The currently processed changed action is called when the currently processed count has changed.</param>
-        public CallbacksBase(Func<bool> shouldAbort = null, Action<bool> operationCompleted = null, Action<int> totalToProcessChanged = null, Action<int> currentlyProcessedChanged = null)
+        protected CallbacksBase(Func<bool> shouldAbort = null, Action<bool> operationCompleted = null, Action<int> totalToProcessChanged = null, Action<int> currentlyProcessedChanged = null)
         {
             _shouldAbort = shouldAbort ?? (() => false);
             _operationCompleted = operationCompleted ?? (b => { });
@@ -85,7 +85,7 @@ namespace VFSBase.Interfaces
         /// <value>
         /// The total to process changed action.
         /// </value>
-        internal Action<int> TotalToProcessChanged
+        private Action<int> TotalToProcessChanged
         {
             get { return _totalToProcessChanged; }
         }
@@ -96,7 +96,7 @@ namespace VFSBase.Interfaces
         /// <value>
         /// The currently processed changed action.
         /// </value>
-        internal Action<int> CurrentlyProcessedChanged
+        private Action<int> CurrentlyProcessedChanged
         {
             get { return _currentlyProcessedChanged; }
         }

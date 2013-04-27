@@ -75,7 +75,7 @@ namespace VFSBaseTests
             using (var m = InitTestFileSystemManipulator())
             {
                 const string testFileSource = "test.txt";
-                byte[] testFileData = new byte[4096];
+                var testFileData = new byte[4096];
                 testFileData[0] = (byte)'\n';
 
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);

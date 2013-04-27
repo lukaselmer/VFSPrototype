@@ -26,7 +26,7 @@ namespace VFSBaseTests.Coding
             }
             public int DataAmount { get; private set; }
             public int ReadBufferSize { get; private set; }
-            public int WriteBufferSize { get; private set; }
+            private int WriteBufferSize { get; set; }
         }
 
         private interface IEncryptorFactory

@@ -46,7 +46,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestNamesShouldSupportUtf8()
         {
-            var name = "∀α,β∈∑α≤β∧β≥α=>α=β";
+            const string name = "∀α,β∈∑α≤β∧β≥α=>α=β";
             using (var fs = GetFileSystem())
             {
                 Assert.IsTrue(!fs.Folders(fs.Root).Any());

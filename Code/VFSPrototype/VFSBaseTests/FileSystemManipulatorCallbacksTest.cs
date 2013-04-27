@@ -176,7 +176,7 @@ namespace VFSBaseTests
                 Expected = 1;
             }
 
-            public int Expected { get; private set; }
+            private int Expected { get; set; }
 
             public void Up(int actual)
             {
