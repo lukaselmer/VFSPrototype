@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
@@ -8,16 +9,25 @@ namespace VFSBaseTests
     [TestClass]
     public class BlockParserTest
     {
+        [ExpectedException(typeof (VFSException))]
+        [TestMethod]
+        public void TestParseTooSmallDirectoryBlock()
+        {
+            var options = new FileSystemOptions("", 0);
+            var b = new BlockParser(options);
+            var b1 = new byte[1024];
+            b.BytesToNode(b1);
+        }
+
+        
+        [ExpectedException(typeof (VFSException))]
         [TestMethod]
         public void TestParseEmptyDirectoryBlock()
         {
             var options = new FileSystemOptions("", 0);
             var b = new BlockParser(options);
-            var b1 = new byte[1024];
-            Assert.AreSame(EmptyBlock.Get(), b.BytesToNode(b1));
-
             var b2 = new byte[options.BlockSize];
-            Assert.AreSame(EmptyBlock.Get(), b.BytesToNode(b2));
+            b.BytesToNode(b2);
         }
 
         [TestMethod]
