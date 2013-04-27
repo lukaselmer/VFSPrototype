@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
@@ -58,6 +59,13 @@ namespace VFSBaseTests
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
                 Assert.IsTrue(fs.Folders(fs.Root).First().Name == name);
             }
+        }
+
+        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
+        public void TestRootFolderSetNotPossible()
+        {
+            new RootFolder().BlockNumber = 42;
         }
     }
 }

@@ -79,6 +79,7 @@
     <Compile Include="BinaryMathUtilTest.cs" />
     <Compile Include="FileSystemManipulatorCallbacksTest.cs" />
     <Compile Include="BlockListTest.cs" />
+    <Compile Include="VFSFileStreamTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VFSBase\VFSBase.csproj">

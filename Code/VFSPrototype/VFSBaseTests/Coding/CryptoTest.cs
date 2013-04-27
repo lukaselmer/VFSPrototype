@@ -232,7 +232,9 @@ namespace VFSBaseTests.Coding
         [TestMethod]
         public void TestSelfMadeAesCryptorInvalidKeyLength()
         {
-            using (new SelfMadeAes256Cryptor(new byte[10], null, CryptoDirection.Encrypt)) ;
+            using (new SelfMadeAes256Cryptor(new byte[10], null, CryptoDirection.Encrypt))
+            {
+            }
         }
 
 
