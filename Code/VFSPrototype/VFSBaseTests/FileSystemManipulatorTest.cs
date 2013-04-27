@@ -13,7 +13,7 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemManipulatorTest
     {
-        private const string DefaultTestfilePath = "../../../Testfiles/TestfileFileSystemManipulator.vhs";
+        private const string DefaultTestfilePath = "../../../Testfiles/TestfileFileSystemManipulatorTest.vhs";
         private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
 
         private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
