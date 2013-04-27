@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using VFSBase.Exceptions;
@@ -35,7 +36,7 @@ namespace VFSBase.Persistence
 
         private Folder ParseFolder(byte[] bb)
         {
-            if (bb.Length != _options.BlockSize) return null;
+            Debug.Assert(bb.Length == _options.BlockSize);
 
             var name = ExtractName(bb);
 
@@ -48,13 +49,15 @@ namespace VFSBase.Persistence
 
         public RootFolder ParseRootFolder(byte[] bb)
         {
+            Debug.Assert(bb.Length == _options.BlockSize);
+
             var f = ParseFolder(bb);
             return new RootFolder { BlocksCount = f.BlocksCount, IndirectNodeNumber = f.IndirectNodeNumber };
         }
 
         private VFSFile ParseFile(byte[] bb)
         {
-            if (bb.Length != _options.BlockSize) return null;
+            Debug.Assert(bb.Length == _options.BlockSize);
 
             var name = ExtractName(bb);
 
