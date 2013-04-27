@@ -60,10 +60,10 @@ namespace VFSBase.Implementation
 
         public int BlockReferenceSize { get; set; }
 
-        public int StartOfDirectBlock { get { return 1 /*type byte*/+ NameLength; } }
-        public int StartOfIndirectBlocks { get { return BlockSize - (3 * BlockReferenceSize); } }
-        public int DirectBlocksSpace { get { return StartOfIndirectBlocks - StartOfDirectBlock; } }
-        public int DirectBlocksAmount { get { return DirectBlocksSpace / BlockReferenceSize; } }
+        //public int StartOfDirectBlock { get { return 1 /*type byte*/+ NameLength; } }
+        //public int StartOfIndirectBlocks { get { return BlockSize - (3 * BlockReferenceSize); } }
+        //public int DirectBlocksSpace { get { return StartOfIndirectBlocks - StartOfDirectBlock; } }
+        //public int DirectBlocksAmount { get { return DirectBlocksSpace / BlockReferenceSize; } }
 
         public static FileSystemOptions Deserialize(Stream stream)
         {
