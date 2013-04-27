@@ -81,7 +81,7 @@ namespace VFSBaseTests.Coding
                 new TestConfig(10000, 1023, 1000),
                 new TestConfig(10000, 1024, 1000),
                 new TestConfig(10000, 1025, 1000),
-                new TestConfig(100000, 100000, 1000)
+                //new TestConfig(100000, 100000, 1000) disabled, so tests execute faster
             };
 
             foreach (var configuration in configurations)
@@ -169,7 +169,6 @@ namespace VFSBaseTests.Coding
         {
             var options = GetEncryptionOptions();
             TestAlgorithm(new SelfMadeAesCryptorFactory(options));
-
         }
 
         private class SelfMadeAesCryptorFactory : IEncryptorFactory
