@@ -103,7 +103,7 @@ namespace VFSBase.Implementation
 
         public void Import(string source, string dest, ImportCallbacks importCallbacks = null)
         {
-            if(importCallbacks == null) importCallbacks = new ImportCallbacks();
+            if (importCallbacks == null) importCallbacks = new ImportCallbacks();
             var node = CreateParentFolder(dest);
             _fileSystem.Import(source, node, PathParser.GetNodeName(dest), importCallbacks);
         }
@@ -182,6 +182,13 @@ namespace VFSBase.Implementation
 
             _fileSystem.Dispose();
             _fileSystem = null;
+        }
+
+        public long QueryFreeDiskSpace()
+        {
+            var s = _fileSystem.FileSystemOptions.Location;
+            var driveInfo = DriveInfo.GetDrives().FirstOrDefault(d => d.Name == Path.GetPathRoot(s));
+            return driveInfo == null ? -1 : driveInfo.TotalFreeSpace;
         }
     }
 }

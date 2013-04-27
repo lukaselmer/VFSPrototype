@@ -16,5 +16,6 @@ namespace VFSBase.Interfaces
         void Delete(string path);
         void Move(string source, string dest);
         bool Exists(string path);
+        long QueryFreeDiskSpace();
     }
 }
