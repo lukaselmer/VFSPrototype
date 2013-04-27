@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using VFSBase.Implementation;
+using VFSBase.Interfaces;
 using MessageBox = System.Windows.MessageBox;
 
 namespace VFSBrowser.ViewModel
@@ -194,7 +195,7 @@ namespace VFSBrowser.ViewModel
                     }
 
                     if (_copy)
-                        _manipulator.Copy(source.Path + source.Name, CurrentPath + source.Name);
+                        _manipulator.Copy(source.Path + source.Name, CurrentPath + source.Name, new CopyCallbacks());
                     else
                         _manipulator.Move(source.Path + source.Name, CurrentPath + source.Name);
 
@@ -218,7 +219,7 @@ namespace VFSBrowser.ViewModel
             { 
                 try {
                     foreach (ListItem item in items)
-                        _manipulator.Export(CurrentPath + item.Name, dlg.SelectedPath + "\\" + item.Name);
+                        _manipulator.Export(CurrentPath + item.Name, dlg.SelectedPath + "\\" + item.Name, new ExportCallbacks());
 
                 } catch (Exception e) {
                     MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -371,7 +372,7 @@ namespace VFSBrowser.ViewModel
                         Items.Remove(listItem);
                     }
 
-                    _manipulator.Import(dlg.FileName, CurrentPath + dlg.SafeFileName);
+                    _manipulator.Import(dlg.FileName, CurrentPath + dlg.SafeFileName, new ImportCallbacks());
                     Items.Add(new ListItem(CurrentPath, dlg.SafeFileName, false));
 
                 } catch (Exception e) {
