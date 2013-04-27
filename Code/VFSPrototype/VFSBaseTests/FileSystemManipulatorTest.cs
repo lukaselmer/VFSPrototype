@@ -289,7 +289,7 @@ namespace VFSBaseTests
                 using (var f = File.OpenWrite(testFileSource))
                 {
                     var buffer = new byte[bufferLength];
-                    for (var i = 0; i < 10000; i++)
+                    for (var i = 0; i < 500; i++) // TODO: increase this value
                     {
                         rand.NextBytes(buffer);
                         f.Write(buffer, 0, buffer.Length);

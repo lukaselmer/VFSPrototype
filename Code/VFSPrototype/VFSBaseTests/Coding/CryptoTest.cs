@@ -5,6 +5,10 @@ using System.Security.Cryptography;
 using Microsoft.Practices.Unity.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Persistence.Coding;
+using VFSBase.Persistence.Coding.General;
+using VFSBase.Persistence.Coding.SelfMadeAes;
+using VFSBase.Persistence.Coding.SelfMadeCaesar;
+using VFSBase.Persistence.Coding.SelfMadeSimple;
 
 namespace VFSBaseTests.Coding
 {
