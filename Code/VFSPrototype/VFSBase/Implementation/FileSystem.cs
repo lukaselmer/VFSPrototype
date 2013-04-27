@@ -85,6 +85,8 @@ namespace VFSBase.Implementation
             return folder;
         }
 
+        #region Import
+
         //TODO: test this method with recursive data
         public void Import(string source, Folder destination, string name, ImportCallbacks importCallbacks)
         {
@@ -115,11 +117,14 @@ namespace VFSBase.Implementation
 
         private void ImportFile(string source, Folder destination, string name, ImportCallbacks importCallbacks)
         {
-            if(importCallbacks.ShouldAbort()) return;
+            if (importCallbacks.ShouldAbort()) return;
 
             var f = new FileInfo(source);
-            if (f.Length > _options.MaximumFileSize) throw new VFSException(
-                 string.Format("File is too big. Maximum file size is {0}. You can adjust the BlockSize in the Options to allow bigger files.", _options.MaximumFileSize));
+            if (f.Length > _options.MaximumFileSize)
+                throw new VFSException(
+                    string.Format(
+                        "File is too big. Maximum file size is {0}. You can adjust the BlockSize in the Options to allow bigger files.",
+                        _options.MaximumFileSize));
 
             var file = CreateFile(source, destination, name);
             AppendBlockReference(destination, file.BlockNumber);
@@ -145,6 +150,11 @@ namespace VFSBase.Implementation
                 ImportFile(fileInfo.FullName, newFolder, fileInfo.Name, importCallbacks);
         }
 
+        #endregion
+
+
+        #region Export
+
         public void Export(IIndexNode source, string destination, ExportCallbacks exportCallbacks)
         {
             var absoluteDestination = Path.GetFullPath(destination);
@@ -153,11 +163,42 @@ namespace VFSBase.Implementation
 
             if (source == null) throw new NotFoundException();
 
-            if (File.Exists(absoluteDestination) || Directory.Exists(absoluteDestination)) throw new VFSException("Destination already exists!");
+            if (File.Exists(absoluteDestination) || Directory.Exists(absoluteDestination))
+                throw new VFSException("Destination already exists!");
+
+            if (source is Folder) CollectExportDirectoryTotals(source as Folder, exportCallbacks);
+            else if (source is VFSFile) exportCallbacks.TotalToProcess++;
+            else throw new ArgumentException("Source must be of type Folder or VFSFile", "source");
 
             if (source is Folder) ExportFolder(source as Folder, absoluteDestination);
-            else if (source is VFSFile) ExportFile(source as VFSFile, absoluteDestination);
-            else throw new ArgumentException("Source must be of type Folder or VFSFile", "source");
+            else ExportFile(source as VFSFile, absoluteDestination);
+        }
+
+        private void CollectExportDirectoryTotals(Folder source, ExportCallbacks exportCallbacks)
+        {
+            exportCallbacks.TotalToProcess++;
+
+            exportCallbacks.TotalToProcess += Files(source).Count();
+
+            foreach (var folder in Folders(source))
+            {
+                CollectExportDirectoryTotals(folder, exportCallbacks);
+            }
+        }
+
+        //TODO: test this
+        private void ExportFolder(Folder folder, string destination)
+        {
+            Directory.CreateDirectory(destination);
+
+            foreach (var vfsFile in Files(folder))
+            {
+                ExportFile(vfsFile, Path.Combine(destination, folder.Name));
+            }
+            foreach (var f in Folders(folder))
+            {
+                ExportFolder(f, Path.Combine(destination, folder.Name));
+            }
         }
 
         private void ExportFile(VFSFile file, string destination)
@@ -165,7 +206,10 @@ namespace VFSBase.Implementation
             EnsureParentDirectoryExists(destination);
             using (var stream = File.OpenWrite(destination))
             {
-                using (var reader = DecorateToHostStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
+                using (
+                    var reader =
+                        DecorateToHostStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator,
+                                                               _persistence)))
                 {
                     var buffer = new byte[_options.BlockSize];
                     int read;
@@ -186,13 +230,10 @@ namespace VFSBase.Implementation
                 throw new VFSException(string.Format("Directory {0} does not exist", directoryName));
         }
 
-        private void ExportFolder(Folder folder, string destination)
-        {
-            // TODO: implement this
-            Console.WriteLine(folder);
-            Console.WriteLine(destination);
-            throw new NotImplementedException();
-        }
+        #endregion
+
+
+        #region Copy
 
         public void Copy(IIndexNode nodeToCopy, Folder destination, string name, CopyCallbacks copyCallbacks)
         {
@@ -208,7 +249,12 @@ namespace VFSBase.Implementation
         {
             CheckName(name);
 
-            var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate(), LastBlockSize = fileToCopy.LastBlockSize };
+            var file = new VFSFile(name)
+                           {
+                               Parent = destination,
+                               BlockNumber = _blockAllocation.Allocate(),
+                               LastBlockSize = fileToCopy.LastBlockSize
+                           };
 
             foreach (var block in GetBlockList(fileToCopy).Blocks()) AddDataToFile(file, block);
 
@@ -224,6 +270,8 @@ namespace VFSBase.Implementation
             var newFolder = CreateFolder(destination, name);
             foreach (var subNode in List(nodeToCopy)) Copy(subNode, newFolder, subNode.Name, copyCallbacks);
         }
+
+        #endregion
 
         public void Delete(IIndexNode node)
         {
