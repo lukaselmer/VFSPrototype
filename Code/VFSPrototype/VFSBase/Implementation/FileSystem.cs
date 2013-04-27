@@ -88,7 +88,7 @@ namespace VFSBase.Implementation
         #region Import
 
         //TODO: test this method with recursive data
-        public void Import(string source, Folder destination, string name, ImportCallbacks importCallbacks)
+        public void Import(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
             CheckDisposed();
             CheckName(name);
@@ -104,7 +104,7 @@ namespace VFSBase.Implementation
             importCallbacks.OperationCompleted(!importCallbacks.ShouldAbort());
         }
 
-        private static void CollectImportDirectoryTotals(string source, ImportCallbacks importCallbacks)
+        private static void CollectImportDirectoryTotals(string source, CallbacksBase importCallbacks)
         {
             var info = new DirectoryInfo(source);
             importCallbacks.TotalToProcess++;
@@ -115,7 +115,7 @@ namespace VFSBase.Implementation
             importCallbacks.TotalToProcess += info.GetFiles().Length;
         }
 
-        private void ImportFile(string source, Folder destination, string name, ImportCallbacks importCallbacks)
+        private void ImportFile(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
             if (importCallbacks.ShouldAbort()) return;
 
@@ -133,7 +133,7 @@ namespace VFSBase.Implementation
         }
 
         // TODO: test this
-        private void ImportDirectory(string source, Folder destination, string name, ImportCallbacks importCallbacks)
+        private void ImportDirectory(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
             if (importCallbacks.ShouldAbort()) return;
 
@@ -155,7 +155,7 @@ namespace VFSBase.Implementation
 
         #region Export
 
-        public void Export(IIndexNode source, string destination, ExportCallbacks exportCallbacks)
+        public void Export(IIndexNode source, string destination, CallbacksBase exportCallbacks)
         {
             var absoluteDestination = Path.GetFullPath(destination);
             EnsureParentDirectoryExists(absoluteDestination);
@@ -178,10 +178,12 @@ namespace VFSBase.Implementation
             exportCallbacks.OperationCompleted(!exportCallbacks.ShouldAbort());
         }
 
-        private void CollectExportDirectoryTotals(Folder source, ExportCallbacks exportCallbacks)
+        private void CollectExportDirectoryTotals(Folder source, CallbacksBase exportCallbacks)
         {
+            // Direcotry
             exportCallbacks.TotalToProcess++;
 
+            // File
             exportCallbacks.TotalToProcess += Files(source).Count();
 
             foreach (var folder in Folders(source))
@@ -191,7 +193,7 @@ namespace VFSBase.Implementation
         }
 
         //TODO: test this
-        private void ExportFolder(Folder folder, string destination, ExportCallbacks exportCallbacks)
+        private void ExportFolder(Folder folder, string destination, CallbacksBase exportCallbacks)
         {
             if (exportCallbacks.ShouldAbort()) return;
 
@@ -208,7 +210,7 @@ namespace VFSBase.Implementation
             }
         }
 
-        private void ExportFile(VFSFile file, string destination, ExportCallbacks exportCallbacks)
+        private void ExportFile(VFSFile file, string destination, CallbacksBase exportCallbacks)
         {
             if (exportCallbacks.ShouldAbort()) return;
 
@@ -245,18 +247,27 @@ namespace VFSBase.Implementation
 
         #region Copy
 
-        public void Copy(IIndexNode nodeToCopy, Folder destination, string name, CopyCallbacks copyCallbacks)
+        public void Copy(IIndexNode nodeToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
         {
             CheckDisposed();
             CheckName(name);
 
-            if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name, copyCallbacks);
-            else if (nodeToCopy is VFSFile) CopyFile(nodeToCopy as VFSFile, destination, name);
+            // Gather totals
+            if (nodeToCopy is Folder) CollectExportDirectoryTotals(nodeToCopy as Folder, copyCallbacks);
+            else if (nodeToCopy is VFSFile) copyCallbacks.TotalToProcess++;
             else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
+
+            // Do the real copy
+            if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name, copyCallbacks);
+            else CopyFile(nodeToCopy as VFSFile, destination, name, copyCallbacks);
+
+            copyCallbacks.OperationCompleted(!copyCallbacks.ShouldAbort());
         }
 
-        private void CopyFile(VFSFile fileToCopy, Folder destination, string name)
+        private void CopyFile(VFSFile fileToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
         {
+            if (copyCallbacks.ShouldAbort()) return;
+
             CheckName(name);
 
             var file = new VFSFile(name)
@@ -271,14 +282,21 @@ namespace VFSBase.Implementation
             _persistence.Persist(file);
 
             AppendBlockReference(destination, file.BlockNumber);
+
+            copyCallbacks.CurrentlyProcessed++;
         }
 
-        private void CopyFolder(Folder nodeToCopy, Folder destination, string name, CopyCallbacks copyCallbacks)
+        private void CopyFolder(Folder nodeToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
         {
+            if (copyCallbacks.ShouldAbort()) return;
+
             CheckName(name);
 
             var newFolder = CreateFolder(destination, name);
-            foreach (var subNode in List(nodeToCopy)) Copy(subNode, newFolder, subNode.Name, copyCallbacks);
+            copyCallbacks.CurrentlyProcessed++;
+
+            foreach (var subNode in Folders(nodeToCopy)) CopyFolder(subNode, newFolder, subNode.Name, copyCallbacks);
+            foreach (var subNode in Files(nodeToCopy)) CopyFile(subNode, newFolder, subNode.Name, copyCallbacks);
         }
 
         #endregion

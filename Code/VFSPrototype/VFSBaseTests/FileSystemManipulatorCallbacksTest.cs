@@ -146,12 +146,15 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                Directory.Delete(DummyExportFolderPath, true);
-
                 var completed = false;
                 var success = false;
 
-                m.Copy("dummy", "dummy2", new CopyCallbacks(() => false, b => { completed = true; success = b; }));
+                var totalCounter = new CountTester(4);
+                Action<int> testTotalToProcess = totalCounter.Up;
+                Action<int> testCurrentlyProcessed = new CountTester(4, totalCounter).Up;
+
+                m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks());
+                m.Copy("dummy", "dummy2", new CopyCallbacks(() => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed));
                 Assert.IsTrue(m.Exists("dummy2"));
 
                 Assert.AreEqual(completed, true);

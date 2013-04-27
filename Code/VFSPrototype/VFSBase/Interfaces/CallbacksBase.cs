@@ -3,6 +3,9 @@ using System.Diagnostics;
 
 namespace VFSBase.Interfaces
 {
+    /// <summary>
+    /// The callbacks base
+    /// </summary>
     public class CallbacksBase
     {
         /// <summary>
