@@ -75,9 +75,14 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\Command.cs" />
+    <Compile Include="ViewModel\DiskInfoViewModel.cs" />
     <Compile Include="ViewModel\InputViewModel.cs" />
     <Compile Include="ViewModel\ListItem.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Page Include="View\DiskInfoDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\InputDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -91,6 +96,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewModel\SearchOption.cs" />
+    <Compile Include="View\DiskInfoDialog.xaml.cs">
+      <DependentUpon>DiskInfoDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\InputDialog.xaml.cs">
       <DependentUpon>InputDialog.xaml</DependentUpon>
     </Compile>

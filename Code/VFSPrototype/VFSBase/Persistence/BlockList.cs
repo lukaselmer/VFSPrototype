@@ -166,7 +166,8 @@ namespace VFSBase.Persistence
 
                 if (recursion == 0)
                 {
-                    // TODO: inspect this: is it needed?? if (blockNumber != toBeReplaced) continue;
+                    // TODO: inspect this: is it needed?? 
+                    if (blockNumber != toBeReplaced) continue;
                 
                     indirectNode[i] = toReplace;
                     _persistence.PersistIndirectNode(indirectNode);

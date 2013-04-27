@@ -376,8 +376,18 @@ namespace VFSBaseTests
         {
             using (var m = InitTestFileSystemManipulator())
             {
-                Assert.IsTrue(m.QueryFreeDiskSpace() > 0);
-                Assert.AreEqual(DriveInfo.GetDrives().First(d => d.Name == @"C:\").TotalFreeSpace, m.QueryFreeDiskSpace(), 10000.0);
+                Assert.IsTrue(m.FileSystemOptions.DiskFree > 0);
+                Assert.AreEqual(DriveInfo.GetDrives().First(d => d.Name == @"C:\").TotalFreeSpace, m.FileSystemOptions.DiskFree, 10000.0);
+            }
+        }
+
+        [TestMethod]
+        public void TestQueryOccupiedSpace()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                Assert.IsTrue(m.FileSystemOptions.DiskOccupied > 0);
+                Assert.AreEqual(16384L, m.FileSystemOptions.DiskOccupied);
             }
         }
     }

@@ -1,0 +1,36 @@
+﻿<Window x:Class="VFSBrowser.View.DiskInfoDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DiskInfoDialogDialog" MinHeight="200" MinWidth="200" Height="200" Width="300">
+    <StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" >File Path</Label>
+            <Label Grid.Row="0" Grid.Column="1" Content="{Binding FilePath}" />
+
+            <Label Grid.Row="1" Grid.Column="0" >Free Disk Space</Label>
+            <StackPanel Grid.Row="1" Grid.Column="1"  >
+                <Label Content="{Binding FreeDiskSpace}"/>
+                <Label Content="{Binding FreeDiskSpaceGb}"/>
+            </StackPanel>
+
+            <Label Grid.Row="2" Grid.Column="0" >Occupied Disk Space</Label>
+            <StackPanel Grid.Row="2" Grid.Column="1">
+                <Label Content="{Binding OccupiedDiskSpace}"/>
+                <Label Content="{Binding OccupiedDiskSpaceGb}"/>
+            </StackPanel>
+
+            <Button Grid.Row="3" Grid.ColumnSpan="2" Grid.Column="0" Margin="5" Width="Auto" IsCancel="True" Content="Close" />
+        </Grid>
+    </StackPanel>
+</Window>

@@ -26,6 +26,9 @@
                 <MenuItem Header="ImportFile" Command="{Binding ImportFileCommand}" />
                 <MenuItem Header="ExportFile" Command="{Binding ExportFileCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItems}" />
             </MenuItem>
+            <MenuItem Header="_Info">
+                <MenuItem Header="Disk Info" Command="{Binding DiskInfoCommand}" />
+            </MenuItem>
         </Menu>
 
         <Expander Grid.Row="1" Header="Search">

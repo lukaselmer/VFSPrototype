@@ -64,9 +64,12 @@ namespace VFSConsoleTests
             return FolderExists;
         }
 
-        public long QueryFreeDiskSpace()
+        public IFileSystemOptions FileSystemOptions
         {
-            throw new NotImplementedException();
+            get
+            {
+                throw new NotImplementedException();
+            }
         }
 
         public void Dispose()
