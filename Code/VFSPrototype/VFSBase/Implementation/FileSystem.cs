@@ -86,7 +86,7 @@ namespace VFSBase.Implementation
         }
 
         //TODO: test this method with recursive data
-        public void Import(string source, Folder destination, string name)
+        public void Import(string source, Folder destination, string name, ImportCallbacks importCallbacks)
         {
             CheckDisposed();
             CheckName(name);
@@ -120,7 +120,7 @@ namespace VFSBase.Implementation
                 ImportFile(fileInfo.FullName, newFolder, fileInfo.Name);
         }
 
-        public void Export(IIndexNode source, string destination)
+        public void Export(IIndexNode source, string destination, ExportCallbacks exportCallbacks)
         {
             var absoluteDestination = Path.GetFullPath(destination);
             EnsureParentDirectoryExists(absoluteDestination);
@@ -169,12 +169,12 @@ namespace VFSBase.Implementation
             throw new NotImplementedException();
         }
 
-        public void Copy(IIndexNode nodeToCopy, Folder destination, string name)
+        public void Copy(IIndexNode nodeToCopy, Folder destination, string name, CopyCallbacks copyCallbacks)
         {
             CheckDisposed();
             CheckName(name);
 
-            if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name);
+            if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name, copyCallbacks);
             else if (nodeToCopy is VFSFile) CopyFile(nodeToCopy as VFSFile, destination, name);
             else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
         }
@@ -192,12 +192,12 @@ namespace VFSBase.Implementation
             AppendBlockReference(destination, file.BlockNumber);
         }
 
-        private void CopyFolder(Folder nodeToCopy, Folder destination, string name)
+        private void CopyFolder(Folder nodeToCopy, Folder destination, string name, CopyCallbacks copyCallbacks)
         {
             CheckName(name);
 
             var newFolder = CreateFolder(destination, name);
-            foreach (var subNode in List(nodeToCopy)) Copy(subNode, newFolder, subNode.Name);
+            foreach (var subNode in List(nodeToCopy)) Copy(subNode, newFolder, subNode.Name, copyCallbacks);
         }
 
         public void Delete(IIndexNode node)

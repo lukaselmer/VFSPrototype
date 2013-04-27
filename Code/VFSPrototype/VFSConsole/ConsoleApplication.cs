@@ -96,7 +96,7 @@ namespace VFSConsole
                 var source = options[0];
                 var dest = PathFor(options[1]);
 
-                _fileSystemTextManipulator.Import(source, dest, _shouldAbort, _operationCompleted, _totalToProcessChanged, _currentlyProcessedChanged);
+                _fileSystemTextManipulator.Import(source, dest, new ImportCallbacks(_shouldAbort, _operationCompleted, _totalToProcessChanged, _currentlyProcessedChanged));
                 _textWriter.WriteLine("Imported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)
@@ -114,7 +114,7 @@ namespace VFSConsole
                 var source = PathFor(options[0]);
                 var dest = options[1];
 
-                _fileSystemTextManipulator.Export(source, dest, _shouldAbort, _operationCompleted, _totalToProcessChanged, _currentlyProcessedChanged);
+                _fileSystemTextManipulator.Export(source, dest, new ExportCallbacks(_shouldAbort, _operationCompleted, _totalToProcessChanged, _currentlyProcessedChanged));
                 _textWriter.WriteLine("Exported \"{0}\" to \"{1}\"", source, dest);
             }
             catch (ArgumentException)

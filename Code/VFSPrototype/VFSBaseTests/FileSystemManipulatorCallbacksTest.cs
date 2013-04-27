@@ -61,7 +61,7 @@ namespace VFSBaseTests
 
                 var totalCounter = new CountTester(3);
 
-                m.Import(DummyImportFolderPath, "dummy", () => true, b => { completed = true; success = b; });
+                m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks(() => true, b => { completed = true; success = b; }));
                 Assert.IsFalse(m.Exists("dummy"));
 
                 Assert.AreEqual(completed, true);
@@ -81,7 +81,7 @@ namespace VFSBaseTests
                 Action<int> testTotalToProcess = totalCounter.Up;
                 Action<int> testCurrentlyProcessed = new CountTester(3, totalCounter).Up;
 
-                m.Import(DummyExportFolderPath, "dummy", () => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed);
+                m.Import(DummyExportFolderPath, "dummy", new ImportCallbacks(() => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed));
                 Assert.IsTrue(m.Exists("dummy"));
 
                 Assert.AreEqual(completed, true);
@@ -99,8 +99,8 @@ namespace VFSBaseTests
                 var completed = false;
                 var success = false;
 
-                m.Import(DummyImportFolderPath, "dummy");
-                m.Export("dummy", DummyExportFolderPath, () => true, b => { completed = true; success = b; });
+                m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks());
+                m.Export("dummy", DummyExportFolderPath, new ExportCallbacks(() => true, b => { completed = true; success = b; }));
                 Assert.IsFalse(Directory.Exists(DummyExportFolderPath));
 
                 Assert.AreEqual(completed, true);
@@ -122,7 +122,7 @@ namespace VFSBaseTests
                 Action<int> testTotalToProcess = totalCounter.Up;
                 Action<int> testCurrentlyProcessed = new CountTester(3, totalCounter).Up;
 
-                m.Import(DummyImportFolderPath, "dummy", () => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed);
+                m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks(() => false, b => { completed = true; success = b; }, testTotalToProcess, testCurrentlyProcessed));
                 Assert.IsTrue(Directory.Exists(DummyExportFolderPath));
 
                 Assert.AreEqual(completed, true);
@@ -140,8 +140,8 @@ namespace VFSBaseTests
                 var completed = false;
                 var success = false;
 
-                m.Import(DummyImportFolderPath, "dummy");
-                m.Copy("dummy", "dummy2", () => true, b => { completed = true; success = b; });
+                m.Import(DummyImportFolderPath, "dummy", new ImportCallbacks());
+                m.Copy("dummy", "dummy2", new CopyCallbacks(() => true, b => { completed = true; success = b; }));
                 Assert.IsFalse(m.Exists("dummy"));
 
                 Assert.AreEqual(completed, true);
@@ -159,7 +159,7 @@ namespace VFSBaseTests
                 var completed = false;
                 var success = false;
 
-                m.Copy("dummy", "dummy2", () => false, b => { completed = true; success = b; });
+                m.Copy("dummy", "dummy2", new CopyCallbacks(() => false, b => { completed = true; success = b; }));
                 Assert.IsTrue(m.Exists("dummy"));
 
                 Assert.AreEqual(completed, true);
