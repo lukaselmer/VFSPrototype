@@ -9,8 +9,22 @@ namespace VFSBase.Implementation
     [Serializable]
     public class BlockAllocation
     {
-        private long _nextFreeBlock = 1;
+
+        /// <summary>
+        /// The next free block
+        /// Starts a 2 => first two blocks are reserved for the file system
+        /// </summary>
+        private long _nextFreeBlock = 2;
         private readonly LinkedList<long> _freeList = new LinkedList<long>();
+
+        /// <summary>
+        /// The next free block
+        /// Starts a 2 => first two blocks are reserved for the file system
+        /// </summary>
+        public long OccupiedCount
+        {
+            get { return _nextFreeBlock - _freeList.Count; }
+        }
 
         public long Allocate()
         {

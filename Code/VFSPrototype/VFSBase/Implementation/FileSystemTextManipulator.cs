@@ -184,11 +184,6 @@ namespace VFSBase.Implementation
             _fileSystem = null;
         }
 
-        public long QueryFreeDiskSpace()
-        {
-            var s = Path.GetFullPath(_fileSystem.FileSystemOptions.Location);
-            var driveInfo = DriveInfo.GetDrives().FirstOrDefault(d => d.Name == Path.GetPathRoot(s));
-            return driveInfo == null ? -1 : driveInfo.TotalFreeSpace;
-        }
+        public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
     }
 }
