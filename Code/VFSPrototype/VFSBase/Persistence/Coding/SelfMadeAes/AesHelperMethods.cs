@@ -236,7 +236,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         /// </summary>
         /// <param name="word">The word.</param>
         /// <param name="iteration">The iteration.</param>
-        public static void KeySchedule(byte[] word, int iteration)
+        private static void KeySchedule(byte[] word, int iteration)
         {
             Rotate(word);
             // Use Sbox to substitute the four parts of the 32bit word

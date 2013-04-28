@@ -64,6 +64,8 @@
   <ItemGroup>
     <Compile Include="BlockAllocationTest.cs" />
     <Compile Include="Coding\CryptoTest.cs" />
+    <Compile Include="Coding\EncryptionStrategiesTest.cs" />
+    <Compile Include="Exceptions\ExceptionsTest.cs" />
     <Compile Include="FileSystemManipulatorFoldersTest.cs" />
     <Compile Include="FileSystemManipulatorLoadTest.cs" />
     <Compile Include="FileSystemFactoryTest.cs" />
@@ -76,6 +78,8 @@
     <Compile Include="FileSystemOptionsTest.cs" />
     <Compile Include="BinaryMathUtilTest.cs" />
     <Compile Include="FileSystemManipulatorCallbacksTest.cs" />
+    <Compile Include="BlockListTest.cs" />
+    <Compile Include="VFSFileStreamTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VFSBase\VFSBase.csproj">
