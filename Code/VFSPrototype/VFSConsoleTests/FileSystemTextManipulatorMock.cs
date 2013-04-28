@@ -64,6 +64,14 @@ namespace VFSConsoleTests
             return FolderExists;
         }
 
+        public IFileSystemOptions FileSystemOptions
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public void Dispose()
         {
         }

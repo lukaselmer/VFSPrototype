@@ -103,7 +103,7 @@ namespace VFSBase.Implementation
 
         public void Import(string source, string dest, ImportCallbacks importCallbacks = null)
         {
-            if(importCallbacks == null) importCallbacks = new ImportCallbacks();
+            if (importCallbacks == null) importCallbacks = new ImportCallbacks();
             var node = CreateParentFolder(dest);
             _fileSystem.Import(source, node, PathParser.GetNodeName(dest), importCallbacks);
         }
@@ -183,5 +183,7 @@ namespace VFSBase.Implementation
             _fileSystem.Dispose();
             _fileSystem = null;
         }
+
+        public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
     }
 }
