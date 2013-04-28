@@ -6,7 +6,7 @@ namespace VFSBase.Interfaces
     /// <summary>
     /// The callbacks base
     /// </summary>
-    public class CallbacksBase
+    public abstract class CallbacksBase
     {
         /// <summary>
         /// The should abort function is called multiple times during the import.

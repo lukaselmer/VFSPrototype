@@ -11,9 +11,9 @@ namespace VFSBase.Interfaces
         IList<string> Folders(string path);
         bool IsDirectory(string path);
         void CreateFolder(string path);
-        void Import(string source, string dest, ImportCallbacks importCallbacks = null);
+        void Import(string source, string dest, CallbacksBase importCallbacks = null);
         void Export(string source, string dest, CallbacksBase exportCallbacks = null);
-        void Copy(string source, string dest, CopyCallbacks copyCallbacks = null);
+        void Copy(string source, string dest, CallbacksBase copyCallbacks = null);
         void Delete(string path);
         void Move(string source, string dest);
         bool Exists(string path);

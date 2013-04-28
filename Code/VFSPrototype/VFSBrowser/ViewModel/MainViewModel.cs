@@ -160,15 +160,13 @@ namespace VFSBrowser.ViewModel
         {
             var items = parameter as ObservableCollection<object>;
 
-            if (items == null)
-                return;
+            if (items == null) return;
 
             try
             {
                 _clipboard.Clear();
                 _copy = true;
-                foreach (ListItem item in items)
-                    _clipboard.Add(item);
+                foreach (ListItem item in items) _clipboard.Add(item);
 
             }
             catch (Exception e)
@@ -204,22 +202,28 @@ namespace VFSBrowser.ViewModel
             {
                 foreach (var source in _clipboard)
                 {
-                    if (_manipulator.Exists(CurrentPath + source.Name))
+                    var destinationPath = CurrentPath + source.Name;
+
+                    if (_manipulator.Exists(destinationPath))
                     {
                         var result = MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
                         if (result == MessageBoxResult.No)
                             continue;
-                        _manipulator.Delete(CurrentPath + source.Name);
+                        _manipulator.Delete(destinationPath);
                         var listItem = Items.First(l => l.Name == source.Name);
                         Items.Remove(listItem);
                     }
 
+                    var sourcePath = source.Path + source.Name;
                     if (_copy)
-                        _manipulator.Copy(source.Path + source.Name, CurrentPath + source.Name, new CopyCallbacks());
-                    else
-                        _manipulator.Move(source.Path + source.Name, CurrentPath + source.Name);
+                    {
+                        var vm = new OperationProgressViewModel();
+                        Task.Run(() => _manipulator.Copy(sourcePath, destinationPath, vm.Callbacks));
+                        vm.ShowDialog();
+                    }
+                    else _manipulator.Move(sourcePath, destinationPath);
 
-                    Items.Add(new ListItem(CurrentPath, source.Name, _manipulator.IsDirectory(CurrentPath + source.Name)));
+                    Items.Add(new ListItem(CurrentPath, source.Name, _manipulator.IsDirectory(destinationPath)));
                 }
             }
             catch (Exception e)
@@ -240,7 +244,6 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-
                 foreach (ListItem item in items)
                 {
                     var exportPath = Path.Combine(dlg.SelectedPath, item.Name);
@@ -457,7 +460,11 @@ namespace VFSBrowser.ViewModel
                     var listItem = Items.First(l => l.Name == name);
                     Items.Remove(listItem);
                 }
-                _manipulator.Import(source, virtualPath, new ImportCallbacks());
+
+                var vm = new OperationProgressViewModel();
+                Task.Run(() => _manipulator.Import(source, virtualPath, vm.Callbacks));
+                vm.ShowDialog();
+
                 Items.Add(new ListItem(CurrentPath, name, isDirectory));
             }
             catch (Exception e)
