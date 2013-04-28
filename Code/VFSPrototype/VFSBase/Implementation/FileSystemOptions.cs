@@ -9,6 +9,7 @@ using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Coding;
 using VFSBase.Persistence.Coding.General;
+using VFSBase.Persistence.Coding.MicrosoftAes;
 using VFSBase.Persistence.Coding.MicrosoftCompression;
 
 namespace VFSBase.Implementation
@@ -44,8 +45,8 @@ namespace VFSBase.Implementation
 
         private void InitializeStreamCodingStrategy()
         {
-            //var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
-            var encryptionStrategy = new SelfMadeStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
+            var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
+            //var encryptionStrategy = new SelfMadeStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
             _streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), encryptionStrategy);
             //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), new NullStreamCodingStrategy());
             //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), new NullStreamCodingStrategy());
@@ -57,12 +58,12 @@ namespace VFSBase.Implementation
 
         public uint MasterBlockSize { get; set; }
 
-        public int BlockReferenceSize { get; set; }
+        public int BlockReferenceSize { get; private set; }
 
-        public int StartOfDirectBlock { get { return 1 /*type byte*/+ NameLength; } }
-        public int StartOfIndirectBlocks { get { return BlockSize - (3 * BlockReferenceSize); } }
-        public int DirectBlocksSpace { get { return StartOfIndirectBlocks - StartOfDirectBlock; } }
-        public int DirectBlocksAmount { get { return DirectBlocksSpace / BlockReferenceSize; } }
+        //public int StartOfDirectBlock { get { return 1 /*type byte*/+ NameLength; } }
+        //public int StartOfIndirectBlocks { get { return BlockSize - (3 * BlockReferenceSize); } }
+        //public int DirectBlocksSpace { get { return StartOfIndirectBlocks - StartOfDirectBlock; } }
+        //public int DirectBlocksAmount { get { return DirectBlocksSpace / BlockReferenceSize; } }
 
         public static FileSystemOptions Deserialize(Stream stream)
         {
@@ -94,11 +95,11 @@ namespace VFSBase.Implementation
         public long DiskFree { get; private set; }
         public long DiskOccupied { get; private set; }
 
-        public int NameLength { get; private set; }
+        public int NameLength { get; internal set; }
 
         public int ReferencesPerIndirectNode { get { return BlockSize / BlockReferenceSize; } }
 
-        public BlockAllocation BlockAllocation { get; set; }
+        public BlockAllocation BlockAllocation { get; private set; }
 
         public long MaximumFileSize
         {

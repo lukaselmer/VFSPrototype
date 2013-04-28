@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
@@ -45,7 +46,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestNamesShouldSupportUtf8()
         {
-            var name = "∀α,β∈∑α≤β∧β≥α=>α=β";
+            const string name = "∀α,β∈∑α≤β∧β≥α=>α=β";
             using (var fs = GetFileSystem())
             {
                 Assert.IsTrue(!fs.Folders(fs.Root).Any());
@@ -58,6 +59,13 @@ namespace VFSBaseTests
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
                 Assert.IsTrue(fs.Folders(fs.Root).First().Name == name);
             }
+        }
+
+        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
+        public void TestRootFolderSetNotPossible()
+        {
+            new RootFolder().BlockNumber = 42;
         }
     }
 }

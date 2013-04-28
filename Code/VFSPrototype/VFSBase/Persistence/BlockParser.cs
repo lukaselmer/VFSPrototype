@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using VFSBase.Exceptions;
@@ -22,7 +23,7 @@ namespace VFSBase.Persistence
 
         public IIndexNode BytesToNode(byte[] bb)
         {
-            if (bb.Length != _options.BlockSize) return EmptyBlock.Get();
+            if (bb.Length != _options.BlockSize) throw new VFSException("block invalid");
 
             var typeByte = bb[0];
 
@@ -30,12 +31,12 @@ namespace VFSBase.Persistence
 
             if (typeByte == FileType) return ParseFile(bb);
 
-            return EmptyBlock.Get();
+            throw new VFSException("block invalid");
         }
 
         private Folder ParseFolder(byte[] bb)
         {
-            if (bb.Length != _options.BlockSize) return null;
+            Debug.Assert(bb.Length == _options.BlockSize);
 
             var name = ExtractName(bb);
 
@@ -48,13 +49,15 @@ namespace VFSBase.Persistence
 
         public RootFolder ParseRootFolder(byte[] bb)
         {
+            Debug.Assert(bb.Length == _options.BlockSize);
+
             var f = ParseFolder(bb);
             return new RootFolder { BlocksCount = f.BlocksCount, IndirectNodeNumber = f.IndirectNodeNumber };
         }
 
         private VFSFile ParseFile(byte[] bb)
         {
-            if (bb.Length != _options.BlockSize) return null;
+            Debug.Assert(bb.Length == _options.BlockSize);
 
             var name = ExtractName(bb);
 
