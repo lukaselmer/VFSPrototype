@@ -1,7 +1,7 @@
 ﻿<Window x:Class="VFSBrowser.View.OperationProgressView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Progress view..." MinHeight="150" Height="150" MinWidth="200" Width="300">
+        Title="Progress view..." MinHeight="170" Height="170" MinWidth="200" Width="300">
     <Grid>
         <StackPanel Margin="5" VerticalAlignment="Stretch">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -9,6 +9,7 @@
                 <Label>/</Label>
                 <Label Content="{Binding TotalToProcess}" />
             </StackPanel>
+            <ProgressBar Height="20" Value="{Binding CurrentlyProcessed}" Maximum="{Binding TotalToProcess}" />
             <Label HorizontalAlignment="Center" Margin="0 10 0 10">Operation in progress, please be patient...</Label>
             <Button Command="{Binding AbortCommand}">Cancel</Button>
         </StackPanel>
