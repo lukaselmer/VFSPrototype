@@ -11,7 +11,9 @@ using System.Windows;
 using System.Windows.Forms;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
+using VFSBrowser.View;
 using MessageBox = System.Windows.MessageBox;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace VFSBrowser.ViewModel
 {
@@ -360,64 +362,61 @@ namespace VFSBrowser.ViewModel
 
         private void NewVfs(object parameter)
         {
+            var pathToVFS = ChooseNewVFSFile();
+            if (pathToVFS == null) return;
+
+            // Close last vfs
+            DisposeManipulator();
+
+            var vm = new NewVFSViewModel();
+            if (vm.ShowDialog() != true) return;
+
+            try
+            {
+                var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType, vm.Password);
+                _manipulator = new FileSystemTextManipulator(fileSystemData);
+                CurrentPath = "/";
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private static string ChooseNewVFSFile()
+        {
             // Create OpenFileDialog
-            var dlg = new Microsoft.Win32.SaveFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
+            var dlg = new SaveFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
 
             // Display OpenFileDialog by calling ShowDialog method
             var result = dlg.ShowDialog();
 
             // Get the selected file name and display in a TextBox
-            if (result == true)
-            {
-                // Close last vfs
-                DisposeManipulator();
-
-                var sizeDlg = new InputViewModel("Size in MB", "10");
-                result = sizeDlg.ShowDialog();
-
-                if (result == true)
-                {
-                    // Open document
-                    int size;
-                    if (int.TryParse(sizeDlg.Text, out size))
-                    {
-                        try
-                        {
-                            var fileSystemData = new FileSystemOptions(dlg.FileName, size);
-                            _manipulator = new FileSystemTextManipulator(fileSystemData);
-                            CurrentPath = "/";
-
-                        }
-                        catch (Exception e)
-                        {
-                            MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
-            }
+            return result != true ? null : dlg.FileName;
         }
 
         private void OpenVfs(object parameter)
         {
             var dlg = new Microsoft.Win32.OpenFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
-            var result = dlg.ShowDialog();
+            if (dlg.ShowDialog() != true) return;
 
-            if (result == true)
+            var passwordDialog = new PasswordDialogViewModel();
+            if (passwordDialog.ShowDialog() != true) return;
+
+            try
             {
+                var fileSystemData = new FileSystemOptions(dlg.FileName, 1000 * 1000 * 1000);
+                var manipulator = new FileSystemTextManipulator(fileSystemData, passwordDialog.Password);
+
                 // Close last vfs
                 DisposeManipulator();
 
-                try
-                {
-                    var fileSystemData = new FileSystemOptions(dlg.FileName, 1000 * 1000 * 1000);
-                    _manipulator = new FileSystemTextManipulator(fileSystemData);
-                    CurrentPath = "/";
-
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                _manipulator = manipulator;
+                CurrentPath = "/";
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -24,7 +24,7 @@ namespace VFSBaseTests
         private IFileSystem GetFileSystem(string path = DefaultTestfilePath)
         {
             var o = new FileSystemOptions(path, _defaultSize);
-            return FileSystemFactory.CreateOrImport(o);
+            return FileSystemFactory.CreateOrImport(o, "");
         }
 
         [TestMethod]

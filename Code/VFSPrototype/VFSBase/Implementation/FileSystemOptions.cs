@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security;
 using System.Security.Cryptography;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
@@ -21,7 +22,7 @@ namespace VFSBase.Implementation
         [NonSerialized]
         private IStreamCodingStrategy _streamCodingStrategy;
 
-        public FileSystemOptions(string location, long diskSize, StreamEncryptionType encryption = StreamEncryptionType.None, StreamCompressionType compression = StreamCompressionType.None)
+        public FileSystemOptions(string location, long diskSize, StreamEncryptionType encryption = StreamEncryptionType.None, StreamCompressionType compression = StreamCompressionType.None, string password = "")
         {
             Location = location;
             DiskSize = diskSize;
@@ -34,18 +35,30 @@ namespace VFSBase.Implementation
             BlockAllocation = new BlockAllocation();
             IndirectionCountForIndirectNodes = 2;
 
-            // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
+            if (encryption == StreamEncryptionType.None) return;
+
             using (var r = Rijndael.Create())
             {
-                EncryptionKey = r.Key;
+                EncryptedEncryptionKey = TransformEncryptionKey(r.Key, password);
                 EncryptionInitializationVector = r.IV;
             }
 
-            InitializeStreamCodingStrategy();
+            InitializeStreamCodingStrategy(password);
         }
 
-        private void InitializeStreamCodingStrategy()
+        private static byte[] TransformEncryptionKey(byte[] key, string password)
         {
+            var bb = new byte[key.Length];
+            for (var i = 0; i < key.Length; i++)
+            {
+                bb[i] = (byte)(key[i] ^ password[i % password.Length]);
+            }
+            return bb;
+        }
+
+        internal void InitializeStreamCodingStrategy(string password)
+        {
+            EncryptionKey = TransformEncryptionKey(EncryptedEncryptionKey, password);
             _streamCodingStrategy = new StramStrategyResolver(this).ResolveStrategy();
         }
 
@@ -64,10 +77,14 @@ namespace VFSBase.Implementation
         //public int DirectBlocksSpace { get { return StartOfIndirectBlocks - StartOfDirectBlock; } }
         //public int DirectBlocksAmount { get { return DirectBlocksSpace / BlockReferenceSize; } }
 
-        public static FileSystemOptions Deserialize(Stream stream)
+        public static FileSystemOptions Deserialize(Stream stream, string password)
         {
             IFormatter formatter = new BinaryFormatter();
-            return formatter.Deserialize(stream) as FileSystemOptions;
+            var fileSystemOptions = formatter.Deserialize(stream) as FileSystemOptions;
+            if (fileSystemOptions == null) throw new VFSException("Invalid file");
+
+            fileSystemOptions.InitializeStreamCodingStrategy(password);
+            return fileSystemOptions;
         }
 
         public void Serialize(Stream stream)
@@ -116,22 +133,26 @@ namespace VFSBase.Implementation
             }
         }
 
-        // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
-        // [NonSerialized]
-        internal byte[] EncryptionKey { get; set; }
+        protected byte[] EncryptedEncryptionKey { get; set; }
 
-        // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
-        // [NonSerialized]
+        [NonSerialized]
+        private byte[] _encryptionKey;
+
+        internal byte[] EncryptionStringForTest { get; set; }
+
+        internal byte[] EncryptionKey
+        {
+            get { return _encryptionKey; }
+            set { _encryptionKey = value; }
+        }
+
         internal byte[] EncryptionInitializationVector { get; set; }
 
         public IStreamCodingStrategy StreamCodingStrategy
         {
             get
             {
-                lock (GetType())
-                {
-                    if (_streamCodingStrategy == null) InitializeStreamCodingStrategy();
-                }
+                if (_streamCodingStrategy == null) throw new VFSException("Invalid initialization");
                 return _streamCodingStrategy;
             }
         }
