@@ -104,5 +104,11 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <value>The file system options.</value>
         FileSystemOptions FileSystemOptions { get; }
+
+        /// <summary>
+        /// Tests the encryption key.
+        /// </summary>
+        /// <returns></returns>
+        void TestEncryptionKey();
     }
 }

@@ -7,13 +7,14 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Implementation
 {
-    public class FileSystemTextManipulator : IFileSystemTextManipulator
+    public sealed class FileSystemTextManipulator : IFileSystemTextManipulator
     {
         private IFileSystem _fileSystem;
 
-        public FileSystemTextManipulator(FileSystemOptions options)
+        public FileSystemTextManipulator(FileSystemOptions options, string password = "")
         {
-            _fileSystem = FileSystemFactory.CreateOrImport(options);
+            _fileSystem = FileSystemFactory.CreateOrImport(options, password);
+            _fileSystem.TestEncryptionKey();
         }
 
         public IList<string> Folders(string path)
@@ -170,7 +171,7 @@ namespace VFSBase.Implementation
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             // If you need thread safety, use a lock around these  
             // operations, as well as in your methods that use the resource.
