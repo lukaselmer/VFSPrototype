@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:VFSBrowser.View"
         xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" MinWidth="525" MinHeight="300" Height="350" Width="525">
     <!--<Window.DataContext>
         Declaratively create an instance of our MainViewModel
         <viewModel:MainViewModel />
@@ -25,6 +25,9 @@
                 <MenuItem Header="New Folder" Command="{Binding NewFolderCommand}" />
                 <MenuItem Header="ImportFile" Command="{Binding ImportFileCommand}" />
                 <MenuItem Header="ExportFile" Command="{Binding ExportFileCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItems}" />
+            </MenuItem>
+            <MenuItem Header="_Info">
+                <MenuItem Header="Disk Info" Command="{Binding DiskInfoCommand}" />
             </MenuItem>
         </Menu>
 

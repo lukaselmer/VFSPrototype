@@ -1,6 +1,6 @@
 ﻿namespace VFSBase.Interfaces
 {
-    internal interface IFileSystemOptions
+    public interface IFileSystemOptions
     {
         string Location { get; set; }
         long DiskSize { get; set; }

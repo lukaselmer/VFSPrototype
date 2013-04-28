@@ -15,7 +15,7 @@ namespace VFSBrowser.ViewModel
 {
     sealed class MainViewModel : AbstractViewModel, IDisposable
     {
-        private FileSystemTextManipulator _manipulator;
+        private IFileSystemTextManipulator _manipulator;
 
         private readonly ListItem _parent = new ListItem(null, "..", true);
         public ListItem Parent
@@ -67,6 +67,7 @@ namespace VFSBrowser.ViewModel
             CopyCommand = new Command(Copy, p => (_manipulator != null && p != null));
             PasteCommand = new Command(Paste, p => (_manipulator != null));
             SearchCommand = new Command(Search, p => (_manipulator != null));
+            DiskInfoCommand = new Command(DiskInfo, p => (_manipulator != null));
         }
 
 
@@ -82,6 +83,7 @@ namespace VFSBrowser.ViewModel
         public Command PasteCommand { get; private set; }
         public Command DeleteCommand { get; private set; }
         public Command SearchCommand { get; private set; }
+        public Command DiskInfoCommand { get; private set; }
 
 
         private List<ListItem> SearchItems(string folder)
@@ -119,6 +121,12 @@ namespace VFSBrowser.ViewModel
             SearchItems(CurrentPath).ForEach(i => Items.Add(i));
         }
 
+        private void DiskInfo(object parameter)
+        {
+
+            var sizeDlg = new DiskInfoViewModel(_manipulator);
+            sizeDlg.ShowDialog();
+        }
 
         private void Delete(object parameter)
         {
@@ -185,7 +193,7 @@ namespace VFSBrowser.ViewModel
                 {
                     if (_manipulator.Exists(CurrentPath + source.Name))
                     {
-                        var result = System.Windows.MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo,
+                        var result = MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo,
                                                                     MessageBoxImage.Information);
                         if (result == MessageBoxResult.No)
                             continue;
@@ -243,7 +251,7 @@ namespace VFSBrowser.ViewModel
                 {
                     if (_manipulator.Exists(CurrentPath + dlg.Text))
                     {
-                        var res = System.Windows.MessageBox.Show("Choose an other name!", "Filename allready exists!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        var res = MessageBox.Show("Choose an other name!", "Filename allready exists!", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                     _manipulator.Move(CurrentPath + item.Name, CurrentPath + dlg.Text);
@@ -300,7 +308,7 @@ namespace VFSBrowser.ViewModel
         private void NewVfs(object parameter)
         {
             // Create OpenFileDialog
-            var dlg = new Microsoft.Win32.SaveFileDialog() { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
+            var dlg = new Microsoft.Win32.SaveFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
             
             // Display OpenFileDialog by calling ShowDialog method
             var result = dlg.ShowDialog();
@@ -335,7 +343,7 @@ namespace VFSBrowser.ViewModel
 
         private void OpenVfs(object parameter)
         {
-            var dlg = new Microsoft.Win32.OpenFileDialog() { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
+            var dlg = new Microsoft.Win32.OpenFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
             var result = dlg.ShowDialog();
 
             if (result == true)
