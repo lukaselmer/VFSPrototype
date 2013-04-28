@@ -159,12 +159,12 @@ namespace VFSBase.Implementation
             if (!_canWrite) throw new VFSException("Stream is not writable");
             if (_canRead) _canRead = false;
 
-            long toWriteOffset = 0;
-            while (toWriteOffset < count)
+            long written = 0;
+            while (written < count)
             {
-                var amountToCopy = Math.Min(count, Math.Min(_writeBuffer.Length - _writeBufferPosition, buffer.Length - toWriteOffset));
-                Array.Copy(buffer, toWriteOffset, _writeBuffer, _writeBufferPosition, amountToCopy);
-                toWriteOffset += amountToCopy;
+                var amountToCopy = Math.Min(count - written, Math.Min(_writeBuffer.Length - _writeBufferPosition, buffer.Length - written));
+                Array.Copy(buffer, written + offset, _writeBuffer, _writeBufferPosition, amountToCopy);
+                written += amountToCopy;
                 _writeBufferPosition += amountToCopy;
                 Persist();
             }
