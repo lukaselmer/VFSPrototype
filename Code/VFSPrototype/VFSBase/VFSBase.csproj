@@ -54,6 +54,15 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Implementation\BlockAllocation.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeLz77\CircularBuffer.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeLz77\Lz77Constants.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeLz77\Lz77Triple.cs" />
+    <Compile Include="Implementation\SelfMadeCaesarStreamEncryptionStrategy.cs" />
+    <Compile Include="Implementation\SelfMadeLz77StreamCompressionStrategy.cs" />
+    <Compile Include="Implementation\SelfMadeSimpleStreamEncryptionStrategy.cs" />
+    <Compile Include="Implementation\StramStrategyResolver.cs" />
+    <Compile Include="Implementation\StreamCompressionType.cs" />
+    <Compile Include="Implementation\StreamEncryptionType.cs" />
     <Compile Include="Interfaces\CallbacksBase.cs" />
     <Compile Include="Interfaces\CopyCallbacks.cs" />
     <Compile Include="Interfaces\ExportCallbacks.cs" />
@@ -65,8 +74,9 @@
     <Compile Include="Persistence\Coding\General\NullStreamCodingStrategy.cs" />
     <Compile Include="Persistence\Coding\SelfMadeAes\SelfMadeAes256Cryptor.cs" />
     <Compile Include="Persistence\Coding\SelfMadeCaesar\SelfMadeCaesarCryptor.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeLz77\SelfMadeLz77Stream.cs" />
     <Compile Include="Persistence\Coding\SelfMadeSimple\SelfMadeSimpleCryptor.cs" />
-    <Compile Include="Persistence\Coding\General\SelfMadeStreamEncryptionStrategy.cs" />
+    <Compile Include="Persistence\Coding\General\SelfMadeAes256StreamEncryptionStrategy.cs" />
     <Compile Include="Persistence\Coding\General\StreamCompressionEncryptionCodingStrategy.cs" />
     <Compile Include="Persistence\Coding\MicrosoftCompression\MicrosoftStreamCompressionStrategy.cs" />
     <Compile Include="Persistence\Coding\MicrosoftAes\MicrosoftStreamEncryptionStrategy.cs" />

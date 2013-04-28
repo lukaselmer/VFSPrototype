@@ -28,6 +28,7 @@ namespace VFSBase.Implementation
         {
             SeekToBlock(blockNumber);
             _diskWriter.Write(block);
+            _diskWriter.Flush();
         }
 
         public byte[] ReadBlock(long blockNumber)

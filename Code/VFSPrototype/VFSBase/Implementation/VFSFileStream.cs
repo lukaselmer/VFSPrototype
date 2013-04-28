@@ -70,7 +70,7 @@ namespace VFSBase.Implementation
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if(buffer == null) throw new ArgumentNullException("buffer");
+            if (buffer == null) throw new ArgumentNullException("buffer");
 
             if (buffer.Length < count + offset) throw new ArgumentOutOfRangeException("buffer");
 
@@ -79,7 +79,7 @@ namespace VFSBase.Implementation
 
             if (_blocks == null) InitRead();
 
-
+            var currentOffset = offset;
             var readCount = 0;
 
             while (count - readCount > 0)
@@ -90,8 +90,12 @@ namespace VFSBase.Implementation
                 while (_readBuffer.Length > _readBufferPosition)
                 {
                     var amountToCopy = Math.Min(count - readCount, _readBuffer.Length - _readBufferPosition);
-                    Array.Copy(_readBuffer, _readBufferPosition, buffer, offset, amountToCopy);
+                    
+                    if (amountToCopy == 0) break;
+
+                    Array.Copy(_readBuffer, _readBufferPosition, buffer, currentOffset, amountToCopy);
                     _readBufferPosition += amountToCopy;
+                    currentOffset += amountToCopy;
                     readCount += amountToCopy;
                 }
             }
@@ -155,12 +159,12 @@ namespace VFSBase.Implementation
             if (!_canWrite) throw new VFSException("Stream is not writable");
             if (_canRead) _canRead = false;
 
-            long toWriteOffset = 0;
-            while (toWriteOffset < count)
+            long written = 0;
+            while (written < count)
             {
-                var amountToCopy = Math.Min(count, Math.Min(_writeBuffer.Length - _writeBufferPosition, buffer.Length - toWriteOffset));
-                Array.Copy(buffer, toWriteOffset, _writeBuffer, _writeBufferPosition, amountToCopy);
-                toWriteOffset += amountToCopy;
+                var amountToCopy = Math.Min(count - written, Math.Min(_writeBuffer.Length - _writeBufferPosition, buffer.Length - written));
+                Array.Copy(buffer, written + offset, _writeBuffer, _writeBufferPosition, amountToCopy);
+                written += amountToCopy;
                 _writeBufferPosition += amountToCopy;
                 Persist();
             }
