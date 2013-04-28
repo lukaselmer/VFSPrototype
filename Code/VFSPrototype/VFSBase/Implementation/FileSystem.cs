@@ -87,7 +87,6 @@ namespace VFSBase.Implementation
 
         #region Import
 
-        //TODO: test this method with recursive data
         public void Import(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
             CheckDisposed();
@@ -132,7 +131,6 @@ namespace VFSBase.Implementation
             importCallbacks.CurrentlyProcessed++;
         }
 
-        // TODO: test this
         private void ImportDirectory(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
             if (importCallbacks.ShouldAbort()) return;
@@ -192,7 +190,6 @@ namespace VFSBase.Implementation
             }
         }
 
-        //TODO: test this
         private void ExportFolder(Folder folder, string destination, CallbacksBase exportCallbacks)
         {
             if (exportCallbacks.ShouldAbort()) return;
@@ -202,11 +199,11 @@ namespace VFSBase.Implementation
 
             foreach (var vfsFile in Files(folder))
             {
-                ExportFile(vfsFile, Path.Combine(destination, folder.Name), exportCallbacks);
+                ExportFile(vfsFile, Path.Combine(destination, vfsFile.Name), exportCallbacks);
             }
             foreach (var f in Folders(folder))
             {
-                ExportFolder(f, Path.Combine(destination, folder.Name), exportCallbacks);
+                ExportFolder(f, Path.Combine(destination, f.Name), exportCallbacks);
             }
         }
 
