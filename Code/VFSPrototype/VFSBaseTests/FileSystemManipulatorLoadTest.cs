@@ -86,6 +86,10 @@ namespace VFSBaseTests
                 Assert.IsTrue(File.Exists(testFileSource));
                 Assert.IsTrue(m.Exists(testFileSource));
 
+                var b3 = File.ReadAllBytes(DummyFilePath);
+                var b4 = File.ReadAllBytes(testFileSource);
+                for (var i = 0; i < b3.Length; i++) Assert.AreEqual(b3[i], b4[i]);
+
                 var b1 = Md5Hash(DummyFilePath);
                 var b2 = Md5Hash(testFileSource);
                 for (var i = 0; i < b1.Length; i++) Assert.AreEqual(b1[i], b2[i]);
