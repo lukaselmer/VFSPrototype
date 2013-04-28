@@ -30,7 +30,7 @@ namespace VFSBaseTests
             Assert.IsFalse(File.Exists(DefaultTestfilePath));
 
             // Should call create, because the file does not exist
-            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions))
+            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions, ""))
             {
                 fileSystemOptions = fileSystem.FileSystemOptions;
             }
@@ -48,7 +48,7 @@ namespace VFSBaseTests
 
             var fileSystemOptions = new FileSystemOptions(DefaultTestfilePath, DefaultSize);
 
-            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions))
+            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions, ""))
             {
                 fileSystemOptions = fileSystem.FileSystemOptions;
             }
@@ -56,7 +56,7 @@ namespace VFSBaseTests
             Assert.IsTrue(File.Exists(DefaultTestfilePath));
 
             // Should call import, because the file exists
-            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions))
+            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions, ""))
             {
                 fileSystemOptions = fileSystem.FileSystemOptions;
             }
@@ -77,7 +77,7 @@ namespace VFSBaseTests
             Assert.IsFalse(File.Exists(DefaultTestfilePath));
 
             // Should call create, because the file does not exist
-            var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions);
+            var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions, "");
 
             Assert.IsTrue(File.Exists(DefaultTestfilePath));
 

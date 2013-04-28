@@ -24,6 +24,31 @@ namespace VFSBase.Implementation
             get { return _options; }
         }
 
+        public void TestEncryptionKey()
+        {
+            var check = "0123456789".ToArray().Select(c => (byte)c).ToArray();
+            byte[] ret;
+            using (var ms = new MemoryStream())
+            {
+                using (var encryptor = _options.StreamCodingStrategy.DecorateToVFS(ms))
+                {
+                    encryptor.Write(check, 0, check.Length);
+                    encryptor.Flush();
+                }
+                ret = ms.ToArray();
+            }
+
+            if (_options.EncryptionStringForTest == null)
+            {
+                _options.EncryptionStringForTest = ret;
+            }
+
+            if (_options.EncryptionStringForTest.Where((t, i) => t != ret[i]).Any())
+            {
+                throw new VFSException("invalid password");
+            }
+        }
+
         internal FileSystem(FileSystemOptions options)
         {
             _options = options;

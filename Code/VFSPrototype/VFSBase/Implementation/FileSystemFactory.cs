@@ -19,7 +19,7 @@ namespace VFSBase.Implementation
             return new FileSystem(options);
         }
 
-        private static FileSystem Import(IFileSystemOptions options)
+        private static FileSystem Import(IFileSystemOptions options, string password)
         {
             if (!File.Exists(options.Location)) throw new VFSException("File does not exist");
 
@@ -29,7 +29,7 @@ namespace VFSBase.Implementation
             {
                 try
                 {
-                    newOptions = FileSystemOptions.Deserialize(file);
+                    newOptions = FileSystemOptions.Deserialize(file, password);
                 }
                 catch (ArgumentException exception)
                 {
@@ -44,9 +44,9 @@ namespace VFSBase.Implementation
             return new FileSystem(newOptions);
         }
 
-        public static IFileSystem CreateOrImport(FileSystemOptions options)
+        public static IFileSystem CreateOrImport(FileSystemOptions options, string password)
         {
-            return File.Exists(options.Location) ? Import(options) : Create(options);
+            return File.Exists(options.Location) ? Import(options, password) : Create(options);
         }
 
         public static void Delete(IFileSystem fileSystem)
