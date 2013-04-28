@@ -2,38 +2,50 @@
 {
     internal class Lz77Triple
     {
-        private readonly int _matchLoc;
-        private int _matchLength;
-        private readonly byte _followed;
-
+        private readonly int _matchLocation;
+        private readonly byte _following;
 
         /// <summary>
-        /// Prevents a default instance of the <see cref="Lz77Triple" /> class from being created.
+        /// Initializes a new instance of the <see cref="Lz77Triple"/> class.
         /// </summary>
-        /// <param name="matchLoc">The matchLoc points to the start of a match relative to current loc. Has value 0 if no match.</param>
-        /// <param name="matchLength">The MatchLength specifies the length of the match 0 if there is no match.</param>
-        /// <param name="charFollowed">The char followed first character that does not match.</param>
-        internal Lz77Triple(int matchLoc, int matchLength, int charFollowed)
+        /// <param name="matchLocation">The match location.</param>
+        /// <param name="matchLength">Length of the match.</param>
+        /// <param name="following">The following.</param>
+        internal Lz77Triple(int matchLocation, int matchLength, int following)
         {
-            _matchLoc = (matchLoc << 4) | (matchLength >> 4);
-            _matchLength = matchLength & Lz77Constants.LookForwardWindow;
-            _followed = (byte)charFollowed;
+            _matchLocation = (matchLocation << 4) | (matchLength >> 4);
+            MatchLength = matchLength & Lz77Constants.LookAheadWindow;
+            _following = (byte)following;
         }
 
-        public int MatchLoc
+        /// <summary>
+        /// Gets the match location.
+        /// </summary>
+        /// <value>
+        /// The match location.
+        /// </value>
+        public int MatchLocation
         {
-            get { return _matchLoc; }
+            get { return _matchLocation; }
         }
 
-        public int MatchLength
-        {
-            get { return _matchLength; }
-            set { _matchLength = value; }
-        }
+        /// <summary>
+        /// Gets or sets the length of the match.
+        /// </summary>
+        /// <value>
+        /// The length of the match.
+        /// </value>
+        public int MatchLength { get; set; }
 
-        public byte followed
+        /// <summary>
+        /// Gets the following.
+        /// </summary>
+        /// <value>
+        /// The following.
+        /// </value>
+        public byte Following
         {
-            get { return _followed; }
+            get { return _following; }
         }
     }
 }
