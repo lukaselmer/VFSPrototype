@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VFSBase.Implementation;
 
 namespace VFSBase.Interfaces
 {
@@ -16,5 +17,7 @@ namespace VFSBase.Interfaces
         void Delete(string path);
         void Move(string source, string dest);
         bool Exists(string path);
+
+        IFileSystemOptions FileSystemOptions { get; }
     }
 }

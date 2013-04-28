@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
@@ -92,8 +93,16 @@ namespace VFSBase.Implementation
 
         public int IndirectionCountForIndirectNodes { get; private set; }
 
-        public long DiskFree { get; private set; }
-        public long DiskOccupied { get; private set; }
+        public long DiskFree
+        {
+            get
+            {
+                var s = Path.GetFullPath(Location);
+                var driveInfo = DriveInfo.GetDrives().FirstOrDefault(d => d.Name == Path.GetPathRoot(s));
+                return driveInfo == null ? -1 : driveInfo.TotalFreeSpace;
+            }
+        }
+        public long DiskOccupied { get { return _blockSize * BlockAllocation.OccupiedCount; } }
 
         public int NameLength { get; internal set; }
 
