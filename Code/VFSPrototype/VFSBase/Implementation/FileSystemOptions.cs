@@ -47,10 +47,12 @@ namespace VFSBase.Implementation
         private void InitializeStreamCodingStrategy()
         {
             var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
-            //var encryptionStrategy = new SelfMadeStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
             _streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), encryptionStrategy);
+            //var encryptionStrategy = new SelfMadeStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
             //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), new NullStreamCodingStrategy());
             //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), new NullStreamCodingStrategy());
+            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), new NullStreamCodingStrategy());
+            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), encryptionStrategy);
         }
 
         public string Location { get; set; }
