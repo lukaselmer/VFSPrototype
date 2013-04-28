@@ -65,6 +65,7 @@
     <Compile Include="BlockAllocationTest.cs" />
     <Compile Include="Coding\CryptoTest.cs" />
     <Compile Include="Coding\EncryptionStrategiesTest.cs" />
+    <Compile Include="Coding\CompressionTest.cs" />
     <Compile Include="Exceptions\ExceptionsTest.cs" />
     <Compile Include="FileSystemManipulatorFoldersTest.cs" />
     <Compile Include="FileSystemManipulatorLoadTest.cs" />
