@@ -21,7 +21,7 @@ namespace VFSBase.Implementation
         [NonSerialized]
         private IStreamCodingStrategy _streamCodingStrategy;
 
-        public FileSystemOptions(string location, long diskSize, StreamEncryptionType encryption, StreamCompressionType compression)
+        public FileSystemOptions(string location, long diskSize, StreamEncryptionType encryption = StreamEncryptionType.None, StreamCompressionType compression = StreamCompressionType.None)
         {
             Location = location;
             DiskSize = diskSize;
