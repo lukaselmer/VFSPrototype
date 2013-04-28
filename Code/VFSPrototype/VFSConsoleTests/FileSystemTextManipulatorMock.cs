@@ -38,15 +38,15 @@ namespace VFSConsoleTests
         {
         }
 
-        public void Import(string source, string dest)
+        public void Import(string source, string dest, ImportCallbacks importCallbacks)
         {
         }
 
-        public void Export(string source, string dest)
+        public void Export(string source, string dest, ExportCallbacks exportCallbacks)
         {
         }
 
-        public void Copy(string source, string dest)
+        public void Copy(string source, string dest, CopyCallbacks copyCallbacks)
         {
         }
 
