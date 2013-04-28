@@ -58,7 +58,7 @@ namespace VFSBase.Implementation
 
         internal void InitializeStreamCodingStrategy(string password)
         {
-            EncryptionKey = TransformEncryptionKey(EncryptedEncryptionKey, password);
+            if (Encryption != StreamEncryptionType.None) EncryptionKey = TransformEncryptionKey(EncryptedEncryptionKey, password);
             _streamCodingStrategy = new StramStrategyResolver(this).ResolveStrategy();
         }
 
@@ -152,7 +152,7 @@ namespace VFSBase.Implementation
         {
             get
             {
-                if (_streamCodingStrategy == null) throw new VFSException("Invalid initialization");
+                if (_streamCodingStrategy == null) InitializeStreamCodingStrategy("");
                 return _streamCodingStrategy;
             }
         }
