@@ -55,7 +55,7 @@ namespace VFSBaseTests.Coding
         [TestMethod]
         public void TestSelfMadeEncryptionStrategy()
         {
-            var s = new SelfMadeStreamEncryptionStrategy(GetEncryptionOptions());
+            var s = new SelfMadeAes256StreamEncryptionStrategy(GetEncryptionOptions());
             using (var ms = new MemoryStream())
             {
                 var cryptedIn = s.DecorateToVFS(ms) as CryptoStream;
