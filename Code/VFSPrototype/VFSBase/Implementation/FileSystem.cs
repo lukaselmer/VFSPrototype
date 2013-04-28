@@ -214,10 +214,8 @@ namespace VFSBase.Implementation
             EnsureParentDirectoryExists(destination);
             using (var stream = File.OpenWrite(destination))
             {
-                using (
-                    var reader =
-                        DecorateToHostStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator,
-                                                               _persistence)))
+                using (var reader = DecorateToHostStream(
+                    new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
                 {
                     var buffer = new byte[_options.BlockSize];
                     int read;
