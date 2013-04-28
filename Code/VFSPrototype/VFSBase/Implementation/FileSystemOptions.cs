@@ -10,8 +10,6 @@ using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Coding;
 using VFSBase.Persistence.Coding.General;
-using VFSBase.Persistence.Coding.MicrosoftAes;
-using VFSBase.Persistence.Coding.MicrosoftCompression;
 
 namespace VFSBase.Implementation
 {
@@ -23,10 +21,12 @@ namespace VFSBase.Implementation
         [NonSerialized]
         private IStreamCodingStrategy _streamCodingStrategy;
 
-        public FileSystemOptions(string location, long diskSize)
+        public FileSystemOptions(string location, long diskSize, StreamEncryptionType encryption, StreamCompressionType compression)
         {
             Location = location;
             DiskSize = diskSize;
+            Encryption = encryption;
+            Compression = compression;
             BlockSize = (int)MathUtil.KB(8);
             MasterBlockSize = (uint)MathUtil.KB(32);
             NameLength = 255;
@@ -46,18 +46,14 @@ namespace VFSBase.Implementation
 
         private void InitializeStreamCodingStrategy()
         {
-            var encryptionStrategy = new MicrosoftStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
-            _streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), encryptionStrategy);
-            //var encryptionStrategy = new SelfMadeStreamEncryptionStrategy(new EncryptionOptions(EncryptionKey, EncryptionInitializationVector));
-            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), new NullStreamCodingStrategy());
-            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), new NullStreamCodingStrategy());
-            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new MicrosoftStreamCompressionStrategy(), new NullStreamCodingStrategy());
-            //_streamCodingStrategy = new StreamCompressionEncryptionCodingStrategy(new NullStreamCodingStrategy(), encryptionStrategy);
+            _streamCodingStrategy = new StramStrategyResolver(this).ResolveStrategy();
         }
 
         public string Location { get; set; }
 
         public long DiskSize { get; set; }
+        public StreamEncryptionType Encryption { get; set; }
+        public StreamCompressionType Compression { get; set; }
 
         public uint MasterBlockSize { get; set; }
 
@@ -122,11 +118,11 @@ namespace VFSBase.Implementation
 
         // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
         // [NonSerialized]
-        private byte[] EncryptionKey { get; set; }
+        internal byte[] EncryptionKey { get; set; }
 
         // TODO: request key (or part of key) on startup? Don't save it in the file (attention, serialization!), that's a bad idea.
         // [NonSerialized]
-        private byte[] EncryptionInitializationVector { get; set; }
+        internal byte[] EncryptionInitializationVector { get; set; }
 
         public IStreamCodingStrategy StreamCodingStrategy
         {
