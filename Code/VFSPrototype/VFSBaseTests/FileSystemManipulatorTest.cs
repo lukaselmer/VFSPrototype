@@ -36,85 +36,6 @@ namespace VFSBaseTests
         }
 
         [TestMethod]
-        public void TestCreateFolder()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                m.CreateFolder("test");
-                Assert.IsTrue(m.Exists("test"));
-
-                m.CreateFolder("test/foo/bar/tamtam");
-                Assert.IsTrue(m.Exists("test/foo/bar/tamtam"));
-                Assert.IsTrue(m.Exists("test/foo"));
-                Assert.IsTrue(m.Exists("test/foo/bar"));
-                Assert.IsFalse(m.Exists("Test/foo/bar/tamTam"));
-
-                m.CreateFolder("some/test/test/test/here");
-                Assert.IsTrue(m.Exists("some/test/test/test/here"));
-                Assert.IsTrue(m.Exists("some/test/test"));
-
-                m.CreateFolder("test/xxx");
-                Assert.IsTrue(m.Exists("test/xxx"));
-            }
-        }
-
-        [TestMethod]
-        public void TestCreateManyFolder()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                // Could be set to more, but it is disabled, so the unit tests run fast
-                for (var i = 0; i < 50; i++)
-                {
-                    m.CreateFolder("test" + i);
-                    Assert.IsTrue(m.Exists("test" + i));
-                }
-            }
-        }
-
-        [TestMethod]
-        public void TestDeleteFolder()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                Assert.IsFalse(m.Exists("test"));
-                m.CreateFolder("test");
-                Assert.IsTrue(m.Exists("test"));
-                m.Delete("test");
-                Assert.IsFalse(m.Exists("test"));
-
-                m.CreateFolder("test/foo/bar/tamtam");
-                m.Delete("test/foo");
-                Assert.IsFalse(m.Exists("test/foo"));
-                Assert.IsFalse(m.Exists("test/foo/bar"));
-                Assert.IsFalse(m.Exists("test/foo/bar/tamtam"));
-                Assert.IsTrue(m.Exists("test"));
-
-                m.CreateFolder("some/test/test/test/here");
-                m.Delete("some/test/test/test/here");
-                Assert.IsFalse(m.Exists("some/test/test/test/here"));
-                Assert.IsTrue(m.Exists("some/test/test/test"));
-
-                m.CreateFolder("test/xxx");
-                m.Delete("test");
-                Assert.IsFalse(m.Exists("test"));
-                Assert.IsFalse(m.Exists("test/xxx"));
-            }
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(NotFoundException))]
-        public void TestInvalidDeleteFolder()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                Assert.IsFalse(m.Exists("test"));
-                m.Delete("test");
-            }
-        }
-
-
-        [TestMethod]
         public void TestImportFile()
         {
             using (var m = InitTestFileSystemManipulator())
@@ -209,7 +130,7 @@ namespace VFSBaseTests
             }
         }
 
-        private byte[] Md5Hash(string filename)
+        private static byte[] Md5Hash(string filename)
         {
             using (var file = File.OpenRead(filename))
             {
@@ -363,28 +284,6 @@ namespace VFSBaseTests
         }
 
         [TestMethod]
-        public void TestMoveFolder()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                m.CreateFolder("you");
-                m.Move("you", "me");
-                Assert.IsTrue(m.Exists("me"));
-                Assert.IsFalse(m.Exists("you"));
-
-                m.CreateFolder("hello/world");
-                m.Move("hello/world", "hello/universe");
-                Assert.IsTrue(m.Exists("hello/universe"));
-                Assert.IsFalse(m.Exists("hello/world"));
-
-                m.CreateFolder("foo/bar");
-                m.Move("foo/bar", "ta/da");
-                Assert.IsTrue(m.Exists("ta/da"));
-                Assert.IsFalse(m.Exists("foo/bar"));
-            }
-        }
-
-        [TestMethod]
         public void TestMoveFile()
         {
             using (var m = InitTestFileSystemManipulator())
@@ -407,28 +306,6 @@ namespace VFSBaseTests
                 m.Move("foo/bar.txt", "ta/da.txt");
                 Assert.IsTrue(m.Exists("ta/da.txt"));
                 Assert.IsFalse(m.Exists("foo/bar.txt"));
-            }
-        }
-
-        [TestMethod]
-        public void TestCopyFolder()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                m.CreateFolder("you");
-                m.Copy("you", "me");
-                Assert.IsTrue(m.Exists("me"));
-                Assert.IsTrue(m.Exists("you"));
-
-                m.CreateFolder("hello/world");
-                m.Copy("hello/world", "hello/universe");
-                Assert.IsTrue(m.Exists("hello/universe"));
-                Assert.IsTrue(m.Exists("hello/world"));
-
-                m.CreateFolder("foo/bar");
-                m.Copy("foo/bar", "ta/da");
-                Assert.IsTrue(m.Exists("ta/da"));
-                Assert.IsTrue(m.Exists("foo/bar"));
             }
         }
 
@@ -459,109 +336,6 @@ namespace VFSBaseTests
         }
 
         [TestMethod]
-        public void TestListRootFolders()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                Assert.AreEqual(0, m.Folders("").Count);
-                Assert.AreEqual(0, m.Folders("/").Count);
-
-                m.CreateFolder("test");
-
-                Assert.AreEqual(1, m.Folders("").Count);
-                Assert.AreEqual(1, m.Folders("/").Count);
-                Assert.IsTrue(m.Folders("").Contains("test"));
-                Assert.IsTrue(m.Folders("/").Contains("test"));
-
-                m.CreateFolder("test");
-
-                Assert.AreEqual(1, m.Folders("").Count);
-                Assert.AreEqual(1, m.Folders("/").Count);
-
-                m.CreateFolder("foo");
-
-                Assert.AreEqual(2, m.Folders("").Count);
-                Assert.AreEqual(2, m.Folders("/").Count);
-
-                m.CreateFolder("bar");
-
-                Assert.AreEqual(3, m.Folders("").Count);
-                Assert.AreEqual(3, m.Folders("/").Count);
-            }
-        }
-
-        [TestMethod]
-        public void TestListDirectoryFolders()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                m.CreateFolder("test");
-
-                Assert.AreEqual(0, m.Folders("test").Count);
-                Assert.AreEqual(0, m.Folders("/test").Count);
-
-                m.CreateFolder("test/foo");
-                Assert.AreEqual(1, m.Folders("test").Count);
-                Assert.IsTrue(m.Folders("test").Contains("foo"));
-
-                m.CreateFolder("test/foo");
-                Assert.AreEqual(1, m.Folders("test").Count);
-                m.CreateFolder("test/bar");
-                Assert.AreEqual(2, m.Folders("test").Count);
-                m.CreateFolder("test/xxx");
-                Assert.AreEqual(3, m.Folders("test").Count);
-                m.Delete("test/xxx");
-                Assert.AreEqual(2, m.Folders("test").Count);
-
-                Assert.AreEqual(0, m.Folders("test/foo").Count);
-                m.CreateFolder("test/foo/bar");
-                Assert.AreEqual(1, m.Folders("test/foo").Count);
-                m.CreateFolder("test/foo/bar");
-                Assert.AreEqual(1, m.Folders("test/foo").Count);
-                m.CreateFolder("test/foo/foobar");
-                Assert.AreEqual(2, m.Folders("test/foo").Count);
-                m.CreateFolder("test/foo/xxx");
-                Assert.AreEqual(3, m.Folders("test/foo").Count);
-
-                Assert.IsTrue(m.Folders("test/foo").Contains("bar"));
-                Assert.IsTrue(m.Folders("test/foo").Contains("foobar"));
-                Assert.IsTrue(m.Folders("test/foo").Contains("xxx"));
-
-                m.Delete("test/foo/xxx");
-                Assert.AreEqual(2, m.Folders("test/foo").Count);
-
-                Assert.IsTrue(m.Folders("test/foo").Contains("bar"));
-                Assert.IsTrue(m.Folders("test/foo").Contains("foobar"));
-                Assert.IsFalse(m.Folders("test/foo").Contains("xxx"));
-
-                m.CreateFolder("/test/foo/zzz");
-                Assert.AreEqual(3, m.Folders("test/foo").Count);
-                Assert.IsTrue(m.Folders("test/foo").Contains("zzz"));
-            }
-        }
-
-        [TestMethod]
-        public void TestListSubdirectoryFolders()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                m.CreateFolder("test/foo");
-                Assert.AreEqual(0, m.Folders("test/foo").Count);
-                Assert.AreEqual(0, m.Folders("test/foo").Count);
-                m.CreateFolder("test/foo/bar");
-                Assert.AreEqual(1, m.Folders("test/foo").Count);
-                m.CreateFolder("test/foo/bar");
-                Assert.AreEqual(1, m.Folders("test/foo").Count);
-                m.CreateFolder("test/foo/foobar");
-                Assert.AreEqual(2, m.Folders("test/foo").Count);
-                m.CreateFolder("test/foo/xxx");
-                Assert.AreEqual(3, m.Folders("test/foo").Count);
-                m.Delete("test/foo/xxx");
-                Assert.AreEqual(2, m.Folders("test/foo").Count);
-            }
-        }
-
-        [TestMethod]
         public void TestExists()
         {
             using (var m = InitTestFileSystemManipulator())
@@ -576,25 +350,6 @@ namespace VFSBaseTests
 
                 Assert.IsTrue(m.Exists("test"));
                 Assert.IsTrue(m.Exists("/test"));
-            }
-        }
-
-        [TestMethod]
-        public void TestIsDirectorySimple()
-        {
-            using (var m = InitTestFileSystemManipulator())
-            {
-                Assert.IsTrue(m.IsDirectory(""));
-                Assert.IsTrue(m.IsDirectory("/"));
-                Assert.IsFalse(m.IsDirectory("test"));
-                m.CreateFolder("test");
-                Assert.IsTrue(m.IsDirectory("test"));
-                Assert.IsTrue(m.IsDirectory("/test"));
-
-                Assert.IsFalse(m.IsDirectory("test/foo"));
-                m.CreateFolder("test/foo");
-                Assert.IsTrue(m.IsDirectory("test/foo"));
-                Assert.IsTrue(m.IsDirectory("/test/foo"));
             }
         }
 
