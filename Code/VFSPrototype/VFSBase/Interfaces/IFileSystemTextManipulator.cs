@@ -12,7 +12,7 @@ namespace VFSBase.Interfaces
         bool IsDirectory(string path);
         void CreateFolder(string path);
         void Import(string source, string dest, ImportCallbacks importCallbacks = null);
-        void Export(string source, string dest, ExportCallbacks exportCallbacks = null);
+        void Export(string source, string dest, CallbacksBase exportCallbacks = null);
         void Copy(string source, string dest, CopyCallbacks copyCallbacks = null);
         void Delete(string path);
         void Move(string source, string dest);

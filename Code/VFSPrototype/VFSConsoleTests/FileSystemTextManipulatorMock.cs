@@ -42,7 +42,7 @@ namespace VFSConsoleTests
         {
         }
 
-        public void Export(string source, string dest, ExportCallbacks exportCallbacks)
+        public void Export(string source, string dest, CallbacksBase exportCallbacks)
         {
         }
 
