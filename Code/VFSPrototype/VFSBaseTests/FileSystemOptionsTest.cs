@@ -24,7 +24,7 @@ namespace VFSBaseTests
 
                 m.Seek(0, SeekOrigin.Begin);
 
-                var o2 = FileSystemOptions.Deserialize(m);
+                var o2 = FileSystemOptions.Deserialize(m, "");
                 Assert.AreEqual(size, o2.DiskSize);
                 Assert.AreEqual(masterBlockSize, o2.MasterBlockSize);
             }
@@ -51,7 +51,7 @@ namespace VFSBaseTests
 
                 m.Seek(0, SeekOrigin.Begin);
 
-                var o2 = FileSystemOptions.Deserialize(m);
+                var o2 = FileSystemOptions.Deserialize(m, "");
                 var b2 = o2.BlockAllocation;
                 Assert.AreEqual(42, b2.Allocate());
                 Assert.AreEqual(33, b2.Allocate());
@@ -98,6 +98,7 @@ namespace VFSBaseTests
                 ms.Seek(0, SeekOrigin.Begin);
 
                 var o2 = b.Deserialize(ms) as FileSystemOptions;
+                o2.InitializeStreamCodingStrategy("");
 
                 Assert.IsNotNull(o2);
 
