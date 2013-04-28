@@ -114,7 +114,7 @@ namespace VFSBase.Implementation
             return FindParentFolder(dest);
         }
 
-        public void Export(string source, string dest, ExportCallbacks exportCallbacks = null)
+        public void Export(string source, string dest, CallbacksBase exportCallbacks = null)
         {
             if (exportCallbacks == null) exportCallbacks = new ExportCallbacks();
             _fileSystem.Export(FindNode(source), dest, exportCallbacks);

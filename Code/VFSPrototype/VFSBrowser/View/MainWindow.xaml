@@ -23,8 +23,9 @@
                 <MenuItem Header="Open VFS" Command="{Binding OpenVfsCommand}" />
                 <MenuItem Header="New VFS" Command="{Binding NewVfsCommand}" />
                 <MenuItem Header="New Folder" Command="{Binding NewFolderCommand}" />
-                <MenuItem Header="ImportFile" Command="{Binding ImportFileCommand}" />
-                <MenuItem Header="ExportFile" Command="{Binding ExportFileCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItems}" />
+                <MenuItem Header="Import File" Command="{Binding ImportFileCommand}" />
+                <MenuItem Header="Import Folder" Command="{Binding ImportFolderCommand}" />
+                <MenuItem Header="Export" Command="{Binding ExportCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItems}" />
             </MenuItem>
             <MenuItem Header="_Info">
                 <MenuItem Header="Disk Info" Command="{Binding DiskInfoCommand}" />

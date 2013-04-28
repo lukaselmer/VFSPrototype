@@ -5,6 +5,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using VFSBase.Implementation;
@@ -26,10 +28,11 @@ namespace VFSBrowser.ViewModel
         private String _currentPath;
         public String CurrentPath
         {
-            get { return _currentPath; } 
+            get { return _currentPath; }
             set
             {
-                try {
+                try
+                {
                     Items.Clear();
                     Items.Add(Parent);
                     foreach (var name in _manipulator.List(value))
@@ -37,12 +40,14 @@ namespace VFSBrowser.ViewModel
                         Items.Add(new ListItem(value, name, _manipulator.IsDirectory(value + name)));
                     }
 
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 _currentPath = value;
                 OnPropertyChanged("CurrentPath");
-                
+
             }
         }
 
@@ -53,15 +58,16 @@ namespace VFSBrowser.ViewModel
         public MainViewModel()
         {
             Items = new ObservableCollection<ListItem>();
-            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, SearchText = ""};
-           
+            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, SearchText = "" };
+
             OpenVfsCommand = new Command(OpenVfs, null);
             NewVfsCommand = new Command(NewVfs, null);
             NewFolderCommand = new Command(NewFolder, p => (_manipulator != null));
             OpenFolderCommand = new Command(OpenFolder, p => (_manipulator != null && p != null && ((ListItem)p).IsDirectory));
             RenameCommand = new Command(Rename, p => (_manipulator != null && p != null));
             ImportFileCommand = new Command(ImportFile, p => (_manipulator != null));
-            ExportFileCommand = new Command(Export, p => (_manipulator != null && p != null));
+            ImportFolderCommand = new Command(ImportFolder, p => (_manipulator != null));
+            ExportCommand = new Command(Export, p => (_manipulator != null && p != null));
             DeleteCommand = new Command(Delete, p => (_manipulator != null && p != null));
             MoveCommand = new Command(Move, p => (_manipulator != null && p != null));
             CopyCommand = new Command(Copy, p => (_manipulator != null && p != null));
@@ -77,7 +83,8 @@ namespace VFSBrowser.ViewModel
         public Command OpenFolderCommand { get; private set; }
         public Command RenameCommand { get; private set; }
         public Command ImportFileCommand { get; private set; }
-        public Command ExportFileCommand { get; private set; }
+        public Command ImportFolderCommand { get; private set; }
+        public Command ExportCommand { get; private set; }
         public Command CopyCommand { get; private set; }
         public Command MoveCommand { get; private set; }
         public Command PasteCommand { get; private set; }
@@ -110,7 +117,7 @@ namespace VFSBrowser.ViewModel
                 }
             }
             return items;
-        } 
+        }
 
         private void Search(object parameter)
         {
@@ -147,8 +154,8 @@ namespace VFSBrowser.ViewModel
         }
 
         private bool _copy;
-        private readonly List<ListItem> _clipboard = new List<ListItem>(); 
-        
+        private readonly List<ListItem> _clipboard = new List<ListItem>();
+
         private void Copy(object parameter)
         {
             var items = parameter as ObservableCollection<object>;
@@ -156,13 +163,16 @@ namespace VFSBrowser.ViewModel
             if (items == null)
                 return;
 
-            try {
+            try
+            {
                 _clipboard.Clear();
                 _copy = true;
                 foreach (ListItem item in items)
                     _clipboard.Add(item);
 
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -174,13 +184,16 @@ namespace VFSBrowser.ViewModel
             if (items == null)
                 return;
 
-            try {
+            try
+            {
                 _clipboard.Clear();
                 _copy = false;
                 foreach (ListItem item in items)
                     _clipboard.Add(item);
 
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -193,8 +206,7 @@ namespace VFSBrowser.ViewModel
                 {
                     if (_manipulator.Exists(CurrentPath + source.Name))
                     {
-                        var result = MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo,
-                                                                    MessageBoxImage.Information);
+                        var result = MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
                         if (result == MessageBoxResult.No)
                             continue;
                         _manipulator.Delete(CurrentPath + source.Name);
@@ -209,7 +221,9 @@ namespace VFSBrowser.ViewModel
 
                     Items.Add(new ListItem(CurrentPath, source.Name, _manipulator.IsDirectory(CurrentPath + source.Name)));
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -218,20 +232,50 @@ namespace VFSBrowser.ViewModel
         {
             var items = parameter as ObservableCollection<object>;
 
-            if (items == null)
-                return;
+            if (items == null) return;
 
-            var dlg = new FolderBrowserDialog() { ShowNewFolderButton = true };
+            var dlg = new FolderBrowserDialog { ShowNewFolderButton = true };
 
-            if (dlg.ShowDialog() == DialogResult.OK)
-            { 
-                try {
-                    foreach (ListItem item in items)
-                        _manipulator.Export(CurrentPath + item.Name, dlg.SelectedPath + "\\" + item.Name, new ExportCallbacks());
+            if (dlg.ShowDialog() != DialogResult.OK) return;
 
-                } catch (Exception e) {
-                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            try
+            {
+
+                foreach (ListItem item in items)
+                {
+                    var exportPath = Path.Combine(dlg.SelectedPath, item.Name);
+                    var vfsExportPath = CurrentPath + item.Name;
+
+                    if (File.Exists(exportPath) || Directory.Exists(exportPath))
+                    {
+                        var messageBoxText = string.Format("Replace {0}? (Current item will be deleted if you choose yes!)", Path.GetFullPath(exportPath));
+                        var result = MessageBox.Show(messageBoxText, "Object already exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                        if (result == MessageBoxResult.No) continue;
+
+                        if (Directory.Exists(exportPath))
+                        {
+                            try
+                            {
+                                Directory.Delete(exportPath, true);
+                            }
+                            catch (IOException)
+                            {
+                                // Give the OS time to release potential resources
+                                Thread.Sleep(0);
+                                Directory.Delete(exportPath, true);
+                            }
+                        }
+                        if (File.Exists(exportPath)) File.Delete(exportPath);
+                    }
+
+                    var vm = new OperationProgressViewModel();
+                    Task.Run(() => _manipulator.Export(vfsExportPath, exportPath, vm.Callbacks));
+                    vm.ShowDialog();
                 }
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -244,7 +288,7 @@ namespace VFSBrowser.ViewModel
 
             var dlg = new InputViewModel("New Name", item.Name);
             var result = dlg.ShowDialog();
-          
+
             if (result == true && item.Name != dlg.Text)
             {
                 try
@@ -258,7 +302,9 @@ namespace VFSBrowser.ViewModel
                     item.Name = dlg.Text;
                     OnPropertyChanged("Items");
 
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -276,8 +322,10 @@ namespace VFSBrowser.ViewModel
                 if (CurrentPath == "/")
                     return;
                 var tmp = CurrentPath.TrimEnd('/');
-                CurrentPath = tmp.Substring(0, tmp.LastIndexOf("/")+1);
-            } else { 
+                CurrentPath = tmp.Substring(0, tmp.LastIndexOf("/") + 1);
+            }
+            else
+            {
                 CurrentPath = item.Path + item.Name + "/";
             }
         }
@@ -296,10 +344,12 @@ namespace VFSBrowser.ViewModel
                 }
 
                 _manipulator.CreateFolder(CurrentPath + newFolderName);
-            
+
                 Items.Add(new ListItem(CurrentPath, newFolderName, true));
 
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -309,7 +359,7 @@ namespace VFSBrowser.ViewModel
         {
             // Create OpenFileDialog
             var dlg = new Microsoft.Win32.SaveFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
-            
+
             // Display OpenFileDialog by calling ShowDialog method
             var result = dlg.ShowDialog();
 
@@ -328,12 +378,15 @@ namespace VFSBrowser.ViewModel
                     int size;
                     if (int.TryParse(sizeDlg.Text, out size))
                     {
-                        try {
+                        try
+                        {
                             var fileSystemData = new FileSystemOptions(dlg.FileName, size);
                             _manipulator = new FileSystemTextManipulator(fileSystemData);
                             CurrentPath = "/";
 
-                        } catch (Exception e) {
+                        }
+                        catch (Exception e)
+                        {
                             MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
@@ -351,12 +404,15 @@ namespace VFSBrowser.ViewModel
                 // Close last vfs
                 DisposeManipulator();
 
-                try {
-                    var fileSystemData = new FileSystemOptions(dlg.FileName, 1000*1000*1000);
+                try
+                {
+                    var fileSystemData = new FileSystemOptions(dlg.FileName, 1000 * 1000 * 1000);
                     _manipulator = new FileSystemTextManipulator(fileSystemData);
                     CurrentPath = "/";
 
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -364,28 +420,49 @@ namespace VFSBrowser.ViewModel
 
         private void ImportFile(object parameter)
         {
-            var dlg = new Microsoft.Win32.OpenFileDialog();
+            var dlg = new OpenFileDialog { AutoUpgradeEnabled = true, CheckFileExists = true, CheckPathExists = true, Multiselect = true };
             var result = dlg.ShowDialog();
 
-            if (result == true)
+            if (result != DialogResult.OK) return;
+
+            for (var i = 0; i < dlg.FileNames.Length; i++)
             {
-                try {
-                    if (_manipulator.Exists(CurrentPath + dlg.SafeFileName))
-                    {
-                        var res = System.Windows.MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
-                        if (res == MessageBoxResult.No)
-                            return;
-                        _manipulator.Delete(CurrentPath + dlg.SafeFileName);
-                        var listItem = Items.First(l => l.Name == dlg.SafeFileName);
-                        Items.Remove(listItem);
-                    }
+                Import(dlg.FileNames[i], dlg.SafeFileNames[i], false);
+            }
+        }
 
-                    _manipulator.Import(dlg.FileName, CurrentPath + dlg.SafeFileName, new ImportCallbacks());
-                    Items.Add(new ListItem(CurrentPath, dlg.SafeFileName, false));
+        private void ImportFolder(object parameter)
+        {
+            var dlg = new FolderBrowserDialog();
+            var result = dlg.ShowDialog();
 
-                } catch (Exception e) {
-                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (result != DialogResult.OK) return;
+
+            Import(dlg.SelectedPath, Path.GetFileName(dlg.SelectedPath), true);
+        }
+
+        private void Import(string source, string name, bool isDirectory)
+        {
+            try
+            {
+                var virtualPath = CurrentPath + name;
+                if (_manipulator.Exists(virtualPath))
+                {
+                    var messageBoxText = string.Format("Replace {0}?", isDirectory ? "folder" : "file");
+                    var caption = string.Format("{0} already exists!", isDirectory ? "Folder" : "File");
+                    var res = MessageBox.Show(messageBoxText, caption, MessageBoxButton.YesNo, MessageBoxImage.Information);
+                    if (res == MessageBoxResult.No) return;
+
+                    _manipulator.Delete(virtualPath);
+                    var listItem = Items.First(l => l.Name == name);
+                    Items.Remove(listItem);
                 }
+                _manipulator.Import(source, virtualPath, new ImportCallbacks());
+                Items.Add(new ListItem(CurrentPath, name, isDirectory));
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
