@@ -1,8 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
@@ -355,6 +352,9 @@ namespace VFSBaseTests
                 Assert.AreEqual("bla", File.ReadAllText(Path.Combine(DummyExportFolderPath, "b")));
                 Assert.AreEqual("blub", File.ReadAllText(Path.Combine(DummyExportFolderPath, "c")));
                 Assert.AreEqual("ddd", File.ReadAllText(Path.Combine(DummyExportFolderPath, "foo", "d")));
+
+                Assert.AreEqual(3, m.Files("dummy").Count);
+                Assert.AreEqual(2, m.Folders("dummy").Count);
             }
         }
     }

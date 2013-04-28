@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -74,6 +75,8 @@ namespace VFSBase.Persistence
 
         public void Remove(IIndexNode nodeToDelete, bool freeSpace)
         {
+            if (nodeToDelete == null) throw new ArgumentNullException("nodeToDelete");
+
             //TODO: make this dynamic, so _options.IndirectionCountForIndirectNodes can be adjusted dynamically
             Debug.Assert(_options.IndirectionCountForIndirectNodes == 2, "This method works only with an indirection count of exactly 2");
 
@@ -163,14 +166,14 @@ namespace VFSBase.Persistence
 
                 if (recursion == 0)
                 {
-                    if (blockNumber == toBeReplaced)
-                    {
-                        indirectNode[i] = toReplace;
-                        _persistence.PersistIndirectNode(indirectNode);
-                        return;
-                    }
+                    // TODO: inspect this: is it needed?? if (blockNumber != toBeReplaced) continue;
+                
+                    indirectNode[i] = toReplace;
+                    _persistence.PersistIndirectNode(indirectNode);
+                    return;
                 }
-                else ReplaceInIndirectNode(ReadIndirectNode(blockNumber), toBeReplaced, toReplace, recursion - 1);
+
+                ReplaceInIndirectNode(ReadIndirectNode(blockNumber), toBeReplaced, toReplace, recursion - 1);
             }
         }
 

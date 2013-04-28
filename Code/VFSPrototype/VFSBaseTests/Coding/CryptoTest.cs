@@ -26,7 +26,7 @@ namespace VFSBaseTests.Coding
             }
             public int DataAmount { get; private set; }
             public int ReadBufferSize { get; private set; }
-            public int WriteBufferSize { get; private set; }
+            private int WriteBufferSize { get; set; }
         }
 
         private interface IEncryptorFactory
@@ -63,6 +63,8 @@ namespace VFSBaseTests.Coding
         private static void TestAlgorithm(ICryptoTransform encryptor, ICryptoTransform decryptor)
         {
             TestAlgorithm(new SimpleEncryptorFactory(encryptor, decryptor));
+            encryptor.Dispose();
+            decryptor.Dispose();
         }
 
         private static void TestAlgorithm(IEncryptorFactory factory)
@@ -81,7 +83,7 @@ namespace VFSBaseTests.Coding
                 new TestConfig(10000, 1023, 1000),
                 new TestConfig(10000, 1024, 1000),
                 new TestConfig(10000, 1025, 1000),
-                new TestConfig(100000, 100000, 1000)
+                //new TestConfig(100000, 100000, 1000) disabled, so tests execute faster
             };
 
             foreach (var configuration in configurations)
@@ -169,8 +171,72 @@ namespace VFSBaseTests.Coding
         {
             var options = GetEncryptionOptions();
             TestAlgorithm(new SelfMadeAesCryptorFactory(options));
-
         }
+
+        [TestMethod]
+        public void TestSelfMadeAesCryptorDispose()
+        {
+            var options = GetEncryptionOptions();
+            var factory = new SelfMadeAesCryptorFactory(options);
+            Assert.AreEqual(false, factory.Decryptor.CanReuseTransform);
+            factory.Encryptor.Dispose();
+            factory.Decryptor.Dispose();
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestSelfMadeAesCryptorInputNull()
+        {
+            var options = GetEncryptionOptions();
+            var factory = new SelfMadeAesCryptorFactory(options);
+            factory.Encryptor.TransformBlock(null, 0, 0, new byte[16], 0);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestSelfMadeAesCryptorOutputNull()
+        {
+            var options = GetEncryptionOptions();
+            var factory = new SelfMadeAesCryptorFactory(options);
+            factory.Encryptor.TransformBlock(new byte[16], 0, 0, null, 0);
+        }
+
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        [TestMethod]
+        public void TestSelfMadeAesCryptorInputRange()
+        {
+            var options = GetEncryptionOptions();
+            var factory = new SelfMadeAesCryptorFactory(options);
+            factory.Encryptor.TransformBlock(new byte[16], 17, 0, new byte[16], 0);
+        }
+
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        [TestMethod]
+        public void TestSelfMadeAesCryptorOutputRange()
+        {
+            var options = GetEncryptionOptions();
+            var factory = new SelfMadeAesCryptorFactory(options);
+            factory.Encryptor.TransformBlock(new byte[16], 0, 0, new byte[16], 17);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestSelfMadeAesCryptorInputNullTransformFinalBlock()
+        {
+            var options = GetEncryptionOptions();
+            var factory = new SelfMadeAesCryptorFactory(options);
+            factory.Encryptor.TransformFinalBlock(null, 0, 0);
+        }
+
+        [ExpectedException(typeof(NotSupportedException))]
+        [TestMethod]
+        public void TestSelfMadeAesCryptorInvalidKeyLength()
+        {
+            using (new SelfMadeAes256Cryptor(new byte[10], null, CryptoDirection.Encrypt))
+            {
+            }
+        }
+
 
         private class SelfMadeAesCryptorFactory : IEncryptorFactory
         {
@@ -210,6 +276,54 @@ namespace VFSBaseTests.Coding
             TestAlgorithm(
                 new SelfMadeCaesarCryptor(7, CryptoDirection.Encrypt),
                 new SelfMadeCaesarCryptor(7, CryptoDirection.Decrypt));
+
+        }
+
+        [TestMethod]
+        public void SelfMadeCaesarCryptorReusable()
+        {
+            var selfMadeCaesarCryptor = new SelfMadeCaesarCryptor(3, CryptoDirection.Encrypt);
+            Assert.AreEqual(true, selfMadeCaesarCryptor.CanReuseTransform);
+        }
+
+        [TestMethod]
+        public void SelfMadeSimpleCryptorReusable()
+        {
+            var selfMadeCaesarCryptor = new SelfMadeSimpleCryptor(new byte[32], new byte[32], CryptoDirection.Encrypt);
+            Assert.AreEqual(true, selfMadeCaesarCryptor.CanReuseTransform);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestInputNullSelfMadeCaesarCryptor()
+        {
+
+            var selfMadeCaesarCryptor = new SelfMadeCaesarCryptor(3, CryptoDirection.Encrypt);
+            selfMadeCaesarCryptor.TransformBlock(null, 0, 0, null, 0);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestOutputNullSelfMadeCaesarCryptor()
+        {
+            var selfMadeCaesarCryptor = new SelfMadeCaesarCryptor(3, CryptoDirection.Encrypt);
+            selfMadeCaesarCryptor.TransformBlock(new byte[0], 0, 0, null, 0);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestInputNullSelfMadeSimpleCryptor()
+        {
+            var selfMadeCaesarCryptor = new SelfMadeSimpleCryptor(new byte[32], new byte[32], CryptoDirection.Encrypt);
+            selfMadeCaesarCryptor.TransformBlock(null, 0, 0, null, 0);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestOutputNullSelfMadeSimpleCryptor()
+        {
+            var selfMadeCaesarCryptor = new SelfMadeSimpleCryptor(new byte[32], new byte[32], CryptoDirection.Encrypt);
+            selfMadeCaesarCryptor.TransformBlock(new byte[0], 0, 0, null, 0);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemManipulatorTest
     {
-        private const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
+        private const string DefaultTestfilePath = "../../../Testfiles/TestfileFileSystemManipulatorTest.vhs";
         private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
 
         private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
@@ -75,7 +75,7 @@ namespace VFSBaseTests
             using (var m = InitTestFileSystemManipulator())
             {
                 const string testFileSource = "test.txt";
-                byte[] testFileData = new byte[4096];
+                var testFileData = new byte[4096];
                 testFileData[0] = (byte)'\n';
 
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
