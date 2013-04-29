@@ -7,13 +7,12 @@ using VFSTestWCFClient.DiskServiceReference;
 
 namespace VFSTestWCFClient
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {
             var d = new DiskServiceClient();
             Console.WriteLine(d.Ish("bubu"));
-            Console.WriteLine(d.Ish("nana"));
             Console.ReadLine();
         }
     }
