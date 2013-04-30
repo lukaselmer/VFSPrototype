@@ -9,9 +9,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBrowser.View;
+using DataFormats = System.Windows.DataFormats;
+using IDataObject = System.Windows.IDataObject;
 using MessageBox = System.Windows.MessageBox;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
@@ -36,7 +38,9 @@ namespace VFSBrowser.ViewModel
                 try
                 {
                     Items.Clear();
-                    Items.Add(Parent);
+                    if (value != "/")
+                        Items.Add(Parent);
+
                     foreach (var name in _manipulator.List(value))
                     {
                         Items.Add(new ListItem(value, name, _manipulator.IsDirectory(value + name)));
@@ -65,24 +69,27 @@ namespace VFSBrowser.ViewModel
             OpenVfsCommand = new Command(OpenVfs, null);
             NewVfsCommand = new Command(NewVfs, null);
             NewFolderCommand = new Command(NewFolder, p => (_manipulator != null));
-            OpenFolderCommand = new Command(OpenFolder, p => (_manipulator != null && p != null && ((ListItem)p).IsDirectory));
-            RenameCommand = new Command(Rename, p => (_manipulator != null && p != null));
+            OpenCommand = new Command(Open, p => (_manipulator != null && p != null));
+            RenameCommand = new Command(Rename, IsItemSelected);
             ImportFileCommand = new Command(ImportFile, p => (_manipulator != null));
             ImportFolderCommand = new Command(ImportFolder, p => (_manipulator != null));
-            ExportCommand = new Command(Export, p => (_manipulator != null && p != null));
-            DeleteCommand = new Command(Delete, p => (_manipulator != null && p != null));
-            MoveCommand = new Command(Move, p => (_manipulator != null && p != null));
-            CopyCommand = new Command(Copy, p => (_manipulator != null && p != null));
-            PasteCommand = new Command(Paste, p => (_manipulator != null));
+            ExportCommand = new Command(Export, IsItemSelected);
+            DeleteCommand = new Command(Delete, IsItemSelected);
+            MoveCommand = new Command(Move, IsItemSelected);
+            CopyCommand = new Command(Copy, IsItemSelected);
+            PasteCommand = new Command(Paste, p => (_manipulator != null && _clipboard.Count > 0));
             SearchCommand = new Command(Search, p => (_manipulator != null));
             DiskInfoCommand = new Command(DiskInfo, p => (_manipulator != null));
+
+            DropCommand = new Command(Drop, null);
         }
-
-
+        
+        public Command DropCommand { get; private set; }
+        
         public Command OpenVfsCommand { get; private set; }
         public Command NewVfsCommand { get; private set; }
         public Command NewFolderCommand { get; private set; }
-        public Command OpenFolderCommand { get; private set; }
+        public Command OpenCommand { get; private set; }
         public Command RenameCommand { get; private set; }
         public Command ImportFileCommand { get; private set; }
         public Command ImportFolderCommand { get; private set; }
@@ -94,6 +101,19 @@ namespace VFSBrowser.ViewModel
         public Command SearchCommand { get; private set; }
         public Command DiskInfoCommand { get; private set; }
 
+
+        private bool IsItemSelected(object parameter)
+        {
+            if (_manipulator == null) return false;
+            if (parameter == null) return false;
+
+            var items = parameter as ObservableCollection<object>;
+            if (items != null)
+                return items.Count > 0 && (items.Count != 1 || (items[0] as ListItem).Name != "..");
+
+            var item = parameter as ListItem;
+            return item != null && item.Name != "..";
+        }
 
         private List<ListItem> SearchItems(string folder)
         {
@@ -132,7 +152,6 @@ namespace VFSBrowser.ViewModel
 
         private void DiskInfo(object parameter)
         {
-
             var sizeDlg = new DiskInfoViewModel(_manipulator);
             sizeDlg.ShowDialog();
         }
@@ -315,25 +334,41 @@ namespace VFSBrowser.ViewModel
             }
         }
 
-        private void OpenFolder(object parameter)
+        private void Open(object parameter)
         {
             var item = parameter as ListItem;
 
             if (item == null)
                 return;
 
-            if (item.Name == "..")
+            if (item.IsDirectory)
             {
-                if (CurrentPath == "/")
-                    return;
-                var tmp = CurrentPath.TrimEnd('/');
-                CurrentPath = tmp.Substring(0, tmp.LastIndexOf("/") + 1);
+                if (item.Name == "..")
+                {
+                    if (CurrentPath == "/")
+                        return;
+                    var tmp = CurrentPath.TrimEnd('/');
+                    CurrentPath = tmp.Substring(0, tmp.LastIndexOf("/") + 1);
+                }
+                else
+                {
+                    CurrentPath = item.Path + item.Name + "/";
+                }
             }
             else
             {
-                CurrentPath = item.Path + item.Name + "/";
+                var tmpFile = Path.GetTempPath() + item.Name;
+                if (File.Exists(tmpFile)) File.Delete(tmpFile);
+
+                var vm = new OperationProgressViewModel();
+                Task.Run(() => _manipulator.Export(item.Path+item.Name, tmpFile, vm.Callbacks));
+                vm.ShowDialog();
+
+                System.Diagnostics.Process.Start(tmpFile);
             }
         }
+
+        public CallbacksBase Exported;
 
         private void NewFolder(object parameter)
         {
@@ -417,6 +452,24 @@ namespace VFSBrowser.ViewModel
             catch (Exception e)
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+
+        private void Drop(object inObject)
+        {
+            var dragArgs = inObject as System.Windows.DragEventArgs;
+            if (null == dragArgs) return;
+
+            var data = dragArgs.Data as IDataObject;
+            if (data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var files = (string[])data.GetData(DataFormats.FileDrop);
+                foreach (var file in files)
+                {
+                    var name = Path.GetFileName(file);
+                    Import(file, name, Directory.Exists(file));
+                }
             }
         }
 
