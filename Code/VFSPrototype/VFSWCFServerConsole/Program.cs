@@ -13,7 +13,7 @@ namespace VFSWCFServer
         static void Main(string[] args)
         {
             // Step 1 Create a URI to serve as the base address.
-            var baseAddress = new Uri("http://localhost:8000/GettingStarted/");
+            var baseAddress = new Uri("http://localhost:8000/");
 
             // Step 2 Create a ServiceHost instance
             var selfHost = new ServiceHost(typeof(UserService), baseAddress);
@@ -21,7 +21,7 @@ namespace VFSWCFServer
             try
             {
                 // Step 3 Add a service endpoint.
-                selfHost.AddServiceEndpoint(typeof(IUserService), new WSHttpBinding(), "CalculatorService");
+                selfHost.AddServiceEndpoint(typeof(IUserService), new WSHttpBinding(), "UserService");
 
                 // Step 4 Enable metadata exchange.
                 var smb = new ServiceMetadataBehavior { HttpGetEnabled = true };
