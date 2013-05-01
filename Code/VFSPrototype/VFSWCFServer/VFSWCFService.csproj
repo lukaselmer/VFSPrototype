@@ -60,15 +60,25 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Service1.svc" />
-    <Content Include="Web.config" />
+    <Content Include="DiskService.svc" />
+    <Content Include="UserService.svc" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Persistence.cs" />
-    <Compile Include="Service1.svc.cs">
-      <DependentUpon>Service1.svc</DependentUpon>
+    <Compile Include="DiskService\DiskService.cs" />
+    <Compile Include="DiskService.svc.cs">
+      <DependentUpon>DiskService.svc</DependentUpon>
     </Compile>
-    <Compile Include="IUserService.cs" />
+    <Compile Include="DiskService\IDiskService.cs" />
+    <Compile Include="Common\Persistence.cs" />
+    <Compile Include="UserService\User.cs" />
+    <Compile Include="UserService\UserService.cs" />
+    <Compile Include="UserService.svc.cs">
+      <DependentUpon>UserService.svc</DependentUpon>
+    </Compile>
+    <Compile Include="UserService\IUserService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +91,9 @@
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
