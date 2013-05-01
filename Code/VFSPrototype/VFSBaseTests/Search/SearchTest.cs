@@ -10,20 +10,26 @@ namespace VFSBaseTests.Search
     public class SearchTest
     {
         private readonly IndexService _service = new IndexService();
+        
+        private RootFolder root;
+        private Folder topFolderBli;
+        private Folder subBliFoo;
 
         [TestInitialize]
         public void FillServiceIndex()
         {
-            var topFolderBli = new Folder("bli");
-            var topFolderBla = new Folder("bla");
-            var topFolderBlub = new Folder("blub");
-            var topFolderBbb = new Folder("bbb");
+            root = new RootFolder();
+
+            topFolderBli = new Folder("bli") {Parent = root};
+            var topFolderBla = new Folder ("bla") { Parent = root };
+            var topFolderBlub = new Folder ("blup") { Parent = root };
+            var topFolderBbb = new Folder ("bbb") { Parent = root };
             _service.AddToIndex(topFolderBli);
             _service.AddToIndex(topFolderBla);
             _service.AddToIndex(topFolderBlub);
             _service.AddToIndex(topFolderBbb);
 
-            var subBliFoo = new Folder("foo") { Parent = topFolderBli };
+            subBliFoo = new Folder("foo") { Parent = topFolderBli };
             var subBliFooCapital = new Folder("FOO") { Parent = topFolderBli };
             var subBliBar = new Folder("bar") { Parent = topFolderBli };
             _service.AddToIndex(subBliFoo);
@@ -50,14 +56,12 @@ namespace VFSBaseTests.Search
         [TestMethod]
         public void TestInFolder()
         {
-            Assert.AreEqual(0, _service.Search(new SearchOptions { Keyword = "bar", RecursionDistance = 0, RestrictToFolderPath = "/"}).Count());
-            Assert.AreEqual(1, _service.Search(new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolderPath = "/"}).Count());
-            Assert.AreEqual(1, _service.Search(new SearchOptions { Keyword = "bar", RecursionDistance = 2, RestrictToFolderPath = "/"}).Count());
-            Assert.AreEqual(2, _service.Search(new SearchOptions { Keyword = "bar", RecursionDistance = 3, RestrictToFolderPath = "/"}).Count());
-            Assert.AreEqual(1, _service.Search(new SearchOptions { Keyword = "bar", RecursionDistance = 0, RestrictToFolderPath = "/bli"}).Count());
-
-            Assert.AreEqual(1, _service.Search(new SearchOptions { Keyword = "foo", CaseSensitive = true }).Count());
-            Assert.AreEqual(1, _service.Search(new SearchOptions { Keyword = "FOO", CaseSensitive = true }).Count());
+            Assert.AreEqual (0, _service.Search(new SearchOptions { Keyword = "bar", RecursionDistance = 0, RestrictToFolder = root}).Count());
+            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = root }).Count ());
+            Assert.AreEqual (2, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 2, RestrictToFolder = root }).Count ());
+            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 0, RestrictToFolder = topFolderBli }).Count ());
+            Assert.AreEqual (2, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = topFolderBli }).Count ());
+            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = subBliFoo }).Count ());
         }
 
         [TestMethod]
@@ -67,6 +71,8 @@ namespace VFSBaseTests.Search
             Assert.AreEqual(1, _service.Search(new SearchOptions { Keyword = "bli" }).Count());
             Assert.AreEqual(1, _service.Search(new SearchOptions { Keyword = "aaa" }).Count());
             Assert.AreEqual(2, _service.Search(new SearchOptions { Keyword = "bbb" }).Count());
+            Assert.AreEqual(3, _service.Search(new SearchOptions { Keyword = "bl" }).Count());
+            Assert.AreEqual(7, _service.Search(new SearchOptions { Keyword = "b" }).Count());
         }
 
         [TestMethod]

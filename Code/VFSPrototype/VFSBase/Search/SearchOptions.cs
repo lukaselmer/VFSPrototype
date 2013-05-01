@@ -1,3 +1,5 @@
+using VFSBase.Implementation;
+
 namespace VFSBase.Search
 {
     /// <summary>
@@ -17,10 +19,17 @@ namespace VFSBase.Search
     {
         internal string Keyword { get; set; }
 
-        internal string RestrictToFolderPath { get; set; }
+        internal Folder RestrictToFolder { get; set; }
         internal int RecursionDistance { get; set; }
 
         internal bool CaseSensitive { get; set; }
         internal bool UseRegex { get; set; }
+
+        public SearchOptions ()
+        {
+            CaseSensitive = false;
+            UseRegex = false;
+            RecursionDistance = -1;
+        }
     }
 }

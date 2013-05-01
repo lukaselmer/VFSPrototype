@@ -31,5 +31,18 @@ namespace VFSBase.Implementation
         }
 
         public long IndirectNodeNumber { get; set; }
+
+
+        public override bool Equals (object obj)
+        {
+            var fold = obj as Folder;
+            if (fold == null)
+                return false;
+
+            return this.BlockNumber == fold.BlockNumber &&
+                   this.BlocksCount == fold.BlocksCount &&
+                   this.IndirectNodeNumber == fold.IndirectNodeNumber &&
+                   this.Name == fold.Name;
+        }
     }
 }
