@@ -6,14 +6,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace VFSBrowser
+namespace Startup
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App
+    public partial class App : Application
     {
-        /*private ApplicationLifetimeManager _manager;
+        private ApplicationLifetimeManager _manager;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -26,6 +26,6 @@ namespace VFSBrowser
         {
             base.OnExit(e);
             _manager.Exit();
-        }*/
+        }
     }
 }

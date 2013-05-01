@@ -11,7 +11,7 @@ using VFSBrowser.View;
 
 namespace VFSBrowser.ViewModel
 {
-    public class OperationProgressViewModel : AbstractViewModel
+    internal class OperationProgressViewModel : AbstractViewModel
     {
         private int _currentlyProcessed;
         public int CurrentlyProcessed
