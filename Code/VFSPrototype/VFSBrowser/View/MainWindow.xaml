@@ -41,7 +41,7 @@
                     <ColumnDefinition Width="Auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 
-                <TextBox Grid.Row="0" Grid.Column="0" Name="SearchTextBox" Text="{Binding Path=SearchOption.SearchText}">
+                <TextBox Grid.Row="0" Grid.Column="0" Name="SearchTextBox" Text="{Binding Path=SearchOption.Keyword}">
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=SearchTextBox, Path=Text}" />
                     </TextBox.InputBindings>

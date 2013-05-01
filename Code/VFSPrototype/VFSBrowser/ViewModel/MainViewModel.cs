@@ -64,7 +64,7 @@ namespace VFSBrowser.ViewModel
         public MainViewModel()
         {
             Items = new ObservableCollection<ListItem>();
-            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, SearchText = "" };
+            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, Keyword = "" };
 
             OpenVfsCommand = new Command(OpenVfs, null);
             NewVfsCommand = new Command(NewVfs, null);
@@ -115,39 +115,47 @@ namespace VFSBrowser.ViewModel
             return item != null && item.Name != "..";
         }
 
-        private List<ListItem> SearchItems(string folder)
-        {
-            var items = new List<ListItem>();
-            foreach (var item in _manipulator.List(folder))
-            {
-                if (SearchOption.Recursive && _manipulator.IsDirectory(folder + item))
-                {
-                    items.AddRange(SearchItems(folder + item + "/"));
-                }
+        //private List<ListItem> SearchItems(string folder)
+        //{
+        //    var items = new List<ListItem>();
+        //    foreach (var item in _manipulator.List(folder))
+        //    {
+        //        if (SearchOption.Recursive && _manipulator.IsDirectory(folder + item))
+        //        {
+        //            items.AddRange(SearchItems(folder + item + "/"));
+        //        }
 
-                var name = item;
-                var searchName = SearchOption.SearchText;
-                if (SearchOption.CaseSensitive == false)
-                {
-                    name = name.ToLower();
-                    searchName = searchName.ToLower();
-                }
+        //        var name = item;
+        //        var searchName = SearchOption.Keyword;
+        //        if (SearchOption.CaseSensitive == false)
+        //        {
+        //            name = name.ToLower();
+        //            searchName = searchName.ToLower();
+        //        }
 
-                if (name.Contains(searchName))
-                {
-                    items.Add(new ListItem(folder, item, _manipulator.IsDirectory(folder + item)));
-                }
-            }
-            return items;
-        }
+        //        if (name.Contains(searchName))
+        //        {
+        //            items.Add(new ListItem(folder, item, _manipulator.IsDirectory(folder + item)));
+        //        }
+        //    }
+        //    return items;
+        //}
 
         private void Search(object parameter)
         {
             if (parameter != null)
-                SearchOption.SearchText = parameter as string;
+                SearchOption.Keyword = parameter as string;
 
-            Items.Clear();
-            SearchItems(CurrentPath).ForEach(i => Items.Add(i));
+            Items.Clear ();
+            //SearchItems(CurrentPath).ForEach(i => Items.Add(i));
+
+            foreach (var i in _manipulator.Search(SearchOption.Keyword, CurrentPath, SearchOption.Recursive, SearchOption.CaseSensitive))
+            {
+                var idx = i.LastIndexOf("/")+1;
+                var name = i.Substring(idx);
+                var path = i.Substring(0, idx);
+                Items.Add(new ListItem(path, name, _manipulator.IsDirectory(i)));
+            }
         }
 
         private void DiskInfo(object parameter)

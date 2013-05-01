@@ -8,10 +8,10 @@ namespace VFSBase.Search
         public TrieNode()
         {
             Nodes = new SortedDictionary<char, TrieNode>();
-            Values = new LinkedList<IIndexNode>();
+            Values = new HashSet<IIndexNode>();
         }
 
         public IDictionary<char, TrieNode> Nodes { get; set; }
-        public LinkedList<IIndexNode> Values { get; set; }
+        public HashSet<IIndexNode> Values { get; set; }
     }
 }
