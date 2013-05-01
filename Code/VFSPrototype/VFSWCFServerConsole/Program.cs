@@ -2,6 +2,7 @@
 using System.ServiceModel;
 using System.ServiceModel.Description;
 using VFSWCFService;
+using VFSWCFService.UserService;
 
 namespace VFSWCFServer
 {

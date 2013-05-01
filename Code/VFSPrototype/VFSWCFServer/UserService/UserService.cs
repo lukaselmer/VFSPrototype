@@ -1,6 +1,6 @@
-﻿using VFSWCFServer;
+using VFSWCFService.Common;
 
-namespace VFSWCFService
+namespace VFSWCFService.UserService
 {
     /// <summary>
     /// The user service handles registration and login

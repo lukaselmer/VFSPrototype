@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSWCFService;
+using VFSWCFService.Common;
+using VFSWCFService.UserService;
 
 namespace VFSWCFServiceTests
 {

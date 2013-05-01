@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using VFSWCFServer;
+using VFSWCFService.UserService;
 
-namespace VFSWCFService
+namespace VFSWCFService.Common
 {
     /// <summary>
     /// The persistence is responsible for the data persistence.
