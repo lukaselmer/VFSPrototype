@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSPrototype", "VFSPrototype\VFSPrototype.csproj", "{28FB729C-24A1-4651-BBBD-3BA091B27842}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4FED1B42-B203-41E0-AB35-0FC6038B3522} = {4FED1B42-B203-41E0-AB35-0FC6038B3522}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{94FF0757-DD3B-46E2-90F4-5C08DEB42743}"
 	ProjectSection(SolutionItems) = preProject
