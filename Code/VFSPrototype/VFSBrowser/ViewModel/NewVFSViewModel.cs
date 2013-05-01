@@ -15,7 +15,7 @@ using VFSBrowser.View;
 
 namespace VFSBrowser.ViewModel
 {
-    public class NewVFSViewModel : AbstractViewModel
+    internal class NewVFSViewModel : AbstractViewModel
     {
         private long _maximumSize;
         public long MaximumSize

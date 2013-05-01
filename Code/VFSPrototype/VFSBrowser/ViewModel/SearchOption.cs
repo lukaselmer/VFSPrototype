@@ -1,6 +1,6 @@
 ﻿namespace VFSBrowser.ViewModel
 {
-    class SearchOption
+    public class SearchOption
     {
         public string SearchText { get; set; }
         public bool CaseSensitive { get; set; }

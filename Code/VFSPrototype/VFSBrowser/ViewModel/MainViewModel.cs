@@ -19,7 +19,7 @@ using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace VFSBrowser.ViewModel
 {
-    sealed class MainViewModel : AbstractViewModel, IDisposable
+    internal sealed class MainViewModel : AbstractViewModel, IMainViewModel, IDisposable
     {
         private IFileSystemTextManipulator _manipulator;
 
@@ -83,9 +83,9 @@ namespace VFSBrowser.ViewModel
 
             DropCommand = new Command(Drop, null);
         }
-        
+
         public Command DropCommand { get; private set; }
-        
+
         public Command OpenVfsCommand { get; private set; }
         public Command NewVfsCommand { get; private set; }
         public Command NewFolderCommand { get; private set; }
@@ -361,7 +361,7 @@ namespace VFSBrowser.ViewModel
                 if (File.Exists(tmpFile)) File.Delete(tmpFile);
 
                 var vm = new OperationProgressViewModel();
-                Task.Run(() => _manipulator.Export(item.Path+item.Name, tmpFile, vm.Callbacks));
+                Task.Run(() => _manipulator.Export(item.Path + item.Name, tmpFile, vm.Callbacks));
                 vm.ShowDialog();
 
                 System.Diagnostics.Process.Start(tmpFile);
@@ -548,5 +548,9 @@ namespace VFSBrowser.ViewModel
 
             DisposeManipulator();
         }
+    }
+
+    public interface IMainViewModel : IDisposable
+    {
     }
 }
