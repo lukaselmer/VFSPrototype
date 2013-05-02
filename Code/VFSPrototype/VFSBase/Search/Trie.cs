@@ -28,16 +28,16 @@ namespace VFSBase.Search
             if (options.CaseSensitive == false) {
                 TrieNode nextUpperNode;
                 TrieNode nextLowerNode;
-                node.Nodes.TryGetValue(char.ToLower(c), out nextUpperNode);
-                node.Nodes.TryGetValue(char.ToUpper(c), out nextLowerNode);
+                node.Nodes.TryGetValue(char.ToLower(c), out nextLowerNode);
+                node.Nodes.TryGetValue (char.ToUpper (c), out nextUpperNode);
                 if (nextUpperNode == null && nextLowerNode == null) return Enumerable.Empty<IIndexNode>();
 
                 options.Keyword = options.Keyword.Substring(1);
 
                 if (nextUpperNode != null && nextLowerNode != null)
-                    return Search(nextLowerNode, options).Union(Search(nextUpperNode, options));
+                    return Search(nextLowerNode, options.Clone()).Union(Search(nextUpperNode, options.Clone()));
 
-                return Search(nextLowerNode ?? nextUpperNode, options);
+                return Search(nextLowerNode ?? nextUpperNode, options.Clone());
 
             } else {
                 TrieNode nextNode;
