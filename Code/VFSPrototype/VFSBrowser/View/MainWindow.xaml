@@ -38,12 +38,18 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" Name="SearchTextBox" Text="{Binding Path=SearchOption.Keyword}">
+            <Grid.Resources>
+                <BitmapImage x:Key="CancelImage" UriSource="../Resources/Cancel.png" />
+            </Grid.Resources>
+            <TextBox Grid.Column="0" Name="SearchTextBox" Text="{Binding Path=SearchOption.Keyword}"  >
                 <TextBox.InputBindings>
                     <KeyBinding Key="Enter" Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=SearchTextBox, Path=Text}" />
                 </TextBox.InputBindings>
             </TextBox>
-            <xctk:SplitButton Grid.Column="1" Content="Search" Command="{Binding SearchCommand}">
+            
+            <Button Grid.Column="1" Command="{Binding CancelSearchCommand}"><Image Source="{StaticResource CancelImage}" /></Button>
+            
+            <xctk:SplitButton Grid.Column="2" Content="Search" Command="{Binding SearchCommand}">
                 <xctk:SplitButton.DropDownContent>
                     <StackPanel Background="WhiteSmoke">
                         <CheckBox Margin="5 0 5 0" Content="Case Sensitive" IsChecked="{Binding SearchOption.CaseSensitive}" />

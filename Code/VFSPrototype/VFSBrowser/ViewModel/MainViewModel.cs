@@ -83,7 +83,8 @@ namespace VFSBrowser.ViewModel
             MoveCommand = new Command(Move, IsItemSelected);
             CopyCommand = new Command(Copy, IsItemSelected);
             PasteCommand = new Command(Paste, p => (_manipulator != null && _clipboard.Count > 0));
-            SearchCommand = new Command(Search, p => (_manipulator != null));
+            SearchCommand = new Command (Search, p => (_manipulator != null));
+            CancelSearchCommand = new Command (CancelSearch, p => (_manipulator != null));
             DiskInfoCommand = new Command(DiskInfo, p => (_manipulator != null));
 
             DropCommand = new Command(Drop, null);
@@ -105,6 +106,7 @@ namespace VFSBrowser.ViewModel
         public Command PasteCommand { get; private set; }
         public Command DeleteCommand { get; private set; }
         public Command SearchCommand { get; private set; }
+        public Command CancelSearchCommand { get; private set; }
         public Command DiskInfoCommand { get; private set; }
 
 
@@ -146,6 +148,14 @@ namespace VFSBrowser.ViewModel
         //    }
         //    return items;
         //}
+
+        
+        private void CancelSearch (object parameter)
+        {
+            SearchOption.Keyword = "";
+            OnPropertyChanged("SearchOption");
+            CurrentPath = CurrentPath;
+        }
 
         private void Search(object parameter)
         {
