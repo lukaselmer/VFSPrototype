@@ -174,9 +174,8 @@ namespace VFSBrowser.ViewModel
             var del = new List<ListItem>();
             foreach (ListItem item in deleteItems)
             {
-                _manipulator.Delete(CurrentPath + item.Name);
-                var listItem = Items.First(l => l.Name == item.Name);
-                del.Add(listItem);
+                _manipulator.Delete(item.Path + item.Name);
+                del.Add(item);
             }
 
             del.ForEach(i => Items.Remove(i));
@@ -276,7 +275,7 @@ namespace VFSBrowser.ViewModel
                 foreach (ListItem item in items)
                 {
                     var exportPath = Path.Combine(dlg.SelectedPath, item.Name);
-                    var vfsExportPath = CurrentPath + item.Name;
+                    var vfsExportPath = item.Path + item.Name;
 
                     if (File.Exists(exportPath) || Directory.Exists(exportPath))
                     {
@@ -325,12 +324,12 @@ namespace VFSBrowser.ViewModel
             {
                 try
                 {
-                    if (_manipulator.Exists(CurrentPath + dlg.Text))
+                    if (_manipulator.Exists(item.Path + dlg.Text))
                     {
                         var res = MessageBox.Show("Choose an other name!", "Filename allready exists!", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
-                    _manipulator.Move(CurrentPath + item.Name, CurrentPath + dlg.Text);
+                    _manipulator.Move(item.Path + item.Name, item.Path + dlg.Text);
                     item.Name = dlg.Text;
                     OnPropertyChanged("Items");
 

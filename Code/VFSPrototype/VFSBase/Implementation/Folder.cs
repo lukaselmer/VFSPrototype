@@ -4,6 +4,8 @@ namespace VFSBase.Implementation
 {
     internal class Folder : IIndexNode
     {
+        
+
         private long _blocksCount;
 
         public Folder(string name)
@@ -35,14 +37,21 @@ namespace VFSBase.Implementation
 
         public override bool Equals (object obj)
         {
-            var fold = obj as Folder;
-            if (fold == null)
-                return false;
-
-            return this.BlockNumber == fold.BlockNumber &&
-                   this.BlocksCount == fold.BlocksCount &&
-                   this.IndirectNodeNumber == fold.IndirectNodeNumber &&
-                   this.Name == fold.Name;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Folder) obj);
         }
+
+        protected bool Equals (Folder other)
+        {
+            return BlockNumber == other.BlockNumber;
+        }
+
+        public override int GetHashCode ()
+        {
+            return BlockNumber.GetHashCode ();
+        }
+
     }
 }

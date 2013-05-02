@@ -20,33 +20,33 @@ namespace VFSBaseTests.Search
         {
             root = new RootFolder();
 
-            topFolderBli = new Folder("bli") {Parent = root};
-            var topFolderBla = new Folder ("bla") { Parent = root };
-            var topFolderBlub = new Folder ("blup") { Parent = root };
-            var topFolderBbb = new Folder ("bbb") { Parent = root };
+            topFolderBli = new Folder("bli") {Parent = root, BlockNumber = 0};
+            var topFolderBla = new Folder ("bla") { Parent = root, BlockNumber = 1};
+            var topFolderBlub = new Folder ("blup") { Parent = root, BlockNumber = 2};
+            var topFolderBbb = new Folder ("bbb") { Parent = root, BlockNumber = 3};
             _service.AddToIndex(topFolderBli);
             _service.AddToIndex(topFolderBla);
             _service.AddToIndex(topFolderBlub);
             _service.AddToIndex(topFolderBbb);
 
-            subBliFoo = new Folder("foo") { Parent = topFolderBli };
-            var subBliFooCapital = new Folder("FOO") { Parent = topFolderBli };
-            var subBliBar = new Folder("bar") { Parent = topFolderBli };
+            subBliFoo = new Folder("foo") { Parent = topFolderBli, BlockNumber = 4};
+            var subBliFooCapital = new Folder("FOO") { Parent = topFolderBli, BlockNumber = 5};
+            var subBliBar = new Folder("bar") { Parent = topFolderBli, BlockNumber = 6};
             _service.AddToIndex(subBliFoo);
             _service.AddToIndex(subBliFooCapital);
             _service.AddToIndex(subBliBar);
 
-            var subsubBliFooAaa = new Folder("aaa") { Parent = subBliFoo };
-            var subsubBliFooBbb = new Folder("bbb") { Parent = subBliFoo };
-            var subsubBliFooCcc = new Folder("Ccc") { Parent = subBliFoo };
+            var subsubBliFooAaa = new Folder("aaa") { Parent = subBliFoo, BlockNumber = 7};
+            var subsubBliFooBbb = new Folder("bbb") { Parent = subBliFoo, BlockNumber = 8};
+            var subsubBliFooCcc = new Folder("Ccc") { Parent = subBliFoo, BlockNumber = 9};
             _service.AddToIndex(subsubBliFooAaa);
             _service.AddToIndex(subsubBliFooBbb);
             _service.AddToIndex(subsubBliFooCcc);
 
-            var subBliFooFile = new VFSFile("File") { Parent = subBliFoo };
-            var subBliFooFile2 = new VFSFile("File2") { Parent = subBliFoo };
-            var subBliFooFile3 = new VFSFile("File3") { Parent = subBliFoo };
-            var subBliFooBar = new Folder("bar") { Parent = subBliFoo };
+            var subBliFooFile = new VFSFile("File") { Parent = subBliFoo, BlockNumber = 10};
+            var subBliFooFile2 = new VFSFile("File2") { Parent = subBliFoo, BlockNumber = 11};
+            var subBliFooFile3 = new VFSFile("File3") { Parent = subBliFoo, BlockNumber = 12};
+            var subBliFooBar = new Folder("bar") { Parent = subBliFoo, BlockNumber = 13};
             _service.AddToIndex(subBliFooFile);
             _service.AddToIndex(subBliFooFile2);
             _service.AddToIndex(subBliFooFile3);
