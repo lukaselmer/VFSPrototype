@@ -14,6 +14,11 @@ namespace VFSConsoleTests
         public bool IsCurrentDirectory;
         public Exception ThrowException;
 
+        public IList<string> Search(string keyword, string folder, bool recursive, bool caseSensitive)
+        {
+            throw new NotImplementedException();
+        }
+
         public IList<string> Files(string path)
         {
             return CurrentFiles;

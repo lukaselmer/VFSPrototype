@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
+using VFSBase.Search;
 
 namespace VFSBase.Interfaces
 {
@@ -36,6 +37,13 @@ namespace VFSBase.Interfaces
         /// <returns><c>true</c> if file or folder with name exists, <c>false</c> otherwise</returns>
         bool Exists(Folder folder, string name);
 
+        /// <summary>
+        /// Does a search on the filesystem with the optionss defined in searchOptions
+        /// </summary>
+        /// <param name="searchOptions">The search options</param>
+        /// <returns>All IIndexNodes which matches the ciriteria in the search options</returns>
+        IEnumerable<IIndexNode> Search(SearchOptions searchOptions);
+            
         /// <summary>
         /// Finds the element with a specified name in the specified folder.
         /// </summary>
