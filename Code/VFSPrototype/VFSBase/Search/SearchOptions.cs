@@ -31,5 +31,17 @@ namespace VFSBase.Search
             UseRegex = false;
             RecursionDistance = -1;
         }
+
+        public SearchOptions Clone()
+        {
+            return new SearchOptions
+                {
+                    CaseSensitive = CaseSensitive,
+                    UseRegex = UseRegex,
+                    Keyword = Keyword,
+                    RecursionDistance = RecursionDistance,
+                    RestrictToFolder = RestrictToFolder
+                };
+        }
     }
 }
