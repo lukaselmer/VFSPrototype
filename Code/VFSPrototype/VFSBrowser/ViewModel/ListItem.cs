@@ -21,5 +21,25 @@ namespace VFSBrowser.ViewModel
             Path = path;
             Name = name;
         }
+
+        public override bool Equals(object other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (other.GetType() != this.GetType()) return false;
+            return Equals((ListItem) other);
+        }
+
+        protected bool Equals (ListItem other)
+        {
+            return string.Equals (_name, other._name) && string.Equals (Path, other.Path);
+        }
+
+        public override int GetHashCode ()
+        {
+            unchecked {
+                return ((_name != null ? _name.GetHashCode () : 0) * 397) ^ (Path != null ? Path.GetHashCode () : 0);
+            }
+        }
     }
 }
