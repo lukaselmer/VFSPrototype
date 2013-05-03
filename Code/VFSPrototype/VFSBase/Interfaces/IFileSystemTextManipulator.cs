@@ -6,6 +6,7 @@ namespace VFSBase.Interfaces
 {
     public interface IFileSystemTextManipulator : IDisposable
     {
+        IList<string> Search(string keyword, string folder, bool recursive, bool caseSensitive);
         IList<string> Files(string path);
         IList<string> List(string path);
         IList<string> Folders(string path);

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
+using VFSBase.Search;
 
 namespace VFSBase.Implementation
 {
@@ -11,10 +13,26 @@ namespace VFSBase.Implementation
     {
         private IFileSystem _fileSystem;
 
+        public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
+
         public FileSystemTextManipulator(FileSystemOptions options, string password = "")
         {
             _fileSystem = FileSystemFactory.CreateOrImport(options, password);
             _fileSystem.TestEncryptionKey();
+        }
+
+        public IList<string> Search(string keyword, string folder, bool recursive, bool caseSensitive)
+        {
+            var restrictToFolder = FindNode(folder) as Folder;
+            var searchOptions = new SearchOptions()
+                {
+                    Keyword = keyword,
+                    CaseSensitive = caseSensitive,
+                    RecursionDistance = (recursive ? -1 : 0),
+                    RestrictToFolder = restrictToFolder ?? _fileSystem.Root
+                };
+
+            return _fileSystem.Search(searchOptions).Select(GetPath).ToList();
         }
 
         public IList<string> Folders(string path)
@@ -164,6 +182,18 @@ namespace VFSBase.Implementation
             return FindParentNode(path) as Folder;
         }
 
+        private static string GetPath(IIndexNode node)
+        {
+            var sb = new StringBuilder();
+            while (node.Parent != null)
+            {
+                sb.Insert(0, node.Name);
+                sb.Insert(0, "/");
+                node = node.Parent;
+            }
+            return sb.ToString();
+        }
+
 
         public void Dispose()
         {
@@ -185,6 +215,5 @@ namespace VFSBase.Implementation
             _fileSystem = null;
         }
 
-        public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
     }
 }
