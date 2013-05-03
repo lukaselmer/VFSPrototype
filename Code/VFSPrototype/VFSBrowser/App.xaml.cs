@@ -13,19 +13,11 @@ namespace VFSBrowser
     /// </summary>
     public partial class App
     {
-        /*private ApplicationLifetimeManager _manager;
-
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            _manager = new ApplicationLifetimeManager();
-            _manager.Startup();
+            MessageBox.Show("Please use the project called \"Statup\" to start the application, not the project \"VFSBrowser\"");
+            Environment.Exit(0);
         }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            base.OnExit(e);
-            _manager.Exit();
-        }*/
     }
 }
