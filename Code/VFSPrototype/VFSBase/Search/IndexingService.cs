@@ -13,13 +13,15 @@ namespace VFSBase.Search
         private static IFileSystem _fileSystem;
         private static IndexService _indexService;
 
-        
+
         public static void StartIndexing(IndexService indexService, IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
             _indexService = indexService;
 
-            Task.Run(() => Index(_fileSystem.Root));
+            // This does not work properly, we would need to use synchronization
+            // Task.Run(() => Index(_fileSystem.Root));
+            Index(_fileSystem.Root);
         }
 
         private static void Index(Folder folder)
