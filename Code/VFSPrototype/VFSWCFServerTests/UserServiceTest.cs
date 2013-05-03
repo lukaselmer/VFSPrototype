@@ -16,7 +16,7 @@ namespace VFSWCFServiceTests
             var user = s.Register("bla", "blub");
             Assert.AreEqual("bla", user.Login);
             Assert.AreEqual("blub", user.HashedPassword);
-            Assert.IsTrue(persistence.Exists("bla"));
+            Assert.IsTrue(persistence.UserExists("bla"));
         }
 
         [TestMethod]

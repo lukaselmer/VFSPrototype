@@ -11,20 +11,35 @@ namespace VFSBaseTests
     [TestClass]
     public class FilSystemTest
     {
-        private const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
+        private const string DefaultTestfileFolder = "../../../Testfiles/FileSystemTests/";
         private readonly long _defaultSize = MathUtil.MB(5);
+
+        [TestInitialize]
+        public void CreateTestFolder()
+        {
+            Directory.CreateDirectory(DefaultTestfileFolder);
+        }
 
         [TestCleanup]
         public void RemoveTestfile()
         {
-            File.Delete(DefaultTestfilePath);
+            Directory.Delete(DefaultTestfileFolder, true);
         }
 
+        private IFileSystem GetFileSystem()
+        {
+            return GetFileSystem(RandomTestfilePath());
+        }
 
-        private IFileSystem GetFileSystem(string path = DefaultTestfilePath)
+        private IFileSystem GetFileSystem(string path)
         {
             var o = new FileSystemOptions(path, _defaultSize);
             return FileSystemFactory.CreateOrImport(o, "");
+        }
+
+        private static string RandomTestfilePath()
+        {
+            return Path.Combine(DefaultTestfileFolder, Guid.NewGuid() + ".vhs");
         }
 
         [TestMethod]
@@ -47,14 +62,16 @@ namespace VFSBaseTests
         public void TestNamesShouldSupportUtf8()
         {
             const string name = "∀α,β∈∑α≤β∧β≥α=>α=β";
-            using (var fs = GetFileSystem())
+            var path = RandomTestfilePath();
+            using (var fs = GetFileSystem(path))
             {
                 Assert.IsTrue(!fs.Folders(fs.Root).Any());
                 fs.CreateFolder(fs.Root, name);
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
+                fs.Dispose();
             }
 
-            using (var fs = GetFileSystem())
+            using (var fs = GetFileSystem(path))
             {
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
                 Assert.IsTrue(fs.Folders(fs.Root).First().Name == name);
