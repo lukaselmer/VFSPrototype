@@ -60,7 +60,7 @@ namespace VFSBase.Implementation
             _persistence = new Persistence(_blockParser, _blockManipulator);
             _blockAllocation = _options.BlockAllocation;
             _indexService = new IndexService();
-            
+
             InitializeFileSystem();
         }
 
@@ -359,10 +359,10 @@ namespace VFSBase.Implementation
             _indexService.AddToIndex(node);
         }
 
-        public IEnumerable<IIndexNode> Search (SearchOptions searchOptions)
+        public IEnumerable<IIndexNode> Search(SearchOptions searchOptions)
         {
             return _indexService.Search(searchOptions);
-        } 
+        }
 
         public IIndexNode Find(Folder folder, string name)
         {
