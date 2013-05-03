@@ -25,7 +25,7 @@ namespace VFSWCFService.UserService
         /// <returns>If successful, the user, null otherwise.</returns>
         public User Register(string login, string hashedPassword)
         {
-            return Persistence.Exists(login) ? null : Persistence.CreateUser(login, hashedPassword);
+            return Persistence.UserExists(login) ? null : Persistence.CreateUser(login, hashedPassword);
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace VFSWCFService.UserService
         /// <returns>The user if login is successful, null otherwise.</returns>
         public User Login(string login, string hashedPassword)
         {
-            if (!Persistence.Exists(login)) return null;
+            if (!Persistence.UserExists(login)) return null;
 
             var u = Persistence.FindUser(login);
             return u.HashedPassword == hashedPassword ? u : null;
