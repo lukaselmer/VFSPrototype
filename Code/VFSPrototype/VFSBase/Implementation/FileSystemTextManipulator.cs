@@ -139,8 +139,9 @@ namespace VFSBase.Implementation
             return FindParentFolder(dest);
         }
 
-        public void Export(string source, string dest, CallbacksBase exportCallbacks = null)
+        public void Export(string source, string dest, CallbacksBase exportCallbacks, int version)
         {
+            // TODO: implement version
             if (exportCallbacks == null) exportCallbacks = new ExportCallbacks();
             _fileSystem.Export(FindNode(source), dest, exportCallbacks);
         }
@@ -221,5 +222,14 @@ namespace VFSBase.Implementation
             _fileSystem = null;
         }
 
+        public IList<string> Folders(string test, long version)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Version(string path)
+        {
+            if(!Exists(path)) throw new VFSException("does not exist");
+        }
     }
 }

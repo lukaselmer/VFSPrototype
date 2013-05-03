@@ -70,7 +70,7 @@
     <Compile Include="FileSystemManipulatorFoldersTest.cs" />
     <Compile Include="FileSystemManipulatorLoadTest.cs" />
     <Compile Include="FileSystemFactoryTest.cs" />
-    <Compile Include="FilSystemTest.cs" />
+    <Compile Include="FileSystemTest.cs" />
     <Compile Include="Helpers\TestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FileSystemManipulatorTest.cs" />
@@ -82,6 +82,7 @@
     <Compile Include="FileSystemManipulatorCallbacksTest.cs" />
     <Compile Include="BlockListTest.cs" />
     <Compile Include="Search\SearchTest.cs" />
+    <Compile Include="HistoryTest.cs" />
     <Compile Include="VFSFileStreamTest.cs" />
   </ItemGroup>
   <ItemGroup>
