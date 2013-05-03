@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VFSWCFService.DiskService;
 using VFSWCFService.UserService;
 
 namespace VFSWCFService.Common
@@ -8,14 +9,16 @@ namespace VFSWCFService.Common
     /// </summary>
     public class Persistence
     {
-        private readonly Dictionary<string, User> _storage;
+        private readonly Dictionary<string, User> _userStorage;
+        private readonly Dictionary<string, IList<Disk>> _diskStorage;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Persistence"/> class.
         /// </summary>
         public Persistence()
         {
-            _storage = new Dictionary<string, User>();
+            _userStorage = new Dictionary<string, User>();
+            _diskStorage = new Dictionary<string, IList<Disk>>();
         }
 
         /// <summary>
@@ -23,9 +26,9 @@ namespace VFSWCFService.Common
         /// </summary>
         /// <param name="login">The login.</param>
         /// <returns></returns>
-        public bool Exists(string login)
+        public bool UserExists(string login)
         {
-            return _storage.ContainsKey(login);
+            return _userStorage.ContainsKey(login);
         }
 
         /// <summary>
@@ -37,7 +40,7 @@ namespace VFSWCFService.Common
         public User CreateUser(string login, string hashedPassword)
         {
             var u = new User { Login = login, HashedPassword = hashedPassword };
-            _storage[login] = u;
+            _userStorage[login] = u;
             return u;
         }
 
@@ -48,7 +51,18 @@ namespace VFSWCFService.Common
         /// <returns></returns>
         internal User FindUser(string login)
         {
-            return _storage[login];
+            return _userStorage[login];
+        }
+
+        public IList<Disk> Disks(User user)
+        {
+            return _diskStorage.ContainsKey(user.Login) ? _diskStorage[user.Login] : null;
+        }
+
+        public void CreateDisk(User user, Disk disk)
+        {
+            if (!_diskStorage.ContainsKey(user.Login)) _diskStorage[user.Login] = new List<Disk>();
+            _diskStorage[user.Login].Add(disk);
         }
     }
 }
