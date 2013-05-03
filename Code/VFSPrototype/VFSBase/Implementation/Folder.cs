@@ -4,7 +4,7 @@ namespace VFSBase.Implementation
 {
     internal class Folder : IIndexNode
     {
-        
+
 
         private long _blocksCount;
 
@@ -14,7 +14,7 @@ namespace VFSBase.Implementation
             Name = name;
         }
 
-        protected Folder()
+        public Folder()
         {
             Name = "";
             _blocksCount = 0;
@@ -34,23 +34,27 @@ namespace VFSBase.Implementation
 
         public long IndirectNodeNumber { get; set; }
 
+        public long PredecessorBlockNr { get; set; }
 
-        public override bool Equals (object obj)
+        internal bool IsRoot { get; set; }
+
+
+        public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Folder) obj);
+            return Equals((Folder)obj);
         }
 
-        protected bool Equals (Folder other)
+        protected bool Equals(Folder other)
         {
             return BlockNumber == other.BlockNumber;
         }
 
-        public override int GetHashCode ()
+        public override int GetHashCode()
         {
-            return BlockNumber.GetHashCode ();
+            return BlockNumber.GetHashCode();
         }
 
     }

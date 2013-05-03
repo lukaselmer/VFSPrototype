@@ -264,13 +264,13 @@ namespace VFSBaseTests
                 if (File.Exists(testFileSource)) File.Delete(testFileSource);
                 File.WriteAllText(testFileSource, "");
 
-                m.Import(testFileSource, "test.txt");
-                m.Delete("test.txt");
-                Assert.IsFalse(m.Exists("test.txt"));
-
                 m.Import(testFileSource, "hello/test.txt");
                 m.Delete("hello/test.txt");
                 Assert.IsFalse(m.Exists("hello/test.txt"));
+
+                m.Import(testFileSource, "test.txt");
+                m.Delete("test.txt");
+                Assert.IsFalse(m.Exists("test.txt"));
             }
         }
 

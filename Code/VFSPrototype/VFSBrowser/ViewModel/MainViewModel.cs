@@ -472,8 +472,7 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                var options = new FileSystemOptions(dlg.FileName, 1000 * 1000 * 1000, StreamEncryptionType.None, StreamCompressionType.None);
-                var manipulator = new FileSystemTextManipulator(options, passwordDialog.Password);
+                var manipulator = new FileSystemTextManipulator(dlg.FileName, passwordDialog.Password);
 
                 // Close last vfs
                 DisposeManipulator();
