@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
+using VFSBase.Search;
 
 namespace VFSBase.Implementation
 {
@@ -18,6 +19,7 @@ namespace VFSBase.Implementation
         private readonly BlockAllocation _blockAllocation;
         private BlockManipulator _blockManipulator;
         private readonly Persistence _persistence;
+        private readonly IndexService _indexService;
 
         public FileSystemOptions FileSystemOptions
         {
@@ -57,6 +59,7 @@ namespace VFSBase.Implementation
             _blockParser = new BlockParser(_options);
             _persistence = new Persistence(_blockParser, _blockManipulator);
             _blockAllocation = _options.BlockAllocation;
+            _indexService = new IndexService();
 
             InitializeFileSystem();
         }
@@ -64,6 +67,8 @@ namespace VFSBase.Implementation
         private void InitializeFileSystem()
         {
             Root = ImportRootFolder();
+
+            IndexingService.StartIndexing(_indexService, this);
         }
 
         private RootFolder ImportRootFolder()
@@ -106,6 +111,8 @@ namespace VFSBase.Implementation
             var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate() };
             _persistence.Persist(folder);
             AppendBlockReference(parentFolder, folder.BlockNumber);
+
+            _indexService.AddToIndex(folder);
 
             return folder;
         }
@@ -304,6 +311,8 @@ namespace VFSBase.Implementation
             AppendBlockReference(destination, file.BlockNumber);
 
             copyCallbacks.CurrentlyProcessed++;
+
+            _indexService.AddToIndex(file);
         }
 
         private void CopyFolder(Folder nodeToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
@@ -326,6 +335,8 @@ namespace VFSBase.Implementation
             CheckDisposed();
 
             GetBlockList(node.Parent).Remove(node);
+
+            _indexService.RemoveFromIndex(node);
         }
 
         public void Move(IIndexNode node, Folder destination, string name)
@@ -335,6 +346,8 @@ namespace VFSBase.Implementation
 
             if (Exists(destination, name)) throw new ArgumentException("Folder already exists!");
 
+            _indexService.RemoveFromIndex(node);
+
             var blockNumber = node.BlockNumber;
             GetBlockList(node.Parent).Remove(node, false);
             AppendBlockReference(destination, blockNumber);
@@ -342,6 +355,13 @@ namespace VFSBase.Implementation
             node.Name = name;
 
             _persistence.Persist(node);
+
+            _indexService.AddToIndex(node);
+        }
+
+        public IEnumerable<IIndexNode> Search(SearchOptions searchOptions)
+        {
+            return _indexService.Search(searchOptions);
         }
 
         public IIndexNode Find(Folder folder, string name)
@@ -382,7 +402,9 @@ namespace VFSBase.Implementation
                 }
             }
 
-            //Note: we could save some metadata too...
+            //Note: we could save some metadata too..
+
+            _indexService.AddToIndex(file);
 
             return file;
         }
