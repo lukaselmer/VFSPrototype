@@ -12,7 +12,7 @@ namespace VFSBaseTests
     [TestClass]
     public class BlockListTest
     {
-        [TestMethod]
+        /*[TestMethod]
         public void TestEmptyFolder()
         {
             IIndexNode n = new Folder("test");
@@ -20,9 +20,9 @@ namespace VFSBaseTests
             var b = new BlockList(n, null, TestHelper.CreateFileSystemOptions("", 0), null, null, null);
             Assert.AreEqual(0, b.Blocks().Count());
             b.Remove(new VFSFile("xxx"), false);
-        }
+        }*/
 
-        [ExpectedException(typeof(ArgumentNullException))]
+        /*[ExpectedException(typeof(ArgumentNullException))]
         [TestMethod]
         public void TestRemoveNull()
         {
@@ -30,9 +30,9 @@ namespace VFSBaseTests
             n.IndirectNodeNumber = 0;
             var b = new BlockList(n, null, TestHelper.CreateFileSystemOptions("", 0), null, null, null);
             b.Remove(null, false);
-        }
+        }*/
 
-        [ExpectedException(typeof(VFSException))]
+        /*[ExpectedException(typeof(VFSException))]
         [TestMethod]
         public void TestInvalidNode()
         {
@@ -40,6 +40,6 @@ namespace VFSBaseTests
             n.IndirectNodeNumber = 0;
             var b = new BlockList(n, null, TestHelper.CreateFileSystemOptions("", 0), null, null, null);
             b.Remove(new VFSFile("xxx"), false);
-        }
+        }*/
     }
 }
