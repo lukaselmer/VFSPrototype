@@ -53,6 +53,8 @@ namespace VFSBase.Implementation
             if (!disposing) return;
 
             // free managed resources
+            if (_diskWriter != null) _diskWriter.Flush();
+            if (_disk != null) _disk.Flush(true);
 
             if (_disk != null)
             {
