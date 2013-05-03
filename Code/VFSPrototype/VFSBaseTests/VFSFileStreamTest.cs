@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
+using VFSBaseTests.Helpers;
 
 namespace VFSBaseTests
 {
@@ -10,7 +11,7 @@ namespace VFSBaseTests
     {
         private static VFSFileStream VFSFileStream()
         {
-            return new VFSFileStream(new VFSFile("test"), null, new FileSystemOptions("", 0), null, null, null);
+            return new VFSFileStream(new VFSFile("test"), null, TestHelper.CreateFileSystemOptions("", 0), null, null, null);
         }
 
         [ExpectedException(typeof(NotSupportedException))]
