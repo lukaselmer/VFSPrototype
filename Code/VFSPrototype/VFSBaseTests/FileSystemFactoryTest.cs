@@ -2,6 +2,7 @@
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
+using VFSBaseTests.Helpers;
 
 namespace VFSBaseTests
 {
@@ -25,12 +26,12 @@ namespace VFSBaseTests
         {
             if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
 
-            var fileSystemOptions = new FileSystemOptions(DefaultTestfilePath, DefaultSize);
+            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath, DefaultSize);
 
             Assert.IsFalse(File.Exists(DefaultTestfilePath));
 
             // Should call create, because the file does not exist
-            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions, ""))
+            using (var fileSystem = FileSystemFactory.Create(fileSystemOptions, ""))
             {
                 fileSystemOptions = fileSystem.FileSystemOptions;
             }
@@ -46,9 +47,9 @@ namespace VFSBaseTests
         {
             if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
 
-            var fileSystemOptions = new FileSystemOptions(DefaultTestfilePath, DefaultSize);
+            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath, DefaultSize);
 
-            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions, ""))
+            using (var fileSystem = FileSystemFactory.Create(fileSystemOptions, ""))
             {
                 fileSystemOptions = fileSystem.FileSystemOptions;
             }
@@ -56,7 +57,7 @@ namespace VFSBaseTests
             Assert.IsTrue(File.Exists(DefaultTestfilePath));
 
             // Should call import, because the file exists
-            using (var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions, ""))
+            using (var fileSystem = FileSystemFactory.Import(fileSystemOptions.Location, ""))
             {
                 fileSystemOptions = fileSystem.FileSystemOptions;
             }
@@ -72,12 +73,12 @@ namespace VFSBaseTests
         {
             if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
 
-            var fileSystemOptions = new FileSystemOptions(DefaultTestfilePath, DefaultSize);
+            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath, DefaultSize);
 
             Assert.IsFalse(File.Exists(DefaultTestfilePath));
 
             // Should call create, because the file does not exist
-            var fileSystem = FileSystemFactory.CreateOrImport(fileSystemOptions, "");
+            var fileSystem = FileSystemFactory.Create(fileSystemOptions, "");
 
             Assert.IsTrue(File.Exists(DefaultTestfilePath));
 

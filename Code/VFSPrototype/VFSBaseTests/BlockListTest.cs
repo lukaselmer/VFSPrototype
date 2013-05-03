@@ -5,6 +5,7 @@ using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
+using VFSBaseTests.Helpers;
 
 namespace VFSBaseTests
 {
@@ -16,7 +17,7 @@ namespace VFSBaseTests
         {
             IIndexNode n = new Folder("test");
             n.IndirectNodeNumber = 0;
-            var b = new BlockList(n, null, new FileSystemOptions("", 0), null, null, null);
+            var b = new BlockList(n, null, TestHelper.CreateFileSystemOptions("", 0), null, null, null);
             Assert.AreEqual(0, b.Blocks().Count());
             b.Remove(new VFSFile("xxx"), false);
         }
@@ -27,7 +28,7 @@ namespace VFSBaseTests
         {
             IIndexNode n = new Folder("test");
             n.IndirectNodeNumber = 0;
-            var b = new BlockList(n, null, new FileSystemOptions("", 0), null, null, null);
+            var b = new BlockList(n, null, TestHelper.CreateFileSystemOptions("", 0), null, null, null);
             b.Remove(null, false);
         }
 
@@ -37,7 +38,7 @@ namespace VFSBaseTests
         {
             IIndexNode n = new VFSFile("test");
             n.IndirectNodeNumber = 0;
-            var b = new BlockList(n, null, new FileSystemOptions("", 0), null, null, null);
+            var b = new BlockList(n, null, TestHelper.CreateFileSystemOptions("", 0), null, null, null);
             b.Remove(new VFSFile("xxx"), false);
         }
     }
