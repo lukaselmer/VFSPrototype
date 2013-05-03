@@ -19,7 +19,7 @@ using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace VFSBrowser.ViewModel
 {
-    sealed class MainViewModel : AbstractViewModel, IDisposable
+    internal sealed class MainViewModel : AbstractViewModel, IMainViewModel, IDisposable
     {
         private IFileSystemTextManipulator _manipulator;
 
@@ -581,5 +581,9 @@ namespace VFSBrowser.ViewModel
 
             DisposeManipulator();
         }
+    }
+
+    public interface IMainViewModel : IDisposable
+    {
     }
 }

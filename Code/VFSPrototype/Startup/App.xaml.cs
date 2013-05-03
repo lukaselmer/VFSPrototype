@@ -6,18 +6,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace VFSBrowser
+namespace Startup
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App
+    public partial class App : Application
     {
+        private ApplicationLifetimeManager _manager;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            MessageBox.Show("Please use the project called \"Statup\" to start the application, not the project \"VFSBrowser\"");
-            Environment.Exit(0);
+            _manager = new ApplicationLifetimeManager();
+            _manager.Startup();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+            _manager.Exit();
         }
     }
 }

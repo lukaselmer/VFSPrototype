@@ -20,7 +20,7 @@ namespace VFSBrowser.View
     /// </summary>
     public partial class PasswordDialog : Window
     {
-        public PasswordDialog(PasswordDialogViewModel passwordDialogViewModel)
+        public PasswordDialog(object passwordDialogViewModel)
         {
             InitializeComponent();
             DataContext = passwordDialogViewModel;

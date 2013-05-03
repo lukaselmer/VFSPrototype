@@ -20,7 +20,7 @@ namespace VFSBrowser.View
     /// </summary>
     public partial class NewVFSView : Window
     {
-        public NewVFSView(NewVFSViewModel viewModel)
+        public NewVFSView(object viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;
