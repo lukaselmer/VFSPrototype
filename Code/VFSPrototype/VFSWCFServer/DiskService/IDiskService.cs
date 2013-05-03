@@ -1,4 +1,6 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.ServiceModel;
+using VFSWCFService.UserService;
 
 namespace VFSWCFService.DiskService
 {
@@ -6,6 +8,12 @@ namespace VFSWCFService.DiskService
     public interface IDiskService
     {
         [OperationContract]
-        string Ish(string input);
+        IList<Disk> Disks(User user);
+
+        [OperationContract]
+        Disk CreateDisk(User user);
+
+        [OperationContract]
+        bool DeleteDisk(Disk disk);
     }
 }
