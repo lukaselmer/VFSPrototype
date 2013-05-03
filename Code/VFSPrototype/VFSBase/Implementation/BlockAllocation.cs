@@ -15,7 +15,6 @@ namespace VFSBase.Implementation
         /// Starts a 2 => first two blocks are reserved for the file system
         /// </summary>
         private long _nextFreeBlock = 2;
-        private readonly LinkedList<long> _freeList = new LinkedList<long>();
 
         /// <summary>
         /// The next free block
@@ -23,21 +22,12 @@ namespace VFSBase.Implementation
         /// </summary>
         public long OccupiedCount
         {
-            get { return _nextFreeBlock - _freeList.Count; }
+            get { return _nextFreeBlock; }
         }
 
         public long Allocate()
         {
-            if (_freeList.First == null) return _nextFreeBlock++;
-
-            var first = _freeList.First.Value;
-            _freeList.RemoveFirst();
-            return first;
-        }
-
-        public void Free(long blockNumber)
-        {
-            _freeList.AddFirst(blockNumber);
+            return _nextFreeBlock++;
         }
 
         public static BlockAllocation Deserialize(Stream stream)

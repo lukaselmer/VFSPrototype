@@ -108,8 +108,9 @@ namespace VFSBase.Persistence
 
             var refToMove = indirectNode1[indexIndirection0];
 
+            // TODO: this should not be necessary
             // Free space is false, when called from "Move" method, true otherwise
-            if (freeSpace) FreeSpace(nodeToDelete);
+            //if (freeSpace) FreeSpace(nodeToDelete);
 
             indirectNode1[indexIndirection0] = 0;
             _persistence.PersistIndirectNode(indirectNode1);
@@ -213,23 +214,25 @@ namespace VFSBase.Persistence
             return b;
         }
 
+        // TODO: this should not be necessary
         /// <summary>
         /// Frees the space and destroys the file contents.
         /// Note: File contents are not destroyed recursively.
         /// </summary>
         /// <param name="node">The node.</param>
-        private void FreeSpace(IIndexNode node)
-        {
+        //private void FreeSpace(IIndexNode node)
+        //{
             // The file contents could be destroyed, but it is not necessary.
             // This would have to be done recursivly tough.
             // This can be used to nullify a single block: WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
 
-            if (node.IndirectNodeNumber != 0) FreeSpace(ReadIndirectNode(node.IndirectNodeNumber), _options.IndirectionCountForIndirectNodes);
+       //     if (node.IndirectNodeNumber != 0) FreeSpace(ReadIndirectNode(node.IndirectNodeNumber), _options.IndirectionCountForIndirectNodes);
 
-            _blockAllocation.Free(node.BlockNumber);
-        }
-
-        private void FreeSpace(IndirectNode node, int recursion)
+           
+            //_blockAllocation.Free(node.BlockNumber);
+        //}
+        // TODO: this should not be necessary
+        /*private void FreeSpace(IndirectNode node, int recursion)
         {
             foreach (var blockNumber in node.UsedBlockNumbers())
             {
@@ -237,6 +240,6 @@ namespace VFSBase.Persistence
                 _blockManipulator.WriteBlock(blockNumber, new byte[_options.BlockSize]);
                 _blockAllocation.Free(blockNumber);
             }
-        }
+        }*/
     }
 }
