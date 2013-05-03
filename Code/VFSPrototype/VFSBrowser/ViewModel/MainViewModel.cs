@@ -57,6 +57,11 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        public string FileSystemName
+        {
+            get { return _manipulator != null ? ("VFS Browser - " + _manipulator.FileSystemOptions.Location) : "VFS Browser"; }
+        }
+
         public SearchOption SearchOption { get; set; }
 
         public ObservableCollection<ListItem> Items { get; set; }
@@ -64,10 +69,11 @@ namespace VFSBrowser.ViewModel
         public MainViewModel()
         {
             Items = new ObservableCollection<ListItem>();
-            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, SearchText = "" };
+            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, Keyword = "" };
 
             OpenVfsCommand = new Command(OpenVfs, null);
             NewVfsCommand = new Command(NewVfs, null);
+            CloseVfsCommand = new Command(CloseVfs, null);
             NewFolderCommand = new Command(NewFolder, p => (_manipulator != null));
             OpenCommand = new Command(Open, p => (_manipulator != null && p != null));
             RenameCommand = new Command(Rename, IsItemSelected);
@@ -79,15 +85,17 @@ namespace VFSBrowser.ViewModel
             CopyCommand = new Command(Copy, IsItemSelected);
             PasteCommand = new Command(Paste, p => (_manipulator != null && _clipboard.Count > 0));
             SearchCommand = new Command(Search, p => (_manipulator != null));
+            CancelSearchCommand = new Command(CancelSearch, p => (_manipulator != null));
             DiskInfoCommand = new Command(DiskInfo, p => (_manipulator != null));
 
             DropCommand = new Command(Drop, null);
         }
-        
+
         public Command DropCommand { get; private set; }
-        
+
         public Command OpenVfsCommand { get; private set; }
         public Command NewVfsCommand { get; private set; }
+        public Command CloseVfsCommand { get; private set; }
         public Command NewFolderCommand { get; private set; }
         public Command OpenCommand { get; private set; }
         public Command RenameCommand { get; private set; }
@@ -99,6 +107,7 @@ namespace VFSBrowser.ViewModel
         public Command PasteCommand { get; private set; }
         public Command DeleteCommand { get; private set; }
         public Command SearchCommand { get; private set; }
+        public Command CancelSearchCommand { get; private set; }
         public Command DiskInfoCommand { get; private set; }
 
 
@@ -115,39 +124,55 @@ namespace VFSBrowser.ViewModel
             return item != null && item.Name != "..";
         }
 
-        private List<ListItem> SearchItems(string folder)
+        //private List<ListItem> SearchItems(string folder)
+        //{
+        //    var items = new List<ListItem>();
+        //    foreach (var item in _manipulator.List(folder))
+        //    {
+        //        if (SearchOption.Recursive && _manipulator.IsDirectory(folder + item))
+        //        {
+        //            items.AddRange(SearchItems(folder + item + "/"));
+        //        }
+
+        //        var name = item;
+        //        var searchName = SearchOption.Keyword;
+        //        if (SearchOption.CaseSensitive == false)
+        //        {
+        //            name = name.ToLower();
+        //            searchName = searchName.ToLower();
+        //        }
+
+        //        if (name.Contains(searchName))
+        //        {
+        //            items.Add(new ListItem(folder, item, _manipulator.IsDirectory(folder + item)));
+        //        }
+        //    }
+        //    return items;
+        //}
+
+
+        private void CancelSearch(object parameter)
         {
-            var items = new List<ListItem>();
-            foreach (var item in _manipulator.List(folder))
-            {
-                if (SearchOption.Recursive && _manipulator.IsDirectory(folder + item))
-                {
-                    items.AddRange(SearchItems(folder + item + "/"));
-                }
-
-                var name = item;
-                var searchName = SearchOption.SearchText;
-                if (SearchOption.CaseSensitive == false)
-                {
-                    name = name.ToLower();
-                    searchName = searchName.ToLower();
-                }
-
-                if (name.Contains(searchName))
-                {
-                    items.Add(new ListItem(folder, item, _manipulator.IsDirectory(folder + item)));
-                }
-            }
-            return items;
+            SearchOption.Keyword = "";
+            OnPropertyChanged("SearchOption");
+            CurrentPath = CurrentPath;
         }
 
         private void Search(object parameter)
         {
             if (parameter != null)
-                SearchOption.SearchText = parameter as string;
+                SearchOption.Keyword = parameter as string;
 
             Items.Clear();
-            SearchItems(CurrentPath).ForEach(i => Items.Add(i));
+            //SearchItems(CurrentPath).ForEach(i => Items.Add(i));
+
+            foreach (var i in _manipulator.Search(SearchOption.Keyword, CurrentPath, SearchOption.Recursive, SearchOption.CaseSensitive))
+            {
+                var idx = i.LastIndexOf("/") + 1;
+                var name = i.Substring(idx);
+                var path = i.Substring(0, idx);
+                Items.Add(new ListItem(path, name, _manipulator.IsDirectory(i)));
+            }
         }
 
         private void DiskInfo(object parameter)
@@ -166,9 +191,8 @@ namespace VFSBrowser.ViewModel
             var del = new List<ListItem>();
             foreach (ListItem item in deleteItems)
             {
-                _manipulator.Delete(CurrentPath + item.Name);
-                var listItem = Items.First(l => l.Name == item.Name);
-                del.Add(listItem);
+                _manipulator.Delete(item.Path + item.Name);
+                del.Add(item);
             }
 
             del.ForEach(i => Items.Remove(i));
@@ -268,7 +292,7 @@ namespace VFSBrowser.ViewModel
                 foreach (ListItem item in items)
                 {
                     var exportPath = Path.Combine(dlg.SelectedPath, item.Name);
-                    var vfsExportPath = CurrentPath + item.Name;
+                    var vfsExportPath = item.Path + item.Name;
 
                     if (File.Exists(exportPath) || Directory.Exists(exportPath))
                     {
@@ -317,12 +341,12 @@ namespace VFSBrowser.ViewModel
             {
                 try
                 {
-                    if (_manipulator.Exists(CurrentPath + dlg.Text))
+                    if (_manipulator.Exists(item.Path + dlg.Text))
                     {
                         var res = MessageBox.Show("Choose an other name!", "Filename allready exists!", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
-                    _manipulator.Move(CurrentPath + item.Name, CurrentPath + dlg.Text);
+                    _manipulator.Move(item.Path + item.Name, item.Path + dlg.Text);
                     item.Name = dlg.Text;
                     OnPropertyChanged("Items");
 
@@ -361,14 +385,12 @@ namespace VFSBrowser.ViewModel
                 if (File.Exists(tmpFile)) File.Delete(tmpFile);
 
                 var vm = new OperationProgressViewModel();
-                Task.Run(() => _manipulator.Export(item.Path+item.Name, tmpFile, vm.Callbacks));
+                Task.Run(() => _manipulator.Export(item.Path + item.Name, tmpFile, vm.Callbacks));
                 vm.ShowDialog();
 
-                System.Diagnostics.Process.Start(tmpFile);
+                System.Diagnostics.Process.Start("explorer", tmpFile);
             }
         }
-
-        public CallbacksBase Exported;
 
         private void NewFolder(object parameter)
         {
@@ -395,6 +417,15 @@ namespace VFSBrowser.ViewModel
         }
 
 
+        private void CloseVfs(object parameter)
+        {
+            // Close last vfs
+            DisposeManipulator();
+            _manipulator = null;
+            Items.Clear();
+            OnPropertyChanged("FileSystemName");
+        }
+
         private void NewVfs(object parameter)
         {
             var pathToVFS = ChooseNewVFSFile();
@@ -411,6 +442,7 @@ namespace VFSBrowser.ViewModel
                 var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType, vm.Password);
                 _manipulator = new FileSystemTextManipulator(fileSystemData);
                 CurrentPath = "/";
+                OnPropertyChanged("FileSystemName");
             }
             catch (Exception e)
             {
@@ -448,6 +480,7 @@ namespace VFSBrowser.ViewModel
 
                 _manipulator = manipulator;
                 CurrentPath = "/";
+                OnPropertyChanged("FileSystemName");
             }
             catch (Exception e)
             {
