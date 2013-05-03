@@ -38,6 +38,8 @@ namespace VFSBase.Implementation
 
         internal bool IsRoot { get; set; }
 
+        public long Version { get; set; }
+
 
         public override bool Equals(object obj)
         {

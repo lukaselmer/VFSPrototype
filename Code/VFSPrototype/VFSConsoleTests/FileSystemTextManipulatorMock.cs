@@ -51,6 +51,11 @@ namespace VFSConsoleTests
         {
         }
 
+        public void Export(string source, string dest, CallbacksBase exportCallbacks, long version)
+        {
+            
+        }
+
         public void Copy(string source, string dest, CallbacksBase copyCallbacks = null)
         {
         }
