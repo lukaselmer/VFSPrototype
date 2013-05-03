@@ -139,11 +139,24 @@ namespace VFSBase.Implementation
             return FindParentFolder(dest);
         }
 
-        public void Export(string source, string dest, CallbacksBase exportCallbacks, int version)
+        public void Export(string source, string dest, CallbacksBase exportCallbacks)
         {
-            // TODO: implement version
             if (exportCallbacks == null) exportCallbacks = new ExportCallbacks();
             _fileSystem.Export(FindNode(source), dest, exportCallbacks);
+        }
+
+        public void Export(string testFileSource, string dest, CallbacksBase exportCallbacks, long version)
+        {
+            var originalVersion = Version("/");
+            try
+            {
+                SwitchToVersion(version);
+                Export(testFileSource, dest, exportCallbacks);
+            }
+            finally
+            {
+                SwitchToVersion(originalVersion);
+            }
         }
 
         public void Copy(string source, string dest, CallbacksBase copyCallbacks = null)
@@ -224,12 +237,40 @@ namespace VFSBase.Implementation
 
         public IList<string> Folders(string test, long version)
         {
+            long latestVersion = _fileSystem.CurrentVersion;
+            try
+            {
+                _fileSystem.SwitchToVersion(version);
+                return Folders(test);
+            }
+            finally
+            {
+                _fileSystem.SwitchToVersion(latestVersion);
+            }
+        }
+
+        public long Version(string path)
+        {
+            if (!Exists(path)) throw new VFSException("does not exist");
+
+            return FindNode(path).Version;
+        }
+
+        public IEnumerable<long> Versions(string path)
+        {
             throw new NotImplementedException();
         }
 
-        public int Version(string path)
+        public void SwitchToVersion(long version)
         {
-            if(!Exists(path)) throw new VFSException("does not exist");
+            if (Version("/") < version) SwitchToLatestVersion();
+            _fileSystem.SwitchToVersion(version);
         }
+
+        public void SwitchToLatestVersion()
+        {
+            _fileSystem.SwitchToLatestVersion();
+        }
+
     }
 }

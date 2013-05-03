@@ -40,10 +40,15 @@ namespace VFSBase.Persistence
 
             var name = ExtractName(bb);
 
+            var startBlocksCount = _options.NameLength + 1;
+            var startIndirectNodeNumber = startBlocksCount + sizeof (long);
+            var startVersion = startIndirectNodeNumber + sizeof(long);
+
             return new Folder(name)
                        {
-                           BlocksCount = BitConverter.ToInt64(bb, _options.NameLength + 1),
-                           IndirectNodeNumber = BitConverter.ToInt64(bb, sizeof(long) + _options.NameLength + 1)
+                           BlocksCount = BitConverter.ToInt64(bb, startBlocksCount),
+                           IndirectNodeNumber = BitConverter.ToInt64(bb, startIndirectNodeNumber),
+                           Version = BitConverter.ToInt64(bb, startVersion)
                        };
         }
 
@@ -61,11 +66,17 @@ namespace VFSBase.Persistence
 
             var name = ExtractName(bb);
 
+            var startBlocksCount = _options.NameLength + 1;
+            var startIndirectNodeNumber = startBlocksCount + sizeof(long);
+            var startVersion = startIndirectNodeNumber + sizeof(long);
+            var startLastBlockSize = startVersion + sizeof(long);
+
             return new VFSFile(name)
             {
-                BlocksCount = BitConverter.ToInt64(bb, _options.NameLength + 1),
-                IndirectNodeNumber = BitConverter.ToInt64(bb, sizeof(long) + _options.NameLength + 1),
-                LastBlockSize = BitConverter.ToInt32(bb, sizeof(long) * 2 + _options.NameLength + 1)
+                BlocksCount = BitConverter.ToInt64(bb, startBlocksCount),
+                IndirectNodeNumber = BitConverter.ToInt64(bb, startIndirectNodeNumber),
+                Version = BitConverter.ToInt64(bb, startVersion),
+                LastBlockSize = BitConverter.ToInt32(bb, startLastBlockSize)
             };
         }
 
@@ -120,7 +131,10 @@ namespace VFSBase.Persistence
             BitConverter.GetBytes(node.IndirectNodeNumber).CopyTo(bb, offset);
             offset += sizeof(long);
 
-            var file= node as VFSFile;
+            BitConverter.GetBytes(node.Version).CopyTo(bb, offset);
+            offset += sizeof(long);
+
+            var file = node as VFSFile;
             if (file != null) BitConverter.GetBytes(file.LastBlockSize).CopyTo(bb, offset);
 
             return bb;

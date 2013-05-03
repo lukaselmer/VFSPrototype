@@ -14,6 +14,7 @@ namespace VFSBase.Interfaces
         void CreateFolder(string path);
         void Import(string source, string dest, CallbacksBase importCallbacks = null);
         void Export(string source, string dest, CallbacksBase exportCallbacks = null);
+        void Export(string source, string dest, CallbacksBase exportCallbacks, long version);
         void Copy(string source, string dest, CallbacksBase copyCallbacks = null);
         void Delete(string path);
         void Move(string source, string dest);

@@ -9,5 +9,6 @@ namespace VFSBase.Interfaces
         long BlockNumber { get; set; }
         long IndirectNodeNumber { get; set; }
         long BlocksCount { get; set; }
+        long Version { get; }
     }
 }

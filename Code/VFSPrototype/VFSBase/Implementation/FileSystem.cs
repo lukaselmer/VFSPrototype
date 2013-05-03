@@ -13,6 +13,8 @@ namespace VFSBase.Implementation
 {
     internal sealed class FileSystem : IFileSystem
     {
+        #region Fields and properties
+
         private readonly FileSystemOptions _options;
         private bool _disposed;
         private readonly BlockParser _blockParser;
@@ -20,10 +22,49 @@ namespace VFSBase.Implementation
         private BlockManipulator _blockManipulator;
         private readonly Persistence _persistence;
         private readonly IndexService _indexService;
+        public Folder Root { get; private set; }
+        private Folder LatestRoot { get; set; }
 
         public FileSystemOptions FileSystemOptions
         {
             get { return _options; }
+        }
+
+        #endregion
+
+
+        #region Constructor / Initialization
+
+        internal FileSystem(FileSystemOptions options)
+        {
+            _options = options;
+
+            _blockManipulator = new BlockManipulator(_options);
+            _blockParser = new BlockParser(_options);
+            _persistence = new Persistence(_blockParser, _blockManipulator);
+            _blockAllocation = _options.BlockAllocation;
+            _indexService = new IndexService();
+
+            InitializeFileSystem();
+        }
+
+        private void InitializeFileSystem()
+        {
+            Root = LatestRoot = ImportRootFolder();
+
+            IndexingService.StartIndexing(_indexService, this);
+        }
+
+        private Folder ImportRootFolder()
+        {
+            var folder = _blockParser.ParseRootFolder(_blockManipulator.ReadBlock(_options.RootBlockNr));
+
+            if (folder != null) return folder;
+
+            var root = new Folder { IsRoot = true };
+            _blockManipulator.WriteBlock(root.BlockNumber, _blockParser.NodeToBytes(root));
+
+            return root;
         }
 
         public void TestEncryptionKey()
@@ -51,64 +92,68 @@ namespace VFSBase.Implementation
             }
         }
 
-        internal FileSystem(FileSystemOptions options)
+        #endregion
+
+
+        #region Versioning
+
+        public long CurrentVersion
         {
-            _options = options;
-
-            _blockManipulator = new BlockManipulator(_options);
-            _blockParser = new BlockParser(_options);
-            _persistence = new Persistence(_blockParser, _blockManipulator);
-            _blockAllocation = _options.BlockAllocation;
-            _indexService = new IndexService();
-
-            InitializeFileSystem();
+            get { return Root.Version; }
         }
 
-        private void InitializeFileSystem()
+        public void SwitchToLatestVersion()
         {
-            Root = ImportRootFolder();
-
-            IndexingService.StartIndexing(_indexService, this);
+            Root = LatestRoot;
         }
 
-        private Folder ImportRootFolder()
+        public void SwitchToVersion(long version)
         {
-            var folder = _blockParser.ParseRootFolder(_blockManipulator.ReadBlock(_options.RootBlockNr));
-
-            if (folder != null) return folder;
-
-            var root = new Folder {IsRoot = true};
-            _blockManipulator.WriteBlock(root.BlockNumber, _blockParser.NodeToBytes(root));
-
-            return root;
+            if (version < 0) throw new VFSException(string.Format("Version {0} is not a positive version", version));
+            if (LatestRoot.Version < version) throw new VFSException(string.Format("Version {0} does not exist", version));
+            Root = LatestRoot;
         }
 
-        public IEnumerable<IIndexNode> List(Folder folder)
+        private long NextVersion
         {
-            CheckDisposed();
-            return GetBlockList(folder).AsEnumerable();
+            get { return Root.Version + 1; }
         }
 
-        public IEnumerable<Folder> Folders(Folder folder)
+        private void CheckVersion()
         {
-            return List(folder).OfType<Folder>();
+            if (Root.Version != LatestRoot.Version) throw new VFSException(string.Format(
+                 "Changes can only be made on the latest version. This version is {0}, latest version is {1}", Root.Version, LatestRoot.Version));
         }
 
-        public IEnumerable<VFSFile> Files(Folder folder)
+        private void ResetRoot(Folder newRoot)
         {
-            return List(folder).OfType<VFSFile>();
+            _indexService.RemoveFromIndex(Root);
+
+            Root = newRoot;
+            Root.IsRoot = true;
+            LatestRoot = Root;
+            _persistence.Persist(Root);
+            _options.RootBlockNr = Root.BlockNumber;
+            WriteConfig();
+
+            _indexService.AddToIndex(newRoot);
         }
 
-        public Folder Root { get; private set; }
+        #endregion
+
+
+        #region Create
 
         public Folder CreateFolder(Folder parentFolder, string name)
         {
+            // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
+            CheckVersion();
 
             if (Exists(parentFolder, name)) throw new AlreadyExistsException();
 
-            var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate() };
+            var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate(), Version = NextVersion };
             _persistence.Persist(folder);
             AppendBlockReference(parentFolder, folder.BlockNumber);
 
@@ -117,12 +162,38 @@ namespace VFSBase.Implementation
             return folder;
         }
 
+        private VFSFile CreateFile(string source, Folder destination, string name)
+        {
+            var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
+
+            using (var b = new BinaryReader(File.OpenRead(source)))
+            using (var w = DecorateToVFSStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
+            {
+                byte[] block;
+                while ((block = b.ReadBytes(_options.BlockSize)).Length > 0)
+                {
+                    w.Write(block, 0, block.Length);
+                }
+            }
+
+            //Note: we could save some metadata too..
+
+            _indexService.AddToIndex(file);
+
+            return file;
+        }
+
+        #endregion
+
+
         #region Import
 
         public void Import(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
+            // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
+            CheckVersion();
 
             if (Directory.Exists(source)) CollectImportDirectoryTotals(source, importCallbacks);
             else if (File.Exists(source)) importCallbacks.TotalToProcess++;
@@ -276,8 +347,10 @@ namespace VFSBase.Implementation
 
         public void Copy(IIndexNode nodeToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
         {
+            // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
+            CheckVersion();
 
             // Gather totals
             if (nodeToCopy is Folder) CollectExportDirectoryTotals(nodeToCopy as Folder, copyCallbacks);
@@ -330,9 +403,14 @@ namespace VFSBase.Implementation
 
         #endregion
 
+
+        #region Delete
+
         public void Delete(IIndexNode node)
         {
+            // TODO: versioning - search index...?
             CheckDisposed();
+            CheckVersion();
 
             var newRoot = GetBlockList(node.Parent).Archive(node);
             ResetRoot(newRoot);
@@ -340,23 +418,18 @@ namespace VFSBase.Implementation
             _indexService.RemoveFromIndex(node);
         }
 
-        private void ResetRoot(Folder newRoot)
-        {
-            _indexService.RemoveFromIndex(Root);
-            
-            Root = newRoot;
-            Root.IsRoot = true;
-            _options.RootBlockNr = Root.BlockNumber;
-            WriteConfig();
+        #endregion
 
-            _indexService.AddToIndex(newRoot);
-        }
+
+        #region Move
 
         public void Move(IIndexNode node, Folder destination, string name)
         {
-            // TODO: implement this
+            // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
+            CheckVersion();
+
 
             if (Exists(destination, name)) throw new ArgumentException("Folder already exists!");
 
@@ -371,6 +444,27 @@ namespace VFSBase.Implementation
             _persistence.Persist(node);
 
             _indexService.AddToIndex(node);
+        }
+
+        #endregion
+
+
+        #region Search / Find / Exists
+
+        public IEnumerable<IIndexNode> List(Folder folder)
+        {
+            CheckDisposed();
+            return GetBlockList(folder).AsEnumerable();
+        }
+
+        public IEnumerable<Folder> Folders(Folder folder)
+        {
+            return List(folder).OfType<Folder>();
+        }
+
+        public IEnumerable<VFSFile> Files(Folder folder)
+        {
+            return List(folder).OfType<VFSFile>();
         }
 
         public IEnumerable<IIndexNode> Search(SearchOptions searchOptions)
@@ -392,6 +486,11 @@ namespace VFSBase.Implementation
             return GetBlockList(folder).Exists(name);
         }
 
+        #endregion
+
+
+        #region Blocks and Streams
+
         private void AppendBlockReference(IIndexNode parentFolder, long reference)
         {
             GetBlockList(parentFolder).AddReference(reference);
@@ -400,27 +499,6 @@ namespace VFSBase.Implementation
         private IBlockList GetBlockList(IIndexNode parentFolder)
         {
             return new BlockList(parentFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
-        }
-
-        private VFSFile CreateFile(string source, Folder destination, string name)
-        {
-            var file = new VFSFile(name) { Parent = destination, BlockNumber = _blockAllocation.Allocate() };
-
-            using (var b = new BinaryReader(File.OpenRead(source)))
-            using (var w = DecorateToVFSStream(new VFSFileStream(file, _blockParser, _options, _blockAllocation, _blockManipulator, _persistence)))
-            {
-                byte[] block;
-                while ((block = b.ReadBytes(_options.BlockSize)).Length > 0)
-                {
-                    w.Write(block, 0, block.Length);
-                }
-            }
-
-            //Note: we could save some metadata too..
-
-            _indexService.AddToIndex(file);
-
-            return file;
         }
 
         private Stream DecorateToVFSStream(Stream originalStream)
@@ -439,6 +517,11 @@ namespace VFSBase.Implementation
             _blockManipulator.WriteBlock(nextBlockNumber, block);
             AppendBlockReference(file, nextBlockNumber);
         }
+
+        #endregion
+
+
+        #region Dispose / Cleanup
 
         public void Dispose()
         {
@@ -470,6 +553,11 @@ namespace VFSBase.Implementation
             _blockManipulator.SaveConfig(_options, _blockAllocation);
         }
 
+        #endregion
+
+
+        #region Checks / Preconditions
+
         private void CheckDisposed()
         {
             if (_disposed) throw new ObjectDisposedException("Resource was disposed.");
@@ -482,5 +570,8 @@ namespace VFSBase.Implementation
             if (BlockParser.StringToBytes(name).Length > _options.NameLength)
                 throw new VFSException(string.Format("Name too long, max {0}", 255));
         }
+
+        #endregion
+
     }
 }
