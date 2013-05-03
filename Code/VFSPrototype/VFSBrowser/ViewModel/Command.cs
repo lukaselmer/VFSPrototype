@@ -7,7 +7,7 @@ using System.Windows.Input;
 
 namespace VFSBrowser.ViewModel
 {
-    public class Command : ICommand
+    internal class Command : ICommand
     {
 
         public delegate bool CommandCanExecute(object parameter);

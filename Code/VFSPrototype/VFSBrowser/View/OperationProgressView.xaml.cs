@@ -20,7 +20,7 @@ namespace VFSBrowser.View
     /// </summary>
     public partial class OperationProgressView : Window
     {
-        public OperationProgressView(OperationProgressViewModel viewModel)
+        public OperationProgressView(object viewModel)
         {
             InitializeComponent();
             DataContext = viewModel;

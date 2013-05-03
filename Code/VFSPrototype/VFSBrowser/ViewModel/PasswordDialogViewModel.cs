@@ -15,7 +15,7 @@ using VFSBrowser.View;
 
 namespace VFSBrowser.ViewModel
 {
-    public class PasswordDialogViewModel : AbstractViewModel
+    internal class PasswordDialogViewModel : AbstractViewModel
     {
         
         private PasswordDialog _dlg;
