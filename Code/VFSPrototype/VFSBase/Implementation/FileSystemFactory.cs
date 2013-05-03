@@ -7,25 +7,26 @@ namespace VFSBase.Implementation
 {
     internal static class FileSystemFactory
     {
-        private static FileSystem Create(FileSystemOptions options)
+        internal static FileSystem Create(FileSystemOptions options, string password)
         {
             if (File.Exists(options.Location)) throw new VFSException("File already exists");
 
             using (var file = File.Open(options.Location, FileMode.CreateNew, FileAccess.Write))
             {
+                options.InitializePassword(password);
                 options.Serialize(file);
             }
 
             return new FileSystem(options);
         }
 
-        private static FileSystem Import(IFileSystemOptions options, string password)
+        internal static FileSystem Import(string location, string password)
         {
-            if (!File.Exists(options.Location)) throw new VFSException("File does not exist");
+            if (!File.Exists(location)) throw new VFSException("File does not exist");
 
             FileSystemOptions newOptions;
 
-            using (var file = File.Open(options.Location, FileMode.Open, FileAccess.ReadWrite))
+            using (var file = File.Open(location, FileMode.Open, FileAccess.ReadWrite))
             {
                 try
                 {
@@ -35,7 +36,7 @@ namespace VFSBase.Implementation
                 {
                     throw new VFSException("Invalid virtual file", exception);
                 }
-                newOptions.Location = options.Location;
+                newOptions.Location = location;
 
                 file.Seek(0, SeekOrigin.Begin);
                 newOptions.Serialize(file);
@@ -44,12 +45,7 @@ namespace VFSBase.Implementation
             return new FileSystem(newOptions);
         }
 
-        public static IFileSystem CreateOrImport(FileSystemOptions options, string password)
-        {
-            return File.Exists(options.Location) ? Import(options, password) : Create(options);
-        }
-
-        public static void Delete(IFileSystem fileSystem)
+        internal static void Delete(IFileSystem fileSystem)
         {
             fileSystem.Dispose();
             File.Delete(fileSystem.FileSystemOptions.Location);

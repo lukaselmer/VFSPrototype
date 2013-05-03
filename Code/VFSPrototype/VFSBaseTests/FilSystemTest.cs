@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
+using VFSBaseTests.Helpers;
 
 namespace VFSBaseTests
 {
@@ -26,15 +27,19 @@ namespace VFSBaseTests
             Directory.Delete(DefaultTestfileFolder, true);
         }
 
-        private IFileSystem GetFileSystem()
+        private IFileSystem CreateFileSystem()
         {
-            return GetFileSystem(RandomTestfilePath());
+            return CreateFileSystem(RandomTestfilePath());
         }
 
-        private IFileSystem GetFileSystem(string path)
+        private IFileSystem CreateFileSystem(string path)
         {
-            var o = new FileSystemOptions(path, _defaultSize);
-            return FileSystemFactory.CreateOrImport(o, "");
+            return FileSystemFactory.Create(TestHelper.CreateFileSystemOptions(path, _defaultSize), "");
+        }
+
+        private IFileSystem ImportFileSystem(string path)
+        {
+            return FileSystemFactory.Import(path, "");
         }
 
         private static string RandomTestfilePath()
@@ -45,14 +50,14 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestCreateTopLevelFolder()
         {
-            using (var fs = GetFileSystem())
+            using (var fs = CreateFileSystem())
             {
                 Assert.IsTrue(!fs.Folders(fs.Root).Any());
                 fs.CreateFolder(fs.Root, "test");
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
             }
 
-            using (var fs = GetFileSystem())
+            using (var fs = CreateFileSystem())
             {
                 //TODO: make this true! Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
             }
@@ -63,7 +68,7 @@ namespace VFSBaseTests
         {
             const string name = "∀α,β∈∑α≤β∧β≥α=>α=β";
             var path = RandomTestfilePath();
-            using (var fs = GetFileSystem(path))
+            using (var fs = CreateFileSystem(path))
             {
                 Assert.IsTrue(!fs.Folders(fs.Root).Any());
                 fs.CreateFolder(fs.Root, name);
@@ -71,7 +76,7 @@ namespace VFSBaseTests
                 fs.Dispose();
             }
 
-            using (var fs = GetFileSystem(path))
+            using (var fs = ImportFileSystem(path))
             {
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
                 Assert.IsTrue(fs.Folders(fs.Root).First().Name == name);
