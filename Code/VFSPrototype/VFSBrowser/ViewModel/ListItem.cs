@@ -14,7 +14,7 @@ namespace VFSBrowser.ViewModel
         public string Name { get { return _name; } set { _name = value; OnPropertyChanged("Name"); } }
         private bool _isDirectory;
         public bool IsDirectory { get { return _isDirectory; } set { _isDirectory = value; OnPropertyChanged("IsDirectory"); } }
-        
+
         public string Path { get; set; }
 
         public ImageSource Icon
@@ -24,17 +24,19 @@ namespace VFSBrowser.ViewModel
 
         private static readonly BitmapImage Folder;
         private static readonly BitmapImage File;
-        static ListItem() 
+        static ListItem()
         {
-            Folder = new BitmapImage ();
-            Folder.BeginInit ();
-            Folder.UriSource = new Uri ("../Resources/Folder.png", UriKind.Relative);
-            Folder.EndInit ();
+            Folder = new BitmapImage();
+            Folder.BeginInit();
+            Folder.UriSource = new Uri("../Resources/Folder.png", UriKind.Relative);
+            Folder.EndInit();
+            Folder.Freeze();
 
-            File = new BitmapImage ();
-            File.BeginInit ();
-            File.UriSource = new Uri ("../Resources/File.png", UriKind.Relative);
-            File.EndInit ();
+            File = new BitmapImage();
+            File.BeginInit();
+            File.UriSource = new Uri("../Resources/File.png", UriKind.Relative);
+            File.EndInit();
+            File.Freeze();
         }
 
         public ListItem(string path, string name, bool isDirectory)
@@ -49,18 +51,19 @@ namespace VFSBrowser.ViewModel
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             if (other.GetType() != this.GetType()) return false;
-            return Equals((ListItem) other);
+            return Equals((ListItem)other);
         }
 
-        protected bool Equals (ListItem other)
+        protected bool Equals(ListItem other)
         {
-            return string.Equals (_name, other._name) && string.Equals (Path, other.Path);
+            return string.Equals(_name, other._name) && string.Equals(Path, other.Path);
         }
 
-        public override int GetHashCode ()
+        public override int GetHashCode()
         {
-            unchecked {
-                return ((_name != null ? _name.GetHashCode () : 0) * 397) ^ (Path != null ? Path.GetHashCode () : 0);
+            unchecked
+            {
+                return ((_name != null ? _name.GetHashCode() : 0) * 397) ^ (Path != null ? Path.GetHashCode() : 0);
             }
         }
     }
