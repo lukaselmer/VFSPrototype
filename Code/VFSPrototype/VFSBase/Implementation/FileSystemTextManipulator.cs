@@ -15,9 +15,15 @@ namespace VFSBase.Implementation
 
         public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
 
-        public FileSystemTextManipulator(FileSystemOptions options, string password = "")
+        public FileSystemTextManipulator(string location, string password)
         {
-            _fileSystem = FileSystemFactory.CreateOrImport(options, password);
+            _fileSystem = FileSystemFactory.Import(location, password);
+            _fileSystem.TestEncryptionKey();
+        }
+
+        public FileSystemTextManipulator(FileSystemOptions options, string password)
+        {
+            _fileSystem = FileSystemFactory.Create(options, password);
             _fileSystem.TestEncryptionKey();
         }
 

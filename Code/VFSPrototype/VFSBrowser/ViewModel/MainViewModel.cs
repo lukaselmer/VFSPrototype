@@ -439,8 +439,8 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType, vm.Password);
-                _manipulator = new FileSystemTextManipulator(fileSystemData);
+                var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType);
+                _manipulator = new FileSystemTextManipulator(fileSystemData, vm.Password);
                 CurrentPath = "/";
                 OnPropertyChanged("FileSystemName");
             }
@@ -472,8 +472,8 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                var fileSystemData = new FileSystemOptions(dlg.FileName, 1000 * 1000 * 1000);
-                var manipulator = new FileSystemTextManipulator(fileSystemData, passwordDialog.Password);
+                var options = new FileSystemOptions(dlg.FileName, 1000 * 1000 * 1000, StreamEncryptionType.None, StreamCompressionType.None);
+                var manipulator = new FileSystemTextManipulator(options, passwordDialog.Password);
 
                 // Close last vfs
                 DisposeManipulator();
