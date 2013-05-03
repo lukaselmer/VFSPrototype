@@ -22,12 +22,8 @@ namespace VFSBase.Implementation
         [NonSerialized]
         private IStreamCodingStrategy _streamCodingStrategy;
 
-        public FileSystemOptions(string location, long diskSize)
-            : this(location, diskSize, StreamEncryptionType.None, StreamCompressionType.None, "")
-        {
-        }
 
-        public FileSystemOptions(string location, long diskSize, StreamEncryptionType encryption, StreamCompressionType compression, string password)
+        public FileSystemOptions(string location, long diskSize, StreamEncryptionType encryption, StreamCompressionType compression)
         {
             Location = location;
             DiskSize = diskSize;
@@ -39,8 +35,11 @@ namespace VFSBase.Implementation
             BlockReferenceSize = 64;
             BlockAllocation = new BlockAllocation();
             IndirectionCountForIndirectNodes = 2;
+        }
 
-            if (encryption == StreamEncryptionType.None) return;
+        internal void InitializePassword(string password)
+        {
+            if (Encryption == StreamEncryptionType.None) return;
 
             using (var r = Rijndael.Create())
             {

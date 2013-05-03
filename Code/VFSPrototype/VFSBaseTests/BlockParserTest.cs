@@ -5,6 +5,7 @@ using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
+using VFSBaseTests.Helpers;
 
 namespace VFSBaseTests
 {
@@ -15,7 +16,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseTooSmallDirectoryBlock()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var b = new BlockParser(options);
             var b1 = new byte[1024];
             b.BytesToNode(b1);
@@ -26,7 +27,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseEmptyDirectoryBlock()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var b = new BlockParser(options);
             var b2 = new byte[options.BlockSize];
             b.BytesToNode(b2);
@@ -35,7 +36,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseDirectoryBlock()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var b = new BlockParser(options);
 
             var bb = new byte[options.BlockSize];
@@ -46,7 +47,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseFileBlock()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var b = new BlockParser(options);
 
             var bb = new byte[options.BlockSize];
@@ -58,7 +59,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestWriteFolderBlock()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var b = new BlockParser(options);
 
             var f = new Folder("blubα");
@@ -71,7 +72,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestWriteFileBlock()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var b = new BlockParser(options);
 
             var f = new VFSFile("αaαaαaαablubα");
@@ -84,7 +85,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestWriteAndPareseFolderBlock()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var b = new BlockParser(options);
 
             const string name = "blubα";
@@ -103,7 +104,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestInvalidNode()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var p = new BlockParser(options);
             p.NodeToBytes(new MyType());
         }
@@ -112,7 +113,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestInvalidBlockSizeForFile()
         {
-            var options = new FileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("", 0);
             var p = new BlockParser(options);
             p.NodeToBytes(new MyType());
         }
@@ -124,14 +125,18 @@ namespace VFSBaseTests
             var f = new VFSFile("0123456789");
             try
             {
-                var p1 = new BlockParser(new FileSystemOptions("", 0) { NameLength = f.Name.Length });
+                var o1 = TestHelper.CreateFileSystemOptions("", 0);
+                o1.NameLength = f.Name.Length;
+                var p1 = new BlockParser(o1);
                 p1.NodeToBytes(f);
             }
             catch (VFSException)
             {
                 Assert.Fail("Exception unexpected yet");
             }
-            var p2 = new BlockParser(new FileSystemOptions("", 0) { NameLength = f.Name.Length - 1 });
+            var o2 = TestHelper.CreateFileSystemOptions("", 0);
+            o2.NameLength = f.Name.Length - 1;
+            var p2 = new BlockParser(o2);
             p2.NodeToBytes(f);
         }
 

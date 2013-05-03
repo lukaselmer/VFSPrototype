@@ -8,6 +8,7 @@ using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
+using VFSBaseTests.Helpers;
 
 namespace VFSBaseTests
 {
@@ -22,14 +23,14 @@ namespace VFSBaseTests
         private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
         {
             if (File.Exists(testfilePath)) File.Delete(testfilePath);
-            var fileSystemData = new FileSystemOptions(testfilePath, size);
+            var fileSystemData = TestHelper.CreateFileSystemOptions(testfilePath, size);
             Assert.IsFalse(File.Exists(testfilePath), String.Format("testfile {0} should not exist!", testfilePath));
             return fileSystemData;
         }
 
         private static IFileSystemTextManipulator InitTestFileSystemManipulator()
         {
-            return new FileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize));
+            return new FileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
         }
 
         [TestInitializeAttribute]
