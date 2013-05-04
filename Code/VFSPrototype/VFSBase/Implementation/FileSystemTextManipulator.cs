@@ -235,9 +235,9 @@ namespace VFSBase.Implementation
             _fileSystem = null;
         }
 
-        public IList<string> Folders(string test, long version)
+        public IEnumerable<string> Folders(string test, long version)
         {
-            long latestVersion = _fileSystem.CurrentVersion;
+            var latestVersion = _fileSystem.CurrentVersion;
             try
             {
                 _fileSystem.SwitchToVersion(version);
