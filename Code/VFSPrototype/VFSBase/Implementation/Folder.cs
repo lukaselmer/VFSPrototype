@@ -4,8 +4,6 @@ namespace VFSBase.Implementation
 {
     internal class Folder : IIndexNode
     {
-
-
         private long _blocksCount;
 
         public Folder(string name)
@@ -37,6 +35,8 @@ namespace VFSBase.Implementation
         public long PredecessorBlockNr { get; set; }
 
         internal bool IsRoot { get; set; }
+
+        public long Version { get; set; }
 
 
         public override bool Equals(object obj)
