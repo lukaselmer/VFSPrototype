@@ -4,8 +4,6 @@ namespace VFSBase.Implementation
 {
     internal class Folder : IIndexNode
     {
-
-
         private long _blocksCount;
 
         public Folder(string name)

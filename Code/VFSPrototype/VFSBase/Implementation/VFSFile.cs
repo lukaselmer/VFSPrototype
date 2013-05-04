@@ -22,6 +22,8 @@ namespace VFSBase.Implementation
 
         public int LastBlockSize { get; set; }
 
+        public long PredecessorBlockNr { get; set; }
+
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
