@@ -106,7 +106,7 @@ namespace VFSBaseTests
         {
             var options = TestHelper.CreateFileSystemOptions("", 0);
             var p = new BlockParser(options);
-            p.NodeToBytes(new MyType());
+            p.NodeToBytes(new IndexNodeMock());
         }
 
         [ExpectedException(typeof(ArgumentException))]
@@ -115,7 +115,7 @@ namespace VFSBaseTests
         {
             var options = TestHelper.CreateFileSystemOptions("", 0);
             var p = new BlockParser(options);
-            p.NodeToBytes(new MyType());
+            p.NodeToBytes(new IndexNodeMock());
         }
 
         [ExpectedException(typeof(VFSException))]
@@ -140,13 +140,15 @@ namespace VFSBaseTests
             p2.NodeToBytes(f);
         }
 
-        private class MyType : IIndexNode
+        private class IndexNodeMock : IIndexNode
         {
             public string Name { get; set; }
             public Folder Parent { get; set; }
             public long BlockNumber { get; set; }
             public long IndirectNodeNumber { get; set; }
             public long BlocksCount { get; set; }
+            public long Version { get; set; }
+            public long PredecessorBlockNr { get; set; }
         }
     }
 }
