@@ -58,7 +58,7 @@ namespace VFSBase.Implementation
 
         private Folder ImportRootFolder()
         {
-            var folder = _blockParser.ParseRootFolder(_blockManipulator.ReadBlock(_options.RootBlockNr));
+            var folder = _blockParser.ParseFolder(_blockManipulator.ReadBlock(_options.RootBlockNr));
 
             if (folder != null) return folder;
 
@@ -112,7 +112,13 @@ namespace VFSBase.Implementation
         {
             if (version < 0) throw new VFSException(string.Format("Version {0} is not a positive version", version));
             if (LatestRoot.Version < version) throw new VFSException(string.Format("Version {0} does not exist", version));
-            Root = LatestRoot;
+            while (version < Root.Version)
+            {
+                var blockNr = Root.PredecessorBlockNr;
+                var readBlock = _blockManipulator.ReadBlock(blockNr);
+                Root = _blockParser.ParseFolder(readBlock);
+                Root.BlockNumber = blockNr;
+            }
         }
 
         private long NextVersion
@@ -193,11 +199,20 @@ namespace VFSBase.Implementation
 
             if (Exists(parentFolder, name)) throw new AlreadyExistsException();
 
-            var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate(), Version = NextVersion };
+            var folder = new Folder(name)
+                             {
+                                 Parent = parentFolder,
+                                 BlockNumber = _blockAllocation.Allocate(),
+                                 Version = NextVersion
+                             };
             _persistence.Persist(folder);
             //var newRoot = GetBlockList(parentFolder).CopyReplacingReference(parentFolder, null, folder);
             //d_persistence.Persist(folder);
-            AppendBlockReference(parentFolder, folder.BlockNumber);
+            //AppendBlockReference(parentFolder, folder.BlockNumber);
+
+
+
+            ArchiveAndReplaceRoot(parentFolder, null, folder);
 
             //ResetRoot(newRoot);
 

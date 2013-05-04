@@ -258,6 +258,7 @@ namespace VFSBase.Implementation
 
         public IEnumerable<long> Versions(string path)
         {
+            // TODO: how do we implement this?
             throw new NotImplementedException();
         }
 

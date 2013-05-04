@@ -169,7 +169,7 @@ namespace VFSBase.Persistence
             var newFolder = new Folder(toCopy.Name)
                                    {
                                        //BlocksCount = newBlocksCount,
-                                       PredecessorBlockNr = toReplaceNr,
+                                       PredecessorBlockNr = toCopy.BlockNumber, //toReplaceNr,
                                        BlockNumber = _blockAllocation.Allocate(),
                                        Version = newVersion
                                    };
