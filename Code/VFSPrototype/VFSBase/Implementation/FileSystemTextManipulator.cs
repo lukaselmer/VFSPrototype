@@ -258,8 +258,26 @@ namespace VFSBase.Implementation
 
         public IEnumerable<long> Versions(string path)
         {
-            // TODO: how do we implement this?
-            throw new NotImplementedException();
+            ISet<long> versions = new HashSet<long>();
+            var originalVersion = Version("/");
+            try
+            {
+                SwitchToLatestVersion();
+                var currentVersion = Version("/");
+
+                while (currentVersion >= 0)
+                {
+                    SwitchToVersion(currentVersion);
+                    if (Exists(path)) versions.Add(Version(path));
+                    currentVersion -= 1;
+                }
+            }
+            finally
+            {
+                SwitchToVersion(originalVersion);
+            }
+
+            return versions;
         }
 
         public void SwitchToVersion(long version)
