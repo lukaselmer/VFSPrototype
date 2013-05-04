@@ -118,5 +118,22 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <returns></returns>
         void TestEncryptionKey();
+
+        /// <summary>
+        /// Gets the current version
+        /// </summary>
+        /// <returns></returns>
+        long CurrentVersion { get; }
+
+        /// <summary>
+        /// Switches to latest version.
+        /// </summary>
+        void SwitchToLatestVersion();
+
+        /// <summary>
+        /// Switches to the specified version.
+        /// </summary>
+        /// <param name="version">The version.</param>
+        void SwitchToVersion(long version);
     }
 }

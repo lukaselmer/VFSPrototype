@@ -34,25 +34,24 @@ namespace VFSBase.Persistence
             throw new VFSException("block invalid");
         }
 
-        private Folder ParseFolder(byte[] bb)
+        internal Folder ParseFolder(byte[] bb)
         {
-            Debug.Assert(bb.Length == _options.BlockSize);
+            if (bb.Length != _options.BlockSize) throw new VFSException("block invalid");
 
             var name = ExtractName(bb);
 
+            var startBlocksCount = _options.NameLength + 1;
+            var startIndirectNodeNumber = startBlocksCount + sizeof (long);
+            var startVersion = startIndirectNodeNumber + sizeof(long);
+            var startPredecessorBlockNr = startVersion + sizeof(long);
+
             return new Folder(name)
                        {
-                           BlocksCount = BitConverter.ToInt64(bb, _options.NameLength + 1),
-                           IndirectNodeNumber = BitConverter.ToInt64(bb, sizeof(long) + _options.NameLength + 1)
+                           BlocksCount = BitConverter.ToInt64(bb, startBlocksCount),
+                           IndirectNodeNumber = BitConverter.ToInt64(bb, startIndirectNodeNumber),
+                           Version = BitConverter.ToInt64(bb, startVersion),
+                           PredecessorBlockNr = BitConverter.ToInt64(bb, startPredecessorBlockNr)
                        };
-        }
-
-        public RootFolder ParseRootFolder(byte[] bb)
-        {
-            Debug.Assert(bb.Length == _options.BlockSize);
-
-            var f = ParseFolder(bb);
-            return new RootFolder { BlocksCount = f.BlocksCount, IndirectNodeNumber = f.IndirectNodeNumber };
         }
 
         private VFSFile ParseFile(byte[] bb)
@@ -61,11 +60,19 @@ namespace VFSBase.Persistence
 
             var name = ExtractName(bb);
 
+            var startBlocksCount = _options.NameLength + 1;
+            var startIndirectNodeNumber = startBlocksCount + sizeof(long);
+            var startVersion = startIndirectNodeNumber + sizeof(long);
+            var startPredecessorBlockNr = startVersion + sizeof(long);
+            var startLastBlockSize = startPredecessorBlockNr + sizeof(long);
+
             return new VFSFile(name)
             {
-                BlocksCount = BitConverter.ToInt64(bb, _options.NameLength + 1),
-                IndirectNodeNumber = BitConverter.ToInt64(bb, sizeof(long) + _options.NameLength + 1),
-                LastBlockSize = BitConverter.ToInt32(bb, sizeof(long) * 2 + _options.NameLength + 1)
+                BlocksCount = BitConverter.ToInt64(bb, startBlocksCount),
+                IndirectNodeNumber = BitConverter.ToInt64(bb, startIndirectNodeNumber),
+                Version = BitConverter.ToInt64(bb, startVersion),
+                PredecessorBlockNr = BitConverter.ToInt64(bb, startPredecessorBlockNr),
+                LastBlockSize = BitConverter.ToInt32(bb, startLastBlockSize),
             };
         }
 
@@ -120,7 +127,13 @@ namespace VFSBase.Persistence
             BitConverter.GetBytes(node.IndirectNodeNumber).CopyTo(bb, offset);
             offset += sizeof(long);
 
-            var file= node as VFSFile;
+            BitConverter.GetBytes(node.Version).CopyTo(bb, offset);
+            offset += sizeof(long);
+
+            BitConverter.GetBytes(node.PredecessorBlockNr).CopyTo(bb, offset);
+            offset += sizeof(long);
+
+            var file = node as VFSFile;
             if (file != null) BitConverter.GetBytes(file.LastBlockSize).CopyTo(bb, offset);
 
             return bb;

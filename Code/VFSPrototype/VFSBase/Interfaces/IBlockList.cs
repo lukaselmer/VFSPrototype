@@ -47,9 +47,13 @@ namespace VFSBase.Interfaces
         IEnumerable<byte[]> Blocks();
 
         /// <summary>
-        /// Archives the specified node.
+        /// Copies the toCopy index node, and replaces the toReplace node with the replacement
         /// </summary>
-        /// <param name="node">The node.</param>
-        Folder Archive(IIndexNode node);
+        /// <param name="toCopy">To index node to copy.</param>
+        /// <param name="toReplace">To node to be replaced. Can be set to null if only a node should be appended and no one should be replaced.</param>
+        /// <param name="replacement">The node to replace the node toReplace. Can be set to null for the delete action.</param>
+        /// <param name="newVersion"></param>
+        /// <returns></returns>
+        Folder CopyReplacingReference(Folder toCopy, IIndexNode toReplace, IIndexNode replacement, long newVersion);
     }
 }
