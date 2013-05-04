@@ -108,7 +108,7 @@ namespace VFSBaseTests
                 m.CreateFolder("test/blub"); // V5
 
                 m.SwitchToVersion(0);
-                Assert.AreEqual(0, m.Folders("/"));
+                Assert.AreEqual(0, m.Folders("/").Count);
                 Assert.AreEqual(0, m.Version("/"));
 
                 m.SwitchToVersion(2);
