@@ -112,6 +112,8 @@ namespace VFSBase.Implementation
         {
             if (version < 0) throw new VFSException(string.Format("Version {0} is not a positive version", version));
             if (LatestRoot.Version < version) throw new VFSException(string.Format("Version {0} does not exist", version));
+            if (Root.Version < version) Root = LatestRoot;
+
             while (version < Root.Version)
             {
                 var blockNr = Root.PredecessorBlockNr;
@@ -132,7 +134,7 @@ namespace VFSBase.Implementation
                  "Changes can only be made on the latest version. This version is {0}, latest version is {1}", Root.Version, LatestRoot.Version));
         }
 
-        private void ArchiveAndReplaceRoot(Folder folderToCopy, IIndexNode nodeToReplace, IIndexNode nodeReplacement)
+        private Folder ArchiveAndReplaceRoot(Folder folderToCopy, IIndexNode nodeToReplace, IIndexNode nodeReplacement)
         {
             if (folderToCopy == null) throw new VFSException("Node cannot be null");
 
@@ -140,11 +142,13 @@ namespace VFSBase.Implementation
             var toReplace = nodeToReplace;
             var replacement = nodeReplacement;
 
+            Folder copyOfFolderToCopy = null;
             Folder previous = null;
 
             while (toCopy != null)
             {
                 var newFolder = GetBlockList(toCopy).CopyReplacingReference(toCopy, toReplace, replacement, NextVersion);
+                if (copyOfFolderToCopy == null) copyOfFolderToCopy = newFolder;
 
                 if (previous != null)
                 {
@@ -166,6 +170,8 @@ namespace VFSBase.Implementation
             previous.IsRoot = true;
             _persistence.Persist(previous);
             ResetRoot(previous);
+
+            return copyOfFolderToCopy;
         }
 
         private void ResetRoot(Folder newRoot)
@@ -257,10 +263,11 @@ namespace VFSBase.Implementation
 
         public void Import(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
-            // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
             CheckVersion();
+
+            destination = ArchiveAndReplaceRoot(destination, null, null);
 
             if (Directory.Exists(source)) CollectImportDirectoryTotals(source, importCallbacks);
             else if (File.Exists(source)) importCallbacks.TotalToProcess++;

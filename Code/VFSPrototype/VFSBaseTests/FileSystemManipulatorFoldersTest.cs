@@ -11,28 +11,17 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemManipulatorFoldersTest
     {
-        //TODO: fix this...
-        private const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
-        private const string DummyImportFolderPath = "../../../Testfiles/DummyfolderImportFolders";
-        private const string DummyExportFolderPath = "../../../Testfiles/DummyfolderExportFolders";
-        private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
+        private TestHelper _testHelper;
 
-        private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
-        {
-            if (File.Exists(testfilePath)) File.Delete(testfilePath);
-            var fileSystemData = TestHelper.CreateFileSystemOptions(testfilePath, size);
-            Assert.IsFalse(File.Exists(testfilePath), String.Format("testfile {0} should not exist!", testfilePath));
-            return fileSystemData;
-        }
-
-        private static IFileSystemTextManipulator InitTestFileSystemManipulator()
-        {
-            return new FileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
-        }
+        private const string DefaultTestfileDirectoryPath = "../../../Testfiles/FileSystemManipulatorFolders";
+        private const string DummyImportFolderPath = DefaultTestfileDirectoryPath + "/DummyfolderImportFolders";
+        private const string DummyExportFolderPath = DefaultTestfileDirectoryPath + "/DummyfolderExportFolders";
 
         [TestInitialize]
         public void CreateDummyfiles()
         {
+            _testHelper = new TestHelper(DefaultTestfileDirectoryPath);
+
             if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
             if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
             Directory.CreateDirectory(DummyImportFolderPath);
@@ -47,15 +36,13 @@ namespace VFSBaseTests
         [TestCleanup]
         public void RemoveTestfile()
         {
-            if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
-            if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
-            File.Delete(DefaultTestfilePath);
+            _testHelper.CleanupTestFolder();
         }
 
         [TestMethod]
         public void TestListSubdirectoryFolders()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 m.CreateFolder("test/foo");
                 Assert.AreEqual(0, m.Folders("test/foo").Count);
@@ -76,7 +63,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestIsDirectorySimple()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 Assert.IsTrue(m.IsDirectory(""));
                 Assert.IsTrue(m.IsDirectory("/"));
@@ -96,7 +83,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestListRootFolders()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 Assert.AreEqual(0, m.Folders("").Count);
                 Assert.AreEqual(0, m.Folders("/").Count);
@@ -128,7 +115,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestListDirectoryFolders()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 m.CreateFolder("test");
 
@@ -178,7 +165,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestCopyFolder()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 m.CreateFolder("you");
                 m.Copy("you", "me");
@@ -201,7 +188,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestMoveFolder()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 m.CreateFolder("you");
                 m.Move("you", "me");
@@ -223,7 +210,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestCreateFolder()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 m.CreateFolder("test");
                 Assert.IsTrue(m.Exists("test"));
@@ -246,7 +233,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestCreateManyFolder()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 // Could be set to more, but it is disabled, so the unit tests run fast
                 for (var i = 0; i < 50; i++)
@@ -260,7 +247,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestDeleteFolder()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 Assert.IsFalse(m.Exists("test"));
                 m.CreateFolder("test");
@@ -291,7 +278,7 @@ namespace VFSBaseTests
         [ExpectedException(typeof(NotFoundException))]
         public void TestInvalidDeleteFolder()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 Assert.IsFalse(m.Exists("test"));
                 m.Delete("test");
@@ -301,7 +288,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestImportFolder()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 Assert.IsFalse(m.Exists("dummy"));
                 Assert.IsFalse(m.Exists("dummy/a"));
@@ -312,7 +299,7 @@ namespace VFSBaseTests
                 Assert.IsFalse(m.Exists("dummy/foo/d"));
 
                 m.Import(DummyImportFolderPath, "dummy");
-                
+
                 Assert.IsTrue(m.Exists("dummy"));
                 Assert.IsTrue(m.Exists("dummy/a"));
                 Assert.IsTrue(m.Exists("dummy/b"));
@@ -328,17 +315,17 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestExportFolder()
         {
-            using (var m = InitTestFileSystemManipulator())
+            using (var m = _testHelper.GetManipulator())
             {
                 if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
 
                 m.Import(DummyImportFolderPath, "dummy");
 
-                if(!m.Exists("dummy")) Assert.Inconclusive();
+                if (!m.Exists("dummy")) Assert.Inconclusive();
 
                 Assert.IsFalse(Directory.Exists(DummyExportFolderPath));
 
-                m.Export("dummy", DummyExportFolderPath);
+                m.Export("dummy", DummyExportFolderPath, null);
 
                 Assert.IsTrue(Directory.Exists(DummyExportFolderPath));
                 Assert.IsTrue(File.Exists(Path.Combine(DummyExportFolderPath, "a")));
