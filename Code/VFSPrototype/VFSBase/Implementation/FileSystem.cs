@@ -271,9 +271,8 @@ namespace VFSBase.Implementation
             var f = new FileInfo(source);
             if (f.Length > _options.MaximumFileSize)
                 throw new VFSException(
-                    string.Format(
-                        "File is too big. Maximum file size is {0}. You can adjust the BlockSize in the Options to allow bigger files.",
-                        _options.MaximumFileSize));
+                    string.Format("File is too big. Maximum file size is {0}. You can adjust the BlockSize in the Options to allow bigger files.",
+                    _options.MaximumFileSize));
 
             var file = CreateFile(source, destination, name);
             AppendBlockReference(destination, file.BlockNumber);
@@ -311,8 +310,7 @@ namespace VFSBase.Implementation
 
             if (source == null) throw new NotFoundException();
 
-            if (File.Exists(absoluteDestination) || Directory.Exists(absoluteDestination))
-                throw new VFSException("Destination already exists!");
+            if (File.Exists(absoluteDestination) || Directory.Exists(absoluteDestination)) throw new VFSException("Destination already exists!");
 
             // Gather totals
             if (source is Folder) CollectExportDirectoryTotals(source as Folder, exportCallbacks);
