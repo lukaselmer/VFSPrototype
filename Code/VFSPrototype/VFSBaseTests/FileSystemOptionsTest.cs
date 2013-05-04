@@ -49,8 +49,6 @@ namespace VFSBaseTests
                 Assert.AreEqual(3, b1.Allocate());
                 Assert.AreEqual(4, b1.Allocate());
                 Assert.AreEqual(5, b1.Allocate());
-                b1.Free(33);
-                b1.Free(42);
 
                 o1.Serialize(m);
 
@@ -58,8 +56,6 @@ namespace VFSBaseTests
 
                 var o2 = FileSystemOptions.Deserialize(m, "");
                 var b2 = o2.BlockAllocation;
-                Assert.AreEqual(42, b2.Allocate());
-                Assert.AreEqual(33, b2.Allocate());
                 Assert.AreEqual(6, b2.Allocate());
                 Assert.AreEqual(7, b2.Allocate());
                 Assert.AreEqual(8, b2.Allocate());

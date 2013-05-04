@@ -105,7 +105,7 @@ namespace VFSBase.Interfaces
         /// Gets the root folder.
         /// </summary>
         /// <value>The root.</value>
-        RootFolder Root { get; }
+        Folder Root { get; }
 
         /// <summary>
         /// Gets the file system options.
