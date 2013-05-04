@@ -35,7 +35,10 @@ namespace VFSBase.Implementation
             BlockReferenceSize = 64;
             BlockAllocation = new BlockAllocation();
             IndirectionCountForIndirectNodes = 2;
+            RootBlockNr = 0;
         }
+
+        internal long RootBlockNr { get; set; }
 
         internal void InitializePassword(string password)
         {

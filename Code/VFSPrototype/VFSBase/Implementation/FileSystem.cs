@@ -71,14 +71,14 @@ namespace VFSBase.Implementation
             IndexingService.StartIndexing(_indexService, this);
         }
 
-        private RootFolder ImportRootFolder()
+        private Folder ImportRootFolder()
         {
-            var folder = _blockParser.ParseRootFolder(_blockManipulator.ReadBlock(0));
+            var folder = _blockParser.ParseRootFolder(_blockManipulator.ReadBlock(_options.RootBlockNr));
 
             if (folder != null) return folder;
 
-            var root = new RootFolder();
-            _blockManipulator.WriteBlock(0, _blockParser.NodeToBytes(root));
+            var root = new Folder {IsRoot = true};
+            _blockManipulator.WriteBlock(root.BlockNumber, _blockParser.NodeToBytes(root));
 
             return root;
         }
@@ -99,7 +99,7 @@ namespace VFSBase.Implementation
             return List(folder).OfType<VFSFile>();
         }
 
-        public RootFolder Root { get; private set; }
+        public Folder Root { get; private set; }
 
         public Folder CreateFolder(Folder parentFolder, string name)
         {
@@ -334,13 +334,27 @@ namespace VFSBase.Implementation
         {
             CheckDisposed();
 
-            GetBlockList(node.Parent).Remove(node);
+            var newRoot = GetBlockList(node.Parent).Archive(node);
+            ResetRoot(newRoot);
 
             _indexService.RemoveFromIndex(node);
         }
 
+        private void ResetRoot(Folder newRoot)
+        {
+            _indexService.RemoveFromIndex(Root);
+            
+            Root = newRoot;
+            Root.IsRoot = true;
+            _options.RootBlockNr = Root.BlockNumber;
+            WriteConfig();
+
+            _indexService.AddToIndex(newRoot);
+        }
+
         public void Move(IIndexNode node, Folder destination, string name)
         {
+            // TODO: implement this
             CheckDisposed();
             CheckName(name);
 
@@ -349,7 +363,7 @@ namespace VFSBase.Implementation
             _indexService.RemoveFromIndex(node);
 
             var blockNumber = node.BlockNumber;
-            GetBlockList(node.Parent).Remove(node, false);
+            //GetBlockList(node.Parent).Remove(node, false);
             AppendBlockReference(destination, blockNumber);
 
             node.Name = name;

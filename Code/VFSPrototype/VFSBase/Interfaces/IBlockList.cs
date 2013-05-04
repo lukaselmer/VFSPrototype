@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using VFSBase.Implementation;
 using VFSBase.Persistence.Coding;
 
 namespace VFSBase.Interfaces
@@ -18,13 +19,6 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="reference">The reference.</param>
         void AddReference(long reference);
-
-        /// <summary>
-        /// Removes the specified node from the list.
-        /// </summary>
-        /// <param name="nodeToDelete">The node to delete.</param>
-        /// <param name="freeSpace">if set to <c>true</c> [free space].</param>
-        void Remove(IIndexNode nodeToDelete, bool freeSpace = true);
 
         /// <summary>
         /// Enumerates through the nodes.
@@ -51,5 +45,11 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <returns>IEnumerable{System.Byte[]}.</returns>
         IEnumerable<byte[]> Blocks();
+
+        /// <summary>
+        /// Archives the specified node.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        Folder Archive(IIndexNode node);
     }
 }
