@@ -203,7 +203,6 @@ namespace VFSBase.Implementation
 
         private Folder CreateFolder(Folder parentFolder, string name, bool createVersion)
         {
-            // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
             CheckVersion();
@@ -217,18 +216,9 @@ namespace VFSBase.Implementation
                                  Version = NextVersion
                              };
             _persistence.Persist(folder);
-            //var newRoot = GetBlockList(parentFolder).CopyReplacingReference(parentFolder, null, folder);
-            //d_persistence.Persist(folder);
-            //AppendBlockReference(parentFolder, folder.BlockNumber);
-
 
             if (createVersion) ArchiveAndReplaceRoot(parentFolder, null, folder);
             else AppendBlockReference(parentFolder, folder.BlockNumber);
-
-            //ResetRoot(newRoot);
-
-
-
 
             _indexService.AddToIndex(folder);
 
@@ -419,17 +409,12 @@ namespace VFSBase.Implementation
 
         public void Copy(IIndexNode nodeToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
         {
-            // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
             CheckVersion();
 
-            // Gather totals
+            // Gather totals (copy in ~O(1) :D)
             copyCallbacks.TotalToProcess++;
-
-            /*if (nodeToCopy is Folder) CollectExportDirectoryTotals(nodeToCopy as Folder, copyCallbacks);
-            else if (nodeToCopy is VFSFile) copyCallbacks.TotalToProcess++;
-            else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");*/
 
             // Do the real copy
             if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name, copyCallbacks);
@@ -498,7 +483,6 @@ namespace VFSBase.Implementation
 
         public void Delete(IIndexNode node)
         {
-            // TODO: versioning and search index update...?
             CheckDisposed();
             CheckVersion();
 
@@ -515,19 +499,18 @@ namespace VFSBase.Implementation
 
         public void Move(IIndexNode node, Folder destination, string name)
         {
-            // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
             CheckVersion();
-
 
             if (Exists(destination, name)) throw new ArgumentException("Folder already exists!");
 
             _indexService.RemoveFromIndex(node);
 
+            var newDestination = ArchiveAndReplaceRoot(destination, null, null);
+
             var blockNumber = node.BlockNumber;
-            //GetBlockList(node.Parent).Remove(node, false);
-            AppendBlockReference(destination, blockNumber);
+            AppendBlockReference(newDestination, blockNumber);
 
             node.Name = name;
 
