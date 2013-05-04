@@ -76,23 +76,25 @@ namespace VFSBaseTests
             {
                 var pathToTestfile = _testHelper.RandomTestfilePath();
 
-                ImportFile(pathToTestfile, "xxx", m); // V1
+                var internalTestfilePath = Path.GetFileName(pathToTestfile);
+
+                ImportFile(pathToTestfile, internalTestfilePath, "xxx", m); // V1
                 File.Delete(pathToTestfile);
-                m.Delete(pathToTestfile); // V2
+                m.Delete(internalTestfilePath); // V2
 
-                ImportFile(pathToTestfile, "yyy", m);  // V3
+                ImportFile(pathToTestfile, internalTestfilePath, "yyy", m);  // V3
                 File.Delete(pathToTestfile);
-                m.Delete(pathToTestfile); // V4
+                m.Delete(internalTestfilePath); // V4
 
-                AssertExportThrowsException(m, pathToTestfile, 0);
-                AssertExportThrowsException(m, pathToTestfile, 2);
-                AssertExportThrowsException(m, pathToTestfile, 4);
+                AssertExportThrowsException(m, internalTestfilePath, 0);
+                AssertExportThrowsException(m, internalTestfilePath, 2);
+                AssertExportThrowsException(m, internalTestfilePath, 4);
 
-                m.Export(pathToTestfile, pathToTestfile + "x", null, 1);
-                m.Export(pathToTestfile, pathToTestfile + "y", null, 3);
+                m.Export(internalTestfilePath, pathToTestfile + "x", null, 1);
+                m.Export(internalTestfilePath, pathToTestfile + "y", null, 3);
 
-                Assert.AreEqual("xxx", File.ReadAllLines(pathToTestfile + "x"));
-                Assert.AreEqual("yyy", File.ReadAllLines(pathToTestfile + "y"));
+                Assert.AreEqual("xxx", File.ReadAllText(pathToTestfile + "x"));
+                Assert.AreEqual("yyy", File.ReadAllText(pathToTestfile + "y"));
             }
         }
 
@@ -158,11 +160,11 @@ namespace VFSBaseTests
             }
         }
 
-        private static void ImportFile(string testFileSource, string testFileData, FileSystemTextManipulator m)
+        private static void ImportFile(string testFileSource, string internalTestfilePath, string testFileData, FileSystemTextManipulator m)
         {
             if (File.Exists(testFileSource)) File.Delete(testFileSource);
             File.WriteAllText(testFileSource, testFileData);
-            m.Import(testFileSource, testFileSource);
+            m.Import(testFileSource, internalTestfilePath);
         }
     }
 }
