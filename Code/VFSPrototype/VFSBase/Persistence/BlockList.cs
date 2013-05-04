@@ -185,6 +185,8 @@ namespace VFSBase.Persistence
             }
             if (toReplace == null && replacement != null) b.AddReference(replacementNr);
 
+            if (replacement != null) replacement.Parent = newFolder;
+
             return newFolder;
         }
 

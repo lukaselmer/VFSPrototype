@@ -192,6 +192,11 @@ namespace VFSBase.Implementation
 
         public Folder CreateFolder(Folder parentFolder, string name)
         {
+            return CreateFolder(parentFolder, name, true);
+        }
+
+        private Folder CreateFolder(Folder parentFolder, string name, bool createVersion)
+        {
             // TODO: implement versioning
             CheckDisposed();
             CheckName(name);
@@ -211,8 +216,8 @@ namespace VFSBase.Implementation
             //AppendBlockReference(parentFolder, folder.BlockNumber);
 
 
-
-            ArchiveAndReplaceRoot(parentFolder, null, folder);
+            if (createVersion) ArchiveAndReplaceRoot(parentFolder, null, folder);
+            else AppendBlockReference(parentFolder, folder.BlockNumber);
 
             //ResetRoot(newRoot);
 
@@ -261,8 +266,8 @@ namespace VFSBase.Implementation
             else if (File.Exists(source)) importCallbacks.TotalToProcess++;
             else throw new NotFoundException();
 
-            if (Directory.Exists(source)) ImportDirectory(source, destination, name, importCallbacks);
-            else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks);
+            if (Directory.Exists(source)) ImportDirectory(source, destination, name, importCallbacks, true);
+            else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks, true);
             else throw new NotFoundException();
 
             importCallbacks.OperationCompleted(!importCallbacks.ShouldAbort());
@@ -279,7 +284,7 @@ namespace VFSBase.Implementation
             importCallbacks.TotalToProcess += info.GetFiles().Length;
         }
 
-        private void ImportFile(string source, Folder destination, string name, CallbacksBase importCallbacks)
+        private void ImportFile(string source, Folder destination, string name, CallbacksBase importCallbacks, bool createVersion)
         {
             if (importCallbacks.ShouldAbort()) return;
 
@@ -295,21 +300,21 @@ namespace VFSBase.Implementation
             importCallbacks.CurrentlyProcessed++;
         }
 
-        private void ImportDirectory(string source, Folder destination, string name, CallbacksBase importCallbacks)
+        private void ImportDirectory(string source, Folder destination, string name, CallbacksBase importCallbacks, bool createVersion)
         {
             if (importCallbacks.ShouldAbort()) return;
 
             var info = new DirectoryInfo(source);
 
-            var newFolder = CreateFolder(destination, name);
+            var newFolder = CreateFolder(destination, name, createVersion);
 
             importCallbacks.CurrentlyProcessed++;
 
             foreach (var directoryInfo in info.GetDirectories())
-                ImportDirectory(directoryInfo.FullName, newFolder, directoryInfo.Name, importCallbacks);
+                ImportDirectory(directoryInfo.FullName, newFolder, directoryInfo.Name, importCallbacks, false);
 
             foreach (var fileInfo in info.GetFiles())
-                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name, importCallbacks);
+                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name, importCallbacks, false);
         }
 
         #endregion
@@ -468,7 +473,7 @@ namespace VFSBase.Implementation
 
             CheckName(name);
 
-            var newFolder = CreateFolder(destination, name);
+            var newFolder = CreateFolder(destination, name, true);
             newFolder.IndirectNodeNumber = nodeToCopy.IndirectNodeNumber;
             newFolder.BlocksCount = nodeToCopy.BlocksCount;
             newFolder.PredecessorBlockNr = nodeToCopy.BlockNumber;
