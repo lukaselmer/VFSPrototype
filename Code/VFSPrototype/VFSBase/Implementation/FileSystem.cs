@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -125,9 +126,47 @@ namespace VFSBase.Implementation
                  "Changes can only be made on the latest version. This version is {0}, latest version is {1}", Root.Version, LatestRoot.Version));
         }
 
+        private void ArchiveAndReplaceRoot(Folder folderToCopy, IIndexNode nodeToReplace, IIndexNode nodeReplacement)
+        {
+            if (folderToCopy == null) throw new VFSException("Node cannot be null");
+
+            var toCopy = folderToCopy;
+            var toReplace = nodeToReplace;
+            var replacement = nodeReplacement;
+
+            Folder previous = null;
+
+            while (toCopy != null)
+            {
+                var newFolder = GetBlockList(toCopy).CopyReplacingReference(toCopy, toReplace, replacement, NextVersion);
+
+                if (previous != null)
+                {
+                    previous.Parent = newFolder;
+                    _persistence.Persist(previous);
+                }
+
+                toReplace = toCopy;
+                toCopy = toCopy.Parent;
+                replacement = newFolder;
+
+                previous = newFolder;
+            }
+
+            Debug.Assert(previous != null, "previous != null");
+            Debug.Assert(previous.Name == "", "previous.Name == \"\"");
+
+            // previous is now the new root node!
+            previous.IsRoot = true;
+            _persistence.Persist(previous);
+            ResetRoot(previous);
+        }
+
         private void ResetRoot(Folder newRoot)
         {
             _indexService.RemoveFromIndex(Root);
+
+            newRoot.Version = NextVersion;
 
             Root = newRoot;
             Root.IsRoot = true;
@@ -138,6 +177,7 @@ namespace VFSBase.Implementation
 
             _indexService.AddToIndex(newRoot);
         }
+
 
         #endregion
 
@@ -155,7 +195,14 @@ namespace VFSBase.Implementation
 
             var folder = new Folder(name) { Parent = parentFolder, BlockNumber = _blockAllocation.Allocate(), Version = NextVersion };
             _persistence.Persist(folder);
+            //var newRoot = GetBlockList(parentFolder).CopyReplacingReference(parentFolder, null, folder);
+            //d_persistence.Persist(folder);
             AppendBlockReference(parentFolder, folder.BlockNumber);
+
+            //ResetRoot(newRoot);
+
+
+
 
             _indexService.AddToIndex(folder);
 
@@ -353,13 +400,16 @@ namespace VFSBase.Implementation
             CheckVersion();
 
             // Gather totals
-            if (nodeToCopy is Folder) CollectExportDirectoryTotals(nodeToCopy as Folder, copyCallbacks);
+            copyCallbacks.TotalToProcess++;
+
+            /*if (nodeToCopy is Folder) CollectExportDirectoryTotals(nodeToCopy as Folder, copyCallbacks);
             else if (nodeToCopy is VFSFile) copyCallbacks.TotalToProcess++;
-            else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
+            else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");*/
 
             // Do the real copy
             if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name, copyCallbacks);
-            else CopyFile(nodeToCopy as VFSFile, destination, name, copyCallbacks);
+            else if (nodeToCopy is VFSFile) CopyFile(nodeToCopy as VFSFile, destination, name, copyCallbacks);
+            else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
 
             copyCallbacks.OperationCompleted(!copyCallbacks.ShouldAbort());
         }
@@ -370,14 +420,25 @@ namespace VFSBase.Implementation
 
             CheckName(name);
 
-            var file = new VFSFile(name)
+            var newFile = new VFSFile(name)
                            {
                                Parent = destination,
                                BlockNumber = _blockAllocation.Allocate(),
-                               LastBlockSize = fileToCopy.LastBlockSize
+                               LastBlockSize = fileToCopy.LastBlockSize,
+                               IndirectNodeNumber = fileToCopy.IndirectNodeNumber,
+                               BlocksCount = fileToCopy.BlocksCount,
+                               PredecessorBlockNr = fileToCopy.BlockNumber,
+                               Version = NextVersion
                            };
 
-            foreach (var block in GetBlockList(fileToCopy).Blocks()) AddDataToFile(file, block);
+            _persistence.Persist(newFile);
+            copyCallbacks.CurrentlyProcessed++;
+
+            ArchiveAndReplaceRoot(destination, null, newFile);
+
+            _indexService.AddToIndex(newFile);
+
+            /*foreach (var block in GetBlockList(fileToCopy).Blocks()) AddDataToFile(file, block);
 
             _persistence.Persist(file);
 
@@ -385,7 +446,7 @@ namespace VFSBase.Implementation
 
             copyCallbacks.CurrentlyProcessed++;
 
-            _indexService.AddToIndex(file);
+            _indexService.AddToIndex(file);*/
         }
 
         private void CopyFolder(Folder nodeToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
@@ -395,10 +456,14 @@ namespace VFSBase.Implementation
             CheckName(name);
 
             var newFolder = CreateFolder(destination, name);
-            copyCallbacks.CurrentlyProcessed++;
+            newFolder.IndirectNodeNumber = nodeToCopy.IndirectNodeNumber;
+            newFolder.BlocksCount = nodeToCopy.BlocksCount;
+            newFolder.PredecessorBlockNr = nodeToCopy.BlockNumber;
+            newFolder.Version = NextVersion;
+            _persistence.Persist(newFolder);
 
-            foreach (var subNode in Folders(nodeToCopy)) CopyFolder(subNode, newFolder, subNode.Name, copyCallbacks);
-            foreach (var subNode in Files(nodeToCopy)) CopyFile(subNode, newFolder, subNode.Name, copyCallbacks);
+            ArchiveAndReplaceRoot(destination, null, newFolder);
+            copyCallbacks.CurrentlyProcessed++;
         }
 
         #endregion
@@ -408,12 +473,12 @@ namespace VFSBase.Implementation
 
         public void Delete(IIndexNode node)
         {
-            // TODO: versioning - search index...?
+            // TODO: versioning and search index update...?
             CheckDisposed();
             CheckVersion();
 
-            var newRoot = GetBlockList(node.Parent).Archive(node);
-            ResetRoot(newRoot);
+            if (node.Parent == null) throw new VFSException("Cannot delete root node");
+            ArchiveAndReplaceRoot(node.Parent, node, null);
 
             _indexService.RemoveFromIndex(node);
         }

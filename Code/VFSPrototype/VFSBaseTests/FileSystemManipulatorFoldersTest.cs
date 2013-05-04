@@ -11,6 +11,7 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemManipulatorFoldersTest
     {
+        //TODO: fix this...
         private const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
         private const string DummyImportFolderPath = "../../../Testfiles/DummyfolderImportFolders";
         private const string DummyExportFolderPath = "../../../Testfiles/DummyfolderExportFolders";

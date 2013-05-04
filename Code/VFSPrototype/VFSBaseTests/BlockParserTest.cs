@@ -148,6 +148,7 @@ namespace VFSBaseTests
             public long IndirectNodeNumber { get; set; }
             public long BlocksCount { get; set; }
             public long Version { get; set; }
+            public long PredecessorBlockNr { get; set; }
         }
     }
 }

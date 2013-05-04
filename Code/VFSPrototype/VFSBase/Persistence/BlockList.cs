@@ -151,46 +151,18 @@ namespace VFSBase.Persistence
             }
         }
 
-        public Folder Archive(IIndexNode node)
+        /// <summary>
+        /// Copies the toCopy index node, and replaces the toReplace node with the replacement
+        /// </summary>
+        /// <param name="toCopy">To index node to copy.</param>
+        /// <param name="toReplace">To node to be replaced. Can be set to null if only a node should be appended and no one should be replaced.</param>
+        /// <param name="replacement">The node to replace the node toReplace. Can be set to null for the delete action.</param>
+        /// <param name="newVersion"></param>
+        /// <returns></returns>
+        public Folder CopyReplacingReference(Folder toCopy, IIndexNode toReplace, IIndexNode replacement, long newVersion)
         {
-            if(node.Parent == null) throw new VFSException("Cannot delete /");
-
-            var toCopy = node.Parent;
-            var toReplace = node;
-            Folder replacement = null;
-            Folder previous = null;
-            var b = this;
-
-            while (toCopy != null)
-            {
-                var newFolder = b.CopyReplacingReference(toCopy, toReplace, replacement);
-
-                if (previous != null)
-                {
-                    previous.Parent = newFolder;
-                    _persistence.Persist(previous);
-                }
-
-                toReplace = toCopy;
-                toCopy = toCopy.Parent;
-                replacement = newFolder;
-                b = new BlockList(toCopy, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
-
-                previous = newFolder;
-            }
-
-            Debug.Assert(previous != null, "previous != null");
-
-            // previous is now the new root node!
-            previous.IsRoot = true;
-            _persistence.Persist(previous);
-            return previous;
-        }
-
-        private Folder CopyReplacingReference(Folder toCopy, IIndexNode toReplace, IIndexNode replacement)
-        {
+            var toReplaceNr = toReplace == null ? 0 : toReplace.BlockNumber;
             var replacementNr = replacement == null ? 0 : replacement.BlockNumber;
-            var toReplaceNr = toReplace.BlockNumber;
 
             //var newBlocksCount = toCopy.BlocksCount - (replacementNr == 0 ? -1 : 0);
 
@@ -198,18 +170,20 @@ namespace VFSBase.Persistence
                                    {
                                        //BlocksCount = newBlocksCount,
                                        PredecessorBlockNr = toReplaceNr,
-                                       BlockNumber = _blockAllocation.Allocate()
+                                       BlockNumber = _blockAllocation.Allocate(),
+                                       Version = newVersion
                                    };
             _persistence.Persist(newFolder);
+
+            var b = new BlockList(newFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
 
             // Improve this algorithm section! We don't have to copy everything, we only have to copy the blocks that are different.
             foreach (var reference in AsEnumerable())
             {
-                var b = new BlockList(newFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
-
                 var blockNumber = reference.BlockNumber == toReplaceNr ? replacementNr : reference.BlockNumber;
                 if (blockNumber != 0) b.AddReference(blockNumber);
             }
+            if (toReplace == null && replacement != null) b.AddReference(replacementNr);
 
             return newFolder;
         }
@@ -229,33 +203,5 @@ namespace VFSBase.Persistence
             b.BlockNumber = blockNumber;
             return b;
         }
-
-        // TODO: this should not be necessary
-        /// <summary>
-        /// Frees the space and destroys the file contents.
-        /// Note: File contents are not destroyed recursively.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        //private void FreeSpace(IIndexNode node)
-        //{
-        // The file contents could be destroyed, but it is not necessary.
-        // This would have to be done recursivly tough.
-        // This can be used to nullify a single block: WriteBlock(node.BlockNumber, new byte[_options.BlockSize]);
-
-        //     if (node.IndirectNodeNumber != 0) FreeSpace(ReadIndirectNode(node.IndirectNodeNumber), _options.IndirectionCountForIndirectNodes);
-
-
-        //_blockAllocation.Free(node.BlockNumber);
-        //}
-        // TODO: this should not be necessary
-        /*private void FreeSpace(IndirectNode node, int recursion)
-        {
-            foreach (var blockNumber in node.UsedBlockNumbers())
-            {
-                if (recursion != 0) FreeSpace(ReadIndirectNode(blockNumber), recursion - 1);
-                _blockManipulator.WriteBlock(blockNumber, new byte[_options.BlockSize]);
-                _blockAllocation.Free(blockNumber);
-            }
-        }*/
     }
 }
