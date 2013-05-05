@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Persistence.Coding.General;
 using VFSBase.Persistence.Coding.MicrosoftAes;
+using VFSBase.Persistence.Coding.Strategies;
 
 namespace VFSBaseTests.Coding
 {

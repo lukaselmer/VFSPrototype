@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using VFSBase.Exceptions;
+using VFSBase.Helpers;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Search;
@@ -21,7 +22,7 @@ namespace VFSBase.Implementation
         private readonly BlockParser _blockParser;
         private readonly BlockAllocation _blockAllocation;
         private BlockManipulator _blockManipulator;
-        private readonly Persistence _persistence;
+        private readonly Persistence.Persistence _persistence;
         private readonly IndexService _indexService;
         public Folder Root { get; private set; }
         private Folder LatestRoot { get; set; }
@@ -42,7 +43,7 @@ namespace VFSBase.Implementation
 
             _blockManipulator = new BlockManipulator(_options);
             _blockParser = new BlockParser(_options);
-            _persistence = new Persistence(_blockParser, _blockManipulator);
+            _persistence = new Persistence.Persistence(_blockParser, _blockManipulator);
             _blockAllocation = _options.BlockAllocation;
             _indexService = new IndexService();
 

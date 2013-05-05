@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Exceptions;
+using VFSBase.Factories;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBaseTests.Helpers;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Helpers;
 using VFSBase.Implementation;
 
 namespace VFSBaseTests

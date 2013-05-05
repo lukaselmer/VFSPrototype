@@ -14,7 +14,7 @@ namespace VFSBase.Implementation
         private readonly FileSystemOptions _options;
         private readonly BlockAllocation _blockAllocation;
         private readonly BlockManipulator _blockManipulator;
-        private readonly Persistence _persistence;
+        private readonly Persistence.Persistence _persistence;
 
         #region Writing
 
@@ -37,7 +37,7 @@ namespace VFSBase.Implementation
         #endregion
 
 
-        public VFSFileStream(VFSFile file, BlockParser blockParser, FileSystemOptions options, BlockAllocation blockAllocation, BlockManipulator blockManipulator, Persistence persistence)
+        public VFSFileStream(VFSFile file, BlockParser blockParser, FileSystemOptions options, BlockAllocation blockAllocation, BlockManipulator blockManipulator, Persistence.Persistence persistence)
         {
             _file = file;
             _blockParser = blockParser;

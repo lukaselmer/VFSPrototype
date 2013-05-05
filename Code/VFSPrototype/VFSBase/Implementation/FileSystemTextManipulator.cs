@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using VFSBase.Exceptions;
+using VFSBase.Helpers;
 using VFSBase.Interfaces;
 using VFSBase.Search;
 

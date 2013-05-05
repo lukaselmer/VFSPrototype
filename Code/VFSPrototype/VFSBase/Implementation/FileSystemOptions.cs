@@ -11,6 +11,7 @@ using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Coding;
 using VFSBase.Persistence.Coding.General;
+using VFSBase.Persistence.Coding.Strategies;
 
 namespace VFSBase.Implementation
 {

@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Factories;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
+using VFSBase.Persistence.Coding.General;
 
 namespace VFSBaseTests.Helpers
 {
