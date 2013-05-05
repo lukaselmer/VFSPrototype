@@ -19,7 +19,7 @@ namespace VFSBase.Search
             _fileSystem = fileSystem;
             _indexService = indexService;
 
-            // This does not work properly, we would need to use synchronization
+            // TODO: This does not work properly, we would need to use synchronization
             // Task.Run(() => Index(_fileSystem.Root));
             Index(_fileSystem.Root);
         }

@@ -22,7 +22,7 @@ namespace VFSBase.Search
     /// </summary>
     public class IndexService
     {
-        private readonly Trie _flatNames = new Trie();
+        private readonly SuffixTree _flatNames = new SuffixTree();
 
         internal IEnumerable<IIndexNode> Search(SearchOptions searchOptions)
         {

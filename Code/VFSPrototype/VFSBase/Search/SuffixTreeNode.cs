@@ -3,15 +3,15 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Search
 {
-    internal class TrieNode
+    internal class SuffixTreeNode
     {
-        public TrieNode()
+        public SuffixTreeNode()
         {
-            Nodes = new SortedDictionary<char, TrieNode>();
+            Nodes = new SortedDictionary<char, SuffixTreeNode>();
             Values = new HashSet<IIndexNode>();
         }
 
-        public IDictionary<char, TrieNode> Nodes { get; set; }
+        public IDictionary<char, SuffixTreeNode> Nodes { get; set; }
         public HashSet<IIndexNode> Values { get; set; }
     }
 }

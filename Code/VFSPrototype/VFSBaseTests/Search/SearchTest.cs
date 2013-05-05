@@ -11,42 +11,42 @@ namespace VFSBaseTests.Search
     {
         private readonly IndexService _service = new IndexService();
         
-        private RootFolder root;
-        private Folder topFolderBli;
-        private Folder subBliFoo;
+        private Folder _root;
+        private Folder _topFolderBli;
+        private Folder _subBliFoo;
 
         [TestInitialize]
         public void FillServiceIndex()
         {
-            root = new RootFolder();
+            _root = new Folder(""){BlockNumber = 100};
 
-            topFolderBli = new Folder("bli") {Parent = root, BlockNumber = 0};
-            var topFolderBla = new Folder ("bla") { Parent = root, BlockNumber = 1};
-            var topFolderBlub = new Folder ("blup") { Parent = root, BlockNumber = 2};
-            var topFolderBbb = new Folder ("bbb") { Parent = root, BlockNumber = 3};
-            _service.AddToIndex(topFolderBli);
+            _topFolderBli = new Folder("bli") {Parent = _root, BlockNumber = 0};
+            var topFolderBla = new Folder ("bla") { Parent = _root, BlockNumber = 1};
+            var topFolderBlub = new Folder ("blup") { Parent = _root, BlockNumber = 2};
+            var topFolderBbb = new Folder ("bbb") { Parent = _root, BlockNumber = 3};
+            _service.AddToIndex(_topFolderBli);
             _service.AddToIndex(topFolderBla);
             _service.AddToIndex(topFolderBlub);
             _service.AddToIndex(topFolderBbb);
 
-            subBliFoo = new Folder("foo") { Parent = topFolderBli, BlockNumber = 4};
-            var subBliFooCapital = new Folder("FOO") { Parent = topFolderBli, BlockNumber = 5};
-            var subBliBar = new Folder("bar") { Parent = topFolderBli, BlockNumber = 6};
-            _service.AddToIndex(subBliFoo);
+            _subBliFoo = new Folder("foo") { Parent = _topFolderBli, BlockNumber = 4};
+            var subBliFooCapital = new Folder("FOO") { Parent = _topFolderBli, BlockNumber = 5};
+            var subBliBar = new Folder("bar") { Parent = _topFolderBli, BlockNumber = 6};
+            _service.AddToIndex(_subBliFoo);
             _service.AddToIndex(subBliFooCapital);
             _service.AddToIndex(subBliBar);
 
-            var subsubBliFooAaa = new Folder("aaa") { Parent = subBliFoo, BlockNumber = 7};
-            var subsubBliFooBbb = new Folder("bbb") { Parent = subBliFoo, BlockNumber = 8};
-            var subsubBliFooCcc = new Folder("Ccc") { Parent = subBliFoo, BlockNumber = 9};
+            var subsubBliFooAaa = new Folder("aaa") { Parent = _subBliFoo, BlockNumber = 7};
+            var subsubBliFooBbb = new Folder("bbb") { Parent = _subBliFoo, BlockNumber = 8};
+            var subsubBliFooCcc = new Folder("Ccc") { Parent = _subBliFoo, BlockNumber = 9};
             _service.AddToIndex(subsubBliFooAaa);
             _service.AddToIndex(subsubBliFooBbb);
             _service.AddToIndex(subsubBliFooCcc);
 
-            var subBliFooFile = new VFSFile("File") { Parent = subBliFoo, BlockNumber = 10};
-            var subBliFooFile2 = new VFSFile("File2") { Parent = subBliFoo, BlockNumber = 11};
-            var subBliFooFile3 = new VFSFile("File3") { Parent = subBliFoo, BlockNumber = 12};
-            var subBliFooBar = new Folder("bar") { Parent = subBliFoo, BlockNumber = 13};
+            var subBliFooFile = new VFSFile("File") { Parent = _subBliFoo, BlockNumber = 10};
+            var subBliFooFile2 = new VFSFile("File2") { Parent = _subBliFoo, BlockNumber = 11};
+            var subBliFooFile3 = new VFSFile("File3") { Parent = _subBliFoo, BlockNumber = 12};
+            var subBliFooBar = new Folder("bar") { Parent = _subBliFoo, BlockNumber = 13};
             _service.AddToIndex(subBliFooFile);
             _service.AddToIndex(subBliFooFile2);
             _service.AddToIndex(subBliFooFile3);
@@ -56,12 +56,12 @@ namespace VFSBaseTests.Search
         [TestMethod]
         public void TestInFolder()
         {
-            Assert.AreEqual (0, _service.Search(new SearchOptions { Keyword = "bar", RecursionDistance = 0, RestrictToFolder = root}).Count());
-            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = root }).Count ());
-            Assert.AreEqual (2, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 2, RestrictToFolder = root }).Count ());
-            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 0, RestrictToFolder = topFolderBli }).Count ());
-            Assert.AreEqual (2, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = topFolderBli }).Count ());
-            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = subBliFoo }).Count ());
+            Assert.AreEqual (0, _service.Search(new SearchOptions { Keyword = "bar", RecursionDistance = 0, RestrictToFolder = _root}).Count());
+            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = _root }).Count ());
+            Assert.AreEqual (2, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 2, RestrictToFolder = _root }).Count ());
+            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 0, RestrictToFolder = _topFolderBli }).Count ());
+            Assert.AreEqual (2, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = _topFolderBli }).Count ());
+            Assert.AreEqual (1, _service.Search (new SearchOptions { Keyword = "bar", RecursionDistance = 1, RestrictToFolder = _subBliFoo }).Count ());
         }
 
         [TestMethod]

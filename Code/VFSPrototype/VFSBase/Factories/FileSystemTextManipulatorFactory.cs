@@ -1,6 +1,7 @@
+using VFSBase.Implementation;
 using VFSBase.Interfaces;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Factories
 {
     internal class FileSystemTextManipulatorFactory : IFileSystemTextManipulatorFactory
     {
