@@ -38,6 +38,13 @@ namespace VFSBase.Implementation
 
         public long Version { get; set; }
 
+        /// <summary>
+        /// Gets or sets the blocks used. This is needed for the root folder.
+        /// </summary>
+        /// <value>
+        /// The blocks used.
+        /// </value>
+        public long BlocksUsed { get; set; }
 
         public override bool Equals(object obj)
         {

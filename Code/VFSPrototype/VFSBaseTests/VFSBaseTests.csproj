@@ -84,6 +84,7 @@
     <Compile Include="BlockListTest.cs" />
     <Compile Include="Search\SearchTest.cs" />
     <Compile Include="History\HistoryTest.cs" />
+    <Compile Include="Synchronization\SynchronizationTest.cs" />
     <Compile Include="Synchronization\ShiftBlockTest.cs" />
     <Compile Include="VFSFileStreamTest.cs" />
   </ItemGroup>

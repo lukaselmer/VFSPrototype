@@ -9,6 +9,7 @@ using VFSBase.Exceptions;
 using VFSBase.Helpers;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
+using VFSBase.Persistence.Blocks;
 using VFSBase.Search;
 
 namespace VFSBase.Implementation
@@ -184,6 +185,7 @@ namespace VFSBase.Implementation
             Root = newRoot;
             Root.IsRoot = true;
             LatestRoot = Root;
+            Root.BlocksUsed = _blockAllocation.CurrentMax;
             _persistence.Persist(Root);
             _options.RootBlockNr = Root.BlockNumber;
             WriteConfig();

@@ -4,6 +4,7 @@ using System.IO;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
+using VFSBase.Persistence.Blocks;
 
 namespace VFSBase.Implementation
 {
