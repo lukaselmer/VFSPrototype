@@ -66,6 +66,7 @@
     <Compile Include="Coding\CryptoTest.cs" />
     <Compile Include="Coding\EncryptionStrategiesTest.cs" />
     <Compile Include="Coding\CompressionTest.cs" />
+    <Compile Include="History\BlocksDontChangeTest.cs" />
     <Compile Include="Exceptions\ExceptionsTest.cs" />
     <Compile Include="FileSystemManipulatorFoldersTest.cs" />
     <Compile Include="FileSystemManipulatorLoadTest.cs" />
@@ -82,7 +83,8 @@
     <Compile Include="FileSystemManipulatorCallbacksTest.cs" />
     <Compile Include="BlockListTest.cs" />
     <Compile Include="Search\SearchTest.cs" />
-    <Compile Include="HistoryTest.cs" />
+    <Compile Include="History\HistoryTest.cs" />
+    <Compile Include="Synchronization\ShiftBlockTest.cs" />
     <Compile Include="VFSFileStreamTest.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +95,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Mocks\" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

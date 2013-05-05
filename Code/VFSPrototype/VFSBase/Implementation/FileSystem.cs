@@ -646,5 +646,15 @@ namespace VFSBase.Implementation
 
         #endregion
 
+
+        #region Synchronization
+
+        public void ShiftBlocks(long fromVersion, long offset)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
     }
 }

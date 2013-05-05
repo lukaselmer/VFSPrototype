@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBaseTests.Helpers;
 
-namespace VFSBaseTests
+namespace VFSBaseTests.History
 {
     [TestClass]
     public class HistoryTest
@@ -146,8 +143,7 @@ namespace VFSBaseTests
             }
         }
 
-        private static
-            void AssertExportThrowsException(FileSystemTextManipulator m, string testFileSource, int version)
+        private static void AssertExportThrowsException(IFileSystemTextManipulator m, string testFileSource, int version)
         {
             try
             {
@@ -160,7 +156,7 @@ namespace VFSBaseTests
             }
         }
 
-        private static void ImportFile(string testFileSource, string internalTestfilePath, string testFileData, FileSystemTextManipulator m)
+        private static void ImportFile(string testFileSource, string internalTestfilePath, string testFileData, IFileSystemTextManipulator m)
         {
             if (File.Exists(testFileSource)) File.Delete(testFileSource);
             File.WriteAllText(testFileSource, testFileData);

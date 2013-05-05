@@ -135,5 +135,13 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="version">The version.</param>
         void SwitchToVersion(long version);
+
+        /// <summary>
+        /// Shifts all the blocks from version fromVersion (excluding fromVersion) by offset.
+        /// This method is used to free space after a specific version (i.e. the server version before synchronization)
+        /// </summary>
+        /// <param name="fromVersion">From version.</param>
+        /// <param name="offset">The offset.</param>
+        void ShiftBlocks(long fromVersion, long offset);
     }
 }

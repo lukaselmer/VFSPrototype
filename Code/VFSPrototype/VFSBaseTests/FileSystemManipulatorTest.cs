@@ -27,7 +27,7 @@ namespace VFSBaseTests
 
         private static IFileSystemTextManipulator InitTestFileSystemManipulator()
         {
-            return new FileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
+            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
         }
 
         [TestCleanup]

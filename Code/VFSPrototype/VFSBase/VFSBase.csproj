@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Implementation\BlockAllocation.cs" />
+    <Compile Include="Implementation\FileSystemTextManipulatorFactory.cs" />
+    <Compile Include="Interfaces\IFileSystemTextManipulatorFactory.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\CircularBuffer.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\Lz77Constants.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\Lz77Triple.cs" />
