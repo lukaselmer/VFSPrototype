@@ -27,7 +27,7 @@ namespace VFSBase.Synchronization
         private readonly User _user;
         private readonly SynchronizationCallbacks _callbacks;
         private static BackgroundWorker _backgroundWorker;
-        private DiskServiceClient _diskService;
+        private readonly DiskServiceClient _diskService;
         private UserServiceClient _userService;
         private Disk _disk;
 

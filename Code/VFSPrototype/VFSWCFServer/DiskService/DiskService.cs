@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using VFSBlockAbstraction;
 using VFSWCFService.Common;
 using VFSWCFService.UserService;
 
@@ -51,22 +53,37 @@ namespace VFSWCFService.DiskService
 
         public DiskOptions GetDiskOptions(Disk disk)
         {
-            return Persistence.LoadDiskOptions(disk);
+            return Persistence.LoadDiskOptions(disk.Uuid);
         }
 
         public void SetDiskOptions(Disk disk, DiskOptions options)
         {
-            Persistence.SaveDiskOptions(disk, options);
+            Persistence.SaveDiskOptions(disk.Uuid, options);
         }
 
         public void WriteBlock(string diskUuid, long blockNr, byte[] content)
         {
-            throw new NotImplementedException();
+            var b = GetBlockManipulator(diskUuid);
+            b.WriteBlock(blockNr, content);
+        }
+
+        private BlockManipulator GetBlockManipulator(string diskUuid)
+        {
+            var options = Persistence.LoadDiskOptions(diskUuid);
+            var b = new BlockManipulator(DiskLocation(diskUuid), options.BlockSize, options.MasterBlockSize);
+            return b;
+        }
+
+        private static string DiskLocation(string diskUuid)
+        {
+            if (!Directory.Exists("./Disks")) Directory.CreateDirectory("./Disks");
+            return string.Format("./Disks/{0}.vhs", diskUuid);
         }
 
         public byte[] ReadBlock(string diskUuid, long blockNr)
         {
-            throw new NotImplementedException();
+            var b = GetBlockManipulator(diskUuid);
+            return b.ReadBlock(blockNr);
         }
 
         public void UpdateDisk(Disk disk)
