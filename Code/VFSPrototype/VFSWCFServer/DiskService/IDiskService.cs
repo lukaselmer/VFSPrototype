@@ -23,12 +23,15 @@ namespace VFSWCFService.DiskService
         DiskOptions GetDiskOptions(Disk disk);
 
         [OperationContract]
-        void SetDiskOptions(DiskOptions disk);
+        void SetDiskOptions(Disk disk, DiskOptions options);
 
         [OperationContract]
         void WriteBlock(string diskUuid, long blockNr, byte[] content);
 
         [OperationContract]
         byte[] ReadBlock(string diskUuid, long blockNr);
+
+        [OperationContract]
+        void UpdateDisk(Disk disk);
     }
 }

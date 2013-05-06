@@ -76,7 +76,8 @@
   <xs:element name="SetDiskOptions">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q11:DiskOptions" />
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q11:Disk" />
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="options" nillable="true" type="q12:DiskOptions" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -112,6 +113,18 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="ReadBlockResult" nillable="true" type="xs:base64Binary" />
       </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateDisk">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q13:Disk" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateDiskResponse">
+    <xs:complexType>
+      <xs:sequence />
     </xs:complexType>
   </xs:element>
 </xs:schema>
