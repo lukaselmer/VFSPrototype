@@ -165,5 +165,11 @@ namespace VFSBase.Implementation
                 return _streamCodingStrategy;
             }
         }
+
+        public string Uuid { get; set; }
+
+        public long LocalVersion { get; set; }
+
+        public long LastServerVersion { get; set; }
     }
 }

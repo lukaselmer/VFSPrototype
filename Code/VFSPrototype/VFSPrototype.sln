@@ -11,6 +11,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSBaseTests", "VFSBaseTests\VFSBaseTests.csproj", "{6A331FB8-5B2B-4A27-A0E9-9086C02BF38A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSBase", "VFSBase\VFSBase.csproj", "{2996B9E0-F50A-468D-8282-F62435108C4F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4FED1B42-B203-41E0-AB35-0FC6038B3522} = {4FED1B42-B203-41E0-AB35-0FC6038B3522}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSConsole", "VFSConsole\VFSConsole.csproj", "{FFCBEC0D-B275-45F5-A551-62D3BAF0B818}"
 EndProject
@@ -23,6 +26,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSWCFServiceTests", "VFSWCFServerTests\VFSWCFServiceTests.csproj", "{C5F35FC7-4499-4591-BE4D-3E7A1F3B48FA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Startup", "Startup\Startup.csproj", "{FDCFC726-5C56-49F4-BCD9-5C82ACDD60FD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4FED1B42-B203-41E0-AB35-0FC6038B3522} = {4FED1B42-B203-41E0-AB35-0FC6038B3522}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
