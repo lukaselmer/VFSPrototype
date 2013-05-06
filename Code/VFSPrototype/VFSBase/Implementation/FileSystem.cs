@@ -6,8 +6,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using VFSBase.Exceptions;
+using VFSBase.Helpers;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
+using VFSBase.Persistence.Blocks;
 using VFSBase.Search;
 
 namespace VFSBase.Implementation
@@ -21,7 +23,7 @@ namespace VFSBase.Implementation
         private readonly BlockParser _blockParser;
         private readonly BlockAllocation _blockAllocation;
         private BlockManipulator _blockManipulator;
-        private readonly Persistence _persistence;
+        private readonly Persistence.Persistence _persistence;
         private readonly IndexService _indexService;
         public Folder Root { get; private set; }
         private Folder LatestRoot { get; set; }
@@ -42,7 +44,7 @@ namespace VFSBase.Implementation
 
             _blockManipulator = new BlockManipulator(_options);
             _blockParser = new BlockParser(_options);
-            _persistence = new Persistence(_blockParser, _blockManipulator);
+            _persistence = new Persistence.Persistence(_blockParser, _blockManipulator);
             _blockAllocation = _options.BlockAllocation;
             _indexService = new IndexService();
 
@@ -183,6 +185,7 @@ namespace VFSBase.Implementation
             Root = newRoot;
             Root.IsRoot = true;
             LatestRoot = Root;
+            Root.BlocksUsed = _blockAllocation.CurrentMax;
             _persistence.Persist(Root);
             _options.RootBlockNr = Root.BlockNumber;
             WriteConfig();
@@ -642,6 +645,16 @@ namespace VFSBase.Implementation
             if (name.Length <= 0) throw new VFSException("Name must not be empty!");
             if (BlockParser.StringToBytes(name).Length > _options.NameLength)
                 throw new VFSException(string.Format("Name too long, max {0}", 255));
+        }
+
+        #endregion
+
+
+        #region Synchronization
+
+        public void ShiftBlocks(long fromVersion, long offset)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

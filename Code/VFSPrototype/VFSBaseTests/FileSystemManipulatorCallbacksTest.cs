@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Factories;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBaseTests.Helpers;
@@ -25,7 +26,7 @@ namespace VFSBaseTests
 
         private static IFileSystemTextManipulator InitTestFileSystemManipulator()
         {
-            return new FileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
+            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
         }
 
         [TestInitialize]

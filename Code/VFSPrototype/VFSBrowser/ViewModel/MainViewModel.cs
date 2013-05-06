@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Microsoft.Practices.Unity;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using DataFormats = System.Windows.DataFormats;
@@ -66,8 +67,9 @@ namespace VFSBrowser.ViewModel
 
         public ObservableCollection<ListItem> Items { get; set; }
 
-        public MainViewModel()
+        public MainViewModel(IUnityContainer container)
         {
+            _container = container;
             Items = new ObservableCollection<ListItem>();
             SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, Keyword = "" };
 
@@ -200,6 +202,7 @@ namespace VFSBrowser.ViewModel
 
         private bool _copy;
         private readonly List<ListItem> _clipboard = new List<ListItem>();
+        private IUnityContainer _container;
 
         private void Copy(object parameter)
         {
@@ -440,7 +443,7 @@ namespace VFSBrowser.ViewModel
             try
             {
                 var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType);
-                _manipulator = new FileSystemTextManipulator(fileSystemData, vm.Password);
+                _manipulator = _container.Resolve <IFileSystemTextManipulatorFactory>().CreateFileSystemTextManipulator(fileSystemData, vm.Password);
                 CurrentPath = "/";
                 OnPropertyChanged("FileSystemName");
             }
@@ -472,7 +475,7 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                var manipulator = new FileSystemTextManipulator(dlg.FileName, passwordDialog.Password);
+                var manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().OpenFileSystemTextManipulator(dlg.FileName, passwordDialog.Password);
 
                 // Close last vfs
                 DisposeManipulator();

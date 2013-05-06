@@ -1,8 +1,8 @@
-﻿using VFSBase.Interfaces;
-using VFSBase.Persistence;
+﻿using VFSBase.Implementation;
+using VFSBase.Interfaces;
 using VFSBase.Persistence.Blocks;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Persistence
 {
     internal class Persistence
     {

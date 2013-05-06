@@ -34,6 +34,11 @@ namespace VFSConsoleTests
             return CurrentFolders;
         }
 
+        public IList<string> Folders(string path, long version)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool IsDirectory(string path)
         {
             return IsCurrentDirectory;
@@ -80,6 +85,26 @@ namespace VFSConsoleTests
             {
                 throw new NotImplementedException();
             }
+        }
+
+        public long Version(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SwitchToVersion(long version)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SwitchToLatestVersion()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<long> Versions(string path)
+        {
+            throw new NotImplementedException();
         }
 
         public void Dispose()

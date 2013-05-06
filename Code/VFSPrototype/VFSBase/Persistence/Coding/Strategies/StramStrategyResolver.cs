@@ -1,9 +1,10 @@
 ﻿using System;
+using VFSBase.Implementation;
 using VFSBase.Persistence.Coding.General;
 using VFSBase.Persistence.Coding.MicrosoftAes;
 using VFSBase.Persistence.Coding.MicrosoftCompression;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Persistence.Coding.Strategies
 {
     internal class StramStrategyResolver
     {

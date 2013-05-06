@@ -4,17 +4,18 @@
         xmlns:local="clr-namespace:VFSBase.Implementation;assembly=VFSBase"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel" mc:Ignorable="d"
+        xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel"
+        xmlns:general="clr-namespace:VFSBase.Persistence.Coding.General;assembly=VFSBase" mc:Ignorable="d"
         Title="NewVFSView" MinHeight="240" MinWidth="350" MaxHeight="250" Height="240" Width="450" d:DataContext="{d:DesignInstance viewModel:NewVFSViewModel}">
     <Window.Resources>
         <ObjectDataProvider x:Key="compressionTypes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:StreamCompressionType" />
+                <x:Type TypeName="general:StreamCompressionType" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
         <ObjectDataProvider x:Key="encryptionTypes" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:StreamEncryptionType" />
+                <x:Type TypeName="general:StreamEncryptionType" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
