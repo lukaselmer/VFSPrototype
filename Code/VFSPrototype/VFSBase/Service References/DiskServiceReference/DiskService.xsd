@@ -73,6 +73,18 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="SetDiskOptions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q11:DiskOptions" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SetDiskOptionsResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="WriteBlock">
     <xs:complexType>
       <xs:sequence>
@@ -85,7 +97,7 @@
   <xs:element name="WriteBlockResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="WriteBlockResult" nillable="true" type="q11:DiskOptions" />
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="WriteBlockResult" nillable="true" type="q12:DiskOptions" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

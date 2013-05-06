@@ -295,6 +295,12 @@ namespace VFSBase.DiskServiceReference {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/GetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/GetDiskOptionsResponse")]
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptions> GetDiskOptionsAsync(VFSBase.DiskServiceReference.Disk disk);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/SetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/SetDiskOptionsResponse")]
+        void SetDiskOptions(VFSBase.DiskServiceReference.DiskOptions disk);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/SetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/SetDiskOptionsResponse")]
+        System.Threading.Tasks.Task SetDiskOptionsAsync(VFSBase.DiskServiceReference.DiskOptions disk);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/WriteBlock", ReplyAction="http://tempuri.org/IDiskService/WriteBlockResponse")]
         VFSBase.DiskServiceReference.DiskOptions WriteBlock(string diskUuid, long blockNr, byte[] content);
         
@@ -367,6 +373,14 @@ namespace VFSBase.DiskServiceReference {
         
         public System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptions> GetDiskOptionsAsync(VFSBase.DiskServiceReference.Disk disk) {
             return base.Channel.GetDiskOptionsAsync(disk);
+        }
+        
+        public void SetDiskOptions(VFSBase.DiskServiceReference.DiskOptions disk) {
+            base.Channel.SetDiskOptions(disk);
+        }
+        
+        public System.Threading.Tasks.Task SetDiskOptionsAsync(VFSBase.DiskServiceReference.DiskOptions disk) {
+            return base.Channel.SetDiskOptionsAsync(disk);
         }
         
         public VFSBase.DiskServiceReference.DiskOptions WriteBlock(string diskUuid, long blockNr, byte[] content) {
