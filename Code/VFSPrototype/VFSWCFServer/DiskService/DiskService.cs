@@ -54,6 +54,11 @@ namespace VFSWCFService.DiskService
             throw new NotImplementedException();
         }
 
+        public void SetDiskOptions(DiskOptions disk)
+        {
+            throw new NotImplementedException();
+        }
+
         public DiskOptions WriteBlock(string diskUuid, long blockNr, byte[] content)
         {
             throw new NotImplementedException();
