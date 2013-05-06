@@ -36,11 +36,5 @@ namespace VFSBase.Persistence.Blocks
             IFormatter formatter = new BinaryFormatter();
             return formatter.Deserialize(stream) as BlockAllocation;
         }
-
-        public void Serialize(Stream stream)
-        {
-            IFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, this);
-        }
     }
 }

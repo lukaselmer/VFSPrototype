@@ -96,12 +96,6 @@ namespace VFSBase.Implementation
             return fileSystemOptions;
         }
 
-        public void Serialize(Stream stream)
-        {
-            IFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, this);
-        }
-
         public int BlockSize
         {
             get

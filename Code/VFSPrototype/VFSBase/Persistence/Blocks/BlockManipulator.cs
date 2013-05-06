@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using VFSBase.Persistence.Blocks;
 
 namespace VFSBase.Implementation
@@ -77,11 +79,12 @@ namespace VFSBase.Implementation
             }
         }
 
-        public void SaveConfig(FileSystemOptions options, BlockAllocation blockAllocation)
+        public void SaveConfig(object options)
         {
             _disk.Seek(0, SeekOrigin.Begin);
-            options.Serialize(_disk);
-            blockAllocation.Serialize(_disk);
+
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(_disk, options);
         }
     }
 }

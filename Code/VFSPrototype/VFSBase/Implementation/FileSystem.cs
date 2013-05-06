@@ -631,7 +631,7 @@ namespace VFSBase.Implementation
 
         private void WriteConfig()
         {
-            _blockManipulator.SaveConfig(_options, _blockAllocation);
+            _blockManipulator.SaveConfig(_options);
         }
 
         #endregion
