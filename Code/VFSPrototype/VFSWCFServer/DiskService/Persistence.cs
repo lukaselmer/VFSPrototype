@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Web.Hosting;
-using VFSWCFService.UserService;
+using SQLite;
 
 namespace VFSWCFService.DiskService
 {
@@ -14,58 +14,33 @@ namespace VFSWCFService.DiskService
     /// </summary>
     public class Persistence
     {
-        private Dictionary<string, User> _userStorage = new Dictionary<string, User>();
-        private Dictionary<string, Dictionary<string, Disk>> _diskStorage = new Dictionary<string, Dictionary<string, Disk>>();
+        private Dictionary<string, UserDto> _userStorage = new Dictionary<string, UserDto>();
+        private Dictionary<string, Dictionary<string, DiskDto>> _diskStorage = new Dictionary<string, Dictionary<string, DiskDto>>();
         private Dictionary<string, DiskOptions> _diskOptions = new Dictionary<string, DiskOptions>();
 
         private readonly string _pathToDataStore;
-        private readonly string _pathToSerializedFile;
+        private readonly string _pathToDbFile;
+
+        private SQLiteConnection _db;
 
         public Persistence()
         {
-            return;
             var p = HostingEnvironment.ApplicationPhysicalPath ?? "../../Testfiles";
             _pathToDataStore = Path.Combine(p, "App_Data");
-            _pathToSerializedFile = string.Format("{0}/data.serialized", _pathToDataStore);
+            _pathToDbFile = string.Format("{0}/data.sqlite", _pathToDataStore);
+
 
             if (!Directory.Exists(_pathToDataStore)) Directory.CreateDirectory(_pathToDataStore);
 
-            if (File.Exists(_pathToSerializedFile)) Import();
+            _db = new SQLiteConnection(_pathToDbFile);
+            if (_db.TableMappings.Count() != 3) CreateTables();
         }
 
-        private void Import()
+        private void CreateTables()
         {
-            return;
-            if (!File.Exists(_pathToSerializedFile)) return;
-
-            IFormatter formatter = new BinaryFormatter();
-            using (var stream = File.OpenRead(_pathToSerializedFile))
-            {
-                try
-                {
-                    _userStorage = formatter.Deserialize(stream) as Dictionary<string, User>;
-                    _diskStorage = formatter.Deserialize(stream) as Dictionary<string, Dictionary<string, Disk>>;
-                    _diskOptions = formatter.Deserialize(stream) as Dictionary<string, DiskOptions>;
-                }
-                catch (SerializationException)
-                {
-                    
-                }
-            }
-        }
-
-        private void Persist()
-        {
-            return;
-            if (File.Exists(_pathToSerializedFile)) File.Delete(_pathToSerializedFile);
-
-            IFormatter formatter = new BinaryFormatter();
-            using (var stream = File.OpenWrite(_pathToSerializedFile))
-            {
-                formatter.Serialize(stream, _userStorage);
-                formatter.Serialize(stream, _diskStorage);
-                formatter.Serialize(stream, _diskOptions);
-            }
+            _db.CreateTable<UserDto>();
+            _db.CreateTable<DiskDto>();
+            _db.CreateTable<DiskOptions>();
         }
 
         /// <summary>
@@ -75,7 +50,7 @@ namespace VFSWCFService.DiskService
         /// <returns></returns>
         public bool UserExists(string login)
         {
-            return _userStorage.ContainsKey(login);
+            return FindUser(login) != null;
         }
 
         /// <summary>
@@ -84,11 +59,10 @@ namespace VFSWCFService.DiskService
         /// <param name="login">The login.</param>
         /// <param name="hashedPassword">The hashed password.</param>
         /// <returns></returns>
-        public User CreateUser(string login, string hashedPassword)
+        public UserDto CreateUser(string login, string hashedPassword)
         {
-            var u = new User { Login = login, HashedPassword = hashedPassword };
-            _userStorage[login] = u;
-            Persist();
+            var u = new UserDto { Login = login, HashedPassword = hashedPassword };
+            _db.Insert(u);
             return u;
         }
 
@@ -97,53 +71,58 @@ namespace VFSWCFService.DiskService
         /// </summary>
         /// <param name="login">The login.</param>
         /// <returns></returns>
-        internal User FindUser(string login)
+        internal UserDto FindUser(string login)
         {
-            return _userStorage[login];
+            return _db.Find<UserDto>(u => u.Login == login);
         }
 
-        public IList<Disk> Disks(User user)
+        public IList<DiskDto> Disks(string userLogin)
         {
-            return _diskStorage.ContainsKey(user.Login) ? _diskStorage[user.Login].Values.ToList() : null;
+            return _db.Table<DiskDto>().Where(d => d.UserLogin == userLogin).ToList();
         }
 
-        public void CreateDisk(User user, Disk disk)
+        public void CreateDisk(UserDto userDto, DiskDto diskDto)
         {
-            if (!_diskStorage.ContainsKey(user.Login)) _diskStorage[user.Login] = new Dictionary<string, Disk>();
-            if (_diskStorage[user.Login].ContainsKey(disk.Uuid)) throw new Exception("duplicate uuid");
-            _diskStorage[user.Login][disk.Uuid] = disk;
-            Persist();
+            if (FindUser(userDto.Login) == null) return;
+            if (FindDisk(diskDto) != null) throw new Exception("duplicate uuid"); ;
+            _db.Insert(diskDto);
         }
 
-        public void UpdateDisk(Disk disk)
+        public void UpdateDisk(DiskDto diskDto)
         {
-            _diskStorage[disk.User.Login][disk.Uuid] = disk;
-            Persist();
+            _db.Update(diskDto);
         }
 
-        public bool RemoveDisk(Disk disk)
+        public bool RemoveDisk(DiskDto diskDto)
         {
-            if (!_diskStorage[disk.User.Login].ContainsKey(disk.Uuid)) return false;
+            if (FindDisk(diskDto) == null) return false;
 
-            _diskStorage[disk.User.Login].Remove(disk.Uuid);
-            Persist();
+            _db.Delete<DiskDto>(diskDto.Uuid);
             return true;
         }
 
-        public Disk FindDisk(Disk remoteDisk)
+        public DiskDto FindDisk(DiskDto remoteDiskDto)
         {
-            return _diskStorage[remoteDisk.User.Login][remoteDisk.Uuid];
+            return _db.Find<DiskDto>(d => d.Uuid == remoteDiskDto.Uuid);
         }
 
         public DiskOptions LoadDiskOptions(string uuid)
         {
-            return _diskOptions[uuid];
+            return _db.Find<DiskOptions>(uuid);
         }
 
         public void SaveDiskOptions(string uuid, DiskOptions options)
         {
-            _diskOptions[uuid] = options;
-            Persist();
+            options.DiskUuid = uuid;
+            _db.Insert(options);
+        }
+
+        public void Clear()
+        {
+            _db.DropTable<DiskDto>();
+            _db.DropTable<UserDto>();
+            _db.DropTable<DiskOptions>();
+            CreateTables();
         }
     }
 }
