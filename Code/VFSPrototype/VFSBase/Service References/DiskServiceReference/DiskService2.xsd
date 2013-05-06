@@ -16,6 +16,14 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Disk" nillable="true" type="tns:Disk" />
+  <xs:complexType name="DiskOptions">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="BlockSize" type="xs:int" />
+      <xs:element minOccurs="0" name="MasterBlockSize" type="xs:int" />
+      <xs:element minOccurs="0" name="SerializedFileSystemOptions" nillable="true" type="xs:base64Binary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiskOptions" nillable="true" type="tns:DiskOptions" />
   <xs:simpleType name="SynchronizationState">
     <xs:restriction base="xs:string">
       <xs:enumeration value="RemoteChanges" />

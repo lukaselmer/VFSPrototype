@@ -12,10 +12,10 @@ namespace VFSBlockAbstraction
         private BinaryWriter _diskWriter;
 
         private readonly int _blockSize;
-        private readonly uint _masterBlockSize;
+        private readonly int _masterBlockSize;
         private readonly string _location;
 
-        public BlockManipulator(string location, int blockSize, uint masterBlockSize)
+        public BlockManipulator(string location, int blockSize, int masterBlockSize)
         {
             _location = location;
             _blockSize = blockSize;

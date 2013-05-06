@@ -32,6 +32,18 @@
   <wsdl:message name="IDiskService_FetchSynchronizationState_OutputMessage">
     <wsdl:part name="parameters" element="tns:FetchSynchronizationStateResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_GetDiskOptions_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDiskOptions" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_GetDiskOptions_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDiskOptionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_WriteBlock_InputMessage">
+    <wsdl:part name="parameters" element="tns:WriteBlock" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_WriteBlock_OutputMessage">
+    <wsdl:part name="parameters" element="tns:WriteBlockResponse" />
+  </wsdl:message>
   <wsdl:portType name="IDiskService">
     <wsdl:operation name="Disks">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/Disks" message="tns:IDiskService_Disks_InputMessage" />
@@ -48,6 +60,14 @@
     <wsdl:operation name="FetchSynchronizationState">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/FetchSynchronizationState" message="tns:IDiskService_FetchSynchronizationState_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/FetchSynchronizationStateResponse" message="tns:IDiskService_FetchSynchronizationState_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetDiskOptions">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/GetDiskOptions" message="tns:IDiskService_GetDiskOptions_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/GetDiskOptionsResponse" message="tns:IDiskService_GetDiskOptions_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="WriteBlock">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/WriteBlock" message="tns:IDiskService_WriteBlock_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/WriteBlockResponse" message="tns:IDiskService_WriteBlock_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="BasicHttpBinding_IDiskService" type="tns:IDiskService">
@@ -81,6 +101,24 @@
     </wsdl:operation>
     <wsdl:operation name="FetchSynchronizationState">
       <soap:operation soapAction="http://tempuri.org/IDiskService/FetchSynchronizationState" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDiskOptions">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/GetDiskOptions" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="WriteBlock">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/WriteBlock" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

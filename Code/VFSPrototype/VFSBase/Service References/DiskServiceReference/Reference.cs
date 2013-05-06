@@ -167,6 +167,83 @@ namespace VFSBase.DiskServiceReference {
         }
     }
     
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="DiskOptions", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService")]
+    [System.SerializableAttribute()]
+    public partial class DiskOptions : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int BlockSizeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private int MasterBlockSizeField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private byte[] SerializedFileSystemOptionsField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int BlockSize {
+            get {
+                return this.BlockSizeField;
+            }
+            set {
+                if ((this.BlockSizeField.Equals(value) != true)) {
+                    this.BlockSizeField = value;
+                    this.RaisePropertyChanged("BlockSize");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int MasterBlockSize {
+            get {
+                return this.MasterBlockSizeField;
+            }
+            set {
+                if ((this.MasterBlockSizeField.Equals(value) != true)) {
+                    this.MasterBlockSizeField = value;
+                    this.RaisePropertyChanged("MasterBlockSize");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte[] SerializedFileSystemOptions {
+            get {
+                return this.SerializedFileSystemOptionsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.SerializedFileSystemOptionsField, value) != true)) {
+                    this.SerializedFileSystemOptionsField = value;
+                    this.RaisePropertyChanged("SerializedFileSystemOptions");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="SynchronizationState", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService")]
     public enum SynchronizationState : int {
@@ -195,10 +272,10 @@ namespace VFSBase.DiskServiceReference {
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.Disk[]> DisksAsync(VFSBase.DiskServiceReference.User user);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/CreateDisk", ReplyAction="http://tempuri.org/IDiskService/CreateDiskResponse")]
-        VFSBase.DiskServiceReference.Disk CreateDisk(VFSBase.DiskServiceReference.User user);
+        VFSBase.DiskServiceReference.Disk CreateDisk(VFSBase.DiskServiceReference.User user, VFSBase.DiskServiceReference.DiskOptions options);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/CreateDisk", ReplyAction="http://tempuri.org/IDiskService/CreateDiskResponse")]
-        System.Threading.Tasks.Task<VFSBase.DiskServiceReference.Disk> CreateDiskAsync(VFSBase.DiskServiceReference.User user);
+        System.Threading.Tasks.Task<VFSBase.DiskServiceReference.Disk> CreateDiskAsync(VFSBase.DiskServiceReference.User user, VFSBase.DiskServiceReference.DiskOptions options);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/DeleteDisk", ReplyAction="http://tempuri.org/IDiskService/DeleteDiskResponse")]
         bool DeleteDisk(VFSBase.DiskServiceReference.Disk disk);
@@ -211,6 +288,18 @@ namespace VFSBase.DiskServiceReference {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/FetchSynchronizationState", ReplyAction="http://tempuri.org/IDiskService/FetchSynchronizationStateResponse")]
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.SynchronizationState> FetchSynchronizationStateAsync(VFSBase.DiskServiceReference.Disk disk);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/GetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/GetDiskOptionsResponse")]
+        VFSBase.DiskServiceReference.DiskOptions GetDiskOptions(VFSBase.DiskServiceReference.Disk disk);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/GetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/GetDiskOptionsResponse")]
+        System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptions> GetDiskOptionsAsync(VFSBase.DiskServiceReference.Disk disk);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/WriteBlock", ReplyAction="http://tempuri.org/IDiskService/WriteBlockResponse")]
+        VFSBase.DiskServiceReference.DiskOptions WriteBlock(string diskUuid, long blockNr, byte[] content);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/WriteBlock", ReplyAction="http://tempuri.org/IDiskService/WriteBlockResponse")]
+        System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptions> WriteBlockAsync(string diskUuid, long blockNr, byte[] content);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -248,12 +337,12 @@ namespace VFSBase.DiskServiceReference {
             return base.Channel.DisksAsync(user);
         }
         
-        public VFSBase.DiskServiceReference.Disk CreateDisk(VFSBase.DiskServiceReference.User user) {
-            return base.Channel.CreateDisk(user);
+        public VFSBase.DiskServiceReference.Disk CreateDisk(VFSBase.DiskServiceReference.User user, VFSBase.DiskServiceReference.DiskOptions options) {
+            return base.Channel.CreateDisk(user, options);
         }
         
-        public System.Threading.Tasks.Task<VFSBase.DiskServiceReference.Disk> CreateDiskAsync(VFSBase.DiskServiceReference.User user) {
-            return base.Channel.CreateDiskAsync(user);
+        public System.Threading.Tasks.Task<VFSBase.DiskServiceReference.Disk> CreateDiskAsync(VFSBase.DiskServiceReference.User user, VFSBase.DiskServiceReference.DiskOptions options) {
+            return base.Channel.CreateDiskAsync(user, options);
         }
         
         public bool DeleteDisk(VFSBase.DiskServiceReference.Disk disk) {
@@ -270,6 +359,22 @@ namespace VFSBase.DiskServiceReference {
         
         public System.Threading.Tasks.Task<VFSBase.DiskServiceReference.SynchronizationState> FetchSynchronizationStateAsync(VFSBase.DiskServiceReference.Disk disk) {
             return base.Channel.FetchSynchronizationStateAsync(disk);
+        }
+        
+        public VFSBase.DiskServiceReference.DiskOptions GetDiskOptions(VFSBase.DiskServiceReference.Disk disk) {
+            return base.Channel.GetDiskOptions(disk);
+        }
+        
+        public System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptions> GetDiskOptionsAsync(VFSBase.DiskServiceReference.Disk disk) {
+            return base.Channel.GetDiskOptionsAsync(disk);
+        }
+        
+        public VFSBase.DiskServiceReference.DiskOptions WriteBlock(string diskUuid, long blockNr, byte[] content) {
+            return base.Channel.WriteBlock(diskUuid, blockNr, content);
+        }
+        
+        public System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptions> WriteBlockAsync(string diskUuid, long blockNr, byte[] content) {
+            return base.Channel.WriteBlockAsync(diskUuid, blockNr, content);
         }
     }
 }

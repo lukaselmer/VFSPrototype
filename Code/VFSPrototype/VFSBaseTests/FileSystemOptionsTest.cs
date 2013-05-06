@@ -18,7 +18,7 @@ namespace VFSBaseTests
             using (var m = new MemoryStream())
             {
                 const long size = 1001L;
-                const uint masterBlockSize = 30000U;
+                const int masterBlockSize = 30000;
 
                 var o1 = TestHelper.CreateFileSystemOptions("", 0);
                 o1.DiskSize = size;
@@ -41,7 +41,7 @@ namespace VFSBaseTests
             using (var m = new MemoryStream())
             {
                 const long size = 1001L;
-                const uint masterBlockSize = 30000U;
+                const int masterBlockSize = 30000;
 
                 var o1 = TestHelper.CreateFileSystemOptions("", 0);
                 o1.DiskSize = size;
@@ -69,7 +69,7 @@ namespace VFSBaseTests
         public void TestMaximumFileSize()
         {
             const long size = 1001L;
-            const uint masterBlockSize = 30000U;
+            const int masterBlockSize = 30000;
             var o = TestHelper.CreateFileSystemOptions("", 0);
             o.DiskSize = size;
             o.MasterBlockSize = masterBlockSize;

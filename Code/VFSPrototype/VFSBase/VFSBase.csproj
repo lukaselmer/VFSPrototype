@@ -143,6 +143,9 @@
     <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.Disk.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.DiskOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.SynchronizationState.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>

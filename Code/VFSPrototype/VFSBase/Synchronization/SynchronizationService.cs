@@ -111,7 +111,8 @@ namespace VFSBase.Synchronization
 
         private void CreateDisk()
         {
-            var serverDisk = _diskService.CreateDisk(_user);
+            var o = _fileSystem.FileSystemOptions;
+            var serverDisk = _diskService.CreateDisk(_user, new DiskOptions{BlockSize = o.BlockSize, MasterBlockSize = o.MasterBlockSize});
             _fileSystem.MakeSynchronizedDisk(serverDisk.Uuid);
             LoadDisk();
         }
