@@ -10,6 +10,7 @@ using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
 using VFSBase.Search;
+using VFSBlockAbstraction;
 
 namespace VFSBase.Implementation
 {
@@ -47,7 +48,7 @@ namespace VFSBase.Implementation
         {
             _options = options;
 
-            _blockManipulator = new BlockManipulator(_options);
+            _blockManipulator = new BlockManipulator(_options.Location, _options.BlockSize, _options.MasterBlockSize);
             _blockParser = new BlockParser(_options);
             _persistence = new Persistence.Persistence(_blockParser, _blockManipulator);
             _blockAllocation = _options.BlockAllocation;

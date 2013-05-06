@@ -94,6 +94,10 @@
       <Project>{2996B9E0-F50A-468D-8282-F62435108C4F}</Project>
       <Name>VFSBase</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VFSBlockAbstraction\VFSBlockAbstraction.csproj">
+      <Project>{8937804B-8BD8-4058-85A2-A22FD767E0E7}</Project>
+      <Name>VFSBlockAbstraction</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
