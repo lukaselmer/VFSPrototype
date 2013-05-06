@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
+using VFSBase.Persistence.Coding.General;
 using VFSBrowser.View;
 
 namespace VFSBrowser.ViewModel

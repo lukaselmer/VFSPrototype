@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Helpers
 {
     internal static class PathParser
     {
@@ -20,7 +20,7 @@ namespace VFSBase.Implementation
             var doublePathSeperator = string.Format("{0}{0}", PathSeperatorString);
 
             // Remove forbidden substrings
-            foreach (var forbiddenSubstring in ForbiddenSubstrings) path = path.Replace(forbiddenSubstring, "");
+            path = ForbiddenSubstrings.Aggregate(path, (current, forbiddenSubstring) => current.Replace(forbiddenSubstring, ""));
 
             // Trims all directory names and file names
             var l = path.Split(new[] { PathSeperator }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim());

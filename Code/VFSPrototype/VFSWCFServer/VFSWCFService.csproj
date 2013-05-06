@@ -74,6 +74,7 @@
     </Compile>
     <Compile Include="DiskService\IDiskService.cs" />
     <Compile Include="Common\Persistence.cs" />
+    <Compile Include="DiskService\SynchronizationState.cs" />
     <Compile Include="UserService\User.cs" />
     <Compile Include="UserService\UserService.cs" />
     <Compile Include="UserService.svc.cs">

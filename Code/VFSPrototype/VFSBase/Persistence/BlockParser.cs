@@ -44,13 +44,15 @@ namespace VFSBase.Persistence
             var startIndirectNodeNumber = startBlocksCount + sizeof (long);
             var startVersion = startIndirectNodeNumber + sizeof(long);
             var startPredecessorBlockNr = startVersion + sizeof(long);
+            var startBlocksUsed = startPredecessorBlockNr + sizeof(long);
 
             return new Folder(name)
                        {
                            BlocksCount = BitConverter.ToInt64(bb, startBlocksCount),
                            IndirectNodeNumber = BitConverter.ToInt64(bb, startIndirectNodeNumber),
                            Version = BitConverter.ToInt64(bb, startVersion),
-                           PredecessorBlockNr = BitConverter.ToInt64(bb, startPredecessorBlockNr)
+                           PredecessorBlockNr = BitConverter.ToInt64(bb, startPredecessorBlockNr),
+                           BlocksUsed = BitConverter.ToInt64(bb, startBlocksUsed)
                        };
         }
 
@@ -135,6 +137,9 @@ namespace VFSBase.Persistence
 
             var file = node as VFSFile;
             if (file != null) BitConverter.GetBytes(file.LastBlockSize).CopyTo(bb, offset);
+
+            var folder = node as Folder;
+            if (folder != null) BitConverter.GetBytes(folder.BlocksUsed).CopyTo(bb, offset);
 
             return bb;
         }

@@ -15,5 +15,8 @@ namespace VFSWCFService.DiskService
 
         [OperationContract]
         bool DeleteDisk(Disk disk);
+
+        [OperationContract]
+        SynchronizationState FetchSynchronizationState(Disk disk);
     }
 }

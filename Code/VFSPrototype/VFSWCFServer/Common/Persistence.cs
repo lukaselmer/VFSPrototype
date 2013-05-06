@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using VFSWCFService.DiskService;
 using VFSWCFService.UserService;
 
@@ -10,7 +12,7 @@ namespace VFSWCFService.Common
     public class Persistence
     {
         private readonly Dictionary<string, User> _userStorage;
-        private readonly Dictionary<string, IList<Disk>> _diskStorage;
+        private readonly Dictionary<string, Dictionary<string, Disk>> _diskStorage;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Persistence"/> class.
@@ -18,7 +20,7 @@ namespace VFSWCFService.Common
         public Persistence()
         {
             _userStorage = new Dictionary<string, User>();
-            _diskStorage = new Dictionary<string, IList<Disk>>();
+            _diskStorage = new Dictionary<string, Dictionary<string, Disk>>();
         }
 
         /// <summary>
@@ -56,13 +58,32 @@ namespace VFSWCFService.Common
 
         public IList<Disk> Disks(User user)
         {
-            return _diskStorage.ContainsKey(user.Login) ? _diskStorage[user.Login] : null;
+            return _diskStorage.ContainsKey(user.Login) ? _diskStorage[user.Login].Values.ToList() : null;
         }
 
         public void CreateDisk(User user, Disk disk)
         {
-            if (!_diskStorage.ContainsKey(user.Login)) _diskStorage[user.Login] = new List<Disk>();
-            _diskStorage[user.Login].Add(disk);
+            if (!_diskStorage.ContainsKey(user.Login)) _diskStorage[user.Login] = new Dictionary<string, Disk>();
+            if (_diskStorage[user.Login].ContainsKey(disk.Uuid)) throw new Exception("duplicate uuid");
+            _diskStorage[user.Login][disk.Uuid] = disk;
+        }
+
+        public void UpdateDisk(Disk disk)
+        {
+            _diskStorage[disk.User.Login][disk.Uuid] = disk;
+        }
+
+        public bool RemoveDisk(Disk disk)
+        {
+            if (!_diskStorage[disk.User.Login].ContainsKey(disk.Uuid)) return false;
+
+            _diskStorage[disk.User.Login].Remove(disk.Uuid);
+            return true;
+        }
+
+        public Disk FindDisk(Disk remoteDisk)
+        {
+            return _diskStorage[remoteDisk.User.Login][remoteDisk.Uuid];
         }
     }
 }

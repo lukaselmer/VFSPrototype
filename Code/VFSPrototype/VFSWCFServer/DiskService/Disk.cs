@@ -11,5 +11,11 @@ namespace VFSWCFService.DiskService
 
         [DataMember]
         public User User { get; set; }
+
+        [DataMember]
+        public long LastServerVersion { get; set; }
+
+        [DataMember]
+        public long LocalVersion { get; set; }
     }
 }
