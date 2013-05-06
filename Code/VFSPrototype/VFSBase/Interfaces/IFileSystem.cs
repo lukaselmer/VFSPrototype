@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Search;
@@ -43,7 +45,7 @@ namespace VFSBase.Interfaces
         /// <param name="searchOptions">The search options</param>
         /// <returns>All IIndexNodes which matches the ciriteria in the search options</returns>
         IEnumerable<IIndexNode> Search(SearchOptions searchOptions);
-            
+
         /// <summary>
         /// Finds the element with a specified name in the specified folder.
         /// </summary>
@@ -143,5 +145,24 @@ namespace VFSBase.Interfaces
         /// <param name="fromVersion">From version.</param>
         /// <param name="offset">The offset.</param>
         void ShiftBlocks(long fromVersion, long offset);
+
+        /// <summary>
+        /// Returns the mutex for the file system. This allows to lock the file system and thus allow parallel usage of the file system.
+        /// </summary>
+        ReaderWriterLockSlim GetReadWriteLock();
+
+        /// <summary>
+        /// Gets a value indicating whether this instance is a synchronized disk - i.e. is coupled to the synchronization server.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance is synchronized disk; otherwise, <c>false</c>.
+        /// </value>
+        bool IsSynchronizedDisk { get; }
+
+        /// <summary>
+        /// Makes the disk a synchronized disk and sets the uuid for the disk.
+        /// </summary>
+        /// <param name="uuid">The UUID.</param>
+        void MakeSynchronizedDisk(string uuid);
     }
 }
