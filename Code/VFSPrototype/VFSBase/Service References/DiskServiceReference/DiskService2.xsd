@@ -11,6 +11,7 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="LastServerVersion" type="xs:long" />
       <xs:element minOccurs="0" name="LocalVersion" type="xs:long" />
+      <xs:element minOccurs="0" name="NewestBlock" type="xs:long" />
       <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="User" nillable="true" type="q1:User" />
       <xs:element minOccurs="0" name="Uuid" nillable="true" type="xs:string" />
     </xs:sequence>

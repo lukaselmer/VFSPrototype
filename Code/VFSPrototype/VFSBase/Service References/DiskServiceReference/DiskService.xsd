@@ -96,8 +96,21 @@
   </xs:element>
   <xs:element name="WriteBlockResponse">
     <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReadBlock">
+    <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="WriteBlockResult" nillable="true" type="q12:DiskOptions" />
+        <xs:element minOccurs="0" name="diskUuid" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="blockNr" type="xs:long" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReadBlockResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ReadBlockResult" nillable="true" type="xs:base64Binary" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
