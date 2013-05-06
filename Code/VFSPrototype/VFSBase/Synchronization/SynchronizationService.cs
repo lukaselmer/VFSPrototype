@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -112,7 +114,18 @@ namespace VFSBase.Synchronization
         private void CreateDisk()
         {
             var o = _fileSystem.FileSystemOptions;
-            var serverDisk = _diskService.CreateDisk(_user, new DiskOptions{BlockSize = o.BlockSize, MasterBlockSize = o.MasterBlockSize});
+
+            byte[] serializedOptions;
+            using (var ms = new MemoryStream())
+            {
+                var bf = new BinaryFormatter();
+                bf.Serialize(ms, o);
+                serializedOptions = ms.ToArray();
+            }
+
+            var diskOptions = new DiskOptions { BlockSize = o.BlockSize, MasterBlockSize = o.MasterBlockSize, SerializedFileSystemOptions = serializedOptions };
+            var serverDisk = _diskService.CreateDisk(_user, diskOptions);
+
             _fileSystem.MakeSynchronizedDisk(serverDisk.Uuid);
             LoadDisk();
         }
