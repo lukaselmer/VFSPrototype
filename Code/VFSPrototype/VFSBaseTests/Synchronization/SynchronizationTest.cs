@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.DiskServiceReference;
 using VFSBase.Interfaces;
 using VFSBase.Synchronization;
 using VFSBaseTests.Helpers;
@@ -35,7 +36,7 @@ namespace VFSBaseTests.Synchronization
 
             using (var f = _testHelper.GetFileSystem())
             {
-                var s = new SynchronizationService(f);
+                //var s = new SynchronizationService(f, new User(), new SynchronizationCallbacks(state => { }));
 
 
 
