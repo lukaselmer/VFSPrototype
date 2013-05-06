@@ -14,27 +14,24 @@ namespace VFSWCFService.DiskService
     /// </summary>
     public class Persistence
     {
-        private Dictionary<string, UserDto> _userStorage = new Dictionary<string, UserDto>();
-        private Dictionary<string, Dictionary<string, DiskDto>> _diskStorage = new Dictionary<string, Dictionary<string, DiskDto>>();
-        private Dictionary<string, DiskOptions> _diskOptions = new Dictionary<string, DiskOptions>();
-
-        private readonly string _pathToDataStore;
         private readonly string _pathToDbFile;
+        public string PathToDataStore { get; private set; }
 
-        private SQLiteConnection _db;
+        private readonly SQLiteConnection _db;
 
         public Persistence()
         {
             var p = HostingEnvironment.ApplicationPhysicalPath ?? "../../Testfiles";
-            _pathToDataStore = Path.Combine(p, "App_Data");
-            _pathToDbFile = string.Format("{0}/data.sqlite", _pathToDataStore);
+            PathToDataStore = Path.Combine(p, "App_Data");
+            _pathToDbFile = string.Format("{0}/data.sqlite", PathToDataStore);
 
 
-            if (!Directory.Exists(_pathToDataStore)) Directory.CreateDirectory(_pathToDataStore);
+            if (!Directory.Exists(PathToDataStore)) Directory.CreateDirectory(PathToDataStore);
 
             _db = new SQLiteConnection(_pathToDbFile);
             if (_db.TableMappings.Count() != 3) CreateTables();
         }
+
 
         private void CreateTables()
         {

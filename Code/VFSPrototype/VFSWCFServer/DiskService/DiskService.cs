@@ -72,10 +72,11 @@ namespace VFSWCFService.DiskService
             return b;
         }
 
-        private static string DiskLocation(string diskUuid)
+        private string DiskLocation(string diskUuid)
         {
-            if (!Directory.Exists("./Disks")) Directory.CreateDirectory("./Disks");
-            return string.Format("./Disks/{0}.vhs", diskUuid);
+            var location = Path.Combine(Persistence.PathToDataStore, "Disks");
+            if (!Directory.Exists(location)) Directory.CreateDirectory(location);
+            return Path.Combine(location, string.Format("{0}.vhs", diskUuid));
         }
 
         public byte[] ReadBlock(string diskUuid, long blockNr)
