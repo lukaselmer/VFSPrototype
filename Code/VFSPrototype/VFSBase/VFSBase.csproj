@@ -112,6 +112,7 @@
     <Compile Include="Search\IndexService.cs" />
     <Compile Include="Search\SearchOptions.cs" />
     <Compile Include="Search\SuffixTreeNode.cs" />
+    <Compile Include="Synchronization\SynchronizationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
