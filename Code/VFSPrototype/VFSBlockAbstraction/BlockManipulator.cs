@@ -84,6 +84,12 @@ namespace VFSBlockAbstraction
             }
         }
 
+        public void SaveConfig(byte[] options)
+        {
+            _disk.Seek(0, SeekOrigin.Begin);
+            _disk.Write(options, 0, options.Length);
+        }
+
         public void SaveConfig(object options)
         {
             _disk.Seek(0, SeekOrigin.Begin);

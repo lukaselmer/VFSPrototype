@@ -178,5 +178,11 @@ namespace VFSBase.Interfaces
         /// <param name="blockNumber">The block number.</param>
         /// <param name="block">The block.</param>
         void WriteBlock(long blockNumber, byte[] block);
+
+        /// <summary>
+        /// Writes the file system options to the disk.
+        /// </summary>
+        /// <param name="serializedFileSystemOptions">The serialized file system options.</param>
+        void WriteFileSystemOptions(byte[] serializedFileSystemOptions);
     }
 }

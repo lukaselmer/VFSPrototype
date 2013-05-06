@@ -50,6 +50,12 @@
   <wsdl:message name="IDiskService_WriteBlock_OutputMessage">
     <wsdl:part name="parameters" element="tns:WriteBlockResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_ReadBlock_InputMessage">
+    <wsdl:part name="parameters" element="tns:ReadBlock" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_ReadBlock_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ReadBlockResponse" />
+  </wsdl:message>
   <wsdl:portType name="IDiskService">
     <wsdl:operation name="Disks">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/Disks" message="tns:IDiskService_Disks_InputMessage" />
@@ -78,6 +84,10 @@
     <wsdl:operation name="WriteBlock">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/WriteBlock" message="tns:IDiskService_WriteBlock_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/WriteBlockResponse" message="tns:IDiskService_WriteBlock_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ReadBlock">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/ReadBlock" message="tns:IDiskService_ReadBlock_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/ReadBlockResponse" message="tns:IDiskService_ReadBlock_OutputMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="BasicHttpBinding_IDiskService" type="tns:IDiskService">
@@ -138,6 +148,15 @@
     </wsdl:operation>
     <wsdl:operation name="WriteBlock">
       <soap:operation soapAction="http://tempuri.org/IDiskService/WriteBlock" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReadBlock">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/ReadBlock" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

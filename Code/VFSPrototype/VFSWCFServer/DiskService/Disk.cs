@@ -18,5 +18,8 @@ namespace VFSWCFService.DiskService
 
         [DataMember]
         public long LocalVersion { get; set; }
+
+        [DataMember]
+        public long NewestBlock { get; set; }
     }
 }

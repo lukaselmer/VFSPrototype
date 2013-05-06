@@ -88,17 +88,17 @@ namespace VFSBase.Synchronization
         {
             var remoteDisk = RemoteDisk();
 
+            var untilBlockNr = remoteDisk.LastServerVersion;
+            var localBlockNr = _fileSystem.Root.BlocksUsed;
 
-            var fromBlockNr = _fileSystem.Root.BlocksUsed;
-            _fileSystem.SwitchToLatestVersion();
-            var untilBlockNr = _fileSystem.Root.BlocksUsed;
-
-            for (var currentBlockNr = fromBlockNr; currentBlockNr <= untilBlockNr; currentBlockNr++)
+            for (var currentBlockNr = localBlockNr + 1; currentBlockNr <= untilBlockNr; currentBlockNr++)
             {
-                _diskService.WriteBlock(_disk.Uuid, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
+                var data = _diskService.ReadBlock(_disk.Uuid, currentBlockNr);
+                _fileSystem.WriteBlock(currentBlockNr, data);
             }
 
-            _diskService.SetDiskOptions(CalculateDiskOptions(_fileSystem.FileSystemOptions));
+            var options = _diskService.GetDiskOptions(_disk);
+            _fileSystem.WriteFileSystemOptions(options.SerializedFileSystemOptions);
         }
 
         private Disk RemoteDisk()

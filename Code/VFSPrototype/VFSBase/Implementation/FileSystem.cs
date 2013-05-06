@@ -690,6 +690,11 @@ namespace VFSBase.Implementation
             _blockManipulator.WriteBlock(blockNumber, block);
         }
 
+        public void WriteFileSystemOptions(byte[] serializedFileSystemOptions)
+        {
+            _blockManipulator.SaveConfig(serializedFileSystemOptions);
+        }
+
         #endregion
 
     }

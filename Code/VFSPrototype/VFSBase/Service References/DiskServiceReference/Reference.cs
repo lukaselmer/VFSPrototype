@@ -90,6 +90,9 @@ namespace VFSBase.DiskServiceReference {
         private long LocalVersionField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private long NewestBlockField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private VFSBase.DiskServiceReference.User UserField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -127,6 +130,19 @@ namespace VFSBase.DiskServiceReference {
                 if ((this.LocalVersionField.Equals(value) != true)) {
                     this.LocalVersionField = value;
                     this.RaisePropertyChanged("LocalVersion");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public long NewestBlock {
+            get {
+                return this.NewestBlockField;
+            }
+            set {
+                if ((this.NewestBlockField.Equals(value) != true)) {
+                    this.NewestBlockField = value;
+                    this.RaisePropertyChanged("NewestBlock");
                 }
             }
         }
@@ -302,10 +318,16 @@ namespace VFSBase.DiskServiceReference {
         System.Threading.Tasks.Task SetDiskOptionsAsync(VFSBase.DiskServiceReference.DiskOptions disk);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/WriteBlock", ReplyAction="http://tempuri.org/IDiskService/WriteBlockResponse")]
-        VFSBase.DiskServiceReference.DiskOptions WriteBlock(string diskUuid, long blockNr, byte[] content);
+        void WriteBlock(string diskUuid, long blockNr, byte[] content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/WriteBlock", ReplyAction="http://tempuri.org/IDiskService/WriteBlockResponse")]
-        System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptions> WriteBlockAsync(string diskUuid, long blockNr, byte[] content);
+        System.Threading.Tasks.Task WriteBlockAsync(string diskUuid, long blockNr, byte[] content);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/ReadBlock", ReplyAction="http://tempuri.org/IDiskService/ReadBlockResponse")]
+        byte[] ReadBlock(string diskUuid, long blockNr);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/ReadBlock", ReplyAction="http://tempuri.org/IDiskService/ReadBlockResponse")]
+        System.Threading.Tasks.Task<byte[]> ReadBlockAsync(string diskUuid, long blockNr);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -383,12 +405,20 @@ namespace VFSBase.DiskServiceReference {
             return base.Channel.SetDiskOptionsAsync(disk);
         }
         
-        public VFSBase.DiskServiceReference.DiskOptions WriteBlock(string diskUuid, long blockNr, byte[] content) {
-            return base.Channel.WriteBlock(diskUuid, blockNr, content);
+        public void WriteBlock(string diskUuid, long blockNr, byte[] content) {
+            base.Channel.WriteBlock(diskUuid, blockNr, content);
         }
         
-        public System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptions> WriteBlockAsync(string diskUuid, long blockNr, byte[] content) {
+        public System.Threading.Tasks.Task WriteBlockAsync(string diskUuid, long blockNr, byte[] content) {
             return base.Channel.WriteBlockAsync(diskUuid, blockNr, content);
+        }
+        
+        public byte[] ReadBlock(string diskUuid, long blockNr) {
+            return base.Channel.ReadBlock(diskUuid, blockNr);
+        }
+        
+        public System.Threading.Tasks.Task<byte[]> ReadBlockAsync(string diskUuid, long blockNr) {
+            return base.Channel.ReadBlockAsync(diskUuid, blockNr);
         }
     }
 }
