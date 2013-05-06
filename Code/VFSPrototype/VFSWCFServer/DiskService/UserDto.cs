@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using SQLite;
 
-namespace VFSWCFService.UserService
+namespace VFSWCFService.DiskService
 {
     [Serializable]
     [DataContract]
-    public class User
+    public class UserDto
     {
+        [PrimaryKey]
         [DataMember]
         public string Login { get; set; }
 

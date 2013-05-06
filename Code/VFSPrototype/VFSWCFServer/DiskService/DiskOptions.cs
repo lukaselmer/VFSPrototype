@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using SQLite;
 
 namespace VFSWCFService.DiskService
 {
@@ -8,6 +9,10 @@ namespace VFSWCFService.DiskService
     [DataContract]
     public class DiskOptions
     {
+        [PrimaryKey]
+        [DataMember]
+        public string DiskUuid { get; set; }
+
         [DataMember]
         public int BlockSize { get; set; }
 
