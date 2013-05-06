@@ -22,7 +22,7 @@ namespace VFSWCFService.DiskService
             return Persistence.Disks(user);
         }
 
-        public Disk CreateDisk(User user)
+        public Disk CreateDisk(User user, DiskOptions options)
         {
             if (!Persistence.UserExists(user.Login)) return null;
 
@@ -47,6 +47,16 @@ namespace VFSWCFService.DiskService
 
             if (localChanges) return serverChanges ? SynchronizationState.Conflicted : SynchronizationState.LocalChanges;
             return serverChanges ? SynchronizationState.RemoteChanges : SynchronizationState.UpToDate;
+        }
+
+        public DiskOptions GetDiskOptions(Disk disk)
+        {
+            throw new NotImplementedException();
+        }
+
+        public DiskOptions WriteBlock(string diskUuid, long blockNr, byte[] content)
+        {
+            throw new NotImplementedException();
         }
     }
 }

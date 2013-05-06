@@ -26,7 +26,7 @@ namespace VFSWCFServiceTests
         {
             _persistence.CreateUser(_user.Login, _user.HashedPassword);
             var s = new DiskService { Persistence = _persistence };
-            var disk = s.CreateDisk(_user);
+            var disk = s.CreateDisk(_user, null);
             Assert.AreEqual(_user, disk.User);
             Assert.AreEqual(1, _persistence.Disks(_user).Count);
         }
@@ -35,7 +35,7 @@ namespace VFSWCFServiceTests
         public void TestCreateDiskBad()
         {
             var s = new DiskService { Persistence = _persistence };
-            var disk = s.CreateDisk(new User { Login = "xxx", HashedPassword = "yyy" });
+            var disk = s.CreateDisk(new User { Login = "xxx", HashedPassword = "yyy" }, null);
             Assert.IsNull(disk);
         }
 
