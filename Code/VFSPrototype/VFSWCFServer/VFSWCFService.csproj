@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DiskService\Disk.cs" />
+    <Compile Include="DiskService\DiskOptions.cs" />
     <Compile Include="DiskService\DiskService.cs" />
     <Compile Include="DiskService.svc.cs">
       <DependentUpon>DiskService.svc</DependentUpon>
