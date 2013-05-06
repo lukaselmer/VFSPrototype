@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Helpers;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
 using VFSBase.Search;
+using VFSBlockAbstraction;
 
 namespace VFSBase.Implementation
 {
@@ -18,13 +18,13 @@ namespace VFSBase.Implementation
     {
         #region Fields and properties
 
-        private readonly FileSystemOptions _options;
+        private FileSystemOptions _options;
         private bool _disposed;
-        private readonly BlockParser _blockParser;
-        private readonly BlockAllocation _blockAllocation;
+        private BlockParser _blockParser;
+        private BlockAllocation _blockAllocation;
         private BlockManipulator _blockManipulator;
-        private readonly Persistence.Persistence _persistence;
-        private readonly IndexService _indexService;
+        private Persistence.Persistence _persistence;
+        private IndexService _indexService;
         public Folder Root { get; private set; }
         private Folder LatestRoot { get; set; }
 
@@ -48,13 +48,24 @@ namespace VFSBase.Implementation
         {
             _options = options;
 
-            _blockManipulator = new BlockManipulator(_options);
+            _blockManipulator = new BlockManipulator(_options.Location, _options.BlockSize, _options.MasterBlockSize);
             _blockParser = new BlockParser(_options);
             _persistence = new Persistence.Persistence(_blockParser, _blockManipulator);
             _blockAllocation = _options.BlockAllocation;
             _indexService = new IndexService();
 
             InitializeFileSystem();
+        }
+
+        public void Reload(FileSystemOptions options)
+        {
+            _options = options;
+
+            _blockAllocation = _options.BlockAllocation;
+            // TODO: reload indexing service
+            // IndexingService.StartIndexing(_indexService, this);
+
+            Root = LatestRoot = ImportRootFolder();
         }
 
         private void InitializeFileSystem()
@@ -630,9 +641,9 @@ namespace VFSBase.Implementation
             }
         }
 
-        private void WriteConfig()
+        public void WriteConfig()
         {
-            _blockManipulator.SaveConfig(_options, _blockAllocation);
+            _blockManipulator.SaveConfig(_options);
         }
 
         #endregion
@@ -678,6 +689,21 @@ namespace VFSBase.Implementation
             _options.LocalVersion = 0;
             _options.LastServerVersion = 0;
             WriteConfig();
+        }
+
+        public byte[] ReadBlock(long blockNumber)
+        {
+            return _blockManipulator.ReadBlock(blockNumber);
+        }
+
+        public void WriteBlock(long blockNumber, byte[] block)
+        {
+            _blockManipulator.WriteBlock(blockNumber, block);
+        }
+
+        public void WriteFileSystemOptions(byte[] serializedFileSystemOptions)
+        {
+            _blockManipulator.SaveConfig(serializedFileSystemOptions);
         }
 
         #endregion

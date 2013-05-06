@@ -164,5 +164,36 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="uuid">The UUID.</param>
         void MakeSynchronizedDisk(string uuid);
+
+        /// <summary>
+        /// Reads a block.
+        /// </summary>
+        /// <param name="blockNumber">The block number.</param>
+        /// <returns></returns>
+        byte[] ReadBlock(long blockNumber);
+
+        /// <summary>
+        /// Writes a block.
+        /// </summary>
+        /// <param name="blockNumber">The block number.</param>
+        /// <param name="block">The block.</param>
+        void WriteBlock(long blockNumber, byte[] block);
+
+        /// <summary>
+        /// Writes the file system options to the disk.
+        /// </summary>
+        /// <param name="serializedFileSystemOptions">The serialized file system options.</param>
+        void WriteFileSystemOptions(byte[] serializedFileSystemOptions);
+
+        /// <summary>
+        /// Writes the config to the disk.
+        /// </summary>
+        void WriteConfig();
+
+        /// <summary>
+        /// Reloads the file system with the specified options.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        void Reload(FileSystemOptions options);
     }
 }

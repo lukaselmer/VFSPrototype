@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
@@ -15,7 +17,9 @@ namespace VFSBase.Factories
             using (var file = File.Open(options.Location, FileMode.CreateNew, FileAccess.Write))
             {
                 options.InitializePassword(password);
-                options.Serialize(file);
+
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(file, options);
             }
 
             return new FileSystem(options);
@@ -40,7 +44,9 @@ namespace VFSBase.Factories
                 newOptions.Location = location;
 
                 file.Seek(0, SeekOrigin.Begin);
-                newOptions.Serialize(file);
+
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(file, newOptions);
             }
 
             return new FileSystem(newOptions);

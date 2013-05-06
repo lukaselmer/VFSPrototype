@@ -20,6 +20,8 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -63,32 +65,30 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="DiskService.svc" />
-    <Content Include="UserService.svc" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DiskService\Disk.cs" />
+    <Compile Include="DiskService\DiskDto.cs" />
+    <Compile Include="DiskService\DiskOptions.cs" />
     <Compile Include="DiskService\DiskService.cs" />
     <Compile Include="DiskService.svc.cs">
       <DependentUpon>DiskService.svc</DependentUpon>
     </Compile>
     <Compile Include="DiskService\IDiskService.cs" />
-    <Compile Include="Common\Persistence.cs" />
+    <Compile Include="DiskService\Persistence.cs" />
     <Compile Include="DiskService\SynchronizationState.cs" />
-    <Compile Include="UserService\User.cs" />
-    <Compile Include="UserService\UserService.cs" />
-    <Compile Include="UserService.svc.cs">
-      <DependentUpon>UserService.svc</DependentUpon>
-    </Compile>
-    <Compile Include="UserService\IUserService.cs" />
+    <Compile Include="DiskService\UserDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SQLite.cs" />
+    <Compile Include="SQLiteAsync.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -98,6 +98,12 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VFSBlockAbstraction\VFSBlockAbstraction.csproj">
+      <Project>{8937804B-8BD8-4058-85A2-A22FD767E0E7}</Project>
+      <Name>VFSBlockAbstraction</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -110,7 +116,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>8543</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
@@ -124,6 +130,7 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

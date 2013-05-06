@@ -1,6 +1,7 @@
 ﻿using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.Persistence.Blocks;
+using VFSBlockAbstraction;
 
 namespace VFSBase.Persistence
 {

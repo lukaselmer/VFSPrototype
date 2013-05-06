@@ -5,6 +5,7 @@ using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
 using VFSBase.Persistence.Blocks;
+using VFSBlockAbstraction;
 
 namespace VFSBase.Implementation
 {
