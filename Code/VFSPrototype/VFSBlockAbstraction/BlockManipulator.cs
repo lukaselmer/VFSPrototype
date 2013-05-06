@@ -21,7 +21,6 @@ namespace VFSBlockAbstraction
             _blockSize = blockSize;
             _masterBlockSize = masterBlockSize;
 
-
             _disk = new FileStream(_location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, blockSize, FileOptions.RandomAccess);
             _diskReader = new BinaryReader(_disk);
             _diskWriter = new BinaryWriter(_disk);

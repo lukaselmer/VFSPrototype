@@ -78,14 +78,14 @@ namespace VFSWCFService.Common
             return _diskStorage[remoteDisk.User.Login][remoteDisk.Uuid];
         }
 
-        public DiskOptions LoadDiskOptions(Disk disk)
+        public DiskOptions LoadDiskOptions(string uuid)
         {
-            return _diskOptions[disk.Uuid];
+            return _diskOptions[uuid];
         }
 
-        public void SaveDiskOptions(Disk disk, DiskOptions options)
+        public void SaveDiskOptions(string uuid, DiskOptions options)
         {
-            _diskOptions[disk.Uuid] = options;
+            _diskOptions[uuid] = options;
         }
     }
 }

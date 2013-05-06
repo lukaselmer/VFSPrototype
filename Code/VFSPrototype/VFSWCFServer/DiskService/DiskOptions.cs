@@ -9,12 +9,12 @@ namespace VFSWCFService.DiskService
     public class DiskOptions
     {
         [DataMember]
-        int BlockSize { get; set; }
+        public int BlockSize { get; set; }
 
         [DataMember]
-        int MasterBlockSize { get; set; }
+        public int MasterBlockSize { get; set; }
 
         [DataMember]
-        byte[] SerializedFileSystemOptions { get; set; }
+        public byte[] SerializedFileSystemOptions { get; set; }
     }
 }
