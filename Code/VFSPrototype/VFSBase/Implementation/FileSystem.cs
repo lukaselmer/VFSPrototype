@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Security.Cryptography;
+using System.Threading;
+using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Helpers;
 using VFSBase.Interfaces;
@@ -27,6 +27,12 @@ namespace VFSBase.Implementation
         private readonly IndexService _indexService;
         public Folder Root { get; private set; }
         private Folder LatestRoot { get; set; }
+
+        /// <summary>
+        /// The lock is used to lock the file system, so the file system can be used in multiple threads.
+        /// Especially useful for the synchronization.
+        /// </summary>
+        private readonly ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
         public FileSystemOptions FileSystemOptions
         {
@@ -655,6 +661,23 @@ namespace VFSBase.Implementation
         public void ShiftBlocks(long fromVersion, long offset)
         {
             throw new NotImplementedException();
+        }
+
+        public ReaderWriterLockSlim GetReadWriteLock()
+        {
+            return _readWriteLock;
+        }
+
+        public bool IsSynchronizedDisk { get { return _options.Uuid != null; } }
+
+        public void MakeSynchronizedDisk(string uuid)
+        {
+            if (string.IsNullOrEmpty(uuid)) throw new ArgumentException("disk.uuid cannot be null or empty", "disk");
+            if (IsSynchronizedDisk) throw new VFSException("Disk is synchronized already");
+            _options.Uuid = uuid;
+            _options.LocalVersion = 0;
+            _options.LastServerVersion = 0;
+            WriteConfig();
         }
 
         #endregion

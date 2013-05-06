@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using VFSWCFService.UserService;
 
 namespace VFSWCFService.DiskService
