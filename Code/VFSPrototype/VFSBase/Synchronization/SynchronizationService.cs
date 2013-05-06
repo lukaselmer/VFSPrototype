@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using VFSBase.DiskServiceReference;
+using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.UserServiceReference;
@@ -99,6 +101,22 @@ namespace VFSBase.Synchronization
 
             var options = _diskService.GetDiskOptions(_disk);
             _fileSystem.WriteFileSystemOptions(options.SerializedFileSystemOptions);
+
+            _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
+            _fileSystem.FileSystemOptions.LastServerVersion = _fileSystem.Root.Version;
+            _fileSystem.WriteConfig();
+
+            using (var ms = new MemoryStream())
+            {
+                ms.Write(options.SerializedFileSystemOptions, 0, options.SerializedFileSystemOptions.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                IFormatter formatter = new BinaryFormatter();
+                var fileSystemOptions = formatter.Deserialize(ms) as FileSystemOptions;
+                if (fileSystemOptions == null) throw new VFSException("Invalid file");
+
+                _fileSystem.Reload(fileSystemOptions);
+            }
         }
 
         private Disk RemoteDisk()
@@ -120,7 +138,15 @@ namespace VFSBase.Synchronization
                 _diskService.WriteBlock(_disk.Uuid, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
             }
 
-            _diskService.SetDiskOptions(CalculateDiskOptions(_fileSystem.FileSystemOptions));
+            _diskService.SetDiskOptions(_disk, CalculateDiskOptions(_fileSystem.FileSystemOptions));
+
+            _disk.LocalVersion = _fileSystem.Root.Version;
+            _disk.LastServerVersion = _fileSystem.Root.Version;
+            _diskService.UpdateDisk(_disk);
+
+            _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
+            _fileSystem.FileSystemOptions.LastServerVersion = _fileSystem.Root.Version;
+            _fileSystem.WriteConfig();
         }
 
         private void InitializeDisk()

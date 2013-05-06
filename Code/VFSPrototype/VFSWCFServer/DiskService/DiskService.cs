@@ -51,12 +51,12 @@ namespace VFSWCFService.DiskService
 
         public DiskOptions GetDiskOptions(Disk disk)
         {
-            throw new NotImplementedException();
+            return Persistence.LoadDiskOptions(disk);
         }
 
-        public void SetDiskOptions(DiskOptions disk)
+        public void SetDiskOptions(Disk disk, DiskOptions options)
         {
-            throw new NotImplementedException();
+            Persistence.SaveDiskOptions(disk, options);
         }
 
         public void WriteBlock(string diskUuid, long blockNr, byte[] content)
@@ -67,6 +67,11 @@ namespace VFSWCFService.DiskService
         public byte[] ReadBlock(string diskUuid, long blockNr)
         {
             throw new NotImplementedException();
+        }
+
+        public void UpdateDisk(Disk disk)
+        {
+            Persistence.UpdateDisk(disk);
         }
     }
 }

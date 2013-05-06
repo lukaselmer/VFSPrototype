@@ -184,5 +184,16 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="serializedFileSystemOptions">The serialized file system options.</param>
         void WriteFileSystemOptions(byte[] serializedFileSystemOptions);
+
+        /// <summary>
+        /// Writes the config to the disk.
+        /// </summary>
+        void WriteConfig();
+
+        /// <summary>
+        /// Reloads the file system with the specified options.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        void Reload(FileSystemOptions options);
     }
 }

@@ -11,17 +11,9 @@ namespace VFSWCFService.Common
     /// </summary>
     public class Persistence
     {
-        private readonly Dictionary<string, User> _userStorage;
-        private readonly Dictionary<string, Dictionary<string, Disk>> _diskStorage;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Persistence"/> class.
-        /// </summary>
-        public Persistence()
-        {
-            _userStorage = new Dictionary<string, User>();
-            _diskStorage = new Dictionary<string, Dictionary<string, Disk>>();
-        }
+        private readonly Dictionary<string, User> _userStorage = new Dictionary<string, User>();
+        private readonly Dictionary<string, Dictionary<string, Disk>> _diskStorage = new Dictionary<string, Dictionary<string, Disk>>();
+        private Dictionary<string, DiskOptions> _diskOptions = new Dictionary<string, DiskOptions>();
 
         /// <summary>
         /// Checks if the user with the specified login exists.
@@ -84,6 +76,16 @@ namespace VFSWCFService.Common
         public Disk FindDisk(Disk remoteDisk)
         {
             return _diskStorage[remoteDisk.User.Login][remoteDisk.Uuid];
+        }
+
+        public DiskOptions LoadDiskOptions(Disk disk)
+        {
+            return _diskOptions[disk.Uuid];
+        }
+
+        public void SaveDiskOptions(Disk disk, DiskOptions options)
+        {
+            _diskOptions[disk.Uuid] = options;
         }
     }
 }
