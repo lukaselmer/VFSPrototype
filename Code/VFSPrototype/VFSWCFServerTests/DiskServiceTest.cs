@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSWCFService;
 using VFSWCFService.Common;
@@ -42,7 +43,7 @@ namespace VFSWCFServiceTests
         public void TestDisks()
         {
             _persistence.CreateUser(_user.Login, _user.HashedPassword);
-            var disk = new Disk { User = _user };
+            var disk = new Disk { User = _user, Uuid = "foo" };
             _persistence.CreateDisk(_user, disk);
             var s = new DiskService { Persistence = _persistence };
             Assert.AreEqual(1, s.Disks(_user).Count);
@@ -60,12 +61,65 @@ namespace VFSWCFServiceTests
         public void TestDeleteDisks()
         {
             _persistence.CreateUser(_user.Login, _user.HashedPassword);
-            var disk = new Disk { User = _user };
+            var disk = new Disk { User = _user, Uuid = "foo" };
             _persistence.CreateDisk(_user, disk);
             var s = new DiskService { Persistence = _persistence };
             Assert.IsTrue(s.DeleteDisk(disk));
             Assert.AreEqual(0, s.Disks(_user).Count);
             Assert.IsFalse(s.DeleteDisk(disk));
+        }
+
+        [TestMethod]
+        public void TestSynchronizationStateUpToDate()
+        {
+            _persistence.CreateUser(_user.Login, _user.HashedPassword);
+            var disk = new Disk { User = _user, Uuid = "foo" };
+            _persistence.CreateDisk(_user, disk);
+
+            var s = new DiskService { Persistence = _persistence };
+
+            var clonedDisk = s.Disks(_user).First();
+            Assert.AreEqual(SynchronizationState.UpToDate, s.FetchSynchronizationState(clonedDisk));
+        }
+
+        [TestMethod]
+        public void TestSynchronizationStateLocalChanges()
+        {
+            _persistence.CreateUser(_user.Login, _user.HashedPassword);
+            var disk = new Disk { User = _user, Uuid = "foo" };
+            _persistence.CreateDisk(_user, disk);
+
+            var s = new DiskService { Persistence = _persistence };
+
+            var clonedDisk = new Disk { LastServerVersion = disk.LastServerVersion, User = _user, Uuid = disk.Uuid };
+            clonedDisk.LocalVersion += 1;
+            Assert.AreEqual(SynchronizationState.LocalChanges, s.FetchSynchronizationState(clonedDisk));
+        }
+
+        [TestMethod]
+        public void TestSynchronizationStateRemoteChanges()
+        {
+            _persistence.CreateUser(_user.Login, _user.HashedPassword);
+            var disk = new Disk { User = _user, Uuid = "foo", LocalVersion = 10, LastServerVersion = 10};
+            _persistence.CreateDisk(_user, disk);
+
+            var s = new DiskService { Persistence = _persistence };
+
+            var clonedDisk = new Disk { LastServerVersion = 9, LocalVersion = 9, User = _user, Uuid = disk.Uuid };
+            Assert.AreEqual(SynchronizationState.RemoteChanges, s.FetchSynchronizationState(clonedDisk));
+        }
+
+        [TestMethod]
+        public void TestSynchronizationStateConflicted()
+        {
+            _persistence.CreateUser(_user.Login, _user.HashedPassword);
+            var disk = new Disk { User = _user, Uuid = "foo", LocalVersion = 10, LastServerVersion = 10 };
+            _persistence.CreateDisk(_user, disk);
+
+            var s = new DiskService { Persistence = _persistence };
+
+            var clonedDisk = new Disk{LastServerVersion = 7, LocalVersion = 15, User = _user, Uuid = disk.Uuid};
+            Assert.AreEqual(SynchronizationState.Conflicted, s.FetchSynchronizationState(clonedDisk));
         }
     }
 }

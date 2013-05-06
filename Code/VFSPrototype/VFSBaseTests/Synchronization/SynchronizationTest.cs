@@ -2,6 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Interfaces;
+using VFSBase.Synchronization;
 using VFSBaseTests.Helpers;
 
 namespace VFSBaseTests.Synchronization
@@ -34,6 +35,10 @@ namespace VFSBaseTests.Synchronization
 
             using (var f = _testHelper.GetFileSystem())
             {
+                var s = new SynchronizationService(f);
+
+
+
                 /*
 
                 var root = f.Root; // V0
