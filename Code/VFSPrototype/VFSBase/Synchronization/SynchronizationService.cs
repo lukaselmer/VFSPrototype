@@ -12,7 +12,6 @@ using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBase.UserServiceReference;
 using User = VFSBase.DiskServiceReference.User;
 
 namespace VFSBase.Synchronization
@@ -28,7 +27,7 @@ namespace VFSBase.Synchronization
         private readonly SynchronizationCallbacks _callbacks;
         private static BackgroundWorker _backgroundWorker;
         private readonly DiskServiceClient _diskService;
-        private UserServiceClient _userService;
+        //private UserServiceClient _userService;
         private Disk _disk;
 
         public SynchronizationService(IFileSystem fileSystem, User user, SynchronizationCallbacks callbacks)
@@ -39,18 +38,19 @@ namespace VFSBase.Synchronization
             _diskService = new DiskServiceClient();
         }
 
-        public static BackgroundWorker CreateService(IFileSystem fileSystem, User user, SynchronizationCallbacks callbacks)
+        /*public static BackgroundWorker CreateService(IFileSystem fileSystem, User user, SynchronizationCallbacks callbacks)
         {
             var service = new SynchronizationService(fileSystem, user, callbacks);
             var backgroundWorker = new BackgroundWorker();
             backgroundWorker.DoWork += service.DoWork;
-            backgroundWorker.RunWorkerAsync();
             backgroundWorker.WorkerSupportsCancellation = true;
+            backgroundWorker.RunWorkerAsync();
             return backgroundWorker;
-        }
+        }*/
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
+            return;
             var worker = sender as BackgroundWorker;
             if (worker == null) throw new ArgumentException("sender is not a background worker", "sender");
 

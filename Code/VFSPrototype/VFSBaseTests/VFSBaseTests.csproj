@@ -49,6 +49,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -85,6 +87,11 @@
     <Compile Include="BlockListTest.cs" />
     <Compile Include="Search\SearchTest.cs" />
     <Compile Include="History\HistoryTest.cs" />
+    <Compile Include="Service References\DiskServiceReference\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Synchronization\SynchronizationTest.cs" />
     <Compile Include="Synchronization\ShiftBlockTest.cs" />
     <Compile Include="VFSFileStreamTest.cs" />
@@ -100,10 +107,48 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\VFSBase.DiskServiceReference.Disk.datasource" />
+    <None Include="Properties\DataSources\VFSBase.DiskServiceReference.DiskOptions.datasource" />
+    <None Include="Properties\DataSources\VFSBase.DiskServiceReference.User.datasource" />
+    <None Include="Service References\DiskServiceReference\DiskService.wsdl" />
+    <None Include="Service References\DiskServiceReference\DiskService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiskServiceReference\DiskService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiskServiceReference\DiskService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiskServiceReference\DiskService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mocks\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\DiskServiceReference\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiskServiceReference\DiskService.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiskServiceReference\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiskServiceReference\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiskServiceReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

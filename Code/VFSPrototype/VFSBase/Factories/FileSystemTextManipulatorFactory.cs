@@ -1,5 +1,7 @@
+using VFSBase.DiskServiceReference;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
+using VFSBase.Synchronization;
 
 namespace VFSBase.Factories
 {
@@ -9,6 +11,10 @@ namespace VFSBase.Factories
         {
             var fileSystem = FileSystemFactory.Create(options, password);
             fileSystem.TestEncryptionKey();
+            //var x = SynchronizationService.CreateService(fileSystem, new User(), new SynchronizationCallbacks(null));
+
+            new SynchronizationService(fileSystem, new User(), new SynchronizationCallbacks(null));
+
             return new FileSystemTextManipulator(fileSystem);
         }
 

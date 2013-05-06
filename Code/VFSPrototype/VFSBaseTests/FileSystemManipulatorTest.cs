@@ -15,26 +15,24 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemManipulatorTest
     {
-        private const string DefaultTestfilePath = "../../../Testfiles/TestfileFileSystemManipulatorTest.vhs";
-        private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
+        private TestHelper _testHelper;
+        private const string DefaultTestfileDirectoryPath = "../../../Testfiles/TestfileFileSystemManipulatorTest/";
 
-        private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
+        private IFileSystemTextManipulator InitTestFileSystemManipulator()
         {
-            if (File.Exists(testfilePath)) File.Delete(testfilePath);
-            var fileSystemData = TestHelper.CreateFileSystemOptions(testfilePath, size);
-            Assert.IsFalse(File.Exists(testfilePath), String.Format("testfile {0} should not exist!", testfilePath));
-            return fileSystemData;
+            return _testHelper.GetManipulator();
         }
 
-        private static IFileSystemTextManipulator InitTestFileSystemManipulator()
+        [TestInitialize]
+        public void InitTestHelper()
         {
-            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
+            _testHelper = new TestHelper(DefaultTestfileDirectoryPath);
         }
 
         [TestCleanup]
         public void RemoveTestfile()
         {
-            File.Delete(DefaultTestfilePath);
+            _testHelper.CleanupTestFolder();
         }
 
         [TestMethod]

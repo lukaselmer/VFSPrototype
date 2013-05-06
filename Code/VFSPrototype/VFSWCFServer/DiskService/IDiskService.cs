@@ -8,6 +8,12 @@ namespace VFSWCFService.DiskService
     public interface IDiskService
     {
         [OperationContract]
+        User Register(string login, string hashedPassword);
+
+        [OperationContract]
+        User Login(string login, string hashedPassword);
+
+        [OperationContract]
         IList<Disk> Disks(User user);
 
         [OperationContract]

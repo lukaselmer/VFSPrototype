@@ -9,6 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{94FF07
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSBaseTests", "VFSBaseTests\VFSBaseTests.csproj", "{6A331FB8-5B2B-4A27-A0E9-9086C02BF38A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4FED1B42-B203-41E0-AB35-0FC6038B3522} = {4FED1B42-B203-41E0-AB35-0FC6038B3522}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSBase", "VFSBase\VFSBase.csproj", "{2996B9E0-F50A-468D-8282-F62435108C4F}"
 	ProjectSection(ProjectDependencies) = postProject

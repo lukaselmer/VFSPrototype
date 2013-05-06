@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="cc709280-5a82-4f73-8d70-a3ab166c3d68" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="de257b9d-e245-42d1-9364-3c983c4d86fd" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -22,12 +22,12 @@
     <MetadataSource Address="http://localhost:4764/DiskService.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="DiskService.xsd" MetadataType="Schema" ID="e1187d23-2cba-404c-9fe6-65baba4a831e" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?xsd=xsd0" />
-    <MetadataFile FileName="DiskService1.xsd" MetadataType="Schema" ID="349b198e-e3db-4bc7-be14-7e51f44ffa65" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?xsd=xsd1" />
-    <MetadataFile FileName="DiskService.wsdl" MetadataType="Wsdl" ID="7fc2e2db-3d74-45d4-82d4-c1fb75cfa4dd" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?wsdl" />
-    <MetadataFile FileName="DiskService2.xsd" MetadataType="Schema" ID="12b2c0ca-d273-4c42-b263-902084ff20fc" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?xsd=xsd3" />
-    <MetadataFile FileName="DiskService3.xsd" MetadataType="Schema" ID="c17a4a69-0320-4209-81bb-f698af673556" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?xsd=xsd2" />
-    <MetadataFile FileName="DiskService.disco" MetadataType="Disco" ID="863abbd8-9df3-4faf-a155-3d4910afdb55" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?disco" />
+    <MetadataFile FileName="DiskService.xsd" MetadataType="Schema" ID="ce3538c5-fb06-4c6f-b500-c6c0619e774e" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?xsd=xsd0" />
+    <MetadataFile FileName="DiskService1.xsd" MetadataType="Schema" ID="8ffe408d-b1bd-4e10-8fd7-305080e2f923" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?xsd=xsd1" />
+    <MetadataFile FileName="DiskService.wsdl" MetadataType="Wsdl" ID="f44d313f-213a-425d-865f-5f8e89cbb706" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?wsdl" />
+    <MetadataFile FileName="DiskService2.xsd" MetadataType="Schema" ID="b0eecc62-1f15-4d4f-95c9-0bf58506cf44" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?xsd=xsd3" />
+    <MetadataFile FileName="DiskService3.xsd" MetadataType="Schema" ID="d0075bde-479d-4fa6-b88b-0f23a5f494e9" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?xsd=xsd2" />
+    <MetadataFile FileName="DiskService.disco" MetadataType="Disco" ID="cfb9bbe4-b4d7-4dcb-b595-615e57391328" SourceId="1" SourceUrl="http://localhost:4764/DiskService.svc?disco" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

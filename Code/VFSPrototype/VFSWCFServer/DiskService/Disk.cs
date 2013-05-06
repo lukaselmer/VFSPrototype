@@ -4,6 +4,7 @@ using VFSWCFService.UserService;
 
 namespace VFSWCFService.DiskService
 {
+    [Serializable]
     [DataContract]
     public class Disk
     {
