@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Startup", "Startup\Startup.
 		{4FED1B42-B203-41E0-AB35-0FC6038B3522} = {4FED1B42-B203-41E0-AB35-0FC6038B3522}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSBlockAbstraction", "VFSBlockAbstraction\VFSBlockAbstraction.csproj", "{8937804B-8BD8-4058-85A2-A22FD767E0E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +70,10 @@ Global
 		{FDCFC726-5C56-49F4-BCD9-5C82ACDD60FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDCFC726-5C56-49F4-BCD9-5C82ACDD60FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDCFC726-5C56-49F4-BCD9-5C82ACDD60FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8937804B-8BD8-4058-85A2-A22FD767E0E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8937804B-8BD8-4058-85A2-A22FD767E0E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8937804B-8BD8-4058-85A2-A22FD767E0E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8937804B-8BD8-4058-85A2-A22FD767E0E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
