@@ -680,6 +680,16 @@ namespace VFSBase.Implementation
             WriteConfig();
         }
 
+        public byte[] ReadBlock(long blockNumber)
+        {
+            return _blockManipulator.ReadBlock(blockNumber);
+        }
+
+        public void WriteBlock(long blockNumber, byte[] block)
+        {
+            _blockManipulator.WriteBlock(blockNumber, block);
+        }
+
         #endregion
 
     }

@@ -96,7 +96,20 @@ namespace VFSBase.Synchronization
         private void SynchonizeLocalChanges()
         {
             var remoteDisk = RemoteDisk();
-            //TODO: get blocks from the _fileSystem, send them to the server, adjust _blockAllocator on the server
+
+            _fileSystem.SwitchToVersion(remoteDisk.LocalVersion);
+            var fromBlockNr = _fileSystem.Root.BlocksUsed;
+            _fileSystem.SwitchToLatestVersion();
+            var untilBlockNr = _fileSystem.Root.BlocksUsed;
+
+            for (var currentBlockNr = fromBlockNr; currentBlockNr <= untilBlockNr; currentBlockNr++)
+            {
+                _diskService.WriteBlock(_disk.Uuid, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
+            }
+        }
+
+        private void SynchronizeNextLocalVersion()
+        {
         }
 
         private void InitializeDisk()
