@@ -55,17 +55,19 @@ namespace VFSBase.Synchronization
             while (!worker.CancellationPending)
             {
                 var rwLock = _fileSystem.GetReadWriteLock();
+                var version = _fileSystem.CurrentVersion;
 
                 try
                 {
-                    //_fileSystem.FileSystemOptions.
                     rwLock.EnterWriteLock();
+                    _fileSystem.SwitchToLatestVersion();
 
                     if (_disk == null) InitializeDisk();
                     Synchronize();
                 }
                 finally
                 {
+                    _fileSystem.SwitchToVersion(version);
                     if (rwLock.IsWriteLockHeld) rwLock.ExitWriteLock();
                 }
 
@@ -85,7 +87,18 @@ namespace VFSBase.Synchronization
         private void SynchronizeRemoteChanges()
         {
             var remoteDisk = RemoteDisk();
-            //TODO: get blocks from the server, store them in the _fileSystem, adjust root and _blockAllocator
+
+
+            var fromBlockNr = _fileSystem.Root.BlocksUsed;
+            _fileSystem.SwitchToLatestVersion();
+            var untilBlockNr = _fileSystem.Root.BlocksUsed;
+
+            for (var currentBlockNr = fromBlockNr; currentBlockNr <= untilBlockNr; currentBlockNr++)
+            {
+                _diskService.WriteBlock(_disk.Uuid, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
+            }
+
+            _diskService.SetDiskOptions(CalculateDiskOptions(_fileSystem.FileSystemOptions));
         }
 
         private Disk RemoteDisk()
@@ -106,10 +119,8 @@ namespace VFSBase.Synchronization
             {
                 _diskService.WriteBlock(_disk.Uuid, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
             }
-        }
 
-        private void SynchronizeNextLocalVersion()
-        {
+            _diskService.SetDiskOptions(CalculateDiskOptions(_fileSystem.FileSystemOptions));
         }
 
         private void InitializeDisk()
@@ -128,6 +139,14 @@ namespace VFSBase.Synchronization
         {
             var o = _fileSystem.FileSystemOptions;
 
+            var serverDisk = _diskService.CreateDisk(_user, CalculateDiskOptions(o));
+
+            _fileSystem.MakeSynchronizedDisk(serverDisk.Uuid);
+            LoadDisk();
+        }
+
+        private static DiskOptions CalculateDiskOptions(IFileSystemOptions o)
+        {
             byte[] serializedOptions;
             using (var ms = new MemoryStream())
             {
@@ -136,11 +155,13 @@ namespace VFSBase.Synchronization
                 serializedOptions = ms.ToArray();
             }
 
-            var diskOptions = new DiskOptions { BlockSize = o.BlockSize, MasterBlockSize = o.MasterBlockSize, SerializedFileSystemOptions = serializedOptions };
-            var serverDisk = _diskService.CreateDisk(_user, diskOptions);
-
-            _fileSystem.MakeSynchronizedDisk(serverDisk.Uuid);
-            LoadDisk();
+            var diskOptions = new DiskOptions
+                                  {
+                                      BlockSize = o.BlockSize,
+                                      MasterBlockSize = o.MasterBlockSize,
+                                      SerializedFileSystemOptions = serializedOptions
+                                  };
+            return diskOptions;
         }
     }
 
