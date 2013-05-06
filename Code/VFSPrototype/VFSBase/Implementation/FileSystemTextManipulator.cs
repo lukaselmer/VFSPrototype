@@ -4,27 +4,21 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using VFSBase.Exceptions;
+using VFSBase.Helpers;
 using VFSBase.Interfaces;
 using VFSBase.Search;
 
 namespace VFSBase.Implementation
 {
-    public sealed class FileSystemTextManipulator : IFileSystemTextManipulator
+    internal class FileSystemTextManipulator : IFileSystemTextManipulator
     {
-        private IFileSystem _fileSystem;
+        internal IFileSystem _fileSystem;
 
         public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
 
-        public FileSystemTextManipulator(string location, string password)
+        internal FileSystemTextManipulator(IFileSystem fileSystem)
         {
-            _fileSystem = FileSystemFactory.Import(location, password);
-            _fileSystem.TestEncryptionKey();
-        }
-
-        public FileSystemTextManipulator(FileSystemOptions options, string password)
-        {
-            _fileSystem = FileSystemFactory.Create(options, password);
-            _fileSystem.TestEncryptionKey();
+            _fileSystem = fileSystem;
         }
 
         public IList<string> Search(string keyword, string folder, bool recursive, bool caseSensitive)
@@ -49,6 +43,20 @@ namespace VFSBase.Implementation
             if (folder == null) throw new DirectoryNotFoundException();
 
             return _fileSystem.Folders(folder).Select(f => f.Name).ToList();
+        }
+
+        public IList<string> Folders(string path, long version)
+        {
+            var latestVersion = _fileSystem.CurrentVersion;
+            try
+            {
+                _fileSystem.SwitchToVersion(version);
+                return Folders(path);
+            }
+            finally
+            {
+                _fileSystem.SwitchToVersion(latestVersion);
+            }
         }
 
         public IList<string> Files(string path)
@@ -233,20 +241,6 @@ namespace VFSBase.Implementation
 
             _fileSystem.Dispose();
             _fileSystem = null;
-        }
-
-        public IList<string> Folders(string test, long version)
-        {
-            long latestVersion = _fileSystem.CurrentVersion;
-            try
-            {
-                _fileSystem.SwitchToVersion(version);
-                return Folders(test);
-            }
-            finally
-            {
-                _fileSystem.SwitchToVersion(latestVersion);
-            }
         }
 
         public long Version(string path)

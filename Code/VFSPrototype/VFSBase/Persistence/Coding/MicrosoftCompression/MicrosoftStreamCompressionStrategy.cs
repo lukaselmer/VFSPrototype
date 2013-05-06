@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 using VFSBase.Persistence.Coding.General;
+using VFSBase.Persistence.Coding.Strategies;
 
 namespace VFSBase.Persistence.Coding.MicrosoftCompression
 {

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Persistence.Blocks
 {
     [Serializable]
     public class BlockAllocation
@@ -24,6 +23,8 @@ namespace VFSBase.Implementation
         {
             get { return _nextFreeBlock; }
         }
+
+        public long CurrentMax { get { return _nextFreeBlock; } }
 
         public long Allocate()
         {

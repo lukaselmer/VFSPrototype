@@ -5,7 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Factories;
 using VFSBase.Implementation;
+using VFSBase.Interfaces;
+using VFSBase.Persistence.Coding.General;
 
 namespace VFSBaseTests.Helpers
 {
@@ -34,14 +37,19 @@ namespace VFSBaseTests.Helpers
             Directory.Delete(_testfileFolder, true);
         }
 
-        internal FileSystemTextManipulator GetManipulator()
+        internal IFileSystem GetFileSystem()
+        {
+            return FileSystemFactory.Create(CreateFileSystemOptions(RandomTestfilePath(), 0), "");
+        }
+
+        internal IFileSystemTextManipulator GetManipulator()
         {
             return GetManipulator(RandomTestfilePath());
         }
 
-        internal static FileSystemTextManipulator GetManipulator(string path)
+        private static IFileSystemTextManipulator GetManipulator(string path)
         {
-            return new FileSystemTextManipulator(CreateFileSystemOptions(path, 0), "");
+            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(CreateFileSystemOptions(path, 0), "");
         }
 
         internal string RandomTestfilePath()

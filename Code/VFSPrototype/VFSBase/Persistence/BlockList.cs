@@ -19,11 +19,11 @@ namespace VFSBase.Persistence
         private readonly FileSystemOptions _options;
         private readonly BlockParser _blockParser;
         private readonly BlockManipulator _blockManipulator;
-        private readonly Implementation.Persistence _persistence;
+        private readonly Persistence _persistence;
 
         // NOTE: long parameter smell. Are they all needed? If yes: refactoring "introduce parameter object".
         public BlockList(IIndexNode node, BlockAllocation blockAllocation, FileSystemOptions options, BlockParser blockParser,
-                         BlockManipulator blockManipulator, Implementation.Persistence persistence)
+                         BlockManipulator blockManipulator, Persistence persistence)
         {
             _node = node;
             _blockAllocation = blockAllocation;

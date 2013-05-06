@@ -1,4 +1,4 @@
-﻿namespace VFSBase.Persistence
+﻿namespace VFSBase.Helpers
 {
     /// <summary>
     /// The position calculator settings

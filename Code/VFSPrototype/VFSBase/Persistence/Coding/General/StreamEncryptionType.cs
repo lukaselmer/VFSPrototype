@@ -1,4 +1,4 @@
-﻿namespace VFSBase.Implementation
+﻿namespace VFSBase.Persistence.Coding.General
 {
     public enum StreamEncryptionType
     {

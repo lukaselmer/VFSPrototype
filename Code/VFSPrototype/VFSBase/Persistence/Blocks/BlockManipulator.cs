@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using VFSBase.Persistence.Blocks;
 
 namespace VFSBase.Implementation
 {

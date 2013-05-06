@@ -5,13 +5,13 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Search
 {
-    internal class Trie
+    internal class SuffixTree
     {
-        private TrieNode RootNode { get; set; }
+        private SuffixTreeNode RootNode { get; set; }
 
-        public Trie()
+        public SuffixTree()
         {
-            RootNode = new TrieNode();
+            RootNode = new SuffixTreeNode();
         }
 
         public IEnumerable<IIndexNode> Search(SearchOptions options)
@@ -19,15 +19,15 @@ namespace VFSBase.Search
             return Search(RootNode, options);
         }
 
-        private IEnumerable<IIndexNode> Search(TrieNode node, SearchOptions options)
+        private IEnumerable<IIndexNode> Search(SuffixTreeNode node, SearchOptions options)
         {
             if (options.Keyword.Length == 0)
                 return node.Values;
             
             var c = options.Keyword.First();
             if (options.CaseSensitive == false) {
-                TrieNode nextUpperNode;
-                TrieNode nextLowerNode;
+                SuffixTreeNode nextUpperNode;
+                SuffixTreeNode nextLowerNode;
                 node.Nodes.TryGetValue(char.ToLower(c), out nextLowerNode);
                 node.Nodes.TryGetValue (char.ToUpper (c), out nextUpperNode);
                 if (nextUpperNode == null && nextLowerNode == null) return Enumerable.Empty<IIndexNode>();
@@ -40,7 +40,7 @@ namespace VFSBase.Search
                 return Search(nextLowerNode ?? nextUpperNode, options.Clone());
 
             } else {
-                TrieNode nextNode;
+                SuffixTreeNode nextNode;
                 node.Nodes.TryGetValue(c, out nextNode);
                 if (nextNode == null) return Enumerable.Empty<IIndexNode>();
 
@@ -55,11 +55,11 @@ namespace VFSBase.Search
             var currentNode = RootNode;
             foreach (var c in path)
             {
-                TrieNode nextNode;
+                SuffixTreeNode nextNode;
                 currentNode.Nodes.TryGetValue(c, out nextNode);
                 if (nextNode == null)
                 {
-                    nextNode = new TrieNode();
+                    nextNode = new SuffixTreeNode();
                     currentNode.Nodes.Add(c, nextNode);
                 }
                 nextNode.Values.Add(node);
@@ -77,7 +77,7 @@ namespace VFSBase.Search
             var currentNode = RootNode;
             foreach (var c in path)
             {
-                TrieNode nextNode;
+                SuffixTreeNode nextNode;
                 currentNode.Nodes.TryGetValue(c, out nextNode);
                 if (nextNode == null) return null; // Not found
                 if (node != null) currentNode.Values.Remove(node);

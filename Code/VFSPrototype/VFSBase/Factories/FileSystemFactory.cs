@@ -1,9 +1,10 @@
 ﻿using System;
 using System.IO;
 using VFSBase.Exceptions;
+using VFSBase.Implementation;
 using VFSBase.Interfaces;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Factories
 {
     internal static class FileSystemFactory
     {

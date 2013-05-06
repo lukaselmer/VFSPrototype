@@ -1,32 +1,21 @@
 using System.IO;
 
-namespace VFSBase.Persistence.Coding.General
+namespace VFSBase.Persistence.Coding.Strategies
 {
-    /// <summary>
-    /// Class NullStreamCodingStrategy
-    /// 
-    /// Null Object pattern
-    /// </summary>
-    public class NullStreamCodingStrategy : IStreamCodingStrategy
+    public interface IStreamCodingStrategy
     {
         /// <summary>
         /// Decorates the steam, so it can be written to the virtual file system.
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <returns></returns>
-        public Stream DecorateToVFS(Stream stream)
-        {
-            return stream;
-        }
+        Stream DecorateToVFS(Stream stream);
 
         /// <summary>
         /// Decorates the steam, so it can be written to the host system.
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <returns></returns>
-        public Stream DecorateToHost(Stream stream)
-        {
-            return stream;
-        }
+        Stream DecorateToHost(Stream stream);
     }
 }

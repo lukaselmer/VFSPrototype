@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
 using VFSBase.Persistence.Coding.General;
+using VFSBase.Persistence.Coding.Strategies;
 
 namespace VFSBase.Persistence.Coding.MicrosoftAes
 {

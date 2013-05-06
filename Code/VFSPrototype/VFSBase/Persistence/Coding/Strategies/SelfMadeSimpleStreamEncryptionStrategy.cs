@@ -2,19 +2,19 @@
 using System.Security.Cryptography;
 using VFSBase.Persistence.Coding.General;
 using VFSBase.Persistence.Coding.SelfMadeAes;
-using VFSBase.Persistence.Coding.SelfMadeCaesar;
+using VFSBase.Persistence.Coding.SelfMadeSimple;
 
-namespace VFSBase.Implementation
+namespace VFSBase.Persistence.Coding.Strategies
 {
-    internal class SelfMadeCaesarStreamEncryptionStrategy : IStreamCodingStrategy
+    internal class SelfMadeSimpleStreamEncryptionStrategy : IStreamCodingStrategy
     {
         private readonly EncryptionOptions _options;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SelfMadeCaesarStreamEncryptionStrategy"/> class.
+        /// Initializes a new instance of the <see cref="SelfMadeSimpleStreamEncryptionStrategy"/> class.
         /// </summary>
         /// <param name="options">The options.</param>
-        public SelfMadeCaesarStreamEncryptionStrategy(EncryptionOptions options)
+        public SelfMadeSimpleStreamEncryptionStrategy(EncryptionOptions options)
         {
             _options = options;
         }
@@ -26,7 +26,7 @@ namespace VFSBase.Implementation
         /// <returns></returns>
         public Stream DecorateToVFS(Stream stream)
         {
-            var encryptor = new SelfMadeCaesarCryptor(_options.Key[0] + _options.Key[1] + _options.Key[2] + _options.Key[3], CryptoDirection.Encrypt);
+            var encryptor = new SelfMadeSimpleCryptor(_options.Key, _options.InitializationVector, CryptoDirection.Encrypt);
             return new CryptoStream(stream, encryptor, CryptoStreamMode.Write);
         }
 
@@ -37,7 +37,7 @@ namespace VFSBase.Implementation
         /// <returns></returns>
         public Stream DecorateToHost(Stream stream)
         {
-            var decryptor = new SelfMadeCaesarCryptor(_options.Key[0] + _options.Key[1] + _options.Key[2] + _options.Key[3], CryptoDirection.Decrypt);
+            var decryptor = new SelfMadeSimpleCryptor(_options.Key, _options.InitializationVector, CryptoDirection.Decrypt);
             return new CryptoStream(stream, decryptor, CryptoStreamMode.Read);
         }
     }

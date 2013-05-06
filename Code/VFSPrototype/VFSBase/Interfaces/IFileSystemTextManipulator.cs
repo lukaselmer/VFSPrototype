@@ -10,6 +10,7 @@ namespace VFSBase.Interfaces
         IList<string> Files(string path);
         IList<string> List(string path);
         IList<string> Folders(string path);
+        IList<string> Folders(string path, long version);
         bool IsDirectory(string path);
         void CreateFolder(string path);
         void Import(string source, string dest, CallbacksBase importCallbacks = null);
@@ -21,5 +22,10 @@ namespace VFSBase.Interfaces
         bool Exists(string path);
 
         IFileSystemOptions FileSystemOptions { get; }
+
+        long Version(string path);
+        void SwitchToVersion(long version);
+        void SwitchToLatestVersion();
+        IEnumerable<long> Versions(string path);
     }
 }
