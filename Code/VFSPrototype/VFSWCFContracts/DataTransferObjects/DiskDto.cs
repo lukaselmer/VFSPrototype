@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using SQLite;
 
-namespace VFSWCFService.DataTransferObjects
+namespace VFSWCFContracts.DataTransferObjects
 {
     [DataContract]
     public class DiskDto

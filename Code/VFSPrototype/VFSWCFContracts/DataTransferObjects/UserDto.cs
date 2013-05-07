@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using SQLite;
 
-namespace VFSWCFService.DataTransferObjects
+namespace VFSWCFContracts.DataTransferObjects
 {
     [Serializable]
     [DataContract]

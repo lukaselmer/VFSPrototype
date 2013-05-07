@@ -28,7 +28,6 @@
     <MetadataFile FileName="DiskService2.xsd" MetadataType="Schema" ID="a4e70954-44af-44da-bc48-b2c7a9d712c0" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?xsd=xsd0" />
     <MetadataFile FileName="DiskService3.xsd" MetadataType="Schema" ID="23610991-b814-4233-b274-555bec6f06b9" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?xsd=xsd3" />
     <MetadataFile FileName="DiskService.disco" MetadataType="Disco" ID="0a1009de-2be9-44e1-bb4f-7a50b45ad8cf" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?disco" />
-    <MetadataFile FileName="DiskService4.xsd" MetadataType="Schema" ID="d8d82bdd-fc92-4f55-8cc5-3c843b738995" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?xsd=xsd4" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

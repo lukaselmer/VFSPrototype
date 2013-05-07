@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace VFSWCFService.DiskService
+﻿namespace VFSWCFContracts.DataTransferObjects
 {
     public enum SynchronizationState
     {
