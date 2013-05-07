@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="7d456911-bec4-4778-b000-c040af96fa8e" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:8543/DiskService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="DiskService.xsd" MetadataType="Schema" ID="6a5569c7-3d3f-4241-8d10-ec408f541630" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?xsd=xsd2" />
+    <MetadataFile FileName="DiskService.wsdl" MetadataType="Wsdl" ID="7c7b722f-9651-4a15-a2c1-9c6e817e9b33" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?wsdl" />
+    <MetadataFile FileName="DiskService1.xsd" MetadataType="Schema" ID="e1fe78f4-faaa-43c1-94f5-caf5e4748000" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?xsd=xsd1" />
+    <MetadataFile FileName="DiskService2.xsd" MetadataType="Schema" ID="f9b2ffce-b3fa-4fcc-a72e-1a046e99e45b" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?xsd=xsd0" />
+    <MetadataFile FileName="DiskService3.xsd" MetadataType="Schema" ID="45aa160f-b096-4f13-9926-304c02cee83e" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?xsd=xsd3" />
+    <MetadataFile FileName="DiskService.disco" MetadataType="Disco" ID="ea2fc6c8-3a52-44f2-b618-f754620be1b1" SourceId="1" SourceUrl="http://localhost:8543/DiskService.svc?disco" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>
