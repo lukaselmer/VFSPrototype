@@ -20,6 +20,11 @@
         <!-- Menu -->
         <Menu Grid.Row="0" IsMainMenu="True" >
             <MenuItem Header="_File">
+                <MenuItem Header="Register" Command="{Binding RegisterCommand}" />
+                <MenuItem Header="Login" Command="{Binding LoginCommand}" />
+                <MenuItem Header="Switch to online mode" Command="{Binding SwitchToOnlineModeCommand}" />
+                <MenuItem Header="Switch to offline mode" Command="{Binding SwitchToOfflineModeCommand}" />
+                <Separator />
                 <MenuItem Header="Open VFS" Command="{Binding OpenVfsCommand}" />
                 <MenuItem Header="New VFS" Command="{Binding NewVfsCommand}" />
                 <MenuItem Header="Close VFS" Command="{Binding CloseVfsCommand}" />

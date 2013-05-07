@@ -57,6 +57,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
@@ -83,9 +85,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\HashHelper.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\Command.cs" />
+    <Compile Include="ViewModel\LoginDialogViewModel.cs" />
+    <Compile Include="ViewModel\RegisterDialogViewModel.cs" />
     <Compile Include="ViewModel\DropBehavior.cs" />
     <Compile Include="ViewModel\PasswordDialogViewModel.cs" />
     <Compile Include="ViewModel\NewVFSViewModel.cs" />
@@ -94,6 +99,9 @@
     <Compile Include="ViewModel\InputViewModel.cs" />
     <Compile Include="ViewModel\ListItem.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="View\LoginDialog.xaml.cs">
+      <DependentUpon>LoginDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\NewVFSView.xaml.cs">
       <DependentUpon>NewVFSView.xaml</DependentUpon>
     </Compile>
@@ -103,6 +111,13 @@
     <Compile Include="View\PasswordDialog.xaml.cs">
       <DependentUpon>PasswordDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\RegisterDialog.xaml.cs">
+      <DependentUpon>RegisterDialog.xaml</DependentUpon>
+    </Compile>
+    <Page Include="View\LoginDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\DiskInfoDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -139,6 +154,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\PasswordDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\RegisterDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

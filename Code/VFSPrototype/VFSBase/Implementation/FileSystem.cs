@@ -679,13 +679,13 @@ namespace VFSBase.Implementation
             return _readWriteLock;
         }
 
-        public bool IsSynchronizedDisk { get { return _options.Uuid != null; } }
+        public bool IsSynchronizedDisk { get { return _options.Id != 0; } }
 
-        public void MakeSynchronizedDisk(string uuid)
+        public void MakeSynchronizedDisk(int id)
         {
-            if (string.IsNullOrEmpty(uuid)) throw new ArgumentException("disk.uuid cannot be null or empty", "disk");
+            if (id == 0) throw new ArgumentException("disk.id cannot be null or empty", "disk");
             if (IsSynchronizedDisk) throw new VFSException("Disk is synchronized already");
-            _options.Uuid = uuid;
+            _options.Id = id;
             _options.LocalVersion = 0;
             _options.LastServerVersion = 0;
             WriteConfig();

@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ServiceModel" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -50,10 +51,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DiskReadWriteTest.cs" />
     <Compile Include="DiskServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\VFSWCFContracts\VFSWCFContracts.csproj">
+      <Project>{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}</Project>
+      <Name>VFSWCFContracts</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VFSWCFServer\VFSWCFService.csproj">
       <Project>{4FED1B42-B203-41E0-AB35-0FC6038B3522}</Project>
       <Name>VFSWCFService</Name>

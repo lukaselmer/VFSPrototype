@@ -5,14 +5,19 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Microsoft.Practices.Unity;
+using VFSBase.DiskServiceReference;
+using VFSBase.Helpers;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
+using VFSBase.Synchronization;
+using VFSBrowser.Helpers;
 using DataFormats = System.Windows.DataFormats;
 using IDataObject = System.Windows.IDataObject;
 using MessageBox = System.Windows.MessageBox;
@@ -23,6 +28,12 @@ namespace VFSBrowser.ViewModel
     internal sealed class MainViewModel : AbstractViewModel, IMainViewModel, IDisposable
     {
         private IFileSystemTextManipulator _manipulator;
+        private bool _copy;
+        private readonly List<ListItem> _clipboard = new List<ListItem>();
+        private readonly IUnityContainer _container;
+        private ISynchronizationService _synchronization;
+        private UserDto _user;
+        private DiskServiceClient _diskService;
 
         private readonly ListItem _parent = new ListItem(null, "..", true);
         public ListItem Parent
@@ -89,9 +100,16 @@ namespace VFSBrowser.ViewModel
             SearchCommand = new Command(Search, p => (_manipulator != null));
             CancelSearchCommand = new Command(CancelSearch, p => (_manipulator != null));
             DiskInfoCommand = new Command(DiskInfo, p => (_manipulator != null));
+            LoginCommand = new Command(Login, p => (_user == null));
+            RegisterCommand = new Command(Register, p => (_user == null));
+            SwitchToOfflineModeCommand = new Command(SwitchToOfflineMode, p => (_user != null && _synchronization != null));
+            SwitchToOnlineModeCommand = new Command(SwitchToOnlineMode, p => (_user != null && _synchronization == null));
 
             DropCommand = new Command(Drop, null);
+
+            _diskService = new DiskServiceClient();
         }
+
 
         public Command DropCommand { get; private set; }
 
@@ -111,6 +129,11 @@ namespace VFSBrowser.ViewModel
         public Command SearchCommand { get; private set; }
         public Command CancelSearchCommand { get; private set; }
         public Command DiskInfoCommand { get; private set; }
+
+        public Command LoginCommand { get; private set; }
+        public Command RegisterCommand { get; private set; }
+        public Command SwitchToOfflineModeCommand { get; private set; }
+        public Command SwitchToOnlineModeCommand { get; private set; }
 
 
         private bool IsItemSelected(object parameter)
@@ -183,6 +206,69 @@ namespace VFSBrowser.ViewModel
             sizeDlg.ShowDialog();
         }
 
+        #region Synchronization / Registration / Login
+
+        private void Login(object parameter)
+        {
+            var vm = new LoginDialogViewModel();
+
+            if (vm.ShowDialog() != true) return;
+
+            try
+            {
+                _user = _diskService.Login(vm.Login, HashHelper.GenerateHashCode(vm.Password));
+            }
+            catch (EndpointNotFoundException ex)
+            {
+                MessageBox.Show(string.Format("Unable to connect to server: {0}", ex.Message), "Login failed");
+            }
+            catch (FaultException<ServiceFault> ex)
+            {
+                MessageBox.Show(ex.Detail.Message, "Login failed");
+            }
+        }
+
+        private void Register(object parameter)
+        {
+            var vm = new RegisterDialogViewModel();
+
+            if (vm.ShowDialog() != true) return;
+
+            if (string.IsNullOrEmpty(vm.Password))
+            {
+                MessageBox.Show("Password must not be empty", "Registration failed");
+                return;
+            }
+
+            try
+            {
+                // Note: we should encrypt the password with a salt...
+                _user = _diskService.Register(vm.Login, HashHelper.GenerateHashCode(vm.Password));
+            }
+            catch (EndpointNotFoundException ex)
+            {
+                MessageBox.Show(string.Format("Unable to connect to server: {0}", ex.Message), "Registration failed");
+            }
+            catch (FaultException<ServiceFault> ex)
+            {
+                MessageBox.Show(ex.Detail.Message, "Registration failed");
+            }
+        }
+
+        private void SwitchToOfflineMode(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SwitchToOnlineMode(object parameter)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
+
+
         private void Delete(object parameter)
         {
             var deleteItems = parameter as ObservableCollection<object>;
@@ -199,10 +285,6 @@ namespace VFSBrowser.ViewModel
 
             del.ForEach(i => Items.Remove(i));
         }
-
-        private bool _copy;
-        private readonly List<ListItem> _clipboard = new List<ListItem>();
-        private IUnityContainer _container;
 
         private void Copy(object parameter)
         {
@@ -419,7 +501,6 @@ namespace VFSBrowser.ViewModel
             }
         }
 
-
         private void CloseVfs(object parameter)
         {
             // Close last vfs
@@ -443,7 +524,7 @@ namespace VFSBrowser.ViewModel
             try
             {
                 var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType);
-                _manipulator = _container.Resolve <IFileSystemTextManipulatorFactory>().CreateFileSystemTextManipulator(fileSystemData, vm.Password);
+                _manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().CreateFileSystemTextManipulator(fileSystemData, vm.Password);
                 CurrentPath = "/";
                 OnPropertyChanged("FileSystemName");
             }
@@ -489,7 +570,6 @@ namespace VFSBrowser.ViewModel
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
 
         private void Drop(object inObject)
         {

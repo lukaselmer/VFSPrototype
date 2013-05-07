@@ -160,10 +160,10 @@ namespace VFSBase.Interfaces
         bool IsSynchronizedDisk { get; }
 
         /// <summary>
-        /// Makes the disk a synchronized disk and sets the uuid for the disk.
+        /// Makes the disk a synchronized disk and sets the id for the disk.
         /// </summary>
-        /// <param name="uuid">The UUID.</param>
-        void MakeSynchronizedDisk(string uuid);
+        /// <param name="id">The UUID.</param>
+        void MakeSynchronizedDisk(int id);
 
         /// <summary>
         /// Reads a block.
