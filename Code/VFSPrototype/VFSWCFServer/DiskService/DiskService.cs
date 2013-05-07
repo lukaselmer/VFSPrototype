@@ -4,7 +4,8 @@ using System.IO;
 using System.ServiceModel;
 using VFSBlockAbstraction;
 using VFSWCFContracts.Contracts;
-using VFSWCFService.DataTransferObjects;
+using VFSWCFContracts.DataTransferObjects;
+using VFSWCFContracts.FaultContracts;
 
 namespace VFSWCFService.DiskService
 {
@@ -134,8 +135,8 @@ namespace VFSWCFService.DiskService
         {
             var user = Persistence.Authenticate(login, hashedPassword);
 
-            if (user == null) throw new FaultException<ServiceException>(
-                new ServiceException { Message = "Authentication failed. Please check username and password." });
+            if (user == null) throw new FaultException<ServiceFault>(
+                new ServiceFault { Message = "Authentication failed. Please check username and password." });
 
             return user;
         }

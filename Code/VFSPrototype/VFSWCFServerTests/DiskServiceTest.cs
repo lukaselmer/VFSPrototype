@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.ServiceModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VFSWCFContracts.Contracts;
-using VFSWCFService.DataTransferObjects;
+using VFSWCFContracts.DataTransferObjects;
+using VFSWCFContracts.FaultContracts;
 using VFSWCFService.DiskService;
 using VFSWCFService.Persistence;
 
@@ -22,7 +22,7 @@ namespace VFSWCFServiceTests
             _userDto = _persistence.CreateUser("bla", "blub");
         }
 
-        [ExpectedException(typeof(FaultException<ServiceException>))]
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
         [TestMethod]
         public void TestAuthenticationOnLogin()
         {
@@ -30,7 +30,7 @@ namespace VFSWCFServiceTests
             s.Login("nananana", "blub");
         }
 
-        [ExpectedException(typeof(FaultException<ServiceException>))]
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
         [TestMethod]
         public void TestAuthenticationOnCreateDisk()
         {
@@ -59,7 +59,7 @@ namespace VFSWCFServiceTests
             Assert.AreEqual(1, _persistence.Disks(_userDto).Count);
         }
 
-        [ExpectedException(typeof(FaultException<ServiceException>))]
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
         [TestMethod]
         public void TestCreateDiskBad()
         {
@@ -192,7 +192,7 @@ namespace VFSWCFServiceTests
             Assert.AreEqual("blub", user.HashedPassword);
         }
 
-        [ExpectedException(typeof(FaultException<ServiceException>))]
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
         [TestMethod]
         public void TestLoginFail()
         {

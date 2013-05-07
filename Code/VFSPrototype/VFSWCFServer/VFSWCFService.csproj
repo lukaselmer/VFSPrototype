@@ -70,25 +70,17 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataTransferObjects\DiskDto.cs" />
-    <Compile Include="DataTransferObjects\DiskOptionsDto.cs" />
     <Compile Include="DiskService\DiskService.cs" />
     <Compile Include="DiskService.svc.cs">
       <DependentUpon>DiskService.svc</DependentUpon>
     </Compile>
-    <Compile Include="DiskService\IDiskService.cs" />
     <Compile Include="Persistence\Persistence.cs" />
-    <Compile Include="DataTransferObjects\SynchronizationState.cs" />
-    <Compile Include="DataTransferObjects\UserDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SQLite.cs" />
-    <Compile Include="SQLiteAsync.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -107,6 +99,10 @@
     <ProjectReference Include="..\VFSWCFContracts\VFSWCFContracts.csproj">
       <Project>{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}</Project>
       <Name>VFSWCFContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VFSWCFPersistence\ExtermalSQLiteImplementation.csproj">
+      <Project>{46A0359C-FA14-44CB-B861-B7BB09AC05CC}</Project>
+      <Name>ExtermalSQLiteImplementation</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

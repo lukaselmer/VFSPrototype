@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Web.Hosting;
 using SQLite;
-using VFSWCFService.DataTransferObjects;
+using VFSWCFContracts.DataTransferObjects;
 
 namespace VFSWCFService.Persistence
 {

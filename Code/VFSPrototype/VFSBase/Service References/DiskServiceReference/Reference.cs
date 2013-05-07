@@ -15,7 +15,7 @@ namespace VFSBase.DiskServiceReference {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="UserDto", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="UserDto", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.DataTransferObjects")]
     [System.SerializableAttribute()]
     public partial class UserDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -92,9 +92,9 @@ namespace VFSBase.DiskServiceReference {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
     [System.SerializableAttribute()]
-    public partial class ServiceException : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class ServiceFault : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
@@ -137,7 +137,7 @@ namespace VFSBase.DiskServiceReference {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="DiskDto", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="DiskDto", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.DataTransferObjects")]
     [System.SerializableAttribute()]
     public partial class DiskDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -246,7 +246,7 @@ namespace VFSBase.DiskServiceReference {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="DiskOptionsDto", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="DiskOptionsDto", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.DataTransferObjects")]
     [System.SerializableAttribute()]
     public partial class DiskOptionsDto : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
@@ -354,7 +354,7 @@ namespace VFSBase.DiskServiceReference {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="SynchronizationState", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SynchronizationState", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.DataTransferObjects")]
     public enum SynchronizationState : int {
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
@@ -375,77 +375,77 @@ namespace VFSBase.DiskServiceReference {
     public interface IDiskService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Register", ReplyAction="http://tempuri.org/IDiskService/RegisterResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/RegisterServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/RegisterServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         VFSBase.DiskServiceReference.UserDto Register(string login, string hashedPassword);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Register", ReplyAction="http://tempuri.org/IDiskService/RegisterResponse")]
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.UserDto> RegisterAsync(string login, string hashedPassword);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Login", ReplyAction="http://tempuri.org/IDiskService/LoginResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/LoginServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/LoginServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         VFSBase.DiskServiceReference.UserDto Login([System.ServiceModel.MessageParameterAttribute(Name="login")] string login1, string hashedPassword);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Login", ReplyAction="http://tempuri.org/IDiskService/LoginResponse")]
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.UserDto> LoginAsync(string login, string hashedPassword);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Disks", ReplyAction="http://tempuri.org/IDiskService/DisksResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/DisksServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/DisksServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         VFSBase.DiskServiceReference.DiskDto[] Disks(VFSBase.DiskServiceReference.UserDto userDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Disks", ReplyAction="http://tempuri.org/IDiskService/DisksResponse")]
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskDto[]> DisksAsync(VFSBase.DiskServiceReference.UserDto userDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/CreateDisk", ReplyAction="http://tempuri.org/IDiskService/CreateDiskResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/CreateDiskServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/CreateDiskServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         VFSBase.DiskServiceReference.DiskDto CreateDisk(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskOptionsDto optionsDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/CreateDisk", ReplyAction="http://tempuri.org/IDiskService/CreateDiskResponse")]
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskDto> CreateDiskAsync(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskOptionsDto optionsDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/DeleteDisk", ReplyAction="http://tempuri.org/IDiskService/DeleteDiskResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/DeleteDiskServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/DeleteDiskServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         bool DeleteDisk(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/DeleteDisk", ReplyAction="http://tempuri.org/IDiskService/DeleteDiskResponse")]
         System.Threading.Tasks.Task<bool> DeleteDiskAsync(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/FetchSynchronizationState", ReplyAction="http://tempuri.org/IDiskService/FetchSynchronizationStateResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/FetchSynchronizationStateServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/FetchSynchronizationStateServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         VFSBase.DiskServiceReference.SynchronizationState FetchSynchronizationState(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/FetchSynchronizationState", ReplyAction="http://tempuri.org/IDiskService/FetchSynchronizationStateResponse")]
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.SynchronizationState> FetchSynchronizationStateAsync(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/GetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/GetDiskOptionsResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/GetDiskOptionsServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/GetDiskOptionsServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         VFSBase.DiskServiceReference.DiskOptionsDto GetDiskOptions(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/GetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/GetDiskOptionsResponse")]
         System.Threading.Tasks.Task<VFSBase.DiskServiceReference.DiskOptionsDto> GetDiskOptionsAsync(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/SetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/SetDiskOptionsResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/SetDiskOptionsServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/SetDiskOptionsServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         void SetDiskOptions(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto, VFSBase.DiskServiceReference.DiskOptionsDto optionsDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/SetDiskOptions", ReplyAction="http://tempuri.org/IDiskService/SetDiskOptionsResponse")]
         System.Threading.Tasks.Task SetDiskOptionsAsync(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto, VFSBase.DiskServiceReference.DiskOptionsDto optionsDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/WriteBlock", ReplyAction="http://tempuri.org/IDiskService/WriteBlockResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/WriteBlockServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/WriteBlockServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         void WriteBlock(VFSBase.DiskServiceReference.UserDto userDto, int diskId, long blockNr, byte[] content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/WriteBlock", ReplyAction="http://tempuri.org/IDiskService/WriteBlockResponse")]
         System.Threading.Tasks.Task WriteBlockAsync(VFSBase.DiskServiceReference.UserDto userDto, int diskId, long blockNr, byte[] content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/ReadBlock", ReplyAction="http://tempuri.org/IDiskService/ReadBlockResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/ReadBlockServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/ReadBlockServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         byte[] ReadBlock(VFSBase.DiskServiceReference.UserDto userDto, int diskId, long blockNr);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/ReadBlock", ReplyAction="http://tempuri.org/IDiskService/ReadBlockResponse")]
         System.Threading.Tasks.Task<byte[]> ReadBlockAsync(VFSBase.DiskServiceReference.UserDto userDto, int diskId, long blockNr);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/UpdateDisk", ReplyAction="http://tempuri.org/IDiskService/UpdateDiskResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceException), Action="http://tempuri.org/IDiskService/UpdateDiskServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts")]
+        [System.ServiceModel.FaultContractAttribute(typeof(VFSBase.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/UpdateDiskServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
         void UpdateDisk(VFSBase.DiskServiceReference.UserDto userDto, VFSBase.DiskServiceReference.DiskDto diskDto);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/UpdateDisk", ReplyAction="http://tempuri.org/IDiskService/UpdateDiskResponse")]
