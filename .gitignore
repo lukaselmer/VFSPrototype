@@ -174,4 +174,5 @@ Code/VFSPrototype/Testfiles/virtual_disk.vfs
 Code/VFSPrototype/Testfiles/dummy.dat
 Code/VFSPrototype/Testfiles/*
 
+/Code/VFSPrototype/VFSWCFServer/App_Data/*
 /Code/VFSPrototype/VFSWCFServerTests/Testfiles/App_Data/*.sqlite
