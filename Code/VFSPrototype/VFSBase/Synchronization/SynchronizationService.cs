@@ -12,25 +12,24 @@ using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using User = VFSBase.DiskServiceReference.User;
 
 namespace VFSBase.Synchronization
 {
-    class SynchronizationService
+    internal class SynchronizationService : ISynchronizationService
     {
         /// <summary>
         /// The synchronization interval specifies how long the pause in seconds between synchronization should be.
         /// </summary>
         private const int SynchronizationIntervalInSeconds = 3;
         private readonly IFileSystem _fileSystem;
-        private readonly User _user;
+        private readonly UserDto _user;
         private readonly SynchronizationCallbacks _callbacks;
         private static BackgroundWorker _backgroundWorker;
         private readonly DiskServiceClient _diskService;
         //private UserServiceClient _userService;
-        private Disk _disk;
+        private DiskDto _disk;
 
-        public SynchronizationService(IFileSystem fileSystem, User user, SynchronizationCallbacks callbacks)
+        public SynchronizationService(IFileSystem fileSystem, UserDto user, SynchronizationCallbacks callbacks)
         {
             _fileSystem = fileSystem;
             _user = user;
@@ -79,7 +78,7 @@ namespace VFSBase.Synchronization
 
         private void Synchronize()
         {
-            var state = _diskService.FetchSynchronizationState(_disk);
+            var state = _diskService.FetchSynchronizationState(_user, _disk);
             _callbacks.StateChanged(state);
 
             if (state == SynchronizationState.LocalChanges) SynchonizeLocalChanges();
@@ -95,11 +94,11 @@ namespace VFSBase.Synchronization
 
             for (var currentBlockNr = localBlockNr + 1; currentBlockNr <= untilBlockNr; currentBlockNr++)
             {
-                var data = _diskService.ReadBlock(_disk.Uuid, currentBlockNr);
+                var data = _diskService.ReadBlock(_user, _disk.Id, currentBlockNr);
                 _fileSystem.WriteBlock(currentBlockNr, data);
             }
 
-            var options = _diskService.GetDiskOptions(_disk);
+            var options = _diskService.GetDiskOptions(_user, _disk);
             _fileSystem.WriteFileSystemOptions(options.SerializedFileSystemOptions);
 
             _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
@@ -119,9 +118,9 @@ namespace VFSBase.Synchronization
             }
         }
 
-        private Disk RemoteDisk()
+        private DiskDto RemoteDisk()
         {
-            return _diskService.Disks(_user).First(d => d.Uuid == _disk.Uuid);
+            return _diskService.Disks(_user).First(d => d.Id == _disk.Id);
         }
 
         private void SynchonizeLocalChanges()
@@ -135,14 +134,14 @@ namespace VFSBase.Synchronization
 
             for (var currentBlockNr = fromBlockNr; currentBlockNr <= untilBlockNr; currentBlockNr++)
             {
-                _diskService.WriteBlock(_disk.Uuid, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
+                _diskService.WriteBlock(_user, _disk.Id, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
             }
 
-            _diskService.SetDiskOptions(_disk, CalculateDiskOptions(_fileSystem.FileSystemOptions));
+            _diskService.SetDiskOptions(_user, _disk, CalculateDiskOptions(_fileSystem.FileSystemOptions));
 
             _disk.LocalVersion = _fileSystem.Root.Version;
             _disk.LastServerVersion = _fileSystem.Root.Version;
-            _diskService.UpdateDisk(_disk);
+            _diskService.UpdateDisk(_user, _disk);
 
             _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
             _fileSystem.FileSystemOptions.LastServerVersion = _fileSystem.Root.Version;
@@ -151,14 +150,14 @@ namespace VFSBase.Synchronization
 
         private void InitializeDisk()
         {
-            if (_fileSystem.FileSystemOptions.Uuid == null) CreateDisk();
+            if (_fileSystem.FileSystemOptions.Id == 0) CreateDisk();
             else LoadDisk();
         }
 
         private void LoadDisk()
         {
             var o = _fileSystem.FileSystemOptions;
-            _disk = new Disk { LastServerVersion = o.LastServerVersion, LocalVersion = o.LocalVersion, Uuid = o.Uuid, User = _user };
+            _disk = new DiskDto { LastServerVersion = o.LastServerVersion, LocalVersion = o.LocalVersion, Id = o.Id, UserId = _user.Id };
         }
 
         private void CreateDisk()
@@ -167,11 +166,11 @@ namespace VFSBase.Synchronization
 
             var serverDisk = _diskService.CreateDisk(_user, CalculateDiskOptions(o));
 
-            _fileSystem.MakeSynchronizedDisk(serverDisk.Uuid);
+            _fileSystem.MakeSynchronizedDisk(serverDisk.Id);
             LoadDisk();
         }
 
-        private static DiskOptions CalculateDiskOptions(IFileSystemOptions o)
+        private static DiskOptionsDto CalculateDiskOptions(IFileSystemOptions o)
         {
             byte[] serializedOptions;
             using (var ms = new MemoryStream())
@@ -181,7 +180,7 @@ namespace VFSBase.Synchronization
                 serializedOptions = ms.ToArray();
             }
 
-            var diskOptions = new DiskOptions
+            var diskOptions = new DiskOptionsDto
                                   {
                                       BlockSize = o.BlockSize,
                                       MasterBlockSize = o.MasterBlockSize,

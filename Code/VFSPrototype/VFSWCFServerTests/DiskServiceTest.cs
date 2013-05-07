@@ -1,179 +1,258 @@
 ﻿using System;
 using System.Linq;
+using System.ServiceModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VFSWCFService;
+using VFSWCFContracts.DataTransferObjects;
+using VFSWCFContracts.FaultContracts;
 using VFSWCFService.DiskService;
+using VFSWCFService.Persistence;
 
 namespace VFSWCFServiceTests
 {
     [TestClass]
     public class DiskServiceTest
     {
-        private Persistence _persistence;
         private UserDto _userDto;
+        private static TestHelper _testHelper;
 
         [TestInitialize]
         public void InitTestPersistence()
         {
-            _persistence = new Persistence();
-            _persistence.Clear();
-            _userDto = _persistence.CreateUser("bla", "blub");
+            _testHelper = new TestHelper("../../Testfiles/DiskServiceTest");
+            _userDto = new UserDto { Login = "bla", HashedPassword = "blub" };
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            _testHelper.Cleanup();
+        }
+
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
+        [TestMethod]
+        public void TestAuthenticationOnLogin()
+        {
+            using (var s = new DiskService(GetPersistence()))
+            {
+                s.Login("nananana", "blub");
+            }
+        }
+
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
+        [TestMethod]
+        public void TestAuthenticationOnCreateDisk()
+        {
+            using (var s = new DiskService(GetPersistence()))
+            {
+                s.Login("nananana", "blub");
+                var disk = s.CreateDisk(new UserDto { Login = "bla", HashedPassword = "wrong!" },
+                             new DiskOptionsDto { BlockSize = 1000, MasterBlockSize = 1000, SerializedFileSystemOptions = new byte[10] });
+            }
+        }
+
+        [TestMethod]
+        public void TestAutgeneratedIdShouldBeOne()
+        {
+            using (var persistence = GetPersistence())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                Assert.AreEqual(1, user.Id);
+            }
         }
 
         [TestMethod]
         public void TestCreateDiskSuccess()
         {
-            _persistence.Clear();
-            _persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-            var s = new DiskService { Persistence = _persistence };
-            var disk = s.CreateDisk(_userDto, null);
-            Assert.AreEqual(_userDto.Login, disk.UserLogin);
-            Assert.AreEqual(1, _persistence.Disks(_userDto.Login).Count);
+            using (var persistence = GetPersistenceWithUser())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                var s = new DiskService(persistence);
+                var disk = s.CreateDisk(user, new DiskOptionsDto());
+                Assert.AreEqual(user.Id, disk.UserId);
+                Assert.AreEqual(1, persistence.Disks(user).Count);
+                Assert.AreEqual(user.Id, persistence.Disks(user).First().UserId);
+                Assert.AreEqual(user.Id, disk.UserId);
+                Assert.AreEqual(1, disk.UserId);
+            }
         }
 
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
         [TestMethod]
         public void TestCreateDiskBad()
         {
-            _persistence.Clear();
-            var s = new DiskService { Persistence = _persistence };
-            var disk = s.CreateDisk(new UserDto { Login = "xxx", HashedPassword = "yyy" }, null);
-            Assert.IsNull(disk);
+            using (var persistence = GetPersistence())
+            {
+                var s = new DiskService(persistence);
+                var disk = s.CreateDisk(new UserDto { Login = "xxx", HashedPassword = "yyy" }, null);
+                Assert.IsNull(disk);
+            }
         }
 
         [TestMethod]
         public void TestDisks()
         {
-            _persistence.Clear();
-            _persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-            var disk = new DiskDto { UserLogin = _userDto.Login, Uuid = "foo" };
-            _persistence.CreateDisk(_userDto, disk);
-            var s = new DiskService { Persistence = _persistence };
-            Assert.AreEqual(1, s.Disks(_userDto).Count);
-            Assert.AreEqual(disk.Uuid, s.Disks(_userDto).First().Uuid);
+            using (var persistence = GetPersistenceWithUser())
+            {
+                var disk = new DiskDto { UserId = _userDto.Id, Id = 1 };
+                persistence.CreateDisk(_userDto, new DiskOptionsDto());
+                var s = new DiskService(persistence);
+                Assert.AreEqual(1, s.Disks(_userDto).Count);
+                Assert.AreEqual(disk.Id, s.Disks(_userDto).First().Id);
+            }
         }
 
         [TestMethod]
         public void TestDisksEmpty()
         {
-            _persistence.Clear();
-            var s = new DiskService { Persistence = _persistence };
-            Assert.AreEqual(0, s.Disks(_userDto).Count);
+            using (var persistence = GetPersistenceWithUser())
+            {
+                var s = new DiskService(persistence);
+                Assert.AreEqual(0, s.Disks(_userDto).Count);
+            }
         }
 
         [TestMethod]
         public void TestDeleteDisks()
         {
-            _persistence.Clear();
-            _persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-            var disk = new DiskDto { UserLogin = _userDto.Login, Uuid = "foo" };
-            _persistence.CreateDisk(_userDto, disk);
-            var s = new DiskService { Persistence = _persistence };
-            Assert.IsTrue(s.DeleteDisk(disk));
-            Assert.AreEqual(0, s.Disks(_userDto).Count);
-            Assert.IsFalse(s.DeleteDisk(disk));
+            using (var persistence = GetPersistence())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
+                var s = new DiskService(persistence);
+                Assert.IsTrue(s.DeleteDisk(user, disk));
+                Assert.AreEqual(0, s.Disks(user).Count);
+            }
         }
 
         [TestMethod]
         public void TestSynchronizationStateUpToDate()
         {
-            _persistence.Clear();
-            _persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-            var disk = new DiskDto { UserLogin = _userDto.Login, Uuid = "foo" };
-            _persistence.CreateDisk(_userDto, disk);
+            using (var persistence = GetPersistence())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                persistence.CreateDisk(user, new DiskOptionsDto());
 
-            var s = new DiskService { Persistence = _persistence };
+                var s = new DiskService(persistence);
 
-            var clonedDisk = s.Disks(_userDto).First();
-            Assert.AreEqual(SynchronizationState.UpToDate, s.FetchSynchronizationState(clonedDisk));
+                var clonedDisk = s.Disks(user).First();
+                Assert.AreEqual(SynchronizationState.UpToDate, s.FetchSynchronizationState(user, clonedDisk));
+            }
         }
 
         [TestMethod]
         public void TestSynchronizationStateLocalChanges()
         {
-            _persistence.Clear();
-            _persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-            var disk = new DiskDto { UserLogin = _userDto.Login, Uuid = "foo" };
-            _persistence.CreateDisk(_userDto, disk);
+            using (var persistence = GetPersistence())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
 
-            var s = new DiskService { Persistence = _persistence };
+                var s = new DiskService(persistence);
 
-            var clonedDisk = new DiskDto { LastServerVersion = disk.LastServerVersion, UserLogin = _userDto.Login, Uuid = disk.Uuid };
-            clonedDisk.LocalVersion += 1;
-            Assert.AreEqual(SynchronizationState.LocalChanges, s.FetchSynchronizationState(clonedDisk));
+                var clonedDisk = new DiskDto { LastServerVersion = disk.LastServerVersion, UserId = user.Id, Id = disk.Id };
+                clonedDisk.LocalVersion += 1;
+                Assert.AreEqual(SynchronizationState.LocalChanges, s.FetchSynchronizationState(user, clonedDisk));
+            }
         }
 
         [TestMethod]
         public void TestSynchronizationStateRemoteChanges()
         {
-            _persistence.Clear();
-            _persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-            var disk = new DiskDto { UserLogin = _userDto.Login, Uuid = "foo", LocalVersion = 10, LastServerVersion = 10 };
-            _persistence.CreateDisk(_userDto, disk);
+            using (var persistence = GetPersistence())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
 
-            var s = new DiskService { Persistence = _persistence };
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
+                disk.LocalVersion = 10;
+                disk.LastServerVersion = 10;
+                persistence.UpdateDisk(disk);
 
-            var clonedDisk = new DiskDto { LastServerVersion = 9, LocalVersion = 9, UserLogin = _userDto.Login, Uuid = disk.Uuid };
-            Assert.AreEqual(SynchronizationState.RemoteChanges, s.FetchSynchronizationState(clonedDisk));
+                var s = new DiskService(persistence);
+
+                var clonedDisk = new DiskDto { LastServerVersion = 9, LocalVersion = 9, UserId = user.Id, Id = disk.Id };
+                Assert.AreEqual(SynchronizationState.RemoteChanges, s.FetchSynchronizationState(user, clonedDisk));
+            }
         }
 
         [TestMethod]
         public void TestSynchronizationStateConflicted()
         {
-            _persistence.Clear();
-            _persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-            var disk = new DiskDto { UserLogin = _userDto.Login, Uuid = "foo", LocalVersion = 10, LastServerVersion = 10 };
-            _persistence.CreateDisk(_userDto, disk);
+            using (var persistence = GetPersistence())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
+                disk.LocalVersion = 10;
+                disk.LastServerVersion = 10;
+                persistence.UpdateDisk(disk);
 
-            var s = new DiskService { Persistence = _persistence };
+                var s = new DiskService(persistence);
 
-            var clonedDisk = new DiskDto { LastServerVersion = 7, LocalVersion = 15, UserLogin = _userDto.Login, Uuid = disk.Uuid };
-            Assert.AreEqual(SynchronizationState.Conflicted, s.FetchSynchronizationState(clonedDisk));
+                var clonedDisk = new DiskDto { LastServerVersion = 7, LocalVersion = 15, UserId = _userDto.Id, Id = disk.Id };
+                Assert.AreEqual(SynchronizationState.Conflicted, s.FetchSynchronizationState(_userDto, clonedDisk));
+            }
         }
 
         [TestMethod]
         public void TestRegistration()
         {
-            _persistence.Clear();
-            var persistence = new Persistence();
-            var s = new DiskService { Persistence = persistence };
-            var user = s.Register("bla", "blub");
-            Assert.AreEqual("bla", user.Login);
-            Assert.AreEqual("blub", user.HashedPassword);
-            Assert.IsTrue(persistence.UserExists("bla"));
+            using (var persistence = GetPersistence())
+            {
+                var s = new DiskService(persistence);
+                var user = s.Register("bla", "blub");
+                Assert.AreEqual("bla", user.Login);
+                Assert.AreEqual("blub", user.HashedPassword);
+                Assert.IsFalse(persistence.LoginFree("bla"));
+            }
         }
 
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
         [TestMethod]
         public void TestRegistrationFail()
         {
-            _persistence.Clear();
-            var persistence = new Persistence();
-            persistence.CreateUser("bla", "test");
-            var s = new DiskService { Persistence = persistence };
-            var user = s.Register("bla", "blub");
-            Assert.IsNull(user);
+            using (var persistence = GetPersistence())
+            {
+                var u = persistence.CreateUser("bla", "blub");
+                var s = new DiskService(persistence);
+                s.Register(u.Login, "blub");
+            }
         }
 
         [TestMethod]
         public void TestLogin()
         {
-            _persistence.Clear();
-            var persistence = new Persistence();
-            persistence.CreateUser("bla", "blub");
-            var s = new DiskService { Persistence = persistence };
-            var user = s.Login("bla", "blub");
-            Assert.AreEqual("bla", user.Login);
-            Assert.AreEqual("blub", user.HashedPassword);
+            using (var persistence = GetPersistence())
+            {
+                persistence.CreateUser("bla", "blub");
+                var s = new DiskService(persistence);
+                var user = s.Login("bla", "blub");
+                Assert.AreEqual("bla", user.Login);
+                Assert.AreEqual("blub", user.HashedPassword);
+            }
         }
 
+        [ExpectedException(typeof(FaultException<ServiceFault>))]
         [TestMethod]
         public void TestLoginFail()
         {
-            _persistence.Clear();
-            var persistence = new Persistence();
-            persistence.CreateUser("bla", "test");
-            var s = new DiskService { Persistence = persistence };
-            var user = s.Login("bla", "blub");
-            Assert.IsNull(user);
+            using (var persistence = GetPersistence())
+            {
+                persistence.CreateUser("bla", "test");
+                var s = new DiskService(persistence);
+                s.Login("bla", "blub");
+            }
+        }
+
+        private static Persistence GetPersistence()
+        {
+            return _testHelper.GetPersistence();
+        }
+
+        private Persistence GetPersistenceWithUser()
+        {
+            var p = _testHelper.GetPersistence();
+            var user = p.CreateUser(_userDto.Login, _userDto.HashedPassword);
+            _userDto.Id = user.Id;
+            return p;
         }
     }
 }

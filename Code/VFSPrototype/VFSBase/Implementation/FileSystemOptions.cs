@@ -160,7 +160,7 @@ namespace VFSBase.Implementation
             }
         }
 
-        public string Uuid { get; set; }
+        public int Id { get; set; }
 
         public long LocalVersion { get; set; }
 
