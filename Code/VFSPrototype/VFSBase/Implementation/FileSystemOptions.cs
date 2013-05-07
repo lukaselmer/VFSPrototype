@@ -32,7 +32,7 @@ namespace VFSBase.Implementation
             Encryption = encryption;
             Compression = compression;
             BlockSize = (int)MathUtil.KB(8);
-            MasterBlockSize = (uint)MathUtil.KB(32);
+            MasterBlockSize = (int)MathUtil.KB(32);
             NameLength = 255;
             BlockReferenceSize = 64;
             BlockAllocation = new BlockAllocation();
@@ -77,7 +77,7 @@ namespace VFSBase.Implementation
         public StreamEncryptionType Encryption { get; set; }
         public StreamCompressionType Compression { get; set; }
 
-        public uint MasterBlockSize { get; set; }
+        public int MasterBlockSize { get; set; }
 
         public int BlockReferenceSize { get; private set; }
 
@@ -94,12 +94,6 @@ namespace VFSBase.Implementation
 
             fileSystemOptions.InitializeStreamCodingStrategy(password);
             return fileSystemOptions;
-        }
-
-        public void Serialize(Stream stream)
-        {
-            IFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(stream, this);
         }
 
         public int BlockSize

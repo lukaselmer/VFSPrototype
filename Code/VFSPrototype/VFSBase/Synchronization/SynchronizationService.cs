@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using VFSBase.DiskServiceReference;
+using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBase.UserServiceReference;
 using User = VFSBase.DiskServiceReference.User;
 
 namespace VFSBase.Synchronization
@@ -23,8 +26,8 @@ namespace VFSBase.Synchronization
         private readonly User _user;
         private readonly SynchronizationCallbacks _callbacks;
         private static BackgroundWorker _backgroundWorker;
-        private DiskServiceClient _diskService;
-        private UserServiceClient _userService;
+        private readonly DiskServiceClient _diskService;
+        //private UserServiceClient _userService;
         private Disk _disk;
 
         public SynchronizationService(IFileSystem fileSystem, User user, SynchronizationCallbacks callbacks)
@@ -35,35 +38,38 @@ namespace VFSBase.Synchronization
             _diskService = new DiskServiceClient();
         }
 
-        public static BackgroundWorker CreateService(IFileSystem fileSystem, User user, SynchronizationCallbacks callbacks)
+        /*public static BackgroundWorker CreateService(IFileSystem fileSystem, User user, SynchronizationCallbacks callbacks)
         {
             var service = new SynchronizationService(fileSystem, user, callbacks);
             var backgroundWorker = new BackgroundWorker();
             backgroundWorker.DoWork += service.DoWork;
-            backgroundWorker.RunWorkerAsync();
             backgroundWorker.WorkerSupportsCancellation = true;
+            backgroundWorker.RunWorkerAsync();
             return backgroundWorker;
-        }
+        }*/
 
         private void DoWork(object sender, DoWorkEventArgs e)
         {
+            return;
             var worker = sender as BackgroundWorker;
             if (worker == null) throw new ArgumentException("sender is not a background worker", "sender");
 
             while (!worker.CancellationPending)
             {
                 var rwLock = _fileSystem.GetReadWriteLock();
+                var version = _fileSystem.CurrentVersion;
 
                 try
                 {
-                    //_fileSystem.FileSystemOptions.
                     rwLock.EnterWriteLock();
+                    _fileSystem.SwitchToLatestVersion();
 
                     if (_disk == null) InitializeDisk();
                     Synchronize();
                 }
                 finally
                 {
+                    _fileSystem.SwitchToVersion(version);
                     if (rwLock.IsWriteLockHeld) rwLock.ExitWriteLock();
                 }
 
@@ -83,7 +89,34 @@ namespace VFSBase.Synchronization
         private void SynchronizeRemoteChanges()
         {
             var remoteDisk = RemoteDisk();
-            //TODO: get blocks from the server, store them in the _fileSystem, adjust root and _blockAllocator
+
+            var untilBlockNr = remoteDisk.LastServerVersion;
+            var localBlockNr = _fileSystem.Root.BlocksUsed;
+
+            for (var currentBlockNr = localBlockNr + 1; currentBlockNr <= untilBlockNr; currentBlockNr++)
+            {
+                var data = _diskService.ReadBlock(_disk.Uuid, currentBlockNr);
+                _fileSystem.WriteBlock(currentBlockNr, data);
+            }
+
+            var options = _diskService.GetDiskOptions(_disk);
+            _fileSystem.WriteFileSystemOptions(options.SerializedFileSystemOptions);
+
+            _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
+            _fileSystem.FileSystemOptions.LastServerVersion = _fileSystem.Root.Version;
+            _fileSystem.WriteConfig();
+
+            using (var ms = new MemoryStream())
+            {
+                ms.Write(options.SerializedFileSystemOptions, 0, options.SerializedFileSystemOptions.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                IFormatter formatter = new BinaryFormatter();
+                var fileSystemOptions = formatter.Deserialize(ms) as FileSystemOptions;
+                if (fileSystemOptions == null) throw new VFSException("Invalid file");
+
+                _fileSystem.Reload(fileSystemOptions);
+            }
         }
 
         private Disk RemoteDisk()
@@ -94,7 +127,26 @@ namespace VFSBase.Synchronization
         private void SynchonizeLocalChanges()
         {
             var remoteDisk = RemoteDisk();
-            //TODO: get blocks from the _fileSystem, send them to the server, adjust _blockAllocator on the server
+
+            _fileSystem.SwitchToVersion(remoteDisk.LocalVersion);
+            var fromBlockNr = _fileSystem.Root.BlocksUsed;
+            _fileSystem.SwitchToLatestVersion();
+            var untilBlockNr = _fileSystem.Root.BlocksUsed;
+
+            for (var currentBlockNr = fromBlockNr; currentBlockNr <= untilBlockNr; currentBlockNr++)
+            {
+                _diskService.WriteBlock(_disk.Uuid, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
+            }
+
+            _diskService.SetDiskOptions(_disk, CalculateDiskOptions(_fileSystem.FileSystemOptions));
+
+            _disk.LocalVersion = _fileSystem.Root.Version;
+            _disk.LastServerVersion = _fileSystem.Root.Version;
+            _diskService.UpdateDisk(_disk);
+
+            _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
+            _fileSystem.FileSystemOptions.LastServerVersion = _fileSystem.Root.Version;
+            _fileSystem.WriteConfig();
         }
 
         private void InitializeDisk()
@@ -111,9 +163,31 @@ namespace VFSBase.Synchronization
 
         private void CreateDisk()
         {
-            var serverDisk = _diskService.CreateDisk(_user);
+            var o = _fileSystem.FileSystemOptions;
+
+            var serverDisk = _diskService.CreateDisk(_user, CalculateDiskOptions(o));
+
             _fileSystem.MakeSynchronizedDisk(serverDisk.Uuid);
             LoadDisk();
+        }
+
+        private static DiskOptions CalculateDiskOptions(IFileSystemOptions o)
+        {
+            byte[] serializedOptions;
+            using (var ms = new MemoryStream())
+            {
+                var bf = new BinaryFormatter();
+                bf.Serialize(ms, o);
+                serializedOptions = ms.ToArray();
+            }
+
+            var diskOptions = new DiskOptions
+                                  {
+                                      BlockSize = o.BlockSize,
+                                      MasterBlockSize = o.MasterBlockSize,
+                                      SerializedFileSystemOptions = serializedOptions
+                                  };
+            return diskOptions;
         }
     }
 

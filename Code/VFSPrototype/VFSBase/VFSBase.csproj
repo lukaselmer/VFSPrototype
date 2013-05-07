@@ -55,7 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
-    <Compile Include="Persistence\Blocks\BlockAllocation.cs" />
     <Compile Include="Factories\FileSystemTextManipulatorFactory.cs" />
     <Compile Include="Interfaces\IFileSystemTextManipulatorFactory.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\CircularBuffer.cs" />
@@ -86,7 +85,6 @@
     <Compile Include="Persistence\Coding\MicrosoftAes\MicrosoftStreamEncryptionStrategy.cs" />
     <Compile Include="Implementation\VFSFileStream.cs" />
     <Compile Include="Persistence\BlockList.cs" />
-    <Compile Include="Persistence\Blocks\BlockManipulator.cs" />
     <Compile Include="Implementation\FileSystem.cs" />
     <Compile Include="Factories\FileSystemFactory.cs" />
     <Compile Include="Interfaces\IBlockList.cs" />
@@ -119,11 +117,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Service References\UserServiceReference\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
     <Compile Include="Synchronization\SynchronizationService.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -145,20 +138,13 @@
     <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.Disk.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
+    <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.DiskOptions.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
     <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.SynchronizationState.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\UserServiceReference\UserService.wsdl" />
-    <None Include="Service References\UserServiceReference\UserService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\UserServiceReference\UserService1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\UserServiceReference\UserService2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\UserServiceReference\VFSBase.UserServiceReference.User.datasource">
+    <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.User.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
   </ItemGroup>
@@ -166,8 +152,13 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\VFSBlockAbstraction\VFSBlockAbstraction.csproj">
+      <Project>{8937804B-8BD8-4058-85A2-A22FD767E0E7}</Project>
+      <Name>VFSBlockAbstraction</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <WCFMetadataStorage Include="Service References\DiskServiceReference\" />
-    <WCFMetadataStorage Include="Service References\UserServiceReference\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\DiskServiceReference\DiskService.disco" />
@@ -180,21 +171,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\DiskServiceReference\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\UserServiceReference\UserService.disco" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\UserServiceReference\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\UserServiceReference\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\UserServiceReference\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>

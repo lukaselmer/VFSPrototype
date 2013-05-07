@@ -1,28 +1,35 @@
 ﻿using System;
 using System.IO;
-using VFSBase.Persistence.Blocks;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
-namespace VFSBase.Implementation
+namespace VFSBlockAbstraction
 {
-    internal sealed class BlockManipulator : IDisposable
+    public sealed class BlockManipulator : IDisposable
     {
         private FileStream _disk;
         private BinaryReader _diskReader;
         private BinaryWriter _diskWriter;
-        private readonly FileSystemOptions _options;
 
-        public BlockManipulator(FileSystemOptions options)
+        private readonly int _blockSize;
+        private readonly int _masterBlockSize;
+        private readonly string _location;
+
+        public BlockManipulator(string location, int blockSize, int masterBlockSize)
         {
-            _options = options;
+            _location = location;
+            _blockSize = blockSize;
+            _masterBlockSize = masterBlockSize;
 
-            _disk = new FileStream(_options.Location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, _options.BlockSize, FileOptions.RandomAccess);
+            //_disk = new FileStream(_location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, blockSize, FileOptions.RandomAccess);
+            _disk = new FileStream(_location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, blockSize, FileOptions.RandomAccess);
             _diskReader = new BinaryReader(_disk);
             _diskWriter = new BinaryWriter(_disk);
         }
 
         private void SeekToBlock(long blockNumber)
         {
-            _disk.Seek(_options.MasterBlockSize + (blockNumber * _options.BlockSize), SeekOrigin.Begin);
+            _disk.Seek(_masterBlockSize + (blockNumber * _blockSize), SeekOrigin.Begin);
         }
 
         public void WriteBlock(long blockNumber, byte[] block)
@@ -35,8 +42,8 @@ namespace VFSBase.Implementation
         public byte[] ReadBlock(long blockNumber)
         {
             SeekToBlock(blockNumber);
-            var block = _diskReader.ReadBytes(_options.BlockSize);
-            if (block.Length != _options.BlockSize) return new byte[_options.BlockSize];
+            var block = _diskReader.ReadBytes(_blockSize);
+            if (block.Length != _blockSize) return new byte[_blockSize];
             return block;
         }
 
@@ -77,11 +84,18 @@ namespace VFSBase.Implementation
             }
         }
 
-        public void SaveConfig(FileSystemOptions options, BlockAllocation blockAllocation)
+        public void SaveConfig(byte[] options)
         {
             _disk.Seek(0, SeekOrigin.Begin);
-            options.Serialize(_disk);
-            blockAllocation.Serialize(_disk);
+            _disk.Write(options, 0, options.Length);
+        }
+
+        public void SaveConfig(object options)
+        {
+            _disk.Seek(0, SeekOrigin.Begin);
+
+            IFormatter formatter = new BinaryFormatter();
+            formatter.Serialize(_disk, options);
         }
     }
 }

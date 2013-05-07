@@ -9,6 +9,7 @@ using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.Persistence.Blocks;
 using VFSBase.Persistence.Coding;
+using VFSBlockAbstraction;
 
 namespace VFSBase.Persistence
 {

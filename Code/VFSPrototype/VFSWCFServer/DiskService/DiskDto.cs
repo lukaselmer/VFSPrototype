@@ -1,22 +1,26 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using VFSWCFService.UserService;
+using SQLite;
 
 namespace VFSWCFService.DiskService
 {
     [DataContract]
-    public class Disk
+    public class DiskDto
     {
+        [PrimaryKey]
         [DataMember]
         public string Uuid { get; set; }
-
-        [DataMember]
-        public User User { get; set; }
 
         [DataMember]
         public long LastServerVersion { get; set; }
 
         [DataMember]
         public long LocalVersion { get; set; }
+
+        [DataMember]
+        public long NewestBlock { get; set; }
+
+        [DataMember]
+        public string UserLogin { get; set; }
     }
 }

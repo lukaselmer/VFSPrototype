@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
-using VFSWCFService.UserService;
 
 namespace VFSWCFService.DiskService
 {
@@ -8,15 +7,36 @@ namespace VFSWCFService.DiskService
     public interface IDiskService
     {
         [OperationContract]
-        IList<Disk> Disks(User user);
+        UserDto Register(string login, string hashedPassword);
 
         [OperationContract]
-        Disk CreateDisk(User user);
+        UserDto Login(string login, string hashedPassword);
 
         [OperationContract]
-        bool DeleteDisk(Disk disk);
+        IList<DiskDto> Disks(UserDto userDto);
 
         [OperationContract]
-        SynchronizationState FetchSynchronizationState(Disk disk);
+        DiskDto CreateDisk(UserDto userDto, DiskOptions options);
+
+        [OperationContract]
+        bool DeleteDisk(DiskDto diskDto);
+
+        [OperationContract]
+        SynchronizationState FetchSynchronizationState(DiskDto diskDto);
+
+        [OperationContract]
+        DiskOptions GetDiskOptions(DiskDto diskDto);
+
+        [OperationContract]
+        void SetDiskOptions(DiskDto diskDto, DiskOptions options);
+
+        [OperationContract]
+        void WriteBlock(string diskUuid, long blockNr, byte[] content);
+
+        [OperationContract]
+        byte[] ReadBlock(string diskUuid, long blockNr);
+
+        [OperationContract]
+        void UpdateDisk(DiskDto diskDto);
     }
 }
