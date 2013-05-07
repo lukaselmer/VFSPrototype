@@ -96,11 +96,16 @@ namespace VFSWCFService.Persistence
             return _db.Table<DiskDto>().Where(d => d.UserId == userDto.Id).ToList();
         }
 
-        public void CreateDisk(UserDto userDto, DiskDto diskDto)
+
+        public DiskDto CreateDisk(UserDto userDto, DiskOptionsDto optionsDto)
         {
-            if (FindUser(userDto.Login) == null) return;
-            if (FindDisk(diskDto) != null) throw new Exception("duplicate id");
-            _db.Insert(diskDto);
+            var disk = new DiskDto { UserId = userDto.Id };
+            _db.Insert(disk);
+
+            optionsDto.DiskId = disk.Id;
+            _db.Insert(optionsDto);
+
+            return disk;
         }
 
         public void UpdateDisk(DiskDto diskDto)
@@ -121,15 +126,15 @@ namespace VFSWCFService.Persistence
             return _db.Find<DiskDto>(remoteDiskDto.Id);
         }
 
-        public DiskOptionsDto LoadDiskOptions(int id)
+        public DiskOptionsDto LoadDiskOptions(int diskId)
         {
-            return _db.Find<DiskOptionsDto>(id);
+            return _db.Find<DiskOptionsDto>(o => o.DiskId == diskId);
         }
 
-        public void SaveDiskOptions(int id, DiskOptionsDto optionsDto)
+        public void SaveDiskOptions(int diskId, DiskOptionsDto optionsDto)
         {
-            var disk = _db.Find<DiskDto>(d => d.Id == id);
-            optionsDto.DiskId = disk.Id;
+            _db.Delete<DiskOptionsDto>(LoadDiskOptions(diskId).Id);
+            optionsDto.DiskId = diskId;
             _db.Insert(optionsDto);
         }
 
@@ -166,6 +171,11 @@ namespace VFSWCFService.Persistence
                 _db.Dispose();
                 _db = null;
             }
+        }
+
+        public DiskDto Disk(DiskDto diskDto)
+        {
+            return _db.Find<DiskDto>(diskDto.Id);
         }
     }
 }
