@@ -18,7 +18,7 @@ namespace VFSWCFServiceTests
         [TestInitialize]
         public void InitTestPersistence()
         {
-            _testHelper = new TestHelper("../../Testfiles/TmpDatabases");
+            _testHelper = new TestHelper("../../Testfiles/DiskServiceTest");
             _userDto = new UserDto { Login = "bla", HashedPassword = "blub" };
         }
 
@@ -45,7 +45,7 @@ namespace VFSWCFServiceTests
             using (var s = new DiskService(GetPersistence()))
             {
                 s.Login("nananana", "blub");
-                s.CreateDisk(new UserDto { Login = "bla", HashedPassword = "wrong!" },
+                var disk = s.CreateDisk(new UserDto { Login = "bla", HashedPassword = "wrong!" },
                              new DiskOptionsDto { BlockSize = 1000, MasterBlockSize = 1000, SerializedFileSystemOptions = new byte[10] });
             }
         }
@@ -63,13 +63,16 @@ namespace VFSWCFServiceTests
         [TestMethod]
         public void TestCreateDiskSuccess()
         {
-            using (var persistence = GetPersistence())
+            using (var persistence = GetPersistenceWithUser())
             {
-                persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
                 var s = new DiskService(persistence);
-                var disk = s.CreateDisk(_userDto, null);
-                Assert.AreEqual(_userDto.Id, disk.UserId);
-                Assert.AreEqual(1, persistence.Disks(_userDto).Count);
+                var disk = s.CreateDisk(user, new DiskOptionsDto());
+                Assert.AreEqual(user.Id, disk.UserId);
+                Assert.AreEqual(1, persistence.Disks(user).Count);
+                Assert.AreEqual(user.Id, persistence.Disks(user).First().UserId);
+                Assert.AreEqual(user.Id, disk.UserId);
+                Assert.AreEqual(1, disk.UserId);
             }
         }
 
@@ -88,11 +91,10 @@ namespace VFSWCFServiceTests
         [TestMethod]
         public void TestDisks()
         {
-            using (var persistence = GetPersistence())
+            using (var persistence = GetPersistenceWithUser())
             {
-                persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
                 var disk = new DiskDto { UserId = _userDto.Id, Id = 1 };
-                persistence.CreateDisk(_userDto, disk);
+                persistence.CreateDisk(_userDto, new DiskOptionsDto());
                 var s = new DiskService(persistence);
                 Assert.AreEqual(1, s.Disks(_userDto).Count);
                 Assert.AreEqual(disk.Id, s.Disks(_userDto).First().Id);
@@ -102,9 +104,8 @@ namespace VFSWCFServiceTests
         [TestMethod]
         public void TestDisksEmpty()
         {
-            using (var persistence = GetPersistence())
+            using (var persistence = GetPersistenceWithUser())
             {
-                _userDto = persistence.CreateUser("bla", "blub");
                 var s = new DiskService(persistence);
                 Assert.AreEqual(0, s.Disks(_userDto).Count);
             }
@@ -115,13 +116,11 @@ namespace VFSWCFServiceTests
         {
             using (var persistence = GetPersistence())
             {
-                persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-                var disk = new DiskDto { UserId = _userDto.Id, Id = 1 };
-                persistence.CreateDisk(_userDto, disk);
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
                 var s = new DiskService(persistence);
-                Assert.IsTrue(s.DeleteDisk(_userDto, disk));
-                Assert.AreEqual(0, s.Disks(_userDto).Count);
-                Assert.IsFalse(s.DeleteDisk(_userDto, disk));
+                Assert.IsTrue(s.DeleteDisk(user, disk));
+                Assert.AreEqual(0, s.Disks(user).Count);
             }
         }
 
@@ -130,14 +129,13 @@ namespace VFSWCFServiceTests
         {
             using (var persistence = GetPersistence())
             {
-                persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-                var disk = new DiskDto { UserId = _userDto.Id, Id = 1 };
-                persistence.CreateDisk(_userDto, disk);
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                persistence.CreateDisk(user, new DiskOptionsDto());
 
                 var s = new DiskService(persistence);
 
-                var clonedDisk = s.Disks(_userDto).First();
-                Assert.AreEqual(SynchronizationState.UpToDate, s.FetchSynchronizationState(_userDto, clonedDisk));
+                var clonedDisk = s.Disks(user).First();
+                Assert.AreEqual(SynchronizationState.UpToDate, s.FetchSynchronizationState(user, clonedDisk));
             }
         }
 
@@ -146,15 +144,14 @@ namespace VFSWCFServiceTests
         {
             using (var persistence = GetPersistence())
             {
-                persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-                var disk = new DiskDto { UserId = _userDto.Id, Id = 1 };
-                persistence.CreateDisk(_userDto, disk);
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
 
                 var s = new DiskService(persistence);
 
-                var clonedDisk = new DiskDto { LastServerVersion = disk.LastServerVersion, UserId = _userDto.Id, Id = disk.Id };
+                var clonedDisk = new DiskDto { LastServerVersion = disk.LastServerVersion, UserId = user.Id, Id = disk.Id };
                 clonedDisk.LocalVersion += 1;
-                Assert.AreEqual(SynchronizationState.LocalChanges, s.FetchSynchronizationState(_userDto, clonedDisk));
+                Assert.AreEqual(SynchronizationState.LocalChanges, s.FetchSynchronizationState(user, clonedDisk));
             }
         }
 
@@ -163,14 +160,17 @@ namespace VFSWCFServiceTests
         {
             using (var persistence = GetPersistence())
             {
-                persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-                var disk = new DiskDto { UserId = _userDto.Id, Id = 1, LocalVersion = 10, LastServerVersion = 10 };
-                persistence.CreateDisk(_userDto, disk);
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
+                disk.LocalVersion = 10;
+                disk.LastServerVersion = 10;
+                persistence.UpdateDisk(disk);
 
                 var s = new DiskService(persistence);
 
-                var clonedDisk = new DiskDto { LastServerVersion = 9, LocalVersion = 9, UserId = _userDto.Id, Id = disk.Id };
-                Assert.AreEqual(SynchronizationState.RemoteChanges, s.FetchSynchronizationState(_userDto, clonedDisk));
+                var clonedDisk = new DiskDto { LastServerVersion = 9, LocalVersion = 9, UserId = user.Id, Id = disk.Id };
+                Assert.AreEqual(SynchronizationState.RemoteChanges, s.FetchSynchronizationState(user, clonedDisk));
             }
         }
 
@@ -179,9 +179,11 @@ namespace VFSWCFServiceTests
         {
             using (var persistence = GetPersistence())
             {
-                persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
-                var disk = new DiskDto { UserId = _userDto.Id, Id = 1, LocalVersion = 10, LastServerVersion = 10 };
-                persistence.CreateDisk(_userDto, disk);
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
+                disk.LocalVersion = 10;
+                disk.LastServerVersion = 10;
+                persistence.UpdateDisk(disk);
 
                 var s = new DiskService(persistence);
 
@@ -243,6 +245,14 @@ namespace VFSWCFServiceTests
         private static Persistence GetPersistence()
         {
             return _testHelper.GetPersistence();
+        }
+
+        private Persistence GetPersistenceWithUser()
+        {
+            var p = _testHelper.GetPersistence();
+            var user = p.CreateUser(_userDto.Login, _userDto.HashedPassword);
+            _userDto.Id = user.Id;
+            return p;
         }
     }
 }

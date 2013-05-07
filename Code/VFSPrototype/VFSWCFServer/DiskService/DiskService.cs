@@ -33,14 +33,13 @@ namespace VFSWCFService.DiskService
         {
             Authenticate(userDto);
 
-            var d = new DiskDto { UserId = userDto.Id };
-            Persistence.CreateDisk(userDto, d);
-            return d;
+            return Persistence.CreateDisk(userDto, optionsDto);
         }
 
         public bool DeleteDisk(UserDto userDto, DiskDto diskDto)
         {
             Authenticate(userDto);
+            Authenticate(userDto, diskDto);
 
             var disks = Persistence.Disks(userDto);
             if (disks == null) return false;
@@ -50,6 +49,7 @@ namespace VFSWCFService.DiskService
         public SynchronizationState FetchSynchronizationState(UserDto userDto, DiskDto diskDto)
         {
             Authenticate(userDto);
+            Authenticate(userDto, diskDto);
 
             var serverDisk = Persistence.FindDisk(diskDto);
 
@@ -63,6 +63,7 @@ namespace VFSWCFService.DiskService
         public DiskOptionsDto GetDiskOptions(UserDto userDto, DiskDto diskDto)
         {
             Authenticate(userDto);
+            Authenticate(userDto, diskDto);
 
             return Persistence.LoadDiskOptions(diskDto.Id);
         }
@@ -70,6 +71,7 @@ namespace VFSWCFService.DiskService
         public void SetDiskOptions(UserDto userDto, DiskDto diskDto, DiskOptionsDto optionsDto)
         {
             Authenticate(userDto);
+            Authenticate(userDto, diskDto);
 
             Persistence.SaveDiskOptions(diskDto.Id, optionsDto);
         }
@@ -77,15 +79,41 @@ namespace VFSWCFService.DiskService
         public void WriteBlock(UserDto userDto, int diskId, long blockNr, byte[] content)
         {
             Authenticate(userDto);
+            Authenticate(userDto, new DiskDto { Id = diskId });
 
-            var b = GetBlockManipulator(diskId);
-            b.WriteBlock(blockNr, content);
+            using (var b = GetBlockManipulator(diskId))
+            {
+                b.WriteBlock(blockNr, content);
+            }
+        }
+
+        public byte[] ReadBlock(UserDto userDto, int diskId, long blockNr)
+        {
+            Authenticate(userDto);
+            Authenticate(userDto, new DiskDto { Id = diskId });
+
+            using (var b = GetBlockManipulator(diskId))
+            {
+                return b.ReadBlock(blockNr);
+            }
+        }
+
+        public void UpdateDisk(UserDto userDto, DiskDto diskDto)
+        {
+            Authenticate(userDto);
+            Authenticate(userDto, diskDto);
+
+            Persistence.UpdateDisk(diskDto);
         }
 
         private BlockManipulator GetBlockManipulator(int id)
         {
             var options = Persistence.LoadDiskOptions(id);
-            var b = new BlockManipulator(DiskLocation(id), options.BlockSize, options.MasterBlockSize);
+            var path = DiskLocation(id);
+
+            if (!File.Exists(path)) File.WriteAllText(path, "");
+
+            var b = new BlockManipulator(path, options.BlockSize, options.MasterBlockSize);
             return b;
         }
 
@@ -94,21 +122,6 @@ namespace VFSWCFService.DiskService
             var location = Path.Combine(Persistence.PathToDataStore, "Disks");
             if (!Directory.Exists(location)) Directory.CreateDirectory(location);
             return Path.Combine(location, string.Format("{0}.vhs", id));
-        }
-
-        public byte[] ReadBlock(UserDto userDto, int diskId, long blockNr)
-        {
-            Authenticate(userDto);
-
-            var b = GetBlockManipulator(diskId);
-            return b.ReadBlock(blockNr);
-        }
-
-        public void UpdateDisk(UserDto userDto, DiskDto diskDto)
-        {
-            Authenticate(userDto);
-
-            Persistence.UpdateDisk(diskDto);
         }
 
         /// <summary>
@@ -132,7 +145,14 @@ namespace VFSWCFService.DiskService
         private void Authenticate(UserDto userDto)
         {
             var user = Login(userDto.Login, userDto.HashedPassword);
-            user.Id = user.Id;
+            userDto.Id = user.Id;
+        }
+
+        private void Authenticate(UserDto userDto, DiskDto diskDto)
+        {
+            var disk = Persistence.Disk(diskDto);
+            diskDto.UserId = disk.UserId;
+            if (diskDto.UserId != userDto.Id) ErrorOccured(string.Format("You don't have access to the disk {0}", diskDto.Id));
         }
 
         /// <summary>

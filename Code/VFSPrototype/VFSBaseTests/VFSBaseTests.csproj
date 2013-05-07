@@ -110,8 +110,11 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\VFSBase.DiskServiceReference.Disk.datasource" />
+    <None Include="Properties\DataSources\VFSBase.DiskServiceReference.DiskDto.datasource" />
     <None Include="Properties\DataSources\VFSBase.DiskServiceReference.DiskOptions.datasource" />
+    <None Include="Properties\DataSources\VFSBase.DiskServiceReference.DiskOptionsDto.datasource" />
     <None Include="Properties\DataSources\VFSBase.DiskServiceReference.User.datasource" />
+    <None Include="Properties\DataSources\VFSBase.DiskServiceReference.UserDto.datasource" />
     <None Include="Service References\DiskServiceReference\DiskService.wsdl" />
     <None Include="Service References\DiskServiceReference\DiskService.xsd">
       <SubType>Designer</SubType>
@@ -124,15 +127,6 @@
     </None>
     <None Include="Service References\DiskServiceReference\DiskService3.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\DiskServiceReference\VFSBaseTests.DiskServiceReference.DiskDto.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\DiskServiceReference\VFSBaseTests.DiskServiceReference.DiskOptionsDto.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Service References\DiskServiceReference\VFSBaseTests.DiskServiceReference.UserDto.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
