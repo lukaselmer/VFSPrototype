@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="DiskServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VFSWCFContracts\VFSWCFContracts.csproj">
