@@ -2,10 +2,11 @@
 <wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="DiskService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
     <xsd:schema targetNamespace="http://tempuri.org/Imports">
-      <xsd:import schemaLocation="http://localhost:4764/DiskService.svc?xsd=xsd0" namespace="http://tempuri.org/" />
-      <xsd:import schemaLocation="http://localhost:4764/DiskService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
-      <xsd:import schemaLocation="http://localhost:4764/DiskService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" />
-      <xsd:import schemaLocation="http://localhost:4764/DiskService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" />
+      <xsd:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" />
+      <xsd:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" />
+      <xsd:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd4" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" />
     </xsd:schema>
   </wsdl:types>
   <wsdl:message name="IDiskService_Register_InputMessage">
@@ -14,11 +15,17 @@
   <wsdl:message name="IDiskService_Register_OutputMessage">
     <wsdl:part name="parameters" element="tns:RegisterResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_Register_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q1:ServiceException" />
+  </wsdl:message>
   <wsdl:message name="IDiskService_Login_InputMessage">
     <wsdl:part name="parameters" element="tns:Login" />
   </wsdl:message>
   <wsdl:message name="IDiskService_Login_OutputMessage">
     <wsdl:part name="parameters" element="tns:LoginResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_Login_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q2:ServiceException" />
   </wsdl:message>
   <wsdl:message name="IDiskService_Disks_InputMessage">
     <wsdl:part name="parameters" element="tns:Disks" />
@@ -26,11 +33,17 @@
   <wsdl:message name="IDiskService_Disks_OutputMessage">
     <wsdl:part name="parameters" element="tns:DisksResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_Disks_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q3:ServiceException" />
+  </wsdl:message>
   <wsdl:message name="IDiskService_CreateDisk_InputMessage">
     <wsdl:part name="parameters" element="tns:CreateDisk" />
   </wsdl:message>
   <wsdl:message name="IDiskService_CreateDisk_OutputMessage">
     <wsdl:part name="parameters" element="tns:CreateDiskResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_CreateDisk_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q4:ServiceException" />
   </wsdl:message>
   <wsdl:message name="IDiskService_DeleteDisk_InputMessage">
     <wsdl:part name="parameters" element="tns:DeleteDisk" />
@@ -38,11 +51,17 @@
   <wsdl:message name="IDiskService_DeleteDisk_OutputMessage">
     <wsdl:part name="parameters" element="tns:DeleteDiskResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_DeleteDisk_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q5:ServiceException" />
+  </wsdl:message>
   <wsdl:message name="IDiskService_FetchSynchronizationState_InputMessage">
     <wsdl:part name="parameters" element="tns:FetchSynchronizationState" />
   </wsdl:message>
   <wsdl:message name="IDiskService_FetchSynchronizationState_OutputMessage">
     <wsdl:part name="parameters" element="tns:FetchSynchronizationStateResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_FetchSynchronizationState_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q6:ServiceException" />
   </wsdl:message>
   <wsdl:message name="IDiskService_GetDiskOptions_InputMessage">
     <wsdl:part name="parameters" element="tns:GetDiskOptions" />
@@ -50,11 +69,17 @@
   <wsdl:message name="IDiskService_GetDiskOptions_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetDiskOptionsResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_GetDiskOptions_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q7="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q7:ServiceException" />
+  </wsdl:message>
   <wsdl:message name="IDiskService_SetDiskOptions_InputMessage">
     <wsdl:part name="parameters" element="tns:SetDiskOptions" />
   </wsdl:message>
   <wsdl:message name="IDiskService_SetDiskOptions_OutputMessage">
     <wsdl:part name="parameters" element="tns:SetDiskOptionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_SetDiskOptions_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q8="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q8:ServiceException" />
   </wsdl:message>
   <wsdl:message name="IDiskService_WriteBlock_InputMessage">
     <wsdl:part name="parameters" element="tns:WriteBlock" />
@@ -62,11 +87,17 @@
   <wsdl:message name="IDiskService_WriteBlock_OutputMessage">
     <wsdl:part name="parameters" element="tns:WriteBlockResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_WriteBlock_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q9="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q9:ServiceException" />
+  </wsdl:message>
   <wsdl:message name="IDiskService_ReadBlock_InputMessage">
     <wsdl:part name="parameters" element="tns:ReadBlock" />
   </wsdl:message>
   <wsdl:message name="IDiskService_ReadBlock_OutputMessage">
     <wsdl:part name="parameters" element="tns:ReadBlockResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_ReadBlock_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q10="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q10:ServiceException" />
   </wsdl:message>
   <wsdl:message name="IDiskService_UpdateDisk_InputMessage">
     <wsdl:part name="parameters" element="tns:UpdateDisk" />
@@ -74,50 +105,64 @@
   <wsdl:message name="IDiskService_UpdateDisk_OutputMessage">
     <wsdl:part name="parameters" element="tns:UpdateDiskResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_UpdateDisk_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q11="http://schemas.datacontract.org/2004/07/VFSWCFContracts.Contracts" name="detail" element="q11:ServiceException" />
+  </wsdl:message>
   <wsdl:portType name="IDiskService">
     <wsdl:operation name="Register">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/Register" message="tns:IDiskService_Register_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/RegisterResponse" message="tns:IDiskService_Register_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/RegisterServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_Register_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="Login">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/Login" message="tns:IDiskService_Login_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/LoginResponse" message="tns:IDiskService_Login_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/LoginServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_Login_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="Disks">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/Disks" message="tns:IDiskService_Disks_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/DisksResponse" message="tns:IDiskService_Disks_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/DisksServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_Disks_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="CreateDisk">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/CreateDisk" message="tns:IDiskService_CreateDisk_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/CreateDiskResponse" message="tns:IDiskService_CreateDisk_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/CreateDiskServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_CreateDisk_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="DeleteDisk">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/DeleteDisk" message="tns:IDiskService_DeleteDisk_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/DeleteDiskResponse" message="tns:IDiskService_DeleteDisk_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/DeleteDiskServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_DeleteDisk_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="FetchSynchronizationState">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/FetchSynchronizationState" message="tns:IDiskService_FetchSynchronizationState_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/FetchSynchronizationStateResponse" message="tns:IDiskService_FetchSynchronizationState_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/FetchSynchronizationStateServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_FetchSynchronizationState_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetDiskOptions">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/GetDiskOptions" message="tns:IDiskService_GetDiskOptions_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/GetDiskOptionsResponse" message="tns:IDiskService_GetDiskOptions_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/GetDiskOptionsServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_GetDiskOptions_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="SetDiskOptions">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/SetDiskOptions" message="tns:IDiskService_SetDiskOptions_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/SetDiskOptionsResponse" message="tns:IDiskService_SetDiskOptions_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/SetDiskOptionsServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_SetDiskOptions_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="WriteBlock">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/WriteBlock" message="tns:IDiskService_WriteBlock_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/WriteBlockResponse" message="tns:IDiskService_WriteBlock_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/WriteBlockServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_WriteBlock_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="ReadBlock">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/ReadBlock" message="tns:IDiskService_ReadBlock_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/ReadBlockResponse" message="tns:IDiskService_ReadBlock_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/ReadBlockServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_ReadBlock_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="UpdateDisk">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/UpdateDisk" message="tns:IDiskService_UpdateDisk_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/UpdateDiskResponse" message="tns:IDiskService_UpdateDisk_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/IDiskService/UpdateDiskServiceExceptionFault" name="ServiceExceptionFault" message="tns:IDiskService_UpdateDisk_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="BasicHttpBinding_IDiskService" type="tns:IDiskService">
@@ -130,6 +175,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="Login">
       <soap:operation soapAction="http://tempuri.org/IDiskService/Login" style="document" />
@@ -139,6 +187,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="Disks">
       <soap:operation soapAction="http://tempuri.org/IDiskService/Disks" style="document" />
@@ -148,6 +199,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="CreateDisk">
       <soap:operation soapAction="http://tempuri.org/IDiskService/CreateDisk" style="document" />
@@ -157,6 +211,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="DeleteDisk">
       <soap:operation soapAction="http://tempuri.org/IDiskService/DeleteDisk" style="document" />
@@ -166,6 +223,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="FetchSynchronizationState">
       <soap:operation soapAction="http://tempuri.org/IDiskService/FetchSynchronizationState" style="document" />
@@ -175,6 +235,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="GetDiskOptions">
       <soap:operation soapAction="http://tempuri.org/IDiskService/GetDiskOptions" style="document" />
@@ -184,6 +247,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="SetDiskOptions">
       <soap:operation soapAction="http://tempuri.org/IDiskService/SetDiskOptions" style="document" />
@@ -193,6 +259,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="WriteBlock">
       <soap:operation soapAction="http://tempuri.org/IDiskService/WriteBlock" style="document" />
@@ -202,6 +271,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="ReadBlock">
       <soap:operation soapAction="http://tempuri.org/IDiskService/ReadBlock" style="document" />
@@ -211,6 +283,9 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="UpdateDisk">
       <soap:operation soapAction="http://tempuri.org/IDiskService/UpdateDisk" style="document" />
@@ -220,11 +295,14 @@
       <wsdl:output>
         <soap:body use="literal" />
       </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
+      </wsdl:fault>
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="DiskService">
     <wsdl:port name="BasicHttpBinding_IDiskService" binding="tns:BasicHttpBinding_IDiskService">
-      <soap:address location="http://localhost:4764/DiskService.svc" />
+      <soap:address location="http://localhost:8543/DiskService.svc" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

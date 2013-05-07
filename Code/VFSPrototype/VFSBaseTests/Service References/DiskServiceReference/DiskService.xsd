@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:complexType name="User">
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="UserDto">
     <xs:sequence>
       <xs:element minOccurs="0" name="HashedPassword" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
       <xs:element minOccurs="0" name="Login" nillable="true" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="User" nillable="true" type="tns:User" />
+  <xs:element name="UserDto" nillable="true" type="tns:UserDto" />
+  <xs:complexType name="ArrayOfDiskDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DiskDto" nillable="true" type="tns:DiskDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDiskDto" nillable="true" type="tns:ArrayOfDiskDto" />
+  <xs:complexType name="DiskDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="LastServerVersion" type="xs:long" />
+      <xs:element minOccurs="0" name="LocalVersion" type="xs:long" />
+      <xs:element minOccurs="0" name="NewestBlock" type="xs:long" />
+      <xs:element minOccurs="0" name="UserId" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiskDto" nillable="true" type="tns:DiskDto" />
+  <xs:complexType name="DiskOptionsDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="BlockSize" type="xs:int" />
+      <xs:element minOccurs="0" name="DiskId" type="xs:int" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="MasterBlockSize" type="xs:int" />
+      <xs:element minOccurs="0" name="SerializedFileSystemOptions" nillable="true" type="xs:base64Binary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiskOptionsDto" nillable="true" type="tns:DiskOptionsDto" />
 </xs:schema>

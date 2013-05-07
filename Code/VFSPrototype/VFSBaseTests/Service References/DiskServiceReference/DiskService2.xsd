@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" />
+  <xs:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" />
   <xs:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" />
   <xs:element name="Register">
     <xs:complexType>
@@ -13,7 +13,7 @@
   <xs:element name="RegisterResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="RegisterResult" nillable="true" type="q1:User" />
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="RegisterResult" nillable="true" type="q1:UserDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -28,43 +28,44 @@
   <xs:element name="LoginResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="LoginResult" nillable="true" type="q2:User" />
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="LoginResult" nillable="true" type="q2:UserDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="Disks">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="user" nillable="true" type="q3:User" />
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q3:UserDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="DisksResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="DisksResult" nillable="true" type="q4:ArrayOfDisk" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="DisksResult" nillable="true" type="q4:ArrayOfDiskDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="CreateDisk">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="user" nillable="true" type="q5:User" />
-        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="options" nillable="true" type="q6:DiskOptions" />
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q5:UserDto" />
+        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="optionsDto" nillable="true" type="q6:DiskOptionsDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="CreateDiskResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="CreateDiskResult" nillable="true" type="q7:Disk" />
+        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="CreateDiskResult" nillable="true" type="q7:DiskDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="DeleteDisk">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q8:Disk" />
+        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q8:UserDto" />
+        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="diskDto" nillable="true" type="q9:DiskDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -78,36 +79,39 @@
   <xs:element name="FetchSynchronizationState">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q9:Disk" />
+        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q10:UserDto" />
+        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="diskDto" nillable="true" type="q11:DiskDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="FetchSynchronizationStateResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="FetchSynchronizationStateResult" type="q10:SynchronizationState" />
+        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="FetchSynchronizationStateResult" type="q12:SynchronizationState" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetDiskOptions">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q11:Disk" />
+        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q13:UserDto" />
+        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="diskDto" nillable="true" type="q14:DiskDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="GetDiskOptionsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="GetDiskOptionsResult" nillable="true" type="q12:DiskOptions" />
+        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="GetDiskOptionsResult" nillable="true" type="q15:DiskOptionsDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SetDiskOptions">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q13:Disk" />
-        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="options" nillable="true" type="q14:DiskOptions" />
+        <xs:element xmlns:q16="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q16:UserDto" />
+        <xs:element xmlns:q17="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="diskDto" nillable="true" type="q17:DiskDto" />
+        <xs:element xmlns:q18="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="optionsDto" nillable="true" type="q18:DiskOptionsDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -119,7 +123,8 @@
   <xs:element name="WriteBlock">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="diskUuid" nillable="true" type="xs:string" />
+        <xs:element xmlns:q19="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q19:UserDto" />
+        <xs:element minOccurs="0" name="diskId" type="xs:int" />
         <xs:element minOccurs="0" name="blockNr" type="xs:long" />
         <xs:element minOccurs="0" name="content" nillable="true" type="xs:base64Binary" />
       </xs:sequence>
@@ -133,7 +138,8 @@
   <xs:element name="ReadBlock">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="diskUuid" nillable="true" type="xs:string" />
+        <xs:element xmlns:q20="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q20:UserDto" />
+        <xs:element minOccurs="0" name="diskId" type="xs:int" />
         <xs:element minOccurs="0" name="blockNr" type="xs:long" />
       </xs:sequence>
     </xs:complexType>
@@ -148,7 +154,8 @@
   <xs:element name="UpdateDisk">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q15:Disk" />
+        <xs:element xmlns:q21="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="userDto" nillable="true" type="q21:UserDto" />
+        <xs:element xmlns:q22="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" minOccurs="0" name="diskDto" nillable="true" type="q22:DiskDto" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

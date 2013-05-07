@@ -1,160 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:4764/DiskService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" />
-  <xs:import schemaLocation="http://localhost:4764/DiskService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" />
-  <xs:element name="Register">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="login" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="hashedPassword" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="RegisterResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="RegisterResult" nillable="true" type="q1:User" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Login">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="login" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="hashedPassword" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="LoginResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="LoginResult" nillable="true" type="q2:User" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="Disks">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="user" nillable="true" type="q3:User" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DisksResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="DisksResult" nillable="true" type="q4:ArrayOfDisk" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CreateDisk">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" minOccurs="0" name="user" nillable="true" type="q5:User" />
-        <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="options" nillable="true" type="q6:DiskOptions" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CreateDiskResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="CreateDiskResult" nillable="true" type="q7:Disk" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DeleteDisk">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q8:Disk" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="DeleteDiskResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="DeleteDiskResult" type="xs:boolean" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="FetchSynchronizationState">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q9="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q9:Disk" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="FetchSynchronizationStateResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q10="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="FetchSynchronizationStateResult" type="q10:SynchronizationState" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetDiskOptions">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q11="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q11:Disk" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="GetDiskOptionsResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q12="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="GetDiskOptionsResult" nillable="true" type="q12:DiskOptions" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetDiskOptions">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q13="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q13:Disk" />
-        <xs:element xmlns:q14="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="options" nillable="true" type="q14:DiskOptions" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="SetDiskOptionsResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="WriteBlock">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="diskUuid" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="blockNr" type="xs:long" />
-        <xs:element minOccurs="0" name="content" nillable="true" type="xs:base64Binary" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="WriteBlockResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ReadBlock">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="diskUuid" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="blockNr" type="xs:long" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ReadBlockResponse">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="ReadBlockResult" nillable="true" type="xs:base64Binary" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="UpdateDisk">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element xmlns:q15="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" minOccurs="0" name="disk" nillable="true" type="q15:Disk" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="UpdateDiskResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DataTransferObjects" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="UserDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="HashedPassword" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="Login" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="UserDto" nillable="true" type="tns:UserDto" />
+  <xs:complexType name="ArrayOfDiskDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DiskDto" nillable="true" type="tns:DiskDto" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDiskDto" nillable="true" type="tns:ArrayOfDiskDto" />
+  <xs:complexType name="DiskDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="LastServerVersion" type="xs:long" />
+      <xs:element minOccurs="0" name="LocalVersion" type="xs:long" />
+      <xs:element minOccurs="0" name="NewestBlock" type="xs:long" />
+      <xs:element minOccurs="0" name="UserId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiskDto" nillable="true" type="tns:DiskDto" />
+  <xs:complexType name="DiskOptionsDto">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="BlockSize" type="xs:int" />
+      <xs:element minOccurs="0" name="DiskId" type="xs:int" />
+      <xs:element minOccurs="0" name="Id" type="xs:int" />
+      <xs:element minOccurs="0" name="MasterBlockSize" type="xs:int" />
+      <xs:element minOccurs="0" name="SerializedFileSystemOptions" nillable="true" type="xs:base64Binary" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiskOptionsDto" nillable="true" type="tns:DiskOptionsDto" />
 </xs:schema>

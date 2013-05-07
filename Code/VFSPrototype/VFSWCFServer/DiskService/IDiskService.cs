@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ServiceModel;
+using VFSWCFContracts.Contracts;
+using VFSWCFService.DataTransferObjects;
 
 namespace VFSWCFService.DiskService
 {
@@ -7,36 +9,47 @@ namespace VFSWCFService.DiskService
     public interface IDiskService
     {
         [OperationContract]
+        [FaultContract(typeof(ServiceException))]
         UserDto Register(string login, string hashedPassword);
 
         [OperationContract]
+        [FaultContract(typeof(ServiceException))]
         UserDto Login(string login, string hashedPassword);
 
         [OperationContract]
+        [FaultContract(typeof(ServiceException))]
         IList<DiskDto> Disks(UserDto userDto);
 
         [OperationContract]
-        DiskDto CreateDisk(UserDto userDto, DiskOptions options);
+        [FaultContract(typeof(ServiceException))]
+        DiskDto CreateDisk(UserDto userDto, DiskOptionsDto optionsDto);
 
         [OperationContract]
-        bool DeleteDisk(DiskDto diskDto);
+        [FaultContract(typeof(ServiceException))]
+        bool DeleteDisk(UserDto userDto, DiskDto diskDto);
 
         [OperationContract]
-        SynchronizationState FetchSynchronizationState(DiskDto diskDto);
+        [FaultContract(typeof(ServiceException))]
+        SynchronizationState FetchSynchronizationState(UserDto userDto, DiskDto diskDto);
 
         [OperationContract]
-        DiskOptions GetDiskOptions(DiskDto diskDto);
+        [FaultContract(typeof(ServiceException))]
+        DiskOptionsDto GetDiskOptions(UserDto userDto, DiskDto diskDto);
 
         [OperationContract]
-        void SetDiskOptions(DiskDto diskDto, DiskOptions options);
+        [FaultContract(typeof(ServiceException))]
+        void SetDiskOptions(UserDto userDto, DiskDto diskDto, DiskOptionsDto optionsDto);
 
         [OperationContract]
-        void WriteBlock(string diskUuid, long blockNr, byte[] content);
+        [FaultContract(typeof(ServiceException))]
+        void WriteBlock(UserDto userDto, int diskId, long blockNr, byte[] content);
 
         [OperationContract]
-        byte[] ReadBlock(string diskUuid, long blockNr);
+        [FaultContract(typeof(ServiceException))]
+        byte[] ReadBlock(UserDto userDto, int diskId, long blockNr);
 
         [OperationContract]
-        void UpdateDisk(DiskDto diskDto);
+        [FaultContract(typeof(ServiceException))]
+        void UpdateDisk(UserDto userDto, DiskDto diskDto);
     }
 }

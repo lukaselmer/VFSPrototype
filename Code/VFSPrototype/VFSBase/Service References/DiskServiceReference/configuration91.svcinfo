@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="48bOpsQ/yQSU1lvmeQ6xF5Nor/Q=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="5OkQZQQd4sFudwTOnHH6upu89oQ=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_IDiskService">
       <properties>
@@ -112,10 +112,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_IDiskService" contract="DiskServiceReference.IDiskService" bindingType="basicHttpBinding" address="http://localhost:4764/DiskService.svc" bindingConfiguration="BasicHttpBinding_IDiskService">
+    <endpoint name="BasicHttpBinding_IDiskService" contract="DiskServiceReference.IDiskService" bindingType="basicHttpBinding" address="http://localhost:8543/DiskService.svc" bindingConfiguration="BasicHttpBinding_IDiskService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://localhost:4764/DiskService.svc</serializedValue>
+          <serializedValue>http://localhost:8543/DiskService.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />

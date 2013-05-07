@@ -70,16 +70,16 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DiskService\DiskDto.cs" />
-    <Compile Include="DiskService\DiskOptions.cs" />
+    <Compile Include="DataTransferObjects\DiskDto.cs" />
+    <Compile Include="DataTransferObjects\DiskOptionsDto.cs" />
     <Compile Include="DiskService\DiskService.cs" />
     <Compile Include="DiskService.svc.cs">
       <DependentUpon>DiskService.svc</DependentUpon>
     </Compile>
     <Compile Include="DiskService\IDiskService.cs" />
-    <Compile Include="DiskService\Persistence.cs" />
-    <Compile Include="DiskService\SynchronizationState.cs" />
-    <Compile Include="DiskService\UserDto.cs" />
+    <Compile Include="Persistence\Persistence.cs" />
+    <Compile Include="DataTransferObjects\SynchronizationState.cs" />
+    <Compile Include="DataTransferObjects\UserDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SQLite.cs" />
     <Compile Include="SQLiteAsync.cs" />
@@ -103,6 +103,10 @@
     <ProjectReference Include="..\VFSBlockAbstraction\VFSBlockAbstraction.csproj">
       <Project>{8937804B-8BD8-4058-85A2-A22FD767E0E7}</Project>
       <Name>VFSBlockAbstraction</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VFSWCFContracts\VFSWCFContracts.csproj">
+      <Project>{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}</Project>
+      <Name>VFSWCFContracts</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

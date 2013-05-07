@@ -125,6 +125,15 @@
     <None Include="Service References\DiskServiceReference\DiskService3.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\DiskServiceReference\VFSBaseTests.DiskServiceReference.DiskDto.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\DiskServiceReference\VFSBaseTests.DiskServiceReference.DiskOptionsDto.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\DiskServiceReference\VFSBaseTests.DiskServiceReference.UserDto.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mocks\" />

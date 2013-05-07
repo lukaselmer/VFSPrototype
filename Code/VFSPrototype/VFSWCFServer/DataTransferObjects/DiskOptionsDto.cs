@@ -1,17 +1,21 @@
 ﻿using System.Runtime.Serialization;
 using SQLite;
 
-namespace VFSWCFService.DiskService
+namespace VFSWCFService.DataTransferObjects
 {
     /// <summary>
     /// The disk options are used to create the disk on the server and on the client (initial synchronization).
     /// </summary>
     [DataContract]
-    public class DiskOptions
+    public class DiskOptionsDto
     {
         [PrimaryKey]
+        [AutoIncrement]
         [DataMember]
-        public string DiskUuid { get; set; }
+        public int Id { get; set; }
+
+        [DataMember]
+        public int DiskId { get; set; }
 
         [DataMember]
         public int BlockSize { get; set; }
