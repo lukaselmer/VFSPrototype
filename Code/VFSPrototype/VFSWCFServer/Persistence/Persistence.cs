@@ -11,24 +11,42 @@ namespace VFSWCFService.Persistence
     /// <summary>
     /// The persistence is responsible for the data persistence.
     /// </summary>
-    public class Persistence
+    public class Persistence : IDisposable
     {
-        private readonly string _pathToDbFile;
+        private string _pathToDbFileToDbFile;
         public string PathToDataStore { get; private set; }
 
-        private readonly SQLiteConnection _db;
+        private SQLiteConnection _db;
+
+        internal Persistence(string pathToDbFile)
+        {
+            InitDatabase(pathToDbFile);
+        }
+
+        private void InitDatabase(string pathToDbFile)
+        {
+            _pathToDbFileToDbFile = pathToDbFile;
+            _db = File.Exists(_pathToDbFileToDbFile) ? OpenDatabase() : CreateDatabase();
+            CreateTables();
+        }
 
         public Persistence()
         {
-            var p = HostingEnvironment.ApplicationPhysicalPath ?? "../../Testfiles";
+            var p = HostingEnvironment.ApplicationPhysicalPath;
             PathToDataStore = Path.Combine(p, "App_Data");
-            _pathToDbFile = string.Format("{0}/data.sqlite", PathToDataStore);
+            var pathToDbFileToDbFile = string.Format("{0}/data.sqlite", PathToDataStore);
 
+            InitDatabase(pathToDbFileToDbFile);
+        }
 
-            if (!Directory.Exists(PathToDataStore)) Directory.CreateDirectory(PathToDataStore);
+        private SQLiteConnection OpenDatabase()
+        {
+            return new SQLiteConnection(_pathToDbFileToDbFile, SQLiteOpenFlags.ReadWrite);
+        }
 
-            _db = new SQLiteConnection(_pathToDbFile);
-            if (_db.TableMappings.Count() != 3) Clear();
+        private SQLiteConnection CreateDatabase()
+        {
+            return new SQLiteConnection(_pathToDbFileToDbFile);
         }
 
 
@@ -46,6 +64,7 @@ namespace VFSWCFService.Persistence
         /// <returns></returns>
         internal bool LoginFree(string login)
         {
+            var x = _db.Table<UserDto>().ToList();
             return _db.Find<UserDto>(d => d.Login == login) == null;
         }
 
@@ -130,6 +149,23 @@ namespace VFSWCFService.Persistence
         public UserDto Authenticate(string login, string hashedPassword)
         {
             return _db.Find<UserDto>(u => u.Login == login && u.HashedPassword == hashedPassword);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+
+            if (_db != null)
+            {
+                _db.Dispose();
+                _db = null;
+            }
         }
     }
 }

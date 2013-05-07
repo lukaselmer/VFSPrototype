@@ -15,7 +15,7 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Synchronization
 {
-    class SynchronizationService
+    internal class SynchronizationService : ISynchronizationService
     {
         /// <summary>
         /// The synchronization interval specifies how long the pause in seconds between synchronization should be.

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.ServiceModel;
+using System.Threading;
 using VFSBlockAbstraction;
 using VFSWCFContracts.Contracts;
 using VFSWCFContracts.DataTransferObjects;
@@ -9,7 +11,7 @@ using VFSWCFContracts.FaultContracts;
 
 namespace VFSWCFService.DiskService
 {
-    public class DiskService : IDiskService
+    public sealed class DiskService : IDiskService, IDisposable
     {
         private Persistence.Persistence Persistence { get; set; }
 
@@ -117,12 +119,20 @@ namespace VFSWCFService.DiskService
         /// <returns>If successful, the user, null otherwise.</returns>
         public UserDto Register(string login, string hashedPassword)
         {
-            return Persistence.LoginFree(login) ? Persistence.CreateUser(login, hashedPassword) : null;
+            if (string.IsNullOrEmpty(login) || login.Length < 3) ErrorOccured("Login must contain at least 3 characters");
+            if (string.IsNullOrEmpty(hashedPassword)) ErrorOccured("Password must not be empty");
+
+            if (!Persistence.LoginFree(login)) ErrorOccured(string.Format("Login \"{0}\" taken.", login));
+
+            var user = Persistence.CreateUser(login, hashedPassword);
+
+            return user;
         }
 
         private void Authenticate(UserDto userDto)
         {
-            Login(userDto.Login, userDto.HashedPassword);
+            var user = Login(userDto.Login, userDto.HashedPassword);
+            user.Id = user.Id;
         }
 
         /// <summary>
@@ -135,10 +145,31 @@ namespace VFSWCFService.DiskService
         {
             var user = Persistence.Authenticate(login, hashedPassword);
 
-            if (user == null) throw new FaultException<ServiceFault>(
-                new ServiceFault { Message = "Authentication failed. Please check username and password." });
+            if (user == null) ErrorOccured("Authentication failed. Please check username and password.");
 
             return user;
+        }
+
+        private static void ErrorOccured(string message)
+        {
+            throw new FaultException<ServiceFault>(new ServiceFault { Message = message }, new FaultReason(message));
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!disposing) return;
+
+            if (Persistence != null)
+            {
+                Persistence.Dispose();
+                Persistence = null;
+            }
         }
     }
 }

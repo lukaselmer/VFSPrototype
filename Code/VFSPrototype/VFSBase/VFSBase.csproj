@@ -118,6 +118,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Implementation\ISynchronizationService.cs" />
     <Compile Include="Synchronization\SynchronizationService.cs" />
   </ItemGroup>
   <ItemGroup>
