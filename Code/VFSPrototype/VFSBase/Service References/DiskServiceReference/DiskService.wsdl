@@ -8,6 +8,18 @@
       <xsd:import schemaLocation="http://localhost:4764/DiskService.svc?xsd=xsd3" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" />
     </xsd:schema>
   </wsdl:types>
+  <wsdl:message name="IDiskService_Register_InputMessage">
+    <wsdl:part name="parameters" element="tns:Register" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_Register_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RegisterResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_Login_InputMessage">
+    <wsdl:part name="parameters" element="tns:Login" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_Login_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LoginResponse" />
+  </wsdl:message>
   <wsdl:message name="IDiskService_Disks_InputMessage">
     <wsdl:part name="parameters" element="tns:Disks" />
   </wsdl:message>
@@ -32,7 +44,45 @@
   <wsdl:message name="IDiskService_FetchSynchronizationState_OutputMessage">
     <wsdl:part name="parameters" element="tns:FetchSynchronizationStateResponse" />
   </wsdl:message>
+  <wsdl:message name="IDiskService_GetDiskOptions_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetDiskOptions" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_GetDiskOptions_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetDiskOptionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_SetDiskOptions_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetDiskOptions" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_SetDiskOptions_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetDiskOptionsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_WriteBlock_InputMessage">
+    <wsdl:part name="parameters" element="tns:WriteBlock" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_WriteBlock_OutputMessage">
+    <wsdl:part name="parameters" element="tns:WriteBlockResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_ReadBlock_InputMessage">
+    <wsdl:part name="parameters" element="tns:ReadBlock" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_ReadBlock_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ReadBlockResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_UpdateDisk_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateDisk" />
+  </wsdl:message>
+  <wsdl:message name="IDiskService_UpdateDisk_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateDiskResponse" />
+  </wsdl:message>
   <wsdl:portType name="IDiskService">
+    <wsdl:operation name="Register">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/Register" message="tns:IDiskService_Register_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/RegisterResponse" message="tns:IDiskService_Register_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Login">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/Login" message="tns:IDiskService_Login_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/LoginResponse" message="tns:IDiskService_Login_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="Disks">
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/Disks" message="tns:IDiskService_Disks_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/DisksResponse" message="tns:IDiskService_Disks_OutputMessage" />
@@ -49,9 +99,47 @@
       <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/FetchSynchronizationState" message="tns:IDiskService_FetchSynchronizationState_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/FetchSynchronizationStateResponse" message="tns:IDiskService_FetchSynchronizationState_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetDiskOptions">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/GetDiskOptions" message="tns:IDiskService_GetDiskOptions_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/GetDiskOptionsResponse" message="tns:IDiskService_GetDiskOptions_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetDiskOptions">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/SetDiskOptions" message="tns:IDiskService_SetDiskOptions_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/SetDiskOptionsResponse" message="tns:IDiskService_SetDiskOptions_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="WriteBlock">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/WriteBlock" message="tns:IDiskService_WriteBlock_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/WriteBlockResponse" message="tns:IDiskService_WriteBlock_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ReadBlock">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/ReadBlock" message="tns:IDiskService_ReadBlock_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/ReadBlockResponse" message="tns:IDiskService_ReadBlock_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateDisk">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDiskService/UpdateDisk" message="tns:IDiskService_UpdateDisk_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDiskService/UpdateDiskResponse" message="tns:IDiskService_UpdateDisk_OutputMessage" />
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="BasicHttpBinding_IDiskService" type="tns:IDiskService">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Register">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/Register" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Login">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/Login" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="Disks">
       <soap:operation soapAction="http://tempuri.org/IDiskService/Disks" style="document" />
       <wsdl:input>
@@ -81,6 +169,51 @@
     </wsdl:operation>
     <wsdl:operation name="FetchSynchronizationState">
       <soap:operation soapAction="http://tempuri.org/IDiskService/FetchSynchronizationState" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetDiskOptions">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/GetDiskOptions" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetDiskOptions">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/SetDiskOptions" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="WriteBlock">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/WriteBlock" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReadBlock">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/ReadBlock" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateDisk">
+      <soap:operation soapAction="http://tempuri.org/IDiskService/UpdateDisk" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/VFSWCFService.DiskService" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <xs:import schemaLocation="http://localhost:4764/DiskService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" />
+  <xs:import schemaLocation="http://localhost:8543/DiskService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/VFSWCFService.UserService" />
   <xs:complexType name="ArrayOfDisk">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="Disk" nillable="true" type="tns:Disk" />

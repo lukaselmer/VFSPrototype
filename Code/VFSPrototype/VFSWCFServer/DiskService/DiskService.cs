@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using VFSWCFService.Common;
-using VFSWCFService.UserService;
+using System.IO;
+using VFSBlockAbstraction;
 
 namespace VFSWCFService.DiskService
 {
@@ -14,39 +14,105 @@ namespace VFSWCFService.DiskService
             Persistence = new Persistence();
         }
 
-        public IList<Disk> Disks(User user)
+        public IList<DiskDto> Disks(UserDto userDto)
         {
-            if (!Persistence.UserExists(user.Login)) return new List<Disk>();
-            if (Persistence.Disks(user) == null) return new List<Disk>();
+            if (!Persistence.UserExists(userDto.Login)) return new List<DiskDto>();
+            if (Persistence.Disks(userDto.Login) == null) return new List<DiskDto>();
 
-            return Persistence.Disks(user);
+            return Persistence.Disks(userDto.Login);
         }
 
-        public Disk CreateDisk(User user)
+        public DiskDto CreateDisk(UserDto userDto, DiskOptions options)
         {
-            if (!Persistence.UserExists(user.Login)) return null;
+            if (!Persistence.UserExists(userDto.Login)) return null;
 
-            var d = new Disk { User = user, Uuid = Guid.NewGuid().ToString() };
-            Persistence.CreateDisk(user, d);
+            var d = new DiskDto { UserLogin = userDto.Login, Uuid = Guid.NewGuid().ToString() };
+            Persistence.CreateDisk(userDto, d);
             return d;
         }
 
-        public bool DeleteDisk(Disk disk)
+        public bool DeleteDisk(DiskDto diskDto)
         {
-            var disks = Persistence.Disks(disk.User);
+            var disks = Persistence.Disks(diskDto.UserLogin);
             if (disks == null) return false;
-            return Persistence.RemoveDisk(disk);
+            return Persistence.RemoveDisk(diskDto);
         }
 
-        public SynchronizationState FetchSynchronizationState(Disk disk)
+        public SynchronizationState FetchSynchronizationState(DiskDto diskDto)
         {
-            var serverDisk = Persistence.FindDisk(disk);
+            var serverDisk = Persistence.FindDisk(diskDto);
 
-            var localChanges = disk.LastServerVersion < disk.LocalVersion;
-            var serverChanges = disk.LastServerVersion < serverDisk.LocalVersion;
+            var localChanges = diskDto.LastServerVersion < diskDto.LocalVersion;
+            var serverChanges = diskDto.LastServerVersion < serverDisk.LocalVersion;
 
             if (localChanges) return serverChanges ? SynchronizationState.Conflicted : SynchronizationState.LocalChanges;
             return serverChanges ? SynchronizationState.RemoteChanges : SynchronizationState.UpToDate;
+        }
+
+        public DiskOptions GetDiskOptions(DiskDto diskDto)
+        {
+            return Persistence.LoadDiskOptions(diskDto.Uuid);
+        }
+
+        public void SetDiskOptions(DiskDto diskDto, DiskOptions options)
+        {
+            Persistence.SaveDiskOptions(diskDto.Uuid, options);
+        }
+
+        public void WriteBlock(string diskUuid, long blockNr, byte[] content)
+        {
+            var b = GetBlockManipulator(diskUuid);
+            b.WriteBlock(blockNr, content);
+        }
+
+        private BlockManipulator GetBlockManipulator(string diskUuid)
+        {
+            var options = Persistence.LoadDiskOptions(diskUuid);
+            var b = new BlockManipulator(DiskLocation(diskUuid), options.BlockSize, options.MasterBlockSize);
+            return b;
+        }
+
+        private string DiskLocation(string diskUuid)
+        {
+            var location = Path.Combine(Persistence.PathToDataStore, "Disks");
+            if (!Directory.Exists(location)) Directory.CreateDirectory(location);
+            return Path.Combine(location, string.Format("{0}.vhs", diskUuid));
+        }
+
+        public byte[] ReadBlock(string diskUuid, long blockNr)
+        {
+            var b = GetBlockManipulator(diskUuid);
+            return b.ReadBlock(blockNr);
+        }
+
+        public void UpdateDisk(DiskDto diskDto)
+        {
+            Persistence.UpdateDisk(diskDto);
+        }
+
+        /// <summary>
+        /// Registers a user with the specified login and password.
+        /// </summary>
+        /// <param name="login">The login.</param>
+        /// <param name="hashedPassword">The hashed password.</param>
+        /// <returns>If successful, the user, null otherwise.</returns>
+        public UserDto Register(string login, string hashedPassword)
+        {
+            return Persistence.UserExists(login) ? null : Persistence.CreateUser(login, hashedPassword);
+        }
+
+        /// <summary>
+        /// Authenticates the user with the login and password.
+        /// </summary>
+        /// <param name="login">The login.</param>
+        /// <param name="hashedPassword">The hashed password.</param>
+        /// <returns>The user if login is successful, null otherwise.</returns>
+        public UserDto Login(string login, string hashedPassword)
+        {
+            if (!Persistence.UserExists(login)) return null;
+
+            var u = Persistence.FindUser(login);
+            return u.HashedPassword == hashedPassword ? u : null;
         }
     }
 }

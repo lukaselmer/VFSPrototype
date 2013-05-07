@@ -1,6 +1,7 @@
 ﻿using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using VFSBase.Implementation;
 using VFSBase.Persistence.Blocks;
 
 namespace VFSBaseTests
@@ -31,7 +32,9 @@ namespace VFSBaseTests
                 Assert.AreEqual(3, b1.Allocate());
                 Assert.AreEqual(4, b1.Allocate());
                 Assert.AreEqual(5, b1.Allocate());
-                b1.Serialize(m);
+
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(m, b1);
 
                 m.Seek(0, SeekOrigin.Begin);
 
