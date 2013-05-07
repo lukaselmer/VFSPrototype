@@ -13,7 +13,7 @@ namespace VFSBase.Factories
             fileSystem.TestEncryptionKey();
             //var x = SynchronizationService.CreateService(fileSystem, new User(), new SynchronizationCallbacks(null));
 
-            new SynchronizationService(fileSystem, new User(), new SynchronizationCallbacks(null));
+            new SynchronizationService(fileSystem, new UserDto(), new SynchronizationCallbacks(null));
 
             return new FileSystemTextManipulator(fileSystem);
         }

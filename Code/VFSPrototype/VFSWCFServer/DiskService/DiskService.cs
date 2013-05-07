@@ -1,45 +1,53 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.ServiceModel;
 using VFSBlockAbstraction;
+using VFSWCFContracts.Contracts;
+using VFSWCFService.DataTransferObjects;
 
 namespace VFSWCFService.DiskService
 {
     public class DiskService : IDiskService
     {
-        internal Persistence Persistence { get; set; }
+        private Persistence.Persistence Persistence { get; set; }
 
-        public DiskService()
+        public DiskService() : this(new Persistence.Persistence()) { }
+
+        internal DiskService(Persistence.Persistence persistence)
         {
-            Persistence = new Persistence();
+            Persistence = persistence;
         }
 
         public IList<DiskDto> Disks(UserDto userDto)
         {
-            if (!Persistence.UserExists(userDto.Login)) return new List<DiskDto>();
-            if (Persistence.Disks(userDto.Login) == null) return new List<DiskDto>();
+            Authenticate(userDto);
 
-            return Persistence.Disks(userDto.Login);
+            return Persistence.Disks(userDto);
         }
 
-        public DiskDto CreateDisk(UserDto userDto, DiskOptions options)
+        public DiskDto CreateDisk(UserDto userDto, DiskOptionsDto optionsDto)
         {
-            if (!Persistence.UserExists(userDto.Login)) return null;
+            Authenticate(userDto);
 
-            var d = new DiskDto { UserLogin = userDto.Login, Uuid = Guid.NewGuid().ToString() };
+            var d = new DiskDto { UserId = userDto.Id };
             Persistence.CreateDisk(userDto, d);
             return d;
         }
 
-        public bool DeleteDisk(DiskDto diskDto)
+        public bool DeleteDisk(UserDto userDto, DiskDto diskDto)
         {
-            var disks = Persistence.Disks(diskDto.UserLogin);
+            Authenticate(userDto);
+
+            var disks = Persistence.Disks(userDto);
             if (disks == null) return false;
             return Persistence.RemoveDisk(diskDto);
         }
 
-        public SynchronizationState FetchSynchronizationState(DiskDto diskDto)
+        public SynchronizationState FetchSynchronizationState(UserDto userDto, DiskDto diskDto)
         {
+            Authenticate(userDto);
+
             var serverDisk = Persistence.FindDisk(diskDto);
 
             var localChanges = diskDto.LastServerVersion < diskDto.LocalVersion;
@@ -49,44 +57,54 @@ namespace VFSWCFService.DiskService
             return serverChanges ? SynchronizationState.RemoteChanges : SynchronizationState.UpToDate;
         }
 
-        public DiskOptions GetDiskOptions(DiskDto diskDto)
+        public DiskOptionsDto GetDiskOptions(UserDto userDto, DiskDto diskDto)
         {
-            return Persistence.LoadDiskOptions(diskDto.Uuid);
+            Authenticate(userDto);
+
+            return Persistence.LoadDiskOptions(diskDto.Id);
         }
 
-        public void SetDiskOptions(DiskDto diskDto, DiskOptions options)
+        public void SetDiskOptions(UserDto userDto, DiskDto diskDto, DiskOptionsDto optionsDto)
         {
-            Persistence.SaveDiskOptions(diskDto.Uuid, options);
+            Authenticate(userDto);
+
+            Persistence.SaveDiskOptions(diskDto.Id, optionsDto);
         }
 
-        public void WriteBlock(string diskUuid, long blockNr, byte[] content)
+        public void WriteBlock(UserDto userDto, int diskId, long blockNr, byte[] content)
         {
-            var b = GetBlockManipulator(diskUuid);
+            Authenticate(userDto);
+
+            var b = GetBlockManipulator(diskId);
             b.WriteBlock(blockNr, content);
         }
 
-        private BlockManipulator GetBlockManipulator(string diskUuid)
+        private BlockManipulator GetBlockManipulator(int id)
         {
-            var options = Persistence.LoadDiskOptions(diskUuid);
-            var b = new BlockManipulator(DiskLocation(diskUuid), options.BlockSize, options.MasterBlockSize);
+            var options = Persistence.LoadDiskOptions(id);
+            var b = new BlockManipulator(DiskLocation(id), options.BlockSize, options.MasterBlockSize);
             return b;
         }
 
-        private string DiskLocation(string diskUuid)
+        private string DiskLocation(int id)
         {
             var location = Path.Combine(Persistence.PathToDataStore, "Disks");
             if (!Directory.Exists(location)) Directory.CreateDirectory(location);
-            return Path.Combine(location, string.Format("{0}.vhs", diskUuid));
+            return Path.Combine(location, string.Format("{0}.vhs", id));
         }
 
-        public byte[] ReadBlock(string diskUuid, long blockNr)
+        public byte[] ReadBlock(UserDto userDto, int diskId, long blockNr)
         {
-            var b = GetBlockManipulator(diskUuid);
+            Authenticate(userDto);
+
+            var b = GetBlockManipulator(diskId);
             return b.ReadBlock(blockNr);
         }
 
-        public void UpdateDisk(DiskDto diskDto)
+        public void UpdateDisk(UserDto userDto, DiskDto diskDto)
         {
+            Authenticate(userDto);
+
             Persistence.UpdateDisk(diskDto);
         }
 
@@ -98,7 +116,12 @@ namespace VFSWCFService.DiskService
         /// <returns>If successful, the user, null otherwise.</returns>
         public UserDto Register(string login, string hashedPassword)
         {
-            return Persistence.UserExists(login) ? null : Persistence.CreateUser(login, hashedPassword);
+            return Persistence.LoginFree(login) ? Persistence.CreateUser(login, hashedPassword) : null;
+        }
+
+        private void Authenticate(UserDto userDto)
+        {
+            Login(userDto.Login, userDto.HashedPassword);
         }
 
         /// <summary>
@@ -109,10 +132,12 @@ namespace VFSWCFService.DiskService
         /// <returns>The user if login is successful, null otherwise.</returns>
         public UserDto Login(string login, string hashedPassword)
         {
-            if (!Persistence.UserExists(login)) return null;
+            var user = Persistence.Authenticate(login, hashedPassword);
 
-            var u = Persistence.FindUser(login);
-            return u.HashedPassword == hashedPassword ? u : null;
+            if (user == null) throw new FaultException<ServiceException>(
+                new ServiceException { Message = "Authentication failed. Please check username and password." });
+
+            return user;
         }
     }
 }

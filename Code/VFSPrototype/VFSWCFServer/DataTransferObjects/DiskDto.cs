@@ -1,15 +1,18 @@
-﻿using System;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using SQLite;
 
-namespace VFSWCFService.DiskService
+namespace VFSWCFService.DataTransferObjects
 {
     [DataContract]
     public class DiskDto
     {
         [PrimaryKey]
+        [AutoIncrement]
         [DataMember]
-        public string Uuid { get; set; }
+        public int Id { get; set; }
+
+        [DataMember]
+        public int UserId { get; set; }
 
         [DataMember]
         public long LastServerVersion { get; set; }
@@ -19,8 +22,5 @@ namespace VFSWCFService.DiskService
 
         [DataMember]
         public long NewestBlock { get; set; }
-
-        [DataMember]
-        public string UserLogin { get; set; }
     }
 }

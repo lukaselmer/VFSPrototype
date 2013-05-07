@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Startup", "Startup\Startup.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSBlockAbstraction", "VFSBlockAbstraction\VFSBlockAbstraction.csproj", "{8937804B-8BD8-4058-85A2-A22FD767E0E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VFSWCFContracts", "VFSWCFContracts\VFSWCFContracts.csproj", "{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{8937804B-8BD8-4058-85A2-A22FD767E0E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8937804B-8BD8-4058-85A2-A22FD767E0E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8937804B-8BD8-4058-85A2-A22FD767E0E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

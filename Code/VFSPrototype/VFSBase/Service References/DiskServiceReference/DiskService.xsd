@@ -20,7 +20,7 @@
       <xs:element minOccurs="0" name="LastServerVersion" type="xs:long" />
       <xs:element minOccurs="0" name="LocalVersion" type="xs:long" />
       <xs:element minOccurs="0" name="NewestBlock" type="xs:long" />
-      <xs:element minOccurs="0" name="UserId" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="UserId" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="DiskDto" nillable="true" type="tns:DiskDto" />
