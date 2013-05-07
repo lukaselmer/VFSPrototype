@@ -101,6 +101,7 @@ namespace VFSBrowser.ViewModel
             CancelSearchCommand = new Command(CancelSearch, p => (_manipulator != null));
             DiskInfoCommand = new Command(DiskInfo, p => (_manipulator != null));
             LoginCommand = new Command(Login, p => (_user == null));
+            LogoutCommand = new Command(Logout, p => (_user != null));
             RegisterCommand = new Command(Register, p => (_user == null));
             SwitchToOfflineModeCommand = new Command(SwitchToOfflineMode, p => (_user != null && _synchronization != null));
             SwitchToOnlineModeCommand = new Command(SwitchToOnlineMode, p => (_user != null && _synchronization == null));
@@ -131,6 +132,7 @@ namespace VFSBrowser.ViewModel
         public Command DiskInfoCommand { get; private set; }
 
         public Command LoginCommand { get; private set; }
+        public Command LogoutCommand { get; private set; }
         public Command RegisterCommand { get; private set; }
         public Command SwitchToOfflineModeCommand { get; private set; }
         public Command SwitchToOnlineModeCommand { get; private set; }
@@ -226,6 +228,12 @@ namespace VFSBrowser.ViewModel
             {
                 MessageBox.Show(ex.Detail.Message, "Login failed");
             }
+        }
+
+        private void Logout(object parameter)
+        {
+            SwitchToOfflineMode(parameter);
+            _user = null;
         }
 
         private void Register(object parameter)

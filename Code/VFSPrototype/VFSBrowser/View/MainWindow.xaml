@@ -22,6 +22,8 @@
             <MenuItem Header="_File">
                 <MenuItem Header="Register" Command="{Binding RegisterCommand}" />
                 <MenuItem Header="Login" Command="{Binding LoginCommand}" />
+                <MenuItem Header="Logout" Command="{Binding LogoutCommand}" />
+                <Separator />
                 <MenuItem Header="Switch to online mode" Command="{Binding SwitchToOnlineModeCommand}" />
                 <MenuItem Header="Switch to offline mode" Command="{Binding SwitchToOfflineModeCommand}" />
                 <Separator />
