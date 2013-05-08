@@ -107,6 +107,11 @@ namespace VFSConsoleTests
             throw new NotImplementedException();
         }
 
+        public long LatestVersion
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         public void Dispose()
         {
         }

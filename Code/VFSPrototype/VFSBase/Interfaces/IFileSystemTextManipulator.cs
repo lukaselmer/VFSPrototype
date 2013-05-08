@@ -27,5 +27,6 @@ namespace VFSBase.Interfaces
         void SwitchToVersion(long version);
         void SwitchToLatestVersion();
         IEnumerable<long> Versions(string path);
+        long LatestVersion { get; }
     }
 }
