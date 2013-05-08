@@ -13,10 +13,13 @@ namespace VFSBase.Interfaces
         IList<string> Folders(string path, long version);
         bool IsDirectory(string path);
         void CreateFolder(string path);
-        void Import(string source, string dest, CallbacksBase importCallbacks = null);
-        void Export(string source, string dest, CallbacksBase exportCallbacks = null);
+        void Copy(string source, string dest);
+        void Copy(string source, string dest, CallbacksBase copyCallbacks);
+        void Import(string source, string dest);
+        void Import(string source, string dest, CallbacksBase importCallbacks);
+        void Export(string source, string dest);
+        void Export(string source, string dest, CallbacksBase exportCallbacks);
         void Export(string source, string dest, CallbacksBase exportCallbacks, long version);
-        void Copy(string source, string dest, CallbacksBase copyCallbacks = null);
         void Delete(string path);
         void Move(string source, string dest);
         bool Exists(string path);

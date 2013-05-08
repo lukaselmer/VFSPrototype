@@ -48,7 +48,19 @@ namespace VFSConsoleTests
         {
         }
 
-        public void Import(string source, string dest, CallbacksBase importCallbacks = null)
+        public void Copy(string source, string dest)
+        {
+        }
+
+        public void Import(string source, string dest)
+        {
+        }
+
+        public void Import(string source, string dest, CallbacksBase importCallbacks)
+        {
+        }
+
+        public void Export(string source, string dest)
         {
         }
 
@@ -58,10 +70,9 @@ namespace VFSConsoleTests
 
         public void Export(string source, string dest, CallbacksBase exportCallbacks, long version)
         {
-            
         }
 
-        public void Copy(string source, string dest, CallbacksBase copyCallbacks = null)
+        public void Copy(string source, string dest, CallbacksBase copyCallbacks)
         {
         }
 
