@@ -48,7 +48,7 @@ namespace VFSBase.Implementation
 
             using (var r = Rijndael.Create())
             {
-                EncryptedEncryptionKey = TransformEncryptionKey(r.Key, password);
+                _encryptedEncryptionKey = TransformEncryptionKey(r.Key, password);
                 EncryptionInitializationVector = r.IV;
             }
 
@@ -67,7 +67,7 @@ namespace VFSBase.Implementation
 
         internal void InitializeStreamCodingStrategy(string password)
         {
-            if (Encryption != StreamEncryptionType.None) EncryptionKey = TransformEncryptionKey(EncryptedEncryptionKey, password);
+            if (Encryption != StreamEncryptionType.None) EncryptionKey = TransformEncryptionKey(_encryptedEncryptionKey, password);
             _streamCodingStrategy = new StramStrategyResolver(this).ResolveStrategy();
         }
 
@@ -136,10 +136,10 @@ namespace VFSBase.Implementation
             }
         }
 
-        protected byte[] EncryptedEncryptionKey { get; set; }
-
         [NonSerialized]
         private byte[] _encryptionKey;
+
+        private byte[] _encryptedEncryptionKey;
 
         internal byte[] EncryptionStringForTest { get; set; }
 

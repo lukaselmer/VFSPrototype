@@ -1,4 +1,5 @@
 ﻿using System;
+using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Persistence.Coding.General;
 using VFSBase.Persistence.Coding.MicrosoftAes;
@@ -31,7 +32,7 @@ namespace VFSBase.Persistence.Coding.Strategies
                 case StreamCompressionType.SelfMadeLz77:
                     return new SelfMadeLz77StreamCompressionStrategy();
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new VFSException("Unknown compression");
             }
         }
 
@@ -50,7 +51,7 @@ namespace VFSBase.Persistence.Coding.Strategies
                 case StreamEncryptionType.SelfMadeSimple:
                     return new SelfMadeSimpleStreamEncryptionStrategy(new EncryptionOptions(_options.EncryptionKey, _options.EncryptionInitializationVector));
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new VFSException("Unknown encryption");
             }
         }
     }

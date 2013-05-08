@@ -55,13 +55,13 @@ namespace VFSBrowser.ViewModel
                 try
                 {
                     Items.Clear();
-                    if (value != "/")
-                        Items.Add(Parent);
+                    if (value != "/") Items.Add(Parent);
 
                     foreach (var name in _manipulator.List(value))
                     {
                         Items.Add(new ListItem(value, name, _manipulator.IsDirectory(value + name)));
                     }
+                    OnPropertyChanged("Items");
 
                 }
                 catch (Exception e)
@@ -175,6 +175,7 @@ namespace VFSBrowser.ViewModel
             var items = parameter as ObservableCollection<object>;
             if (items != null)
             {
+                if (items.Count <= 0) return false;
                 var listItem = items[0] as ListItem;
                 return listItem != null && (items.Count > 0 && (items.Count != 1 || listItem.Name != ".."));
             }
@@ -236,6 +237,7 @@ namespace VFSBrowser.ViewModel
 
         private void UpdateVersion()
         {
+            if (_manipulator == null) return;
             LatestVersion = _manipulator.LatestVersion;
             var version = _manipulator.Version("/");
             VersionInput = version;
@@ -422,19 +424,26 @@ namespace VFSBrowser.ViewModel
             {
                 foreach (var source in _clipboard)
                 {
+                    var sourcePath = source.Path + source.Name;
                     var destinationPath = CurrentPath + source.Name;
+
+                    if (!_manipulator.Exists(sourcePath))
+                    {
+                        MessageBox.Show("File or folder to copy does not exist", "Path not found!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        continue;
+                    }
+
 
                     if (_manipulator.Exists(destinationPath))
                     {
-                        var result = MessageBox.Show("Replace file?", "File allready exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
-                        if (result == MessageBoxResult.No)
-                            continue;
+                        var result = MessageBox.Show("Replace file?", "File already exists!", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                        if (result == MessageBoxResult.No) continue;
+
                         _manipulator.Delete(destinationPath);
                         var listItem = Items.First(l => l.Name == source.Name);
                         Items.Remove(listItem);
                     }
 
-                    var sourcePath = source.Path + source.Name;
                     if (_copy)
                     {
                         var vm = new OperationProgressViewModel();
@@ -523,8 +532,9 @@ namespace VFSBrowser.ViewModel
                         return;
                     }
                     _manipulator.Move(item.Path + item.Name, item.Path + dlg.Text);
-                    item.Name = dlg.Text;
-                    OnPropertyChanged("Items");
+                    CurrentPath = CurrentPath;
+                    //item.Name = dlg.Text;
+                    //OnPropertyChanged("Items");
 
                 }
                 catch (Exception ex)

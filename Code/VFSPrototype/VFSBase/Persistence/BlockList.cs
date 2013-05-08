@@ -113,7 +113,7 @@ namespace VFSBase.Persistence
             return indirectNode;
         }
 
-        private void ReplaceInIndirectNode(IndirectNode indirectNode, long toBeReplaced, long toReplace, int recursion)
+        /*private void ReplaceInIndirectNode(IndirectNode indirectNode, long toBeReplaced, long toReplace, int recursion)
         {
             for (var i = 0; i < indirectNode.UsedBlockNumbers().Count(); i++)
             {
@@ -131,7 +131,7 @@ namespace VFSBase.Persistence
 
                 ReplaceInIndirectNode(ReadIndirectNode(blockNumber), toBeReplaced, toReplace, recursion - 1);
             }
-        }
+        }*/
 
         private void AddFromIndirectNode(IndirectNode indirectNode, List<IIndexNode> l, int recursion)
         {
