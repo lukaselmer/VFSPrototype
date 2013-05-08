@@ -21,30 +21,60 @@ namespace VFSBlockAbstraction
             _blockSize = blockSize;
             _masterBlockSize = masterBlockSize;
 
-            //_disk = new FileStream(_location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, blockSize, FileOptions.RandomAccess);
-            _disk = new FileStream(_location, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, blockSize, FileOptions.RandomAccess);
+            _disk = new FileStream(_location, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite, blockSize, FileOptions.RandomAccess);
             _diskReader = new BinaryReader(_disk);
             _diskWriter = new BinaryWriter(_disk);
         }
 
         private void SeekToBlock(long blockNumber)
         {
-            _disk.Seek(_masterBlockSize + (blockNumber * _blockSize), SeekOrigin.Begin);
+            _disk.Seek(Offset(blockNumber), SeekOrigin.Begin);
+        }
+
+        private long Offset(long blockNumber)
+        {
+            return _masterBlockSize + (blockNumber * _blockSize);
         }
 
         public void WriteBlock(long blockNumber, byte[] block)
         {
             SeekToBlock(blockNumber);
-            _diskWriter.Write(block);
-            _diskWriter.Flush();
+            LockBlock(blockNumber);
+
+            try
+            {
+                _diskWriter.Write(block);
+                _diskWriter.Flush();
+            }
+            finally
+            {
+                UnlockBlock(blockNumber);
+            }
         }
 
         public byte[] ReadBlock(long blockNumber)
         {
             SeekToBlock(blockNumber);
-            var block = _diskReader.ReadBytes(_blockSize);
-            if (block.Length != _blockSize) return new byte[_blockSize];
-            return block;
+            LockBlock(blockNumber);
+            try
+            {
+                var block = _diskReader.ReadBytes(_blockSize);
+                return block.Length == _blockSize ? block : new byte[_blockSize];
+            }
+            finally
+            {
+                UnlockBlock(blockNumber);
+            }
+        }
+
+        private void LockBlock(long blockNumber)
+        {
+            _disk.Lock(Offset(blockNumber), _blockSize);
+        }
+
+        private void UnlockBlock(long blockNumber)
+        {
+            _disk.Unlock(Offset(blockNumber), _blockSize);
         }
 
         public void Dispose()

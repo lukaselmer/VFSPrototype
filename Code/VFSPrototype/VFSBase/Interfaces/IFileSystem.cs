@@ -144,7 +144,7 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="fromVersion">From version.</param>
         /// <param name="offset">The offset.</param>
-        void ShiftBlocks(long fromVersion, long offset);
+        //void ShiftBlocks(long fromVersion, long offset);
 
         /// <summary>
         /// Returns the mutex for the file system. This allows to lock the file system and thus allow parallel usage of the file system.
