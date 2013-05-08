@@ -16,29 +16,32 @@
             <RowDefinition Height="Auto"/> <!-- Path -->
             <RowDefinition Height="*"/>    <!-- DataGrid -->
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
 
         <!-- Menu -->
-        <Menu Grid.Row="0" IsMainMenu="True" >
+        <Menu Grid.Row="0" IsMainMenu="True">
             <MenuItem Header="_File">
-                <MenuItem Header="Register" Command="{Binding RegisterCommand}" />
-                <MenuItem Header="Login" Command="{Binding LoginCommand}" />
-                <MenuItem Header="Logout" Command="{Binding LogoutCommand}" />
+                <MenuItem Header="_Register" Command="{Binding RegisterCommand}" />
+                <MenuItem Header="_Login" Command="{Binding LoginCommand}" />
+                <MenuItem Header="_Logout" Command="{Binding LogoutCommand}" />
                 <Separator />
-                <MenuItem Header="Switch to online mode" Command="{Binding SwitchToOnlineModeCommand}" />
-                <MenuItem Header="Switch to offline mode" Command="{Binding SwitchToOfflineModeCommand}" />
+                <MenuItem Header="_Switch to online mode" Command="{Binding SwitchToOnlineModeCommand}" />
+                <MenuItem Header="_Switch to offline mode" Command="{Binding SwitchToOfflineModeCommand}" />
                 <Separator />
-                <MenuItem Header="Open VFS" Command="{Binding OpenVfsCommand}" />
-                <MenuItem Header="New VFS" Command="{Binding NewVfsCommand}" />
-                <MenuItem Header="Close VFS" Command="{Binding CloseVfsCommand}" />
+                <MenuItem Header="_Open VFS" Command="{Binding OpenVfsCommand}" />
+                <MenuItem Header="_New VFS" Command="{Binding NewVfsCommand}" />
+                <MenuItem Header="_Close VFS" Command="{Binding CloseVfsCommand}" />
                 <Separator />
-                <MenuItem Header="Import File" Command="{Binding ImportFileCommand}" />
-                <MenuItem Header="Import Folder" Command="{Binding ImportFolderCommand}" />
-                <MenuItem Header="Export" Command="{Binding ExportCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItems}" />
+                <MenuItem Header="_Import File" Command="{Binding ImportFileCommand}" />
+                <MenuItem Header="_Import Folder" Command="{Binding ImportFolderCommand}" />
+                <MenuItem Header="_Export" Command="{Binding ExportCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItems}" />
                 <Separator />
-                <MenuItem Header="New Folder" Command="{Binding NewFolderCommand}" />
+                <MenuItem Header="_New Folder" Command="{Binding NewFolderCommand}" />
             </MenuItem>
             <MenuItem Header="_Info">
-                <MenuItem Header="Disk Info" Command="{Binding DiskInfoCommand}" />
+                <MenuItem Header="_Disk Info" Command="{Binding DiskInfoCommand}" />
             </MenuItem>
         </Menu>
 
