@@ -535,6 +535,8 @@ namespace VFSBase.Implementation
 
             _indexService.RemoveFromIndex(node);
 
+            //TODO: fix this!!!!!!!!
+
             var newDestination = ArchiveAndReplaceRoot(destination, null, null);
 
             var blockNumber = node.BlockNumber;
