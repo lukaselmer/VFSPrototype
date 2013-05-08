@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.ServiceModel;
@@ -13,6 +14,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using Microsoft.Practices.Unity;
 using VFSBase.DiskServiceReference;
+using VFSBase.Exceptions;
 using VFSBase.Helpers;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
@@ -172,7 +174,10 @@ namespace VFSBrowser.ViewModel
 
             var items = parameter as ObservableCollection<object>;
             if (items != null)
-                return items.Count > 0 && (items.Count != 1 || (items[0] as ListItem).Name != "..");
+            {
+                var listItem = items[0] as ListItem;
+                return listItem != null && (items.Count > 0 && (items.Count != 1 || listItem.Name != ".."));
+            }
 
             var item = parameter as ListItem;
             return item != null && item.Name != "..";
@@ -216,10 +221,17 @@ namespace VFSBrowser.ViewModel
 
         private void SwitchVersion(long version)
         {
-            _manipulator.SwitchToVersion(version);
-            CurrentPath = "/";
-            OnPropertyChanged("FileSystemName");
-            UpdateVersion();
+            try
+            {
+                _manipulator.SwitchToVersion(version);
+                CurrentPath = "/";
+                OnPropertyChanged("FileSystemName");
+                UpdateVersion();
+            }
+            catch (Exception ex)
+            {
+                DisplayException(ex);
+            }
         }
 
         private void UpdateVersion()
@@ -244,12 +256,19 @@ namespace VFSBrowser.ViewModel
             Items.Clear();
             //SearchItems(CurrentPath).ForEach(i => Items.Add(i));
 
-            foreach (var i in _manipulator.Search(SearchOption.Keyword, CurrentPath, SearchOption.Recursive, SearchOption.CaseSensitive))
+            try
             {
-                var idx = i.LastIndexOf("/") + 1;
-                var name = i.Substring(idx);
-                var path = i.Substring(0, idx);
-                Items.Add(new ListItem(path, name, _manipulator.IsDirectory(i)));
+                foreach (var i in _manipulator.Search(SearchOption.Keyword, CurrentPath, SearchOption.Recursive, SearchOption.CaseSensitive))
+                {
+                    var idx = i.LastIndexOf("/", StringComparison.CurrentCulture) + 1;
+                    var name = i.Substring(idx);
+                    var path = i.Substring(0, idx);
+                    Items.Add(new ListItem(path, name, _manipulator.IsDirectory(i)));
+                }
+            }
+            catch (Exception ex)
+            {
+                DisplayException(ex);
             }
         }
 
@@ -332,18 +351,29 @@ namespace VFSBrowser.ViewModel
         {
             var deleteItems = parameter as ObservableCollection<object>;
 
-            if (deleteItems == null)
-                return;
+            if (deleteItems == null) return;
 
-            var del = new List<ListItem>();
-            foreach (ListItem item in deleteItems)
+            try
             {
-                _manipulator.Delete(item.Path + item.Name);
-                del.Add(item);
-            }
+                var del = new List<ListItem>();
+                foreach (ListItem item in deleteItems)
+                {
+                    _manipulator.Delete(item.Path + item.Name);
+                    del.Add(item);
+                }
 
-            del.ForEach(i => Items.Remove(i));
+                del.ForEach(i => Items.Remove(i));
+            }
+            catch (Exception ex)
+            {
+                DisplayException(ex);
+            }
             UpdateVersion();
+        }
+
+        private void DisplayException(Exception exception)
+        {
+            MessageBox.Show(exception.Message, "An error occured", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void Copy(object parameter)
@@ -358,9 +388,9 @@ namespace VFSBrowser.ViewModel
                 _copy = true;
                 foreach (ListItem item in items) _clipboard.Add(item);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DisplayException(ex);
             }
             UpdateVersion();
         }
@@ -369,8 +399,7 @@ namespace VFSBrowser.ViewModel
         {
             var items = parameter as ObservableCollection<object>;
 
-            if (items == null)
-                return;
+            if (items == null) return;
 
             try
             {
@@ -380,9 +409,9 @@ namespace VFSBrowser.ViewModel
                     _clipboard.Add(item);
 
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DisplayException(ex);
             }
             UpdateVersion();
         }
@@ -417,9 +446,9 @@ namespace VFSBrowser.ViewModel
                     Items.Add(new ListItem(CurrentPath, source.Name, _manipulator.IsDirectory(destinationPath)));
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DisplayException(ex);
             }
             UpdateVersion();
         }
@@ -468,9 +497,9 @@ namespace VFSBrowser.ViewModel
                     vm.ShowDialog();
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DisplayException(ex);
             }
         }
 
@@ -490,7 +519,7 @@ namespace VFSBrowser.ViewModel
                 {
                     if (_manipulator.Exists(item.Path + dlg.Text))
                     {
-                        var res = MessageBox.Show("Choose an other name!", "Filename allready exists!", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Please choose an other name.", "Filename already exists!", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                     _manipulator.Move(item.Path + item.Name, item.Path + dlg.Text);
@@ -498,9 +527,9 @@ namespace VFSBrowser.ViewModel
                     OnPropertyChanged("Items");
 
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    DisplayException(ex);
                 }
             }
             UpdateVersion();
@@ -512,31 +541,37 @@ namespace VFSBrowser.ViewModel
 
             if (item == null)
                 return;
-
-            if (item.IsDirectory)
+            try
             {
-                if (item.Name == "..")
+                if (item.IsDirectory)
                 {
-                    if (CurrentPath == "/")
-                        return;
-                    var tmp = CurrentPath.TrimEnd('/');
-                    CurrentPath = tmp.Substring(0, tmp.LastIndexOf("/") + 1);
+                    if (item.Name == "..")
+                    {
+                        if (CurrentPath == "/") return;
+
+                        var tmp = CurrentPath.TrimEnd('/');
+                        CurrentPath = tmp.Substring(0, tmp.LastIndexOf("/", StringComparison.CurrentCulture) + 1);
+                    }
+                    else
+                    {
+                        CurrentPath = item.Path + item.Name + "/";
+                    }
                 }
                 else
                 {
-                    CurrentPath = item.Path + item.Name + "/";
+                    var tmpFile = Path.GetTempPath() + item.Name;
+                    if (File.Exists(tmpFile)) File.Delete(tmpFile);
+
+                    var vm = new OperationProgressViewModel();
+                    Task.Run(() => _manipulator.Export(item.Path + item.Name, tmpFile, vm.Callbacks));
+                    vm.ShowDialog();
+
+                    Process.Start("explorer", tmpFile);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                var tmpFile = Path.GetTempPath() + item.Name;
-                if (File.Exists(tmpFile)) File.Delete(tmpFile);
-
-                var vm = new OperationProgressViewModel();
-                Task.Run(() => _manipulator.Export(item.Path + item.Name, tmpFile, vm.Callbacks));
-                vm.ShowDialog();
-
-                System.Diagnostics.Process.Start("explorer", tmpFile);
+                DisplayException(ex);
             }
         }
 
@@ -558,9 +593,9 @@ namespace VFSBrowser.ViewModel
                 Items.Add(new ListItem(CurrentPath, newFolderName, true));
 
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DisplayException(ex);
             }
             UpdateVersion();
         }
@@ -630,9 +665,9 @@ namespace VFSBrowser.ViewModel
                 CurrentPath = "/";
                 OnPropertyChanged("FileSystemName");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DisplayException(ex);
             }
             UpdateVersion();
         }
@@ -642,8 +677,10 @@ namespace VFSBrowser.ViewModel
             var dragArgs = inObject as System.Windows.DragEventArgs;
             if (null == dragArgs) return;
 
-            var data = dragArgs.Data as IDataObject;
-            if (data.GetDataPresent(DataFormats.FileDrop))
+            var data = dragArgs.Data;
+
+            if (!data.GetDataPresent(DataFormats.FileDrop)) return;
+            try
             {
                 var files = (string[])data.GetData(DataFormats.FileDrop);
                 foreach (var file in files)
@@ -651,6 +688,10 @@ namespace VFSBrowser.ViewModel
                     var name = Path.GetFileName(file);
                     Import(file, name, Directory.Exists(file));
                 }
+            }
+            catch (Exception ex)
+            {
+                DisplayException(ex);
             }
         }
 
@@ -661,9 +702,16 @@ namespace VFSBrowser.ViewModel
 
             if (result != DialogResult.OK) return;
 
-            for (var i = 0; i < dlg.FileNames.Length; i++)
+            try
             {
-                Import(dlg.FileNames[i], dlg.SafeFileNames[i], false);
+                for (var i = 0; i < dlg.FileNames.Length; i++)
+                {
+                    Import(dlg.FileNames[i], dlg.SafeFileNames[i], false);
+                }
+            }
+            catch (Exception ex)
+            {
+                DisplayException(ex);
             }
         }
 
@@ -674,7 +722,14 @@ namespace VFSBrowser.ViewModel
 
             if (result != DialogResult.OK) return;
 
-            Import(dlg.SelectedPath, Path.GetFileName(dlg.SelectedPath), true);
+            try
+            {
+                Import(dlg.SelectedPath, Path.GetFileName(dlg.SelectedPath), true);
+            }
+            catch (Exception ex)
+            {
+                DisplayException(ex);
+            }
         }
 
         private void Import(string source, string name, bool isDirectory)
@@ -700,9 +755,9 @@ namespace VFSBrowser.ViewModel
 
                 Items.Add(new ListItem(CurrentPath, name, isDirectory));
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DisplayException(ex);
             }
             UpdateVersion();
         }
