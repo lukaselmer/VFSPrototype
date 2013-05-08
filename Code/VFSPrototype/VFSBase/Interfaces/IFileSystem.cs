@@ -96,14 +96,6 @@ namespace VFSBase.Interfaces
         void Delete(IIndexNode node);
 
         /// <summary>
-        /// Moves the specified nodeToCopy to the destination folder.
-        /// </summary>
-        /// <param name="node">To move.</param>
-        /// <param name="destination">The destination.</param>
-        /// <param name="name">The new name of the nodeToCopy (can be the same as nodeToCopy.Name).</param>
-        void Move(IIndexNode node, Folder destination, string name);
-
-        /// <summary>
         /// Gets the root folder.
         /// </summary>
         /// <value>The root.</value>

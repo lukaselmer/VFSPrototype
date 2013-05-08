@@ -109,16 +109,8 @@ namespace VFSBase.Implementation
 
         public void Move(string source, string dest)
         {
-            var nodeToMove = FindNode(source);
-            if (nodeToMove == null) throw new NotFoundException();
-
-            if (Exists(dest)) throw new VFSException("Element already exists");
-
-            var destParentFolderPath = PathParser.GetParent(dest);
-            CreateFolder(destParentFolderPath);
-            var parent = FindNode(destParentFolderPath) as Folder;
-
-            _fileSystem.Move(nodeToMove, parent, PathParser.GetNodeName(dest));
+            Copy(source, dest);
+            Delete(source);
         }
 
         public bool Exists(string path)
