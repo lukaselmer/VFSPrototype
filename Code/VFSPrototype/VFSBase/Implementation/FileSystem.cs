@@ -32,7 +32,7 @@ namespace VFSBase.Implementation
         /// The lock is used to lock the file system, so the file system can be used in multiple threads.
         /// Especially useful for the synchronization.
         /// </summary>
-        private readonly ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
+        private ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
 
         public FileSystemOptions FileSystemOptions
         {
@@ -191,7 +191,7 @@ namespace VFSBase.Implementation
             }
 
             Debug.Assert(previous != null, "previous != null");
-            Debug.Assert(previous.Name == "", "previous.Name == \"\"");
+            Debug.Assert(string.IsNullOrEmpty(previous.Name), "previous.Name == \"\"");
 
             // previous is now the new root node!
             previous.IsRoot = true;
@@ -293,7 +293,7 @@ namespace VFSBase.Implementation
             else throw new NotFoundException();
 
             if (Directory.Exists(source)) ImportDirectory(source, destination, name, importCallbacks, false);
-            else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks, false);
+            else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks);
             else throw new NotFoundException();
 
             importCallbacks.OperationCompleted(!importCallbacks.ShouldAbort());
@@ -310,7 +310,7 @@ namespace VFSBase.Implementation
             importCallbacks.TotalToProcess += info.GetFiles().Length;
         }
 
-        private void ImportFile(string source, Folder destination, string name, CallbacksBase importCallbacks, bool createVersion)
+        private void ImportFile(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
             if (importCallbacks.ShouldAbort()) return;
 
@@ -340,7 +340,7 @@ namespace VFSBase.Implementation
                 ImportDirectory(directoryInfo.FullName, newFolder, directoryInfo.Name, importCallbacks, false);
 
             foreach (var fileInfo in info.GetFiles())
-                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name, importCallbacks, false);
+                ImportFile(fileInfo.FullName, newFolder, fileInfo.Name, importCallbacks);
         }
 
         #endregion
@@ -586,12 +586,12 @@ namespace VFSBase.Implementation
             return _options.StreamCodingStrategy.DecorateToHost(originalStream);
         }
 
-        private void AddDataToFile(VFSFile file, byte[] block)
+        /*private void AddDataToFile(VFSFile file, byte[] block)
         {
             var nextBlockNumber = _blockAllocation.Allocate();
             _blockManipulator.WriteBlock(nextBlockNumber, block);
             AppendBlockReference(file, nextBlockNumber);
-        }
+        }*/
 
         #endregion
 
@@ -620,6 +620,12 @@ namespace VFSBase.Implementation
                 WriteConfig();
                 _blockManipulator.Dispose();
                 _blockManipulator = null;
+            }
+
+            if (_readWriteLock != null)
+            {
+                _readWriteLock.Dispose();
+                _readWriteLock = null;
             }
         }
 
@@ -665,7 +671,7 @@ namespace VFSBase.Implementation
 
         public void MakeSynchronizedDisk(int id)
         {
-            if (id == 0) throw new ArgumentException("disk.id cannot be null or empty", "disk");
+            if (id == 0) throw new ArgumentException("id cannot be null or empty", "id");
             if (IsSynchronizedDisk) throw new VFSException("Disk is synchronized already");
             _options.Id = id;
             _options.LocalVersion = 0;

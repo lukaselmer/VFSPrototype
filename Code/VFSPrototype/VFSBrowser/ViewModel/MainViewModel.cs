@@ -237,6 +237,7 @@ namespace VFSBrowser.ViewModel
 
         private void UpdateVersion()
         {
+            if (_manipulator == null) return;
             LatestVersion = _manipulator.LatestVersion;
             var version = _manipulator.Version("/");
             VersionInput = version;
