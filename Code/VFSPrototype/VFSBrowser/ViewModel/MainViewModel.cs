@@ -175,6 +175,7 @@ namespace VFSBrowser.ViewModel
             var items = parameter as ObservableCollection<object>;
             if (items != null)
             {
+                if (items.Count <= 0) return false;
                 var listItem = items[0] as ListItem;
                 return listItem != null && (items.Count > 0 && (items.Count != 1 || listItem.Name != ".."));
             }
