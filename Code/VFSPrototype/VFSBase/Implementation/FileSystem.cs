@@ -523,35 +523,6 @@ namespace VFSBase.Implementation
         #endregion
 
 
-        #region Move
-
-        public void Move(IIndexNode node, Folder destination, string name)
-        {
-            CheckDisposed();
-            CheckName(name);
-            CheckVersion();
-
-            if (Exists(destination, name)) throw new ArgumentException("Folder already exists!");
-
-            _indexService.RemoveFromIndex(node);
-
-            //TODO: fix this!!!!!!!!
-
-            var newDestination = ArchiveAndReplaceRoot(destination, null, null);
-
-            var blockNumber = node.BlockNumber;
-            AppendBlockReference(newDestination, blockNumber);
-
-            node.Name = name;
-
-            _persistence.Persist(node);
-
-            _indexService.AddToIndex(node);
-        }
-
-        #endregion
-
-
         #region Search / Find / Exists
 
         public IEnumerable<IIndexNode> List(Folder folder)
