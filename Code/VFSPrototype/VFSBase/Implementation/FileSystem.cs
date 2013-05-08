@@ -237,16 +237,17 @@ namespace VFSBase.Implementation
 
             if (Exists(parentFolder, name)) throw new AlreadyExistsException();
 
+            var newParentFolder = createVersion ? ArchiveAndReplaceRoot(parentFolder, null, null) : parentFolder;
+
             var folder = new Folder(name)
                              {
-                                 Parent = parentFolder,
+                                 Parent = newParentFolder,
                                  BlockNumber = _blockAllocation.Allocate(),
-                                 Version = NextVersion
+                                 Version = newParentFolder.Version
                              };
             _persistence.Persist(folder);
 
-            if (createVersion) ArchiveAndReplaceRoot(parentFolder, null, folder);
-            else AppendBlockReference(parentFolder, folder.BlockNumber);
+            AppendBlockReference(newParentFolder, folder.BlockNumber);
 
             _indexService.AddToIndex(folder);
 
@@ -487,20 +488,20 @@ namespace VFSBase.Implementation
             _indexService.AddToIndex(file);*/
         }
 
-        private void CopyFolder(Folder nodeToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
+        private void CopyFolder(Folder folderToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
         {
             if (copyCallbacks.ShouldAbort()) return;
 
             CheckName(name);
 
-            var newFolder = CreateFolder(destination, name, true);
-            newFolder.IndirectNodeNumber = nodeToCopy.IndirectNodeNumber;
-            newFolder.BlocksCount = nodeToCopy.BlocksCount;
-            newFolder.PredecessorBlockNr = nodeToCopy.BlockNumber;
-            newFolder.Version = NextVersion;
-            _persistence.Persist(newFolder);
+            var copiedFolder = CreateFolder(destination, name, true);
+            copiedFolder.IndirectNodeNumber = folderToCopy.IndirectNodeNumber;
+            copiedFolder.BlocksCount = folderToCopy.BlocksCount;
+            copiedFolder.PredecessorBlockNr = folderToCopy.BlockNumber;
+            //copiedFolder.Version = NextVersion;
+            _persistence.Persist(copiedFolder);
 
-            ArchiveAndReplaceRoot(destination, null, newFolder);
+            //ArchiveAndReplaceRoot(copiedFolder.Parent, null, copiedFolder);
             copyCallbacks.CurrentlyProcessed++;
         }
 
