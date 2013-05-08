@@ -128,6 +128,14 @@ namespace VFSBase.Interfaces
         long CurrentVersion { get; }
 
         /// <summary>
+        /// Gets the latest version.
+        /// </summary>
+        /// <value>
+        /// The latest version.
+        /// </value>
+        long LatestVersion { get; }
+
+        /// <summary>
         /// Switches to latest version.
         /// </summary>
         void SwitchToLatestVersion();
