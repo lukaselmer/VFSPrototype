@@ -56,7 +56,7 @@ namespace VFSBaseTests.Synchronization
                 var testfileIndrectNodeNumber = testfile.IndirectNodeNumber;
 
                 const long offset = 10;
-                f.ShiftBlocks(1L, 10L);
+                //f.ShiftBlocks(1L, 10L);
 
                 testFolder = f.Folders(f.Root).First();
                 blubFolder = f.Folders(testFolder).First();
