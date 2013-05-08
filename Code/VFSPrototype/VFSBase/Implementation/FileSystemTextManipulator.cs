@@ -274,6 +274,11 @@ namespace VFSBase.Implementation
             return versions;
         }
 
+        public long LatestVersion
+        {
+            get { return _fileSystem.LatestVersion; }
+        }
+
         public void SwitchToVersion(long version)
         {
             if (Version("/") < version) SwitchToLatestVersion();

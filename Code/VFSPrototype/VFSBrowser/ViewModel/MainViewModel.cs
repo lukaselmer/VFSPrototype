@@ -42,6 +42,9 @@ namespace VFSBrowser.ViewModel
         }
 
         private String _currentPath;
+        private long _versionInput;
+        private long _latestVersion;
+
         public String CurrentPath
         {
             get { return _currentPath; }
@@ -66,6 +69,26 @@ namespace VFSBrowser.ViewModel
                 _currentPath = value;
                 OnPropertyChanged("CurrentPath");
 
+            }
+        }
+
+        public long VersionInput
+        {
+            get { return _versionInput; }
+            set
+            {
+                _versionInput = value;
+                OnPropertyChanged("VersionInput");
+            }
+        }
+
+        public long LatestVersion
+        {
+            get { return _latestVersion; }
+            set
+            {
+                _latestVersion = value;
+                OnPropertyChanged("LatestVersion");
             }
         }
 
@@ -100,6 +123,9 @@ namespace VFSBrowser.ViewModel
             SearchCommand = new Command(Search, p => (_manipulator != null));
             CancelSearchCommand = new Command(CancelSearch, p => (_manipulator != null));
             DiskInfoCommand = new Command(DiskInfo, p => (_manipulator != null));
+            SwitchToVersionCommand = new Command(SwitchToVersion, p => (_manipulator != null));
+            SwitchToLatestVersionCommand = new Command(SwitchToLatestVersion, p => (_manipulator != null));
+
             LoginCommand = new Command(Login, p => (_user == null));
             LogoutCommand = new Command(Logout, p => (_user != null));
             RegisterCommand = new Command(Register, p => (_user == null));
@@ -130,13 +156,14 @@ namespace VFSBrowser.ViewModel
         public Command SearchCommand { get; private set; }
         public Command CancelSearchCommand { get; private set; }
         public Command DiskInfoCommand { get; private set; }
+        public Command SwitchToVersionCommand { get; private set; }
+        public Command SwitchToLatestVersionCommand { get; private set; }
 
         public Command LoginCommand { get; private set; }
         public Command LogoutCommand { get; private set; }
         public Command RegisterCommand { get; private set; }
         public Command SwitchToOfflineModeCommand { get; private set; }
         public Command SwitchToOnlineModeCommand { get; private set; }
-
 
         private bool IsItemSelected(object parameter)
         {
@@ -177,6 +204,30 @@ namespace VFSBrowser.ViewModel
         //    return items;
         //}
 
+        private void SwitchToLatestVersion(object parameter)
+        {
+            SwitchVersion(LatestVersion);
+        }
+
+        private void SwitchToVersion(object parameter)
+        {
+            SwitchVersion(VersionInput);
+        }
+
+        private void SwitchVersion(long version)
+        {
+            _manipulator.SwitchToVersion(version);
+            CurrentPath = "/";
+            OnPropertyChanged("FileSystemName");
+            UpdateVersion();
+        }
+
+        private void UpdateVersion()
+        {
+            LatestVersion = _manipulator.LatestVersion;
+            var version = _manipulator.Version("/");
+            VersionInput = version;
+        }
 
         private void CancelSearch(object parameter)
         {
@@ -292,6 +343,7 @@ namespace VFSBrowser.ViewModel
             }
 
             del.ForEach(i => Items.Remove(i));
+            UpdateVersion();
         }
 
         private void Copy(object parameter)
@@ -305,12 +357,12 @@ namespace VFSBrowser.ViewModel
                 _clipboard.Clear();
                 _copy = true;
                 foreach (ListItem item in items) _clipboard.Add(item);
-
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            UpdateVersion();
         }
 
         private void Move(object parameter)
@@ -332,6 +384,7 @@ namespace VFSBrowser.ViewModel
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            UpdateVersion();
         }
 
         private void Paste(object parameter)
@@ -368,6 +421,7 @@ namespace VFSBrowser.ViewModel
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            UpdateVersion();
         }
 
         private void Export(object parameter)
@@ -449,6 +503,7 @@ namespace VFSBrowser.ViewModel
                     MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+            UpdateVersion();
         }
 
         private void Open(object parameter)
@@ -507,6 +562,7 @@ namespace VFSBrowser.ViewModel
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            UpdateVersion();
         }
 
         private void CloseVfs(object parameter)
@@ -540,6 +596,7 @@ namespace VFSBrowser.ViewModel
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            UpdateVersion();
         }
 
         private static string ChooseNewVFSFile()
@@ -577,6 +634,7 @@ namespace VFSBrowser.ViewModel
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            UpdateVersion();
         }
 
         private void Drop(object inObject)
@@ -646,6 +704,7 @@ namespace VFSBrowser.ViewModel
             {
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            UpdateVersion();
         }
 
         private void DisposeManipulator()

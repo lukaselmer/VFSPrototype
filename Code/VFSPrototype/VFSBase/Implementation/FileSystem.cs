@@ -78,8 +78,11 @@ namespace VFSBase.Implementation
         private Folder ImportRootFolder()
         {
             var folder = _blockParser.ParseFolder(_blockManipulator.ReadBlock(_options.RootBlockNr));
-
-            if (folder != null) return folder;
+            if (folder != null)
+            {
+                folder.BlockNumber = _options.RootBlockNr;
+                return folder;
+            }
 
             var root = new Folder { IsRoot = true };
             _blockManipulator.WriteBlock(root.BlockNumber, _blockParser.NodeToBytes(root));
@@ -116,6 +119,11 @@ namespace VFSBase.Implementation
 
 
         #region Versioning
+
+        public long LatestVersion
+        {
+            get { return LatestRoot.Version; }
+        }
 
         public long CurrentVersion
         {
@@ -283,8 +291,8 @@ namespace VFSBase.Implementation
             else if (File.Exists(source)) importCallbacks.TotalToProcess++;
             else throw new NotFoundException();
 
-            if (Directory.Exists(source)) ImportDirectory(source, destination, name, importCallbacks, true);
-            else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks, true);
+            if (Directory.Exists(source)) ImportDirectory(source, destination, name, importCallbacks, false);
+            else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks, false);
             else throw new NotFoundException();
 
             importCallbacks.OperationCompleted(!importCallbacks.ShouldAbort());
