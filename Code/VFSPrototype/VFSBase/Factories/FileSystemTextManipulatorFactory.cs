@@ -1,3 +1,4 @@
+using System;
 using VFSBase.DiskServiceReference;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
@@ -21,7 +22,15 @@ namespace VFSBase.Factories
         public IFileSystemTextManipulator OpenFileSystemTextManipulator(string location, string password)
         {
             var fileSystem = FileSystemFactory.Import(location, password);
-            fileSystem.TestEncryptionKey();
+            try
+            {
+                fileSystem.TestEncryptionKey();
+            }
+            catch
+            {
+                fileSystem.Dispose();
+                throw;
+            }
             return new FileSystemTextManipulator(fileSystem);
         }
     }
