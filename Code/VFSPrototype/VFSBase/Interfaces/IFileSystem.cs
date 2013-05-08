@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
@@ -195,5 +196,12 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="options">The options.</param>
         void Reload(FileSystemOptions options);
+
+        /// <summary>
+        /// Occurs when the file system has changed.
+        /// </summary>
+        event EventHandler<FileSystemChangedEventArgs> FileSystemChanged;
+
+        void OnFileSystemChanged(object sender, FileSystemChangedEventArgs e);
     }
 }

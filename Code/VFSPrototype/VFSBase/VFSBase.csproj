@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Factories\FileSystemTextManipulatorFactory.cs" />
+    <Compile Include="Interfaces\FileSystemChangedEventArgs.cs" />
     <Compile Include="Interfaces\IFileSystemTextManipulatorFactory.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\CircularBuffer.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\Lz77Constants.cs" />

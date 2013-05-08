@@ -8,7 +8,6 @@ using VFSBase.Exceptions;
 using VFSBase.Helpers;
 using VFSBase.Interfaces;
 using VFSBase.Persistence;
-using VFSBase.Persistence.Blocks;
 using VFSBase.Search;
 using VFSBlockAbstraction;
 
@@ -32,7 +31,7 @@ namespace VFSBase.Implementation
         /// The lock is used to lock the file system, so the file system can be used in multiple threads.
         /// Especially useful for the synchronization.
         /// </summary>
-        private ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim();
+        private ReaderWriterLockSlim _readWriteLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
         public FileSystemOptions FileSystemOptions
         {
@@ -46,27 +45,59 @@ namespace VFSBase.Implementation
 
         internal FileSystem(FileSystemOptions options)
         {
-            _options = options;
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                _options = options;
 
-            _blockManipulator = new BlockManipulator(_options.Location, _options.BlockSize, _options.MasterBlockSize);
-            _blockParser = new BlockParser(_options);
-            _persistence = new Persistence.Persistence(_blockParser, _blockManipulator);
-            _blockAllocation = _options.BlockAllocation;
-            _indexService = new IndexService();
+                _blockManipulator = new BlockManipulator(_options.Location, _options.BlockSize, _options.MasterBlockSize);
+                _blockParser = new BlockParser(_options);
+                _persistence = new Persistence.Persistence(_blockParser, _blockManipulator);
+                _blockAllocation = _options.BlockAllocation;
+                _indexService = new IndexService();
 
-            InitializeFileSystem();
+                InitializeFileSystem();
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         public void Reload(FileSystemOptions options)
         {
-            _options = options;
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                _options = options;
 
-            _blockAllocation = _options.BlockAllocation;
-            // TODO: reload indexing service
-            // IndexingService.StartIndexing(_indexService, this);
+                _blockAllocation = _options.BlockAllocation;
+                // TODO: reload indexing service
+                // IndexingService.StartIndexing(_indexService, this);
 
-            Root = LatestRoot = ImportRootFolder();
+                Root = LatestRoot = ImportRootFolder();
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
+
+        public void OnFileSystemChanged(object sender, FileSystemChangedEventArgs e)
+        {
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                Root = LatestRoot = ImportRootFolder();
+                if (FileSystemChanged != null) FileSystemChanged(sender, e);
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
+        }
+
+        public event EventHandler<FileSystemChangedEventArgs> FileSystemChanged;
 
         private void InitializeFileSystem()
         {
@@ -137,16 +168,25 @@ namespace VFSBase.Implementation
 
         public void SwitchToVersion(long version)
         {
-            if (version < 0) throw new VFSException(string.Format("Version {0} is not a positive version", version));
-            if (LatestRoot.Version < version) throw new VFSException(string.Format("Version {0} does not exist", version));
-            if (Root.Version < version) Root = LatestRoot;
-
-            while (version < Root.Version)
+            _readWriteLock.EnterWriteLock();
+            try
             {
-                var blockNr = Root.PredecessorBlockNr;
-                var readBlock = _blockManipulator.ReadBlock(blockNr);
-                Root = _blockParser.ParseFolder(readBlock);
-                Root.BlockNumber = blockNr;
+                if (version < 0) throw new VFSException(string.Format("Version {0} is not a positive version", version));
+                if (LatestRoot.Version < version) throw new VFSException(string.Format("Version {0} does not exist", version));
+                if (Root.Version < version) Root = LatestRoot;
+
+                while (version < Root.Version)
+                {
+                    var blockNr = Root.PredecessorBlockNr;
+                    var readBlock = _blockManipulator.ReadBlock(blockNr);
+                    Root = _blockParser.ParseFolder(readBlock);
+                    Root.BlockNumber = blockNr;
+                }
+            }
+            finally
+            {
+
+                _readWriteLock.ExitWriteLock();
             }
         }
 
@@ -226,7 +266,15 @@ namespace VFSBase.Implementation
 
         public Folder CreateFolder(Folder parentFolder, string name)
         {
-            return CreateFolder(parentFolder, name, true);
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                return CreateFolder(parentFolder, name, true);
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         private Folder CreateFolder(Folder parentFolder, string name, bool createVersion)
@@ -282,21 +330,29 @@ namespace VFSBase.Implementation
 
         public void Import(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
-            CheckDisposed();
-            CheckName(name);
-            CheckVersion();
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                CheckDisposed();
+                CheckName(name);
+                CheckVersion();
 
-            destination = ArchiveAndReplaceRoot(destination, null, null);
+                destination = ArchiveAndReplaceRoot(destination, null, null);
 
-            if (Directory.Exists(source)) CollectImportDirectoryTotals(source, importCallbacks);
-            else if (File.Exists(source)) importCallbacks.TotalToProcess++;
-            else throw new NotFoundException();
+                if (Directory.Exists(source)) CollectImportDirectoryTotals(source, importCallbacks);
+                else if (File.Exists(source)) importCallbacks.TotalToProcess++;
+                else throw new NotFoundException();
 
-            if (Directory.Exists(source)) ImportDirectory(source, destination, name, importCallbacks, false);
-            else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks);
-            else throw new NotFoundException();
+                if (Directory.Exists(source)) ImportDirectory(source, destination, name, importCallbacks, false);
+                else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks);
+                else throw new NotFoundException();
 
-            importCallbacks.OperationCompleted(!importCallbacks.ShouldAbort());
+                importCallbacks.OperationCompleted(!importCallbacks.ShouldAbort());
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         private static void CollectImportDirectoryTotals(string source, CallbacksBase importCallbacks)
@@ -350,24 +406,32 @@ namespace VFSBase.Implementation
 
         public void Export(IIndexNode source, string destination, CallbacksBase exportCallbacks)
         {
-            var absoluteDestination = Path.GetFullPath(destination);
-            EnsureParentDirectoryExists(absoluteDestination);
-            CheckDisposed();
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                var absoluteDestination = Path.GetFullPath(destination);
+                EnsureParentDirectoryExists(absoluteDestination);
+                CheckDisposed();
 
-            if (source == null) throw new NotFoundException();
+                if (source == null) throw new NotFoundException();
 
-            if (File.Exists(absoluteDestination) || Directory.Exists(absoluteDestination)) throw new VFSException("Destination already exists!");
+                if (File.Exists(absoluteDestination) || Directory.Exists(absoluteDestination)) throw new VFSException("Destination already exists!");
 
-            // Gather totals
-            if (source is Folder) CollectExportDirectoryTotals(source as Folder, exportCallbacks);
-            else if (source is VFSFile) exportCallbacks.TotalToProcess++;
-            else throw new ArgumentException("Source must be of type Folder or VFSFile", "source");
+                // Gather totals
+                if (source is Folder) CollectExportDirectoryTotals(source as Folder, exportCallbacks);
+                else if (source is VFSFile) exportCallbacks.TotalToProcess++;
+                else throw new ArgumentException("Source must be of type Folder or VFSFile", "source");
 
-            // Do the real export
-            if (source is Folder) ExportFolder(source as Folder, absoluteDestination, exportCallbacks);
-            else ExportFile(source as VFSFile, absoluteDestination, exportCallbacks);
+                // Do the real export
+                if (source is Folder) ExportFolder(source as Folder, absoluteDestination, exportCallbacks);
+                else ExportFile(source as VFSFile, absoluteDestination, exportCallbacks);
 
-            exportCallbacks.OperationCompleted(!exportCallbacks.ShouldAbort());
+                exportCallbacks.OperationCompleted(!exportCallbacks.ShouldAbort());
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         private void CollectExportDirectoryTotals(Folder source, CallbacksBase exportCallbacks)
@@ -438,19 +502,27 @@ namespace VFSBase.Implementation
 
         public void Copy(IIndexNode nodeToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
         {
-            CheckDisposed();
-            CheckName(name);
-            CheckVersion();
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                CheckDisposed();
+                CheckName(name);
+                CheckVersion();
 
-            // Gather totals (copy in ~O(1) :D)
-            copyCallbacks.TotalToProcess++;
+                // Gather totals (copy in ~O(1) :D)
+                copyCallbacks.TotalToProcess++;
 
-            // Do the real copy
-            if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name, copyCallbacks);
-            else if (nodeToCopy is VFSFile) CopyFile(nodeToCopy as VFSFile, destination, name, copyCallbacks);
-            else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
+                // Do the real copy
+                if (nodeToCopy is Folder) CopyFolder(nodeToCopy as Folder, destination, name, copyCallbacks);
+                else if (nodeToCopy is VFSFile) CopyFile(nodeToCopy as VFSFile, destination, name, copyCallbacks);
+                else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
 
-            copyCallbacks.OperationCompleted(!copyCallbacks.ShouldAbort());
+                copyCallbacks.OperationCompleted(!copyCallbacks.ShouldAbort());
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         private void CopyFile(VFSFile fileToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
@@ -512,13 +584,21 @@ namespace VFSBase.Implementation
 
         public void Delete(IIndexNode node)
         {
-            CheckDisposed();
-            CheckVersion();
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                CheckDisposed();
+                CheckVersion();
 
-            if (node.Parent == null) throw new VFSException("Cannot delete root node");
-            ArchiveAndReplaceRoot(node.Parent, node, null);
+                if (node.Parent == null) throw new VFSException("Cannot delete root node");
+                ArchiveAndReplaceRoot(node.Parent, node, null);
 
-            _indexService.RemoveFromIndex(node);
+                _indexService.RemoveFromIndex(node);
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         #endregion
@@ -528,37 +608,86 @@ namespace VFSBase.Implementation
 
         public IEnumerable<IIndexNode> List(Folder folder)
         {
-            CheckDisposed();
-            return GetBlockList(folder).AsEnumerable();
+            _readWriteLock.EnterReadLock();
+            try
+            {
+                CheckDisposed();
+                return GetBlockList(folder).AsEnumerable().ToList();
+            }
+            finally
+            {
+                _readWriteLock.ExitReadLock();
+            }
         }
 
         public IEnumerable<Folder> Folders(Folder folder)
         {
-            return List(folder).OfType<Folder>();
+            _readWriteLock.EnterReadLock();
+            try
+            {
+                return List(folder).OfType<Folder>().ToList();
+            }
+            finally
+            {
+
+                _readWriteLock.ExitReadLock();
+            }
         }
 
         public IEnumerable<VFSFile> Files(Folder folder)
         {
-            return List(folder).OfType<VFSFile>();
+            _readWriteLock.EnterReadLock();
+            try
+            {
+                return List(folder).OfType<VFSFile>();
+            }
+            finally
+            {
+                _readWriteLock.ExitReadLock();
+            }
         }
 
         public IEnumerable<IIndexNode> Search(SearchOptions searchOptions)
         {
-            return _indexService.Search(searchOptions);
+            _readWriteLock.EnterReadLock();
+            try
+            {
+                return _indexService.Search(searchOptions).ToList();
+            }
+            finally
+            {
+                _readWriteLock.ExitReadLock();
+            }
         }
 
         public IIndexNode Find(Folder folder, string name)
         {
-            CheckDisposed();
+            _readWriteLock.EnterReadLock();
+            try
+            {
+                CheckDisposed();
 
-            return GetBlockList(folder).Find(name);
+                return GetBlockList(folder).Find(name);
+            }
+            finally
+            {
+                _readWriteLock.ExitReadLock();
+            }
         }
 
         public bool Exists(Folder folder, string name)
         {
-            CheckDisposed();
+            _readWriteLock.EnterReadLock();
+            try
+            {
+                CheckDisposed();
 
-            return GetBlockList(folder).Exists(name);
+                return GetBlockList(folder).Exists(name);
+            }
+            finally
+            {
+                _readWriteLock.ExitReadLock();
+            }
         }
 
         #endregion
@@ -631,7 +760,16 @@ namespace VFSBase.Implementation
 
         public void WriteConfig()
         {
-            _blockManipulator.SaveConfig(_options);
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                CheckVersion();
+                _blockManipulator.SaveConfig(_options);
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         #endregion
@@ -657,11 +795,6 @@ namespace VFSBase.Implementation
 
         #region Synchronization
 
-        public void ShiftBlocks(long fromVersion, long offset)
-        {
-            throw new NotImplementedException();
-        }
-
         public ReaderWriterLockSlim GetReadWriteLock()
         {
             return _readWriteLock;
@@ -671,27 +804,59 @@ namespace VFSBase.Implementation
 
         public void MakeSynchronizedDisk(int id)
         {
-            if (id == 0) throw new ArgumentException("id cannot be null or empty", "id");
-            if (IsSynchronizedDisk) throw new VFSException("Disk is synchronized already");
-            _options.Id = id;
-            _options.LocalVersion = 0;
-            _options.LastServerVersion = 0;
-            WriteConfig();
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                if (id == 0) throw new ArgumentException("id cannot be null or empty", "id");
+                if (IsSynchronizedDisk) throw new VFSException("Disk is synchronized already");
+                _options.Id = id;
+                _options.LocalVersion = 0;
+                _options.LastServerVersion = 0;
+                WriteConfig();
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         public byte[] ReadBlock(long blockNumber)
         {
-            return _blockManipulator.ReadBlock(blockNumber);
+            _readWriteLock.EnterReadLock();
+            try
+            {
+                return _blockManipulator.ReadBlock(blockNumber);
+            }
+            finally
+            {
+                _readWriteLock.ExitReadLock();
+            }
         }
 
         public void WriteBlock(long blockNumber, byte[] block)
         {
-            _blockManipulator.WriteBlock(blockNumber, block);
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                _blockManipulator.WriteBlock(blockNumber, block);
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         public void WriteFileSystemOptions(byte[] serializedFileSystemOptions)
         {
-            _blockManipulator.SaveConfig(serializedFileSystemOptions);
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                _blockManipulator.SaveConfig(serializedFileSystemOptions);
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         #endregion
