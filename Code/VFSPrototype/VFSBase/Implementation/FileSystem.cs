@@ -223,6 +223,9 @@ namespace VFSBase.Implementation
                     _persistence.Persist(previous);
                 }
 
+                _indexService.RemoveFromIndex(toCopy);
+                _indexService.AddToIndex(newFolder);
+
                 toReplace = toCopy;
                 toCopy = toCopy.Parent;
                 replacement = newFolder;
@@ -243,8 +246,6 @@ namespace VFSBase.Implementation
 
         private void ResetRoot(Folder newRoot)
         {
-            _indexService.RemoveFromIndex(Root);
-
             newRoot.Version = NextVersion;
 
             Root = newRoot;
@@ -254,8 +255,6 @@ namespace VFSBase.Implementation
             _persistence.Persist(Root);
             _options.RootBlockNr = Root.BlockNumber;
             WriteConfig();
-
-            _indexService.AddToIndex(newRoot);
         }
 
 

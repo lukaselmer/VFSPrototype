@@ -103,7 +103,7 @@ namespace VFSBrowser.ViewModel
         {
             _container = container;
             Items = new ObservableCollection<ListItem>();
-            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, Keyword = "" };
+            SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, Keyword = "", Global = false };
 
             OpenVfsCommand = new Command(OpenVfs, null);
             NewVfsCommand = new Command(NewVfs, null);
@@ -256,7 +256,7 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                foreach (var i in _manipulator.Search(SearchOption.Keyword, CurrentPath, SearchOption.Recursive, SearchOption.CaseSensitive))
+                foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? "/" : CurrentPath, SearchOption.Recursive, SearchOption.CaseSensitive))
                 {
                     var idx = i.LastIndexOf("/", StringComparison.CurrentCulture) + 1;
                     var name = i.Substring(idx);
