@@ -1,16 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
+using VFSBase.Search;
 
 namespace VFSBase.Factories
 {
     internal static class FileSystemFactory
     {
-        internal static FileSystem Create(FileSystemOptions options, string password)
+        internal static IFileSystem Create(FileSystemOptions options, string password)
         {
             if (File.Exists(options.Location)) throw new VFSException("File already exists");
 
@@ -25,7 +28,7 @@ namespace VFSBase.Factories
             return new FileSystem(options);
         }
 
-        internal static FileSystem Import(string location, string password)
+        internal static IFileSystem Import(string location, string password)
         {
             if (!File.Exists(location)) throw new VFSException("File does not exist");
 

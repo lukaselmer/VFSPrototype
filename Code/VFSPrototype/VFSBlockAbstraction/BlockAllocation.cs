@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace VFSBase.Persistence.Blocks
+namespace VFSBlockAbstraction
 {
     [Serializable]
     public class BlockAllocation

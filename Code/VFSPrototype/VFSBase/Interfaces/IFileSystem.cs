@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
+using VFSBase.Callbacks;
 using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
@@ -144,7 +146,7 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="fromVersion">From version.</param>
         /// <param name="offset">The offset.</param>
-        void ShiftBlocks(long fromVersion, long offset);
+        //void ShiftBlocks(long fromVersion, long offset);
 
         /// <summary>
         /// Returns the mutex for the file system. This allows to lock the file system and thus allow parallel usage of the file system.
@@ -195,5 +197,12 @@ namespace VFSBase.Interfaces
         /// </summary>
         /// <param name="options">The options.</param>
         void Reload(FileSystemOptions options);
+
+        /// <summary>
+        /// Occurs when the file system has changed.
+        /// </summary>
+        event EventHandler<FileSystemChangedEventArgs> FileSystemChanged;
+
+        void OnFileSystemChanged(object sender, FileSystemChangedEventArgs e);
     }
 }
