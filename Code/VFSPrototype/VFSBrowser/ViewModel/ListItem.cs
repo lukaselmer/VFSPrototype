@@ -30,13 +30,13 @@ namespace VFSBrowser.ViewModel
             Folder.BeginInit();
             Folder.UriSource = new Uri("../Resources/Folder.png", UriKind.Relative);
             Folder.EndInit();
-            Folder.Freeze();
+            //Folder.Freeze();
 
             File = new BitmapImage();
             File.BeginInit();
             File.UriSource = new Uri("../Resources/File.png", UriKind.Relative);
             File.EndInit();
-            File.Freeze();
+            //File.Freeze();
         }
 
         public ListItem(string path, string name, bool isDirectory)
