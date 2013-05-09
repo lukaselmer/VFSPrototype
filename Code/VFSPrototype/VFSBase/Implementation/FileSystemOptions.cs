@@ -13,6 +13,7 @@ using VFSBase.Persistence.Blocks;
 using VFSBase.Persistence.Coding;
 using VFSBase.Persistence.Coding.General;
 using VFSBase.Persistence.Coding.Strategies;
+using VFSBlockAbstraction;
 
 namespace VFSBase.Implementation
 {

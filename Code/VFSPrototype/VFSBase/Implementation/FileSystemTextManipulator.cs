@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using VFSBase.Callbacks;
+using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Helpers;
 using VFSBase.Interfaces;
 using VFSBase.Search;
+using VFSBase.Synchronization;
 
 namespace VFSBase.Implementation
 {
     internal class FileSystemTextManipulator : IFileSystemTextManipulator
     {
-        internal IFileSystem _fileSystem;
+        private IFileSystem _fileSystem;
 
         public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
 
@@ -297,5 +300,9 @@ namespace VFSBase.Implementation
             _fileSystem.SwitchToLatestVersion();
         }
 
+        public ISynchronizationService GenerateSynchronizationService(UserDto user, SynchronizationCallbacks callbacks)
+        {
+            return new SynchronizationService(_fileSystem, user, callbacks);
+        }
     }
 }

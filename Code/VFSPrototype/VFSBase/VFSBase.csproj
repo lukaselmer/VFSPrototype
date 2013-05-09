@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Factories\FileSystemTextManipulatorFactory.cs" />
+    <Compile Include="Interfaces\FileSystemChangedEventArgs.cs" />
     <Compile Include="Interfaces\IFileSystemTextManipulatorFactory.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\CircularBuffer.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\Lz77Constants.cs" />
@@ -67,10 +68,10 @@
     <Compile Include="Persistence\Coding\Strategies\StramStrategyResolver.cs" />
     <Compile Include="Persistence\Coding\General\StreamCompressionType.cs" />
     <Compile Include="Persistence\Coding\General\StreamEncryptionType.cs" />
-    <Compile Include="Interfaces\CallbacksBase.cs" />
-    <Compile Include="Interfaces\CopyCallbacks.cs" />
-    <Compile Include="Interfaces\ExportCallbacks.cs" />
-    <Compile Include="Interfaces\ImportCallbacks.cs" />
+    <Compile Include="Callbacks\CallbacksBase.cs" />
+    <Compile Include="Callbacks\CopyCallbacks.cs" />
+    <Compile Include="Callbacks\ExportCallbacks.cs" />
+    <Compile Include="Callbacks\ImportCallbacks.cs" />
     <Compile Include="Persistence\Coding\SelfMadeAes\AesHelperMethods.cs" />
     <Compile Include="Persistence\Coding\SelfMadeAes\Constants.cs" />
     <Compile Include="Persistence\Coding\SelfMadeAes\CryptoDirection.cs" />
@@ -118,7 +119,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Implementation\ISynchronizationService.cs" />
+    <Compile Include="Interfaces\ISynchronizationService.cs" />
+    <Compile Include="Callbacks\SynchronizationCallbacks.cs" />
     <Compile Include="Synchronization\SynchronizationService.cs" />
   </ItemGroup>
   <ItemGroup>

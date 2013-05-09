@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using VFSBase.Exceptions;
+using VFSBase.Callbacks;
+using VFSBase.DiskServiceReference;
 using VFSBase.Interfaces;
+using VFSBase.Synchronization;
 
 namespace VFSConsoleTests
 {
@@ -121,6 +123,11 @@ namespace VFSConsoleTests
         public long LatestVersion
         {
             get { throw new NotImplementedException(); }
+        }
+
+        public ISynchronizationService GenerateSynchronizationService(UserDto user, SynchronizationCallbacks callbacks)
+        {
+            throw new NotImplementedException();
         }
 
         public void Dispose()

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using VFSBase.Callbacks;
 using VFSBase.Interfaces;
 using VFSBrowser.View;
 

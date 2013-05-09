@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 
-namespace VFSBase.Interfaces
+namespace VFSBase.Callbacks
 {
     /// <summary>
     /// The callbacks base
