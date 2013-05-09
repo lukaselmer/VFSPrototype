@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using Microsoft.Practices.Unity;
 using VFSBase.DiskServiceReference;
 using VFSBase.Implementation;
@@ -39,34 +40,39 @@ namespace VFSBrowser.ViewModel
             get { return _parent; }
         }
 
-        private String _currentPath;
+        private DirectoryPath _currentPath;
         private long _versionInput;
         private long _latestVersion;
 
-        public String CurrentPath
+        public DirectoryPath CurrentPath
         {
             get { return _currentPath; }
             set
             {
-                try
+                var newValue = value;
+                if (_manipulator != null)
                 {
-                    Items.Clear();
-                    if (value != "/") Items.Add(Parent);
-
-                    foreach (var name in _manipulator.List(value))
+                    try
                     {
-                        Items.Add(new ListItem(value, name, _manipulator.IsDirectory(value + name)));
+                        while (!_manipulator.Exists(newValue.ToString()) || !_manipulator.IsDirectory(newValue.ToString())) newValue.SwitchToParent();
+
+                        Items.Clear();
+                        if (!newValue.IsRoot) Items.Add(Parent);
+
+                        foreach (var name in _manipulator.List(newValue.ToString()))
+                        {
+                            Items.Add(new ListItem(newValue.ToString(), name, _manipulator.IsDirectory(newValue.GetChild(name).ToString())));
+                        }
+                        OnPropertyChanged("Items");
+
                     }
-                    OnPropertyChanged("Items");
-
+                    catch (Exception e)
+                    {
+                        DisplayException(e);
+                    }
                 }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-                _currentPath = value;
+                _currentPath = newValue;
                 OnPropertyChanged("CurrentPath");
-
             }
         }
 
@@ -187,7 +193,7 @@ namespace VFSBrowser.ViewModel
         //    {
         //        if (SearchOption.Recursive && _manipulator.IsDirectory(folder + item))
         //        {
-        //            items.AddRange(SearchItems(folder + item + "/"));
+        //            items.AddRange(SearchItems(folder + item + DirectoryPath.Seperator));
         //        }
 
         //        var name = item;
@@ -221,7 +227,7 @@ namespace VFSBrowser.ViewModel
             try
             {
                 _manipulator.SwitchToVersion(version);
-                CurrentPath = "/";
+                RefreshCurrentDirectory();
                 OnPropertyChanged("FileSystemName");
                 UpdateVersion();
             }
@@ -235,7 +241,7 @@ namespace VFSBrowser.ViewModel
         {
             if (_manipulator == null) return;
             LatestVersion = _manipulator.LatestVersion;
-            var version = _manipulator.Version("/");
+            var version = _manipulator.Version(DirectoryPath.Seperator);
             VersionInput = version;
         }
 
@@ -243,7 +249,7 @@ namespace VFSBrowser.ViewModel
         {
             SearchOption.Keyword = "";
             OnPropertyChanged("SearchOption");
-            CurrentPath = CurrentPath;
+            RefreshCurrentDirectory();
         }
 
         private void Search(object parameter)
@@ -256,9 +262,9 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? "/" : CurrentPath, SearchOption.Recursive, SearchOption.CaseSensitive))
+                foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? DirectoryPath.Seperator : CurrentPath.ToString(), SearchOption.Recursive, SearchOption.CaseSensitive))
                 {
-                    var idx = i.LastIndexOf("/", StringComparison.CurrentCulture) + 1;
+                    var idx = i.LastIndexOf(DirectoryPath.Seperator, StringComparison.CurrentCulture) + 1;
                     var name = i.Substring(idx);
                     var path = i.Substring(0, idx);
                     Items.Add(new ListItem(path, name, _manipulator.IsDirectory(i)));
@@ -349,7 +355,12 @@ namespace VFSBrowser.ViewModel
 
         private void SynchronizationStateChanged(SynchronizationState state)
         {
-            Console.WriteLine(state);
+            RefreshCurrentDirectory();
+        }
+
+        private void RefreshCurrentDirectory()
+        {
+            CurrentPath = CurrentPath;
         }
 
         private void SwitchToOfflineMode(object parameter)
@@ -436,7 +447,7 @@ namespace VFSBrowser.ViewModel
                 foreach (var source in _clipboard)
                 {
                     var sourcePath = source.Path + source.Name;
-                    var destinationPath = CurrentPath + source.Name;
+                    var destinationPath = CurrentPath.GetChild(source.Name).ToString();
 
                     if (!_manipulator.Exists(sourcePath))
                     {
@@ -458,12 +469,13 @@ namespace VFSBrowser.ViewModel
                     if (_copy)
                     {
                         var vm = new OperationProgressViewModel();
-                        Task.Run(() => _manipulator.Copy(sourcePath, destinationPath, vm.Callbacks));
+
+                        RunAsyncAction(() => _manipulator.Copy(sourcePath, destinationPath, vm.Callbacks));
                         vm.ShowDialog();
                     }
                     else _manipulator.Move(sourcePath, destinationPath);
 
-                    Items.Add(new ListItem(CurrentPath, source.Name, _manipulator.IsDirectory(destinationPath)));
+                    Items.Add(new ListItem(CurrentPath.ToString(), source.Name, _manipulator.IsDirectory(destinationPath)));
                 }
             }
             catch (Exception ex)
@@ -471,6 +483,12 @@ namespace VFSBrowser.ViewModel
                 DisplayException(ex);
             }
             UpdateVersion();
+        }
+
+        private void RunAsyncAction(Action action)
+        {
+            Action<Task> handleException = task => { if (task.Exception != null) DisplayException(task.Exception.InnerException); };
+            Task.Run(action).ContinueWith(handleException, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void Export(object parameter)
@@ -513,7 +531,7 @@ namespace VFSBrowser.ViewModel
                     }
 
                     var vm = new OperationProgressViewModel();
-                    Task.Run(() => _manipulator.Export(vfsExportPath, exportPath, vm.Callbacks));
+                    RunAsyncAction(() => _manipulator.Export(vfsExportPath, exportPath, vm.Callbacks));
                     vm.ShowDialog();
                 }
             }
@@ -543,7 +561,7 @@ namespace VFSBrowser.ViewModel
                         return;
                     }
                     _manipulator.Move(item.Path + item.Name, item.Path + dlg.Text);
-                    CurrentPath = CurrentPath;
+                    RefreshCurrentDirectory();
                     //item.Name = dlg.Text;
                     //OnPropertyChanged("Items");
 
@@ -568,14 +586,14 @@ namespace VFSBrowser.ViewModel
                 {
                     if (item.Name == "..")
                     {
-                        if (CurrentPath == "/") return;
+                        if (CurrentPath.IsRoot) return;
 
-                        var tmp = CurrentPath.TrimEnd('/');
-                        CurrentPath = tmp.Substring(0, tmp.LastIndexOf("/", StringComparison.CurrentCulture) + 1);
+                        CurrentPath.SwitchToParent();
+                        RefreshCurrentDirectory();
                     }
                     else
                     {
-                        CurrentPath = item.Path + item.Name + "/";
+                        CurrentPath = new DirectoryPath(item.Path, item.Name);
                     }
                 }
                 else
@@ -584,7 +602,7 @@ namespace VFSBrowser.ViewModel
                     if (File.Exists(tmpFile)) File.Delete(tmpFile);
 
                     var vm = new OperationProgressViewModel();
-                    Task.Run(() => _manipulator.Export(item.Path + item.Name, tmpFile, vm.Callbacks));
+                    RunAsyncAction(() => _manipulator.Export(item.Path + item.Name, tmpFile, vm.Callbacks));
                     vm.ShowDialog();
 
                     Process.Start("explorer", tmpFile);
@@ -601,17 +619,16 @@ namespace VFSBrowser.ViewModel
             try
             {
                 var newFolderName = "New Folder";
-                if (_manipulator.Exists(CurrentPath + newFolderName))
+                if (_manipulator.Exists(CurrentPath.GetChild(newFolderName).ToString()))
                 {
                     var count = 1;
-                    while (_manipulator.Exists(CurrentPath + newFolderName + " " + count))
-                        count++;
+                    while (_manipulator.Exists(CurrentPath.GetChild(newFolderName + " " + count).ToString())) count++;
                     newFolderName += " " + count;
                 }
 
-                _manipulator.CreateFolder(CurrentPath + newFolderName);
+                _manipulator.CreateFolder(CurrentPath.GetChild(newFolderName).ToString());
 
-                Items.Add(new ListItem(CurrentPath, newFolderName, true));
+                Items.Add(new ListItem(CurrentPath.ToString(), newFolderName, true));
 
             }
             catch (Exception ex)
@@ -645,7 +662,7 @@ namespace VFSBrowser.ViewModel
             {
                 var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType);
                 _manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().CreateFileSystemTextManipulator(fileSystemData, vm.Password);
-                CurrentPath = "/";
+                CurrentPath = new DirectoryPath();
                 OnPropertyChanged("FileSystemName");
             }
             catch (Exception e)
@@ -683,7 +700,7 @@ namespace VFSBrowser.ViewModel
                 DisposeManipulator();
 
                 _manipulator = manipulator;
-                CurrentPath = "/";
+                CurrentPath = new DirectoryPath();
                 OnPropertyChanged("FileSystemName");
             }
             catch (Exception ex)
@@ -757,7 +774,7 @@ namespace VFSBrowser.ViewModel
         {
             try
             {
-                var virtualPath = CurrentPath + name;
+                var virtualPath = CurrentPath.GetChild(name).ToString();
                 if (_manipulator.Exists(virtualPath))
                 {
                     var messageBoxText = string.Format("Replace {0}?", isDirectory ? "folder" : "file");
@@ -771,10 +788,10 @@ namespace VFSBrowser.ViewModel
                 }
 
                 var vm = new OperationProgressViewModel();
-                Task.Run(() => _manipulator.Import(source, virtualPath, vm.Callbacks));
+                RunAsyncAction(() => _manipulator.Import(source, virtualPath, vm.Callbacks));
                 vm.ShowDialog();
 
-                Items.Add(new ListItem(CurrentPath, name, isDirectory));
+                Items.Add(new ListItem(CurrentPath.ToString(), name, isDirectory));
             }
             catch (Exception ex)
             {
