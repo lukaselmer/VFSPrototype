@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Callbacks;
 using VFSBase.Interfaces;
 using VFSBaseTests.Helpers;
 

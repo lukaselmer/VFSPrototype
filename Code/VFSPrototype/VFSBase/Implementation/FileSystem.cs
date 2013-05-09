@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using VFSBase.Callbacks;
 using VFSBase.Exceptions;
 using VFSBase.Helpers;
 using VFSBase.Interfaces;
@@ -13,7 +14,7 @@ using VFSBlockAbstraction;
 
 namespace VFSBase.Implementation
 {
-    internal sealed class FileSystem : IFileSystem
+    internal class FileSystem : IFileSystem
     {
         #region Fields and properties
 
@@ -57,7 +58,7 @@ namespace VFSBase.Implementation
                 _indexService = new IndexService();
 
                 InitializeFileSystem();
-            }
+            }   
             finally
             {
                 _readWriteLock.ExitWriteLock();
@@ -185,7 +186,6 @@ namespace VFSBase.Implementation
             }
             finally
             {
-
                 _readWriteLock.ExitWriteLock();
             }
         }

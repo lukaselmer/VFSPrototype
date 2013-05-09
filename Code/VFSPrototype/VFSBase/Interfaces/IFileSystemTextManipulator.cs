@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using VFSBase.Callbacks;
+using VFSBase.DiskServiceReference;
 using VFSBase.Implementation;
+using VFSBase.Synchronization;
 
 namespace VFSBase.Interfaces
 {
@@ -31,5 +34,7 @@ namespace VFSBase.Interfaces
         void SwitchToLatestVersion();
         IEnumerable<long> Versions(string path);
         long LatestVersion { get; }
+
+        ISynchronizationService GenerateSynchronizationService(UserDto user, SynchronizationCallbacks callbacks);
     }
 }

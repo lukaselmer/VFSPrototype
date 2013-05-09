@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using VFSBase.Callbacks;
 using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;

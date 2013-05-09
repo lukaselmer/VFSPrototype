@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -11,23 +9,20 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Input;
 using Microsoft.Practices.Unity;
 using VFSBase.DiskServiceReference;
-using VFSBase.Exceptions;
-using VFSBase.Helpers;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBase.Synchronization;
+using VFSBrowser.Annotations;
 using VFSBrowser.Helpers;
 using DataFormats = System.Windows.DataFormats;
-using IDataObject = System.Windows.IDataObject;
 using MessageBox = System.Windows.MessageBox;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace VFSBrowser.ViewModel
 {
-    internal sealed class MainViewModel : AbstractViewModel, IMainViewModel, IDisposable
+    [UsedImplicitly]
+    internal sealed class MainViewModel : AbstractViewModel, IMainViewModel
     {
         private IFileSystemTextManipulator _manipulator;
         private bool _copy;

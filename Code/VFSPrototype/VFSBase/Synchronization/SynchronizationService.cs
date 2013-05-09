@@ -20,11 +20,11 @@ namespace VFSBase.Synchronization
         /// <summary>
         /// The synchronization interval specifies how long the pause in seconds between synchronization should be.
         /// </summary>
-        private const int SynchronizationIntervalInSeconds = 3;
+        //private const int SynchronizationIntervalInSeconds = 3;
         private readonly IFileSystem _fileSystem;
         private readonly UserDto _user;
         private readonly SynchronizationCallbacks _callbacks;
-        private static BackgroundWorker _backgroundWorker;
+        //private static BackgroundWorker _backgroundWorker;
         private readonly DiskServiceClient _diskService;
         //private UserServiceClient _userService;
         private DiskDto _disk;
@@ -37,7 +37,7 @@ namespace VFSBase.Synchronization
             _diskService = new DiskServiceClient();
         }
 
-        /*public static BackgroundWorker CreateService(IFileSystem fileSystem, User user, SynchronizationCallbacks callbacks)
+        /*public static BackgroundWorker CreateService(IFileSystem fileSystem, UserDto user, SynchronizationCallbacks callbacks)
         {
             var service = new SynchronizationService(fileSystem, user, callbacks);
             var backgroundWorker = new BackgroundWorker();
@@ -47,36 +47,41 @@ namespace VFSBase.Synchronization
             return backgroundWorker;
         }*/
 
-        private void DoWork(object sender, DoWorkEventArgs e)
+        public void Synchronize()
         {
-            return;
-            var worker = sender as BackgroundWorker;
-            if (worker == null) throw new ArgumentException("sender is not a background worker", "sender");
+            //var worker = sender as BackgroundWorker;
+            //if (worker == null) throw new ArgumentException("sender is not a background worker", "sender");
 
-            while (!worker.CancellationPending)
+            //while (!worker.CancellationPending)
+
+            var rwLock = _fileSystem.GetReadWriteLock();
+
+            try
             {
-                var rwLock = _fileSystem.GetReadWriteLock();
+                rwLock.EnterWriteLock();
                 var version = _fileSystem.CurrentVersion;
-
                 try
                 {
-                    rwLock.EnterWriteLock();
                     _fileSystem.SwitchToLatestVersion();
 
                     if (_disk == null) InitializeDisk();
-                    Synchronize();
+                    DoSynchronize();
+                    _fileSystem.OnFileSystemChanged(this, new FileSystemChangedEventArgs());
                 }
                 finally
                 {
                     _fileSystem.SwitchToVersion(version);
-                    if (rwLock.IsWriteLockHeld) rwLock.ExitWriteLock();
                 }
-
-                Thread.Sleep(SynchronizationIntervalInSeconds * 1000);
             }
+            finally
+            {
+                if (rwLock.IsWriteLockHeld) rwLock.ExitWriteLock();
+            }
+
+            //Thread.Sleep(SynchronizationIntervalInSeconds*1000);
         }
 
-        private void Synchronize()
+        private void DoSynchronize()
         {
             var state = _diskService.FetchSynchronizationState(_user, _disk);
             _callbacks.StateChanged(state);
@@ -188,15 +193,5 @@ namespace VFSBase.Synchronization
                                   };
             return diskOptions;
         }
-    }
-
-    internal class SynchronizationCallbacks
-    {
-        public SynchronizationCallbacks(Action<SynchronizationState> stateChanged)
-        {
-            StateChanged = stateChanged ?? (s => { });
-        }
-
-        public Action<SynchronizationState> StateChanged { get; private set; }
     }
 }
