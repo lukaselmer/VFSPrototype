@@ -27,7 +27,7 @@ namespace VFSBase.Implementation
         public IList<string> Search(string keyword, string folder, bool recursive, bool caseSensitive)
         {
             var restrictToFolder = FindNode(folder) as Folder;
-            var searchOptions = new SearchOptions()
+            var searchOptions = new SearchOptions
                 {
                     Keyword = keyword,
                     CaseSensitive = caseSensitive,
@@ -128,7 +128,7 @@ namespace VFSBase.Implementation
 
             return _fileSystem.Exists(parent, PathParser.GetNodeName(path));
         }
-        
+
         public void Import(string source, string dest)
         {
             Import(source, dest, null);

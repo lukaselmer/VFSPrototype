@@ -89,6 +89,7 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\Command.cs" />
+    <Compile Include="ViewModel\DirectoryPath.cs" />
     <Compile Include="ViewModel\LoginDialogViewModel.cs" />
     <Compile Include="ViewModel\RegisterDialogViewModel.cs" />
     <Compile Include="ViewModel\DropBehavior.cs" />
