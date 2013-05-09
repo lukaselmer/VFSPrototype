@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VFSBase.Interfaces
+namespace VFSBase.Callbacks
 {
     public class ExportCallbacks : CallbacksBase
     {
