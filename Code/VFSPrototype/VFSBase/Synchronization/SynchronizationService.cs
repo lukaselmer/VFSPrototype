@@ -64,9 +64,8 @@ namespace VFSBase.Synchronization
                 {
                     _fileSystem.SwitchToLatestVersion();
 
-                    if (_disk == null) InitializeDisk();
+                    InitializeDisk();
                     DoSynchronize();
-                    _fileSystem.OnFileSystemChanged(this, new FileSystemChangedEventArgs());
                 }
                 finally
                 {
@@ -88,13 +87,15 @@ namespace VFSBase.Synchronization
 
             if (state == SynchronizationState.LocalChanges) SynchonizeLocalChanges();
             if (state == SynchronizationState.RemoteChanges) SynchronizeRemoteChanges();
+            if (state == SynchronizationState.Conflicted)
+                throw new VFSException("Synchronization is conflicted, please roll back until version is not conflicted anymore");
         }
 
         private void SynchronizeRemoteChanges()
         {
             var remoteDisk = RemoteDisk();
 
-            var untilBlockNr = remoteDisk.LastServerVersion;
+            var untilBlockNr = remoteDisk.NewestBlock;
             var localBlockNr = _fileSystem.Root.BlocksUsed;
 
             for (var currentBlockNr = localBlockNr + 1; currentBlockNr <= untilBlockNr; currentBlockNr++)
@@ -121,6 +122,12 @@ namespace VFSBase.Synchronization
 
                 _fileSystem.Reload(fileSystemOptions);
             }
+
+            _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
+            _fileSystem.FileSystemOptions.LastServerVersion = _fileSystem.Root.Version;
+            _fileSystem.WriteConfig();
+
+            _fileSystem.OnFileSystemChanged(this, new FileSystemChangedEventArgs());
         }
 
         private DiskDto RemoteDisk()
@@ -146,6 +153,7 @@ namespace VFSBase.Synchronization
 
             _disk.LocalVersion = _fileSystem.Root.Version;
             _disk.LastServerVersion = _fileSystem.Root.Version;
+            _disk.NewestBlock = _fileSystem.Root.BlocksUsed;
             _diskService.UpdateDisk(_user, _disk);
 
             _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
@@ -162,7 +170,7 @@ namespace VFSBase.Synchronization
         private void LoadDisk()
         {
             var o = _fileSystem.FileSystemOptions;
-            _disk = new DiskDto { LastServerVersion = o.LastServerVersion, LocalVersion = o.LocalVersion, Id = o.Id, UserId = _user.Id };
+            _disk = new DiskDto { LastServerVersion = o.LastServerVersion, LocalVersion = _fileSystem.LatestVersion, Id = o.Id, UserId = _user.Id };
         }
 
         private void CreateDisk()

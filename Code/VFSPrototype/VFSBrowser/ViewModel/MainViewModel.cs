@@ -13,6 +13,7 @@ using Microsoft.Practices.Unity;
 using VFSBase.DiskServiceReference;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
+using VFSBase.Synchronization;
 using VFSBrowser.Annotations;
 using VFSBrowser.Helpers;
 using DataFormats = System.Windows.DataFormats;
@@ -126,8 +127,8 @@ namespace VFSBrowser.ViewModel
             LoginCommand = new Command(Login, p => (_user == null));
             LogoutCommand = new Command(Logout, p => (_user != null));
             RegisterCommand = new Command(Register, p => (_user == null));
-            SwitchToOfflineModeCommand = new Command(SwitchToOfflineMode, p => (_user != null && _synchronization != null));
-            SwitchToOnlineModeCommand = new Command(SwitchToOnlineMode, p => (_user != null && _synchronization == null));
+            SwitchToOnlineModeCommand = new Command(SwitchToOnlineMode, p => (_manipulator != null && _user != null && _synchronization == null));
+            SwitchToOfflineModeCommand = new Command(SwitchToOfflineMode, p => (_manipulator != null && _user != null && _synchronization != null));
 
             DropCommand = new Command(Drop, null);
 
@@ -159,8 +160,8 @@ namespace VFSBrowser.ViewModel
         public Command LoginCommand { get; private set; }
         public Command LogoutCommand { get; private set; }
         public Command RegisterCommand { get; private set; }
-        public Command SwitchToOfflineModeCommand { get; private set; }
         public Command SwitchToOnlineModeCommand { get; private set; }
+        public Command SwitchToOfflineModeCommand { get; private set; }
 
         private bool IsItemSelected(object parameter)
         {
@@ -330,18 +331,33 @@ namespace VFSBrowser.ViewModel
             }
         }
 
-        private void SwitchToOfflineMode(object parameter)
-        {
-            throw new NotImplementedException();
-        }
-
         private void SwitchToOnlineMode(object parameter)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (_manipulator == null) return;
+                if (_synchronization != null) return;
+                if (_user == null) return;
+                _synchronization = _manipulator.GenerateSynchronizationService(_user, new SynchronizationCallbacks(SynchronizationStateChanged));
+                _synchronization.Synchronize();
+            }
+            catch (Exception ex)
+            {
+                DisplayException(ex);
+            }
+        }
+
+        private void SynchronizationStateChanged(SynchronizationState state)
+        {
+            Console.WriteLine(state);
+        }
+
+        private void SwitchToOfflineMode(object parameter)
+        {
+            _synchronization = null;
         }
 
         #endregion
-
 
 
         private void Delete(object parameter)
