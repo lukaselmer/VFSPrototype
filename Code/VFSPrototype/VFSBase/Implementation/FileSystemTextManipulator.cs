@@ -24,7 +24,7 @@ namespace VFSBase.Implementation
             _fileSystem = fileSystem;
 
             _searchService = new SearchService(this);
-            _searchService.StartIndexing();
+            // Leads to very slow startup... _searchService.StartIndexing();
         }
 
         public IList<string> Search(string keyword, string folder, bool recursive, bool caseSensitive)
@@ -144,7 +144,7 @@ namespace VFSBase.Implementation
             var node = CreateParentFolder(dest);
             _fileSystem.Import(source, node, PathParser.GetNodeName(dest), importCallbacks);
 
-            _searchService.AddToIndexRecursive(dest);
+            // Leads to errors? _searchService.AddToIndexRecursive(dest);
         }
 
         private Folder CreateParentFolder(string dest)
@@ -192,7 +192,7 @@ namespace VFSBase.Implementation
             CreateParentFolder(dest);
             _fileSystem.Copy(FindNode(source), FindParentFolder(dest), PathParser.GetNodeName(dest), copyCallbacks);
 
-            _searchService.AddToIndexRecursive(dest);
+            // Leads to errors? _searchService.AddToIndexRecursive(dest);
         }
 
         private static Queue<string> PathToQueue(string path)

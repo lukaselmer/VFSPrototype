@@ -56,7 +56,7 @@ namespace VFSBase.Search
         {
             lock (_lock)
             {
-                _indexService.AddToIndex(path);
+                _indexService.AddToIndex(path.TrimEnd('/'));
             }
         }
 
@@ -64,10 +64,10 @@ namespace VFSBase.Search
         {
             if (!_manipulator.Exists(path)) return;
 
-            AddToIndex(path);
+            AddToIndex(path.TrimEnd('/'));
 
             // Does not work (yet)... Low prio...? if (_manipulator.IsDirectory(path)) Task.Run(() => Index(path));
-            if (_manipulator.IsDirectory(path)) Index(path);
+            if (_manipulator.IsDirectory(path.TrimEnd('/'))) Index(path.TrimEnd('/'));
         }
     }
 }

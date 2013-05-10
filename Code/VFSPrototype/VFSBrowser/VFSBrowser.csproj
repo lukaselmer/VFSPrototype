@@ -89,6 +89,7 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\Command.cs" />
+    <Compile Include="ViewModel\SynchronizationViewModel.cs" />
     <Compile Include="ViewModel\DirectoryPath.cs" />
     <Compile Include="ViewModel\LoginDialogViewModel.cs" />
     <Compile Include="ViewModel\RegisterDialogViewModel.cs" />
@@ -114,6 +115,9 @@
     </Compile>
     <Compile Include="View\RegisterDialog.xaml.cs">
       <DependentUpon>RegisterDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SynchronizationDialog.xaml.cs">
+      <DependentUpon>SynchronizationDialog.xaml</DependentUpon>
     </Compile>
     <Page Include="View\LoginDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -159,6 +163,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\RegisterDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SynchronizationDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
