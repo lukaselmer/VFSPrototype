@@ -42,13 +42,6 @@ namespace VFSBase.Interfaces
         bool Exists(Folder folder, string name);
 
         /// <summary>
-        /// Does a search on the filesystem with the optionss defined in searchOptions
-        /// </summary>
-        /// <param name="searchOptions">The search options</param>
-        /// <returns>All IIndexNodes which matches the ciriteria in the search options</returns>
-        IEnumerable<IIndexNode> Search(SearchOptions searchOptions);
-
-        /// <summary>
         /// Finds the element with a specified name in the specified folder.
         /// </summary>
         /// <param name="folder">The folder.</param>
