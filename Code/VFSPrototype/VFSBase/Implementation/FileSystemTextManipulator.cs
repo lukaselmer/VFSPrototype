@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using VFSBase.Callbacks;
 using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
@@ -24,8 +23,8 @@ namespace VFSBase.Implementation
         {
             _fileSystem = fileSystem;
 
-            _searchService = new SearchService (this);
-            _searchService.StartIndexing ();
+            _searchService = new SearchService(this);
+            _searchService.StartIndexing();
         }
 
         public IList<string> Search(string keyword, string folder, bool recursive, bool caseSensitive)
@@ -103,7 +102,7 @@ namespace VFSBase.Implementation
 
             _fileSystem.CreateFolder(parentFolder, PathParser.GetNodeName(path));
 
-            _searchService.AddToIndex (path);
+            _searchService.AddToIndex(path);
         }
 
         public void Delete(string path)
@@ -145,7 +144,7 @@ namespace VFSBase.Implementation
             var node = CreateParentFolder(dest);
             _fileSystem.Import(source, node, PathParser.GetNodeName(dest), importCallbacks);
 
-            _searchService.AddToIndexRecursive (dest);
+            _searchService.AddToIndexRecursive(dest);
         }
 
         private Folder CreateParentFolder(string dest)
@@ -194,7 +193,7 @@ namespace VFSBase.Implementation
             _fileSystem.Copy(FindNode(source), FindParentFolder(dest), PathParser.GetNodeName(dest), copyCallbacks);
 
             _searchService.AddToIndexRecursive(dest);
-        }  
+        }
 
         private static Queue<string> PathToQueue(string path)
         {
