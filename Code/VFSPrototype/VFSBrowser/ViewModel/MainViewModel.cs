@@ -54,14 +54,14 @@ namespace VFSBrowser.ViewModel
                 {
                     try
                     {
-                        while (!_manipulator.Exists(newValue.ToString()) || !_manipulator.IsDirectory(newValue.ToString())) newValue.SwitchToParent();
+                        while (!_manipulator.Exists(newValue.DisplayPath) || !_manipulator.IsDirectory(newValue.DisplayPath)) newValue.SwitchToParent();
 
                         Items.Clear();
                         if (!newValue.IsRoot) Items.Add(Parent);
 
-                        foreach (var name in _manipulator.List(newValue.ToString()))
+                        foreach (var name in _manipulator.List(newValue.DisplayPath))
                         {
-                            Items.Add(new ListItem(newValue.ToString(), name, _manipulator.IsDirectory(newValue.GetChild(name).ToString())));
+                            Items.Add(new ListItem(newValue.DisplayPath, name, _manipulator.IsDirectory(newValue.GetChild(name).DisplayPath)));
                         }
                         OnPropertyChanged("Items");
 
@@ -72,7 +72,7 @@ namespace VFSBrowser.ViewModel
                     }
                 }
                 _currentPath = newValue;
-                OnPropertyChanged("CurrentPath");
+                OnPropertyChanged ("CurrentPath");
             }
         }
 
@@ -262,7 +262,7 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? DirectoryPath.Seperator : CurrentPath.ToString(), SearchOption.Recursive, SearchOption.CaseSensitive))
+                foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? DirectoryPath.Seperator : CurrentPath.DisplayPath, SearchOption.Recursive, SearchOption.CaseSensitive))
                 {
                     var idx = i.LastIndexOf(DirectoryPath.Seperator, StringComparison.CurrentCulture) + 1;
                     var name = i.Substring(idx);
@@ -447,7 +447,7 @@ namespace VFSBrowser.ViewModel
                 foreach (var source in _clipboard)
                 {
                     var sourcePath = source.Path + source.Name;
-                    var destinationPath = CurrentPath.GetChild(source.Name).ToString();
+                    var destinationPath = CurrentPath.GetChild(source.Name).DisplayPath;
 
                     if (!_manipulator.Exists(sourcePath))
                     {
@@ -475,7 +475,7 @@ namespace VFSBrowser.ViewModel
                     }
                     else _manipulator.Move(sourcePath, destinationPath);
 
-                    Items.Add(new ListItem(CurrentPath.ToString(), source.Name, _manipulator.IsDirectory(destinationPath)));
+                    Items.Add(new ListItem(CurrentPath.DisplayPath, source.Name, _manipulator.IsDirectory(destinationPath)));
                 }
             }
             catch (Exception ex)
@@ -619,16 +619,16 @@ namespace VFSBrowser.ViewModel
             try
             {
                 var newFolderName = "New Folder";
-                if (_manipulator.Exists(CurrentPath.GetChild(newFolderName).ToString()))
+                if (_manipulator.Exists(CurrentPath.GetChild(newFolderName).DisplayPath))
                 {
                     var count = 1;
-                    while (_manipulator.Exists(CurrentPath.GetChild(newFolderName + " " + count).ToString())) count++;
+                    while (_manipulator.Exists(CurrentPath.GetChild(newFolderName + " " + count).DisplayPath)) count++;
                     newFolderName += " " + count;
                 }
 
-                _manipulator.CreateFolder(CurrentPath.GetChild(newFolderName).ToString());
+                _manipulator.CreateFolder(CurrentPath.GetChild(newFolderName).DisplayPath);
 
-                Items.Add(new ListItem(CurrentPath.ToString(), newFolderName, true));
+                Items.Add(new ListItem(CurrentPath.DisplayPath, newFolderName, true));
 
             }
             catch (Exception ex)
@@ -774,7 +774,7 @@ namespace VFSBrowser.ViewModel
         {
             try
             {
-                var virtualPath = CurrentPath.GetChild(name).ToString();
+                var virtualPath = CurrentPath.GetChild(name).DisplayPath;
                 if (_manipulator.Exists(virtualPath))
                 {
                     var messageBoxText = string.Format("Replace {0}?", isDirectory ? "folder" : "file");
@@ -791,7 +791,7 @@ namespace VFSBrowser.ViewModel
                 RunAsyncAction(() => _manipulator.Import(source, virtualPath, vm.Callbacks));
                 vm.ShowDialog();
 
-                Items.Add(new ListItem(CurrentPath.ToString(), name, isDirectory));
+                Items.Add(new ListItem(CurrentPath.DisplayPath, name, isDirectory));
             }
             catch (Exception ex)
             {

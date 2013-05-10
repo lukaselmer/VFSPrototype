@@ -24,7 +24,6 @@ namespace VFSBase.Implementation
         private BlockAllocation _blockAllocation;
         private BlockManipulator _blockManipulator;
         private Persistence.Persistence _persistence;
-        private IndexService _indexService;
         public Folder Root { get; private set; }
         private Folder LatestRoot { get; set; }
 
@@ -55,8 +54,7 @@ namespace VFSBase.Implementation
                 _blockParser = new BlockParser(_options);
                 _persistence = new Persistence.Persistence(_blockParser, _blockManipulator);
                 _blockAllocation = _options.BlockAllocation;
-                _indexService = new IndexService();
-
+                
                 InitializeFileSystem();
             }   
             finally
@@ -74,7 +72,7 @@ namespace VFSBase.Implementation
 
                 _blockAllocation = _options.BlockAllocation;
                 // TODO: reload indexing service
-                // IndexingService.StartIndexing(_indexService, this);
+                // SearchService.StartIndexing(_searchService, this);
 
                 Root = LatestRoot = ImportRootFolder();
             }
@@ -104,7 +102,6 @@ namespace VFSBase.Implementation
         {
             Root = LatestRoot = ImportRootFolder();
 
-            IndexingService.StartIndexing(_indexService, this);
         }
 
         private Folder ImportRootFolder()
@@ -223,9 +220,6 @@ namespace VFSBase.Implementation
                     _persistence.Persist(previous);
                 }
 
-                _indexService.RemoveFromIndex(toCopy);
-                _indexService.AddToIndex(newFolder);
-
                 toReplace = toCopy;
                 toCopy = toCopy.Parent;
                 replacement = newFolder;
@@ -296,8 +290,6 @@ namespace VFSBase.Implementation
 
             AppendBlockReference(newParentFolder, folder.BlockNumber);
 
-            _indexService.AddToIndex(folder);
-
             return folder;
         }
 
@@ -316,9 +308,6 @@ namespace VFSBase.Implementation
             }
 
             //Note: we could save some metadata too..
-
-            _indexService.AddToIndex(file);
-
             return file;
         }
 
@@ -546,8 +535,6 @@ namespace VFSBase.Implementation
 
             ArchiveAndReplaceRoot(destination, null, newFile);
 
-            _indexService.AddToIndex(newFile);
-
             /*foreach (var block in GetBlockList(fileToCopy).Blocks()) AddDataToFile(file, block);
 
             _persistence.Persist(file);
@@ -556,7 +543,7 @@ namespace VFSBase.Implementation
 
             copyCallbacks.CurrentlyProcessed++;
 
-            _indexService.AddToIndex(file);*/
+            _searchService.AddToIndex(file);*/
         }
 
         private void CopyFolder(Folder folderToCopy, Folder destination, string name, CallbacksBase copyCallbacks)
@@ -591,8 +578,6 @@ namespace VFSBase.Implementation
 
                 if (node.Parent == null) throw new VFSException("Cannot delete root node");
                 ArchiveAndReplaceRoot(node.Parent, node, null);
-
-                _indexService.RemoveFromIndex(node);
             }
             finally
             {
@@ -639,19 +624,6 @@ namespace VFSBase.Implementation
             try
             {
                 return List(folder).OfType<VFSFile>();
-            }
-            finally
-            {
-                _readWriteLock.ExitReadLock();
-            }
-        }
-
-        public IEnumerable<IIndexNode> Search(SearchOptions searchOptions)
-        {
-            _readWriteLock.EnterReadLock();
-            try
-            {
-                return _indexService.Search(searchOptions).ToList();
             }
             finally
             {

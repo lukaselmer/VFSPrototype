@@ -13,6 +13,7 @@ namespace VFSBrowser.ViewModel
         {
         }
 
+
         public DirectoryPath(string path, string name)
         {
             _path = path;
@@ -32,14 +33,14 @@ namespace VFSBrowser.ViewModel
             _path = _path.Substring(0, _path.LastIndexOf("/", StringComparison.CurrentCulture));
         }
 
-        public override string ToString()
+        public string DisplayPath
         {
-            return _path;
+            get { return IsRoot ? "/" : _path; }
         }
 
         public DirectoryPath GetChild(string name)
         {
-            return new DirectoryPath(ToString(), name);
+            return new DirectoryPath(DisplayPath, name);
         }
     }
 }
