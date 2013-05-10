@@ -264,9 +264,10 @@ namespace VFSBrowser.ViewModel
             {
                 foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? DirectoryPath.Seperator : CurrentPath.DisplayPath, SearchOption.Recursive, SearchOption.CaseSensitive))
                 {
-                    var idx = i.LastIndexOf(DirectoryPath.Seperator, StringComparison.CurrentCulture) + 1;
-                    var name = i.Substring(idx);
-                    var path = i.Substring(0, idx);
+                    var path = i.TrimEnd(DirectoryPath.Seperator.First());
+                    var idx = path.LastIndexOf (DirectoryPath.Seperator, StringComparison.CurrentCulture) + 1;
+                    var name = path.Substring (idx);
+                    path = path.Substring (0, idx);
                     Items.Add(new ListItem(path, name, _manipulator.IsDirectory(i)));
                 }
             }

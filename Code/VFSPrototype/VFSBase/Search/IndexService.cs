@@ -66,7 +66,7 @@ namespace VFSBase.Search
 
         private static string GetName(string path)
         {
-            return path.Substring(path.LastIndexOf("/")+1);
+            return path.Substring(path.TrimEnd('/').LastIndexOf("/")+1);
         }
 
         public void AddToIndex(string path)
