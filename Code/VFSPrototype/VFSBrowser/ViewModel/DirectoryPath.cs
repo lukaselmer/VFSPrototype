@@ -35,7 +35,7 @@ namespace VFSBrowser.ViewModel
 
         public string DisplayPath
         {
-            get { return IsRoot ? "/" : _path; }
+            get { return IsRoot ? "/" : _path + Seperator; }
         }
 
         public DirectoryPath GetChild(string name)
