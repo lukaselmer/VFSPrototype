@@ -8,10 +8,10 @@ namespace VFSBase.Search
         public SuffixTreeNode()
         {
             Nodes = new SortedDictionary<char, SuffixTreeNode>();
-            Values = new HashSet<IIndexNode>();
+            Values = new HashSet<string>();
         }
 
         public IDictionary<char, SuffixTreeNode> Nodes { get; set; }
-        public HashSet<IIndexNode> Values { get; set; }
+        public HashSet<string> Values { get; set; }
     }
 }
