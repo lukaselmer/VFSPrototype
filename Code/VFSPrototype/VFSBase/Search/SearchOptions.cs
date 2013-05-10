@@ -19,7 +19,7 @@ namespace VFSBase.Search
     {
         internal string Keyword { get; set; }
 
-        internal Folder RestrictToFolder { get; set; }
+        internal string RestrictToFolder { get; set; }
         internal int RecursionDistance { get; set; }
 
         internal bool CaseSensitive { get; set; }
