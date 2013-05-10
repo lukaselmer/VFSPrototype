@@ -82,13 +82,47 @@ namespace VFSBase.Synchronization
 
         private void DoSynchronize()
         {
-            var state = _diskService.FetchSynchronizationState(_user, _disk);
+            var state = FetchSynchronizationStateInternal();
             _callbacks.StateChanged(state);
 
             if (state == SynchronizationState.LocalChanges) SynchonizeLocalChanges();
             if (state == SynchronizationState.RemoteChanges) SynchronizeRemoteChanges();
             if (state == SynchronizationState.Conflicted)
                 throw new VFSException("Synchronization is conflicted, please roll back until version is not conflicted anymore");
+        }
+
+        private SynchronizationState FetchSynchronizationStateInternal()
+        {
+            var state = _diskService.FetchSynchronizationState(_user, _disk);
+            return state;
+        }
+
+        public SynchronizationState FetchSynchronizationState()
+        {
+            var rwLock = _fileSystem.GetReadWriteLock();
+
+            try
+            {
+                rwLock.EnterWriteLock();
+
+                InitializeDisk();
+
+                var version = _fileSystem.CurrentVersion;
+                try
+                {
+                    _fileSystem.SwitchToLatestVersion();
+                    var state = FetchSynchronizationStateInternal();
+                    return state;
+                }
+                finally
+                {
+                    _fileSystem.SwitchToVersion(version);
+                }
+            }
+            finally
+            {
+                if (rwLock.IsWriteLockHeld) rwLock.ExitWriteLock();
+            }
         }
 
         private void SynchronizeRemoteChanges()
@@ -98,10 +132,12 @@ namespace VFSBase.Synchronization
             var untilBlockNr = remoteDisk.NewestBlock;
             var localBlockNr = _fileSystem.Root.BlocksUsed;
 
+            _callbacks.ProgressChanged(0, localBlockNr - untilBlockNr - 1);
             for (var currentBlockNr = localBlockNr + 1; currentBlockNr <= untilBlockNr; currentBlockNr++)
             {
                 var data = _diskService.ReadBlock(_user, _disk.Id, currentBlockNr);
                 _fileSystem.WriteBlock(currentBlockNr, data);
+                _callbacks.ProgressChanged(currentBlockNr - localBlockNr - 1, localBlockNr - untilBlockNr - 1);
             }
 
             var options = _diskService.GetDiskOptions(_user, _disk);
@@ -144,9 +180,11 @@ namespace VFSBase.Synchronization
             _fileSystem.SwitchToLatestVersion();
             var untilBlockNr = _fileSystem.Root.BlocksUsed;
 
+            _callbacks.ProgressChanged(0, fromBlockNr - untilBlockNr);
             for (var currentBlockNr = fromBlockNr; currentBlockNr <= untilBlockNr; currentBlockNr++)
             {
                 _diskService.WriteBlock(_user, _disk.Id, currentBlockNr, _fileSystem.ReadBlock(currentBlockNr));
+                _callbacks.ProgressChanged(currentBlockNr - fromBlockNr, fromBlockNr - untilBlockNr);
             }
 
             _diskService.SetDiskOptions(_user, _disk, CalculateDiskOptions(_fileSystem.FileSystemOptions));
