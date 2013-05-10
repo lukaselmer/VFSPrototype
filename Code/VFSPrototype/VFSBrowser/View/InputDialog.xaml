@@ -1,7 +1,10 @@
 ﻿<Window x:Class="VFSBrowser.View.InputDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:view="clr-namespace:VFSBrowser.View"
-        Title="InputDialog" MinHeight="125" MinWidth="309" Height="125" Width="309">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel" mc:Ignorable="d"
+        Title="InputDialog" MinHeight="100" MinWidth="309" Height="100" Width="309" d:DataContext="{d:DesignInstance viewModel:InputViewModel}">
 
     <StackPanel>
         <Label Content="{Binding Path=Label, FallbackValue=Input}"></Label>
@@ -12,7 +15,7 @@
         </TextBox>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="5" Width="75" Name="OkButton" Command="{Binding Path=OkCommand}" Content="OK" />
+            <Button IsDefault="True" Margin="5" Width="75" Name="OkButton" Command="{Binding Path=OkCommand}" Content="OK" />
             <Button Margin="5" Width="75" IsCancel="True" Content="Cancel" />
         </StackPanel>
     </StackPanel>

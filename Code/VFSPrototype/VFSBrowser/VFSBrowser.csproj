@@ -89,6 +89,7 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\Command.cs" />
+    <Compile Include="ViewModel\DiskBrowserViewModel.cs" />
     <Compile Include="ViewModel\SynchronizationViewModel.cs" />
     <Compile Include="ViewModel\DirectoryPath.cs" />
     <Compile Include="ViewModel\LoginDialogViewModel.cs" />
@@ -103,6 +104,9 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\UserMessage.cs" />
     <Compile Include="ViewModel\ViewModelHelper.cs" />
+    <Compile Include="View\DiskBrowserDialog.xaml.cs">
+      <DependentUpon>DiskBrowserDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\LoginDialog.xaml.cs">
       <DependentUpon>LoginDialog.xaml</DependentUpon>
     </Compile>
@@ -121,6 +125,10 @@
     <Compile Include="View\SynchronizationDialog.xaml.cs">
       <DependentUpon>SynchronizationDialog.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\DiskBrowserDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\LoginDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

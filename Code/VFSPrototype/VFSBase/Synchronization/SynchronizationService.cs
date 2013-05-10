@@ -38,23 +38,8 @@ namespace VFSBase.Synchronization
             _diskService = new DiskServiceClient();
         }
 
-        /*public static BackgroundWorker CreateService(IFileSystem fileSystem, UserDto user, SynchronizationCallbacks callbacks)
-        {
-            var service = new SynchronizationService(fileSystem, user, callbacks);
-            var backgroundWorker = new BackgroundWorker();
-            backgroundWorker.DoWork += service.DoWork;
-            backgroundWorker.WorkerSupportsCancellation = true;
-            backgroundWorker.RunWorkerAsync();
-            return backgroundWorker;
-        }*/
-
         public void Synchronize()
         {
-            //var worker = sender as BackgroundWorker;
-            //if (worker == null) throw new ArgumentException("sender is not a background worker", "sender");
-
-            //while (!worker.CancellationPending)
-
             var rwLock = _fileSystem.GetReadWriteLock();
 
             try
@@ -79,7 +64,6 @@ namespace VFSBase.Synchronization
             }
 
             _callbacks.Finished();
-            //Thread.Sleep(SynchronizationIntervalInSeconds*1000);
         }
 
         private void DoSynchronize()

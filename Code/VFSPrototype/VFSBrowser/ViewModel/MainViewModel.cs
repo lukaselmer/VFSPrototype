@@ -6,25 +6,17 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Threading;
 using Microsoft.Practices.Unity;
-using VFSBase.Callbacks;
 using VFSBase.DiskServiceReference;
-using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBase.Synchronization;
 using VFSBrowser.Annotations;
 using VFSBrowser.Helpers;
-using Application = System.Windows.Application;
 using DataFormats = System.Windows.DataFormats;
 using MessageBox = System.Windows.MessageBox;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
-using Timer = System.Timers.Timer;
 
 namespace VFSBrowser.ViewModel
 {
@@ -36,7 +28,7 @@ namespace VFSBrowser.ViewModel
         private readonly List<ListItem> _clipboard = new List<ListItem>();
         private readonly IUnityContainer _container;
         private UserDto _user;
-        private DiskServiceClient _diskService;
+        private readonly DiskServiceClient _diskService;
 
         private readonly ListItem _parent = new ListItem(null, "..", true);
         public ListItem Parent
@@ -352,10 +344,14 @@ namespace VFSBrowser.ViewModel
         {
             if (_manipulator != null) return;
             if (_synchronization != null) return;
-            if (_user != null) return;
+            if (_user == null) return;
 
+            var viewModel = new DiskBrowserViewModel(_diskService, _user);
+            if (!viewModel.ShowDialog() || viewModel.SelectedItem == null) return;
 
-            //TODO: implement this
+            var selectedDisk = viewModel.SelectedItem;
+            Console.WriteLine(selectedDisk);
+            //TODO: do initial synchronization
         }
 
         private void SynchronizationFinished()

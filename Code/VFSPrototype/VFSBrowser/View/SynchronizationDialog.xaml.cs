@@ -29,7 +29,8 @@ namespace VFSBrowser.View
             "http://imgs.xkcd.com/comics/footnote_labyrinths.png",
             "http://imgs.xkcd.com/comics/einstein.png",
             "http://imgs.xkcd.com/comics/integration_by_parts.png",
-            "http://imgs.xkcd.com/comics/estimation.png"
+            "http://imgs.xkcd.com/comics/estimation.png",
+            "http://imgs.xkcd.com/comics/fetishes.png"
         };
 
         private int _imageIndex;
