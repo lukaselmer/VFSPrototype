@@ -32,12 +32,12 @@ namespace VFSBase.Search
             {
                 foreach (var file in _manipulator.Files(path))
                 {
-                    _indexService.AddToIndex(path + "/" + file);
+                    _indexService.AddToIndex (path + file);
                 }
                 foreach (var folder in _manipulator.Folders(path))
                 {
-                    _indexService.AddToIndex(path + "/" + folder);
-                    Index(path + "/" + folder);
+                    _indexService.AddToIndex (path + folder + "/");
+                    Index (path + folder + "/");
                 }
             }
         }
