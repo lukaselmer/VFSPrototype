@@ -101,6 +101,8 @@
     <Compile Include="ViewModel\InputViewModel.cs" />
     <Compile Include="ViewModel\ListItem.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\UserMessage.cs" />
+    <Compile Include="ViewModel\ViewModelHelper.cs" />
     <Compile Include="View\LoginDialog.xaml.cs">
       <DependentUpon>LoginDialog.xaml</DependentUpon>
     </Compile>

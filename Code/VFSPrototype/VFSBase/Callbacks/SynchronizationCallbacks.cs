@@ -1,17 +1,17 @@
 ﻿using System;
 using VFSBase.DiskServiceReference;
 
-namespace VFSBase.Synchronization
+namespace VFSBase.Callbacks
 {
     public class SynchronizationCallbacks
     {
-        public SynchronizationCallbacks(Action<SynchronizationState> stateChanged, Action<long, long> progressChanged)
+        public SynchronizationCallbacks(Action finished, Action<long, long> progressChanged)
         {
-            StateChanged = stateChanged ?? ((a) => { });
+            Finished = finished ?? (() => { });
             ProgressChanged = progressChanged ?? ((a, b) => { });
         }
 
-        public Action<SynchronizationState> StateChanged { get; private set; }
+        public Action Finished { get; private set; }
         public Action<long, long> ProgressChanged { get; private set; }
     }
 }
