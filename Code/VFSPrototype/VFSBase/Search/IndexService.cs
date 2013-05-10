@@ -21,31 +21,15 @@ namespace VFSBase.Search
     /// * Restrict search to folder
     /// * Restrict search to folder and subfolders
     /// </summary>
-    public class IndexService
+    internal class IndexService
     {
         private readonly SuffixTree _flatNames = new SuffixTree();
 
-        internal IEnumerable<IIndexNode> Search(SearchOptions searchOptions)
+        public IEnumerable<string> Search(SearchOptions searchOptions)
         {
             var result = _flatNames.Search(searchOptions);
 
-            var restrictFolderPath = (searchOptions.RestrictToFolder == null) 
-                                     ? "" 
-                                     : GetPath(searchOptions.RestrictToFolder);
-                
-            return result.Where(indexNode => IsInFolder(restrictFolderPath, GetPath(indexNode), searchOptions.RecursionDistance));
-        }
-
-        private static string GetPath(IIndexNode node)
-        {
-            var sb = new StringBuilder();
-            
-            while (node != null)
-            {
-                sb.Insert(0, node.Name + "/");
-                node = node.Parent;
-            }
-            return sb.ToString().TrimEnd('/');
+            return result.Where(path => IsInFolder(searchOptions.RestrictToFolder ?? "", path, searchOptions.RecursionDistance));
         }
 
         private static bool IsInFolder (string restrictFolderPath, string nodePath, int recursionDistance)
@@ -80,14 +64,14 @@ namespace VFSBase.Search
         //    return false;
         //}
 
-        internal void AddToIndex(IIndexNode node)
+        private static string GetName(string path)
         {
-            _flatNames.Insert(node.Name, node);
+            return path.Substring(path.LastIndexOf("/")+1);
         }
-        
-        internal void RemoveFromIndex(IIndexNode node)
+
+        public void AddToIndex(string path)
         {
-            _flatNames.Remove(node.Name, node);
+            _flatNames.Insert(GetName(path), path);
         }
     }
 }

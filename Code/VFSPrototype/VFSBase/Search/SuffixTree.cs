@@ -14,12 +14,12 @@ namespace VFSBase.Search
             RootNode = new SuffixTreeNode();
         }
 
-        public IEnumerable<IIndexNode> Search(SearchOptions options)
+        public IEnumerable<string> Search(SearchOptions options)
         {
             return Search(RootNode, options);
         }
 
-        private IEnumerable<IIndexNode> Search(SuffixTreeNode node, SearchOptions options)
+        private IEnumerable<string> Search(SuffixTreeNode node, SearchOptions options)
         {
             if (options.Keyword.Length == 0)
                 return node.Values;
@@ -30,7 +30,7 @@ namespace VFSBase.Search
                 SuffixTreeNode nextLowerNode;
                 node.Nodes.TryGetValue(char.ToLower(c), out nextLowerNode);
                 node.Nodes.TryGetValue (char.ToUpper (c), out nextUpperNode);
-                if (nextUpperNode == null && nextLowerNode == null) return Enumerable.Empty<IIndexNode>();
+                if (nextUpperNode == null && nextLowerNode == null) return Enumerable.Empty<string>();
 
                 options.Keyword = options.Keyword.Substring(1);
 
@@ -42,7 +42,7 @@ namespace VFSBase.Search
             } else {
                 SuffixTreeNode nextNode;
                 node.Nodes.TryGetValue(c, out nextNode);
-                if (nextNode == null) return Enumerable.Empty<IIndexNode>();
+                if (nextNode == null) return Enumerable.Empty<string>();
 
                 options.Keyword = options.Keyword.Substring(1);
                 return Search(nextNode, options);
@@ -50,10 +50,10 @@ namespace VFSBase.Search
         }
 
 
-        public void Insert(string path, IIndexNode node)
+        public void Insert(string name, string path)
         {
             var currentNode = RootNode;
-            foreach (var c in path)
+            foreach (var c in name)
             {
                 SuffixTreeNode nextNode;
                 currentNode.Nodes.TryGetValue(c, out nextNode);
@@ -62,32 +62,12 @@ namespace VFSBase.Search
                     nextNode = new SuffixTreeNode();
                     currentNode.Nodes.Add(c, nextNode);
                 }
-                nextNode.Values.Add(node);
+                nextNode.Values.Add(path);
                 currentNode = nextNode;
             }
 
-            if (path.Length >= 1)
-                Insert(path.Substring(1), node);
-        }
-
-
-
-        public IIndexNode Remove(string path, IIndexNode node)
-        {
-            var currentNode = RootNode;
-            foreach (var c in path)
-            {
-                SuffixTreeNode nextNode;
-                currentNode.Nodes.TryGetValue(c, out nextNode);
-                if (nextNode == null) return null; // Not found
-                if (node != null) currentNode.Values.Remove(node);
-                currentNode = nextNode;
-            }
-
-            if (path.Length >= 1)
-                Remove(path.Substring(1), node);
-
-            return currentNode.Values.Remove(node) ? node : null;
+            if (name.Length >= 1)
+                Insert(name.Substring(1), path);
         }
     }
 }

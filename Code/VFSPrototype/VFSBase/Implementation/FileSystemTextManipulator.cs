@@ -16,26 +16,29 @@ namespace VFSBase.Implementation
     internal class FileSystemTextManipulator : IFileSystemTextManipulator
     {
         private IFileSystem _fileSystem;
+        private readonly ISearchService _searchService;
 
         public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
 
         internal FileSystemTextManipulator(IFileSystem fileSystem)
         {
             _fileSystem = fileSystem;
+
+            _searchService = new SearchService (this);
+            _searchService.StartIndexing ();
         }
 
         public IList<string> Search(string keyword, string folder, bool recursive, bool caseSensitive)
         {
-            var restrictToFolder = FindNode(folder) as Folder;
             var searchOptions = new SearchOptions
                 {
                     Keyword = keyword,
                     CaseSensitive = caseSensitive,
                     RecursionDistance = (recursive ? -1 : 0),
-                    RestrictToFolder = restrictToFolder ?? _fileSystem.Root
+                    RestrictToFolder = folder == "/" ? "" : folder
                 };
 
-            return _fileSystem.Search(searchOptions).Select(GetPath).ToList();
+            return _searchService.Search(searchOptions).ToList();
         }
 
         public IList<string> Folders(string path)
@@ -99,6 +102,8 @@ namespace VFSBase.Implementation
             if (parentFolder == null) throw new DirectoryNotFoundException();
 
             _fileSystem.CreateFolder(parentFolder, PathParser.GetNodeName(path));
+
+            _searchService.AddToIndex (path);
         }
 
         public void Delete(string path)
@@ -139,6 +144,8 @@ namespace VFSBase.Implementation
             if (importCallbacks == null) importCallbacks = new ImportCallbacks();
             var node = CreateParentFolder(dest);
             _fileSystem.Import(source, node, PathParser.GetNodeName(dest), importCallbacks);
+
+            _searchService.AddToIndexRecursive (dest);
         }
 
         private Folder CreateParentFolder(string dest)
@@ -185,7 +192,9 @@ namespace VFSBase.Implementation
 
             CreateParentFolder(dest);
             _fileSystem.Copy(FindNode(source), FindParentFolder(dest), PathParser.GetNodeName(dest), copyCallbacks);
-        }
+
+            _searchService.AddToIndexRecursive(dest);
+        }  
 
         private static Queue<string> PathToQueue(string path)
         {
@@ -219,19 +228,6 @@ namespace VFSBase.Implementation
         {
             return FindParentNode(path) as Folder;
         }
-
-        private static string GetPath(IIndexNode node)
-        {
-            var sb = new StringBuilder();
-            while (node.Parent != null)
-            {
-                sb.Insert(0, node.Name);
-                sb.Insert(0, "/");
-                node = node.Parent;
-            }
-            return sb.ToString();
-        }
-
 
         public void Dispose()
         {

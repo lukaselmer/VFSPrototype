@@ -96,7 +96,7 @@
         </Grid>
 
         <!-- Path -->
-        <Label Grid.Row="3" Content="{Binding CurrentPath}" Height="30"></Label>
+        <Label Grid.Row="3" Content="{Binding CurrentPath.DisplayPath}" Height="30"></Label>
 
         <!-- DataGrid -->
         <DataGrid Grid.Row="4" ItemsSource="{Binding Items}" Name="ItemsGrid" AutoGenerateColumns="False"
