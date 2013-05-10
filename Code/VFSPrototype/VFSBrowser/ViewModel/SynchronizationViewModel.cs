@@ -47,7 +47,7 @@ namespace VFSBrowser.ViewModel
             }
         }
 
-        public bool Closed { get; set; }
+        public bool Closed { get; private set; }
 
         private void SynchronizationProgrssChanged(long done, long total)
         {
@@ -59,6 +59,7 @@ namespace VFSBrowser.ViewModel
         {
             if (_service == null) return;
 
+            Closed = false;
             _dlg.ShowDialog();
         }
 

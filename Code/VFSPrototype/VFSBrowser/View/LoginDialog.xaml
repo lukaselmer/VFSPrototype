@@ -23,7 +23,7 @@
         <PasswordBox Name="Secret" Margin="3 5" Grid.Row="1" Grid.Column="1" />
 
         <Button Grid.Row="2" Grid.Column="0" Margin="3 5" Padding="4" Width="Auto" Content="Login" 
-                    Command="{Binding OkCommand}" CommandParameter="{Binding ElementName=Secret}" />
-        <Button Grid.Row="2" Grid.Column="1" Margin="3 5" Padding="4" Width="Auto" IsCancel="True" Content="Cancel" />
+                    Command="{Binding OkCommand}" CommandParameter="{Binding ElementName=Secret}" IsDefault="True"/>
+        <Button Grid.Row="2" Grid.Column="1" Margin="3 5" Padding="4" Width="Auto" IsCancel="True" Content="Cancel"/>
     </Grid>
 </Window>
