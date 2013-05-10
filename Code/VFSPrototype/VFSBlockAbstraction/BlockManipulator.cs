@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 
 namespace VFSBlockAbstraction
 {
@@ -69,7 +70,23 @@ namespace VFSBlockAbstraction
 
         private void LockBlock(long blockNumber)
         {
-            _disk.Lock(Offset(blockNumber), _blockSize);
+            var tries = 0;
+            while (!TryLockBlock(blockNumber) && (tries++) < 100) { }
+            if (tries >= 100) throw new Exception("Unable to allocate block");
+        }
+
+        private bool TryLockBlock(long blockNumber)
+        {
+            try
+            {
+                _disk.Lock(Offset(blockNumber), _blockSize);
+                return true;
+            }
+            catch (IOException) // Block is locked, try again
+            {
+                Thread.Sleep(10);
+                return false;
+            }
         }
 
         private void UnlockBlock(long blockNumber)
