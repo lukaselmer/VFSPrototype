@@ -1,0 +1,6 @@
+SQLite installation:
+1) Please add the following path to your system path:
+"<Project Path>\VFSPrototype\Code\VFSPrototype\sqlite"
+Please replace <Project Path> with the location that the project is checked out.
+2) Reboot your system
+3) Run the unit tests to confirm that sqlite is working.
