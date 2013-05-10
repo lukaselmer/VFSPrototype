@@ -54,9 +54,9 @@ namespace VFSBase.Implementation
                 _blockParser = new BlockParser(_options);
                 _persistence = new Persistence.Persistence(_blockParser, _blockManipulator);
                 _blockAllocation = _options.BlockAllocation;
-                
+
                 InitializeFileSystem();
-            }   
+            }
             finally
             {
                 _readWriteLock.ExitWriteLock();

@@ -1,0 +1,41 @@
+﻿<Window x:Class="VFSBrowser.View.DiskBrowserDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel" mc:Ignorable="d"
+        Title="DiskBrowserDialog" Height="300" Width="300" d:DataContext="{d:DesignInstance viewModel:DiskBrowserViewModel}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <ListBox Grid.Row="0" ItemsSource="{Binding Disks}" SelectedItem="{Binding SelectedItem}" 
+                 SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontWeight="Bold" Text="ID: " />
+                            <TextBlock FontWeight="Bold" Text="{Binding Id}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Last server version: " />
+                            <TextBlock Text="{Binding LastServerVersion}" />
+                            <TextBlock Text=", block amount: " />
+                            <TextBlock Text="{Binding NewestBlock}" />
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <Grid Grid.Row="1" VerticalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Command="{Binding SelectItemCommand}" IsDefault="True">Select</Button>
+            <Button Grid.Column="1" IsCancel="True">Cancel</Button>
+        </Grid>
+    </Grid>
+</Window>

@@ -50,7 +50,7 @@
             <PasswordBox Name="Secret" Grid.Row="3" Grid.Column="1" Margin="3 5"/>
             <!-- PasswordBox content cannot be binded => pass it as parameter when submitting the form (OK Button) -->
 
-            <Button Grid.Row="4" Grid.Column="0" Margin="3 5" Padding="4" Width="Auto" Content="Ok" 
+            <Button Grid.Row="4" Grid.Column="0" Margin="3 5" Padding="4" Width="Auto" Content="Ok" IsDefault="True"
                     Command="{Binding OkCommand}" CommandParameter="{Binding ElementName=Secret}" />
             <Button Grid.Row="4" Grid.Column="1" Margin="3 5" Padding="4" Width="Auto" IsCancel="True" Content="Cancel" />
         </Grid>
