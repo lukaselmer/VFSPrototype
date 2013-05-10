@@ -34,6 +34,7 @@
     <CodeAnalysisRuleSet>..\JCDCodeAnalysisRules\[jcd]csharp.ruleset</CodeAnalysisRuleSet>
     <FilesToIncludeForPublish>AllFilesInTheProject</FilesToIncludeForPublish>
     <PublishDatabases>false</PublishDatabases>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -44,6 +45,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ExtermalSQLiteImplementation, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\ExtermalSQLiteImplementation.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -51,7 +56,6 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Runtime.Serialization" />
@@ -99,10 +103,6 @@
     <ProjectReference Include="..\VFSWCFContracts\VFSWCFContracts.csproj">
       <Project>{A4C52D8A-6A8F-4AB3-88FB-3AEBDE5B74D7}</Project>
       <Name>VFSWCFContracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VFSWCFPersistence\ExtermalSQLiteImplementation.csproj">
-      <Project>{46A0359C-FA14-44CB-B861-B7BB09AC05CC}</Project>
-      <Name>ExtermalSQLiteImplementation</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

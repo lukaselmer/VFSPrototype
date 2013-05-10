@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web.Hosting;
 using SQLite;
 using VFSWCFContracts.DataTransferObjects;
@@ -26,8 +27,34 @@ namespace VFSWCFService.Persistence
         private void InitDatabase(string pathToDbFile)
         {
             _pathToDbFileToDbFile = pathToDbFile;
-            _db = File.Exists(_pathToDbFileToDbFile) ? OpenDatabase() : CreateDatabase();
-            CreateTables();
+            try
+            {
+                _db = File.Exists(_pathToDbFileToDbFile) ? OpenDatabase() : CreateDatabase();
+                CreateTables();
+            }
+            catch (DllNotFoundException e)
+            {
+                DisplaySqliteError(e);
+            }
+        }
+
+        private static void DisplaySqliteError(DllNotFoundException e)
+        {
+            var currentDirectory = new DirectoryInfo(new Uri(Assembly.GetExecutingAssembly().CodeBase).PathAndQuery);
+            while (currentDirectory.Parent != null)
+            {
+                var testPath = currentDirectory.Parent.FullName + "\\sqlite\\sqlite.dll";
+                if (!File.Exists(testPath))
+                {
+                    currentDirectory = currentDirectory.Parent;
+                    continue;
+                }
+
+                var message = string.Format("Please add {0} to your system path", currentDirectory.Parent.FullName + "\\sqlite");
+                Console.WriteLine(e.Message);
+                Console.WriteLine(message);
+                throw new Exception(message);
+            }
         }
 
         public Persistence()
