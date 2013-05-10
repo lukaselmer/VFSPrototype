@@ -34,12 +34,12 @@ namespace VFSBase.Search
             {
                 foreach (var file in _manipulator.Files(path))
                 {
-                    _indexService.AddToIndex (path + file);
+                    _indexService.AddToIndex(path + "/" + file);
                 }
                 foreach (var folder in _manipulator.Folders(path))
                 {
-                    _indexService.AddToIndex (path + folder + "/");
-                    Index (path + folder + "/");
+                    _indexService.AddToIndex(path + "/" + folder);
+                    Index(path + "/" + folder);
                 }
             }
         }
@@ -56,7 +56,7 @@ namespace VFSBase.Search
         {
             lock (_lock)
             {
-                _indexService.AddToIndex(path);
+                _indexService.AddToIndex(path.TrimEnd('/'));
             }
         }
 
@@ -64,10 +64,10 @@ namespace VFSBase.Search
         {
             if (!_manipulator.Exists(path)) return;
 
-            AddToIndex(path);
+            AddToIndex(path.TrimEnd('/'));
 
             // Does not work (yet)... Low prio...? if (_manipulator.IsDirectory(path)) Task.Run(() => Index(path));
-            if (_manipulator.IsDirectory(path)) Index(path);
+            if (_manipulator.IsDirectory(path.TrimEnd('/'))) Index(path.TrimEnd('/'));
         }
     }
 }

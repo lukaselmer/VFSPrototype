@@ -6,15 +6,12 @@ using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Threading;
 using Microsoft.Practices.Unity;
 using VFSBase.DiskServiceReference;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
-using VFSBase.Synchronization;
 using VFSBrowser.Annotations;
 using VFSBrowser.Helpers;
 using DataFormats = System.Windows.DataFormats;
@@ -30,9 +27,8 @@ namespace VFSBrowser.ViewModel
         private bool _copy;
         private readonly List<ListItem> _clipboard = new List<ListItem>();
         private readonly IUnityContainer _container;
-        private ISynchronizationService _synchronization;
         private UserDto _user;
-        private DiskServiceClient _diskService;
+        private readonly DiskServiceClient _diskService;
 
         private readonly ListItem _parent = new ListItem(null, "..", true);
         public ListItem Parent
@@ -43,6 +39,7 @@ namespace VFSBrowser.ViewModel
         private DirectoryPath _currentPath;
         private long _versionInput;
         private long _latestVersion;
+        private SynchronizationViewModel _synchronization;
 
         public DirectoryPath CurrentPath
         {
@@ -68,11 +65,11 @@ namespace VFSBrowser.ViewModel
                     }
                     catch (Exception e)
                     {
-                        DisplayException(e);
+                        UserMessage.Exception(e);
                     }
                 }
                 _currentPath = newValue;
-                OnPropertyChanged ("CurrentPath");
+                OnPropertyChanged("CurrentPath");
             }
         }
 
@@ -133,6 +130,7 @@ namespace VFSBrowser.ViewModel
             LoginCommand = new Command(Login, p => (_user == null));
             LogoutCommand = new Command(Logout, p => (_user != null));
             RegisterCommand = new Command(Register, p => (_user == null));
+            LinkDiskCommand = new Command(LinkDisk, p => (_manipulator == null && _user != null));
             SwitchToOnlineModeCommand = new Command(SwitchToOnlineMode, p => (_manipulator != null && _user != null && _synchronization == null));
             SwitchToOfflineModeCommand = new Command(SwitchToOfflineMode, p => (_manipulator != null && _user != null && _synchronization != null));
 
@@ -166,6 +164,7 @@ namespace VFSBrowser.ViewModel
         public Command LoginCommand { get; private set; }
         public Command LogoutCommand { get; private set; }
         public Command RegisterCommand { get; private set; }
+        public Command LinkDiskCommand { get; private set; }
         public Command SwitchToOnlineModeCommand { get; private set; }
         public Command SwitchToOfflineModeCommand { get; private set; }
 
@@ -233,7 +232,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
         }
 
@@ -265,15 +264,15 @@ namespace VFSBrowser.ViewModel
                 foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? DirectoryPath.Seperator : CurrentPath.DisplayPath, SearchOption.Recursive, SearchOption.CaseSensitive))
                 {
                     var path = i.TrimEnd(DirectoryPath.Seperator.First());
-                    var idx = path.LastIndexOf (DirectoryPath.Seperator, StringComparison.CurrentCulture) + 1;
-                    var name = path.Substring (idx);
-                    path = path.Substring (0, idx);
+                    var idx = path.LastIndexOf(DirectoryPath.Seperator, StringComparison.CurrentCulture) + 1;
+                    var name = path.Substring(idx);
+                    path = path.Substring(0, idx);
                     Items.Add(new ListItem(path, name, _manipulator.IsDirectory(i)));
                 }
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
         }
 
@@ -294,14 +293,15 @@ namespace VFSBrowser.ViewModel
             try
             {
                 _user = _diskService.Login(vm.Login, HashHelper.GenerateHashCode(vm.Password));
+                UserMessage.Information("You are logged in", "Success");
             }
             catch (EndpointNotFoundException ex)
             {
-                MessageBox.Show(string.Format("Unable to connect to server: {0}", ex.Message), "Login failed");
+                UserMessage.Error(string.Format("Unable to connect to server: {0}", ex.Message), "Login failed");
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Message, "Login failed");
+                UserMessage.Error(ex.Detail.Message, "Login failed");
             }
         }
 
@@ -309,6 +309,7 @@ namespace VFSBrowser.ViewModel
         {
             SwitchToOfflineMode(parameter);
             _user = null;
+            UserMessage.Information("You are logged out", "Success");
         }
 
         private void Register(object parameter)
@@ -319,7 +320,7 @@ namespace VFSBrowser.ViewModel
 
             if (string.IsNullOrEmpty(vm.Password))
             {
-                MessageBox.Show("Password must not be empty", "Registration failed");
+                UserMessage.Error("Password must not be empty", "Registration failed");
                 return;
             }
 
@@ -327,15 +328,35 @@ namespace VFSBrowser.ViewModel
             {
                 // Note: we should encrypt the password with a salt...
                 _user = _diskService.Register(vm.Login, HashHelper.GenerateHashCode(vm.Password));
+                UserMessage.Information("You are registered", "Success");
             }
             catch (EndpointNotFoundException ex)
             {
-                MessageBox.Show(string.Format("Unable to connect to server: {0}", ex.Message), "Registration failed");
+                UserMessage.Error(string.Format("Unable to connect to server: {0}", ex.Message), "Registration failed");
             }
             catch (FaultException<ServiceFault> ex)
             {
-                MessageBox.Show(ex.Detail.Message, "Registration failed");
+                UserMessage.Error(ex.Detail.Message, "Registration failed");
             }
+        }
+
+        private void LinkDisk(object parameter)
+        {
+            if (_manipulator != null) return;
+            if (_synchronization != null) return;
+            if (_user == null) return;
+
+            var viewModel = new DiskBrowserViewModel(_diskService, _user);
+            if (!viewModel.ShowDialog() || viewModel.SelectedItem == null) return;
+
+            var selectedDisk = viewModel.SelectedItem;
+            Console.WriteLine(selectedDisk);
+            //TODO: do initial synchronization
+        }
+
+        private void SynchronizationFinished()
+        {
+            ViewModelHelper.InvokeOnGuiThread(RefreshCurrentDirectory);
         }
 
         private void SwitchToOnlineMode(object parameter)
@@ -345,18 +366,15 @@ namespace VFSBrowser.ViewModel
                 if (_manipulator == null) return;
                 if (_synchronization != null) return;
                 if (_user == null) return;
-                _synchronization = _manipulator.GenerateSynchronizationService(_user, new SynchronizationCallbacks(SynchronizationStateChanged));
-                _synchronization.Synchronize();
+
+                _synchronization = new SynchronizationViewModel(_manipulator, _user, SynchronizationFinished);
+
+                UserMessage.Information("This disk will synchronize automatically now", "Switched to online mode");
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
-        }
-
-        private void SynchronizationStateChanged(SynchronizationState state)
-        {
-            RefreshCurrentDirectory();
         }
 
         private void RefreshCurrentDirectory()
@@ -366,7 +384,9 @@ namespace VFSBrowser.ViewModel
 
         private void SwitchToOfflineMode(object parameter)
         {
+            _synchronization.StopSynchronization();
             _synchronization = null;
+            UserMessage.Information("Synchronization stopped", "Switched to offline mode");
         }
 
         #endregion
@@ -391,14 +411,9 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
             UpdateVersion();
-        }
-
-        private void DisplayException(Exception exception)
-        {
-            MessageBox.Show(exception.Message, "An error occured", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void Copy(object parameter)
@@ -415,7 +430,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
             UpdateVersion();
         }
@@ -436,7 +451,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
             UpdateVersion();
         }
@@ -471,7 +486,7 @@ namespace VFSBrowser.ViewModel
                     {
                         var vm = new OperationProgressViewModel();
 
-                        RunAsyncAction(() => _manipulator.Copy(sourcePath, destinationPath, vm.Callbacks));
+                        ViewModelHelper.RunAsyncAction(() => _manipulator.Copy(sourcePath, destinationPath, vm.Callbacks));
                         vm.ShowDialog();
                     }
                     else _manipulator.Move(sourcePath, destinationPath);
@@ -481,15 +496,9 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
             UpdateVersion();
-        }
-
-        private void RunAsyncAction(Action action)
-        {
-            Action<Task> handleException = task => { if (task.Exception != null) DisplayException(task.Exception.InnerException); };
-            Task.Run(action).ContinueWith(handleException, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void Export(object parameter)
@@ -532,13 +541,13 @@ namespace VFSBrowser.ViewModel
                     }
 
                     var vm = new OperationProgressViewModel();
-                    RunAsyncAction(() => _manipulator.Export(vfsExportPath, exportPath, vm.Callbacks));
+                    ViewModelHelper.RunAsyncAction(() => _manipulator.Export(vfsExportPath, exportPath, vm.Callbacks));
                     vm.ShowDialog();
                 }
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
         }
 
@@ -569,7 +578,7 @@ namespace VFSBrowser.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    DisplayException(ex);
+                    UserMessage.Exception(ex);
                 }
             }
             UpdateVersion();
@@ -603,7 +612,7 @@ namespace VFSBrowser.ViewModel
                     if (File.Exists(tmpFile)) File.Delete(tmpFile);
 
                     var vm = new OperationProgressViewModel();
-                    RunAsyncAction(() => _manipulator.Export(item.Path + item.Name, tmpFile, vm.Callbacks));
+                    ViewModelHelper.RunAsyncAction(() => _manipulator.Export(item.Path + item.Name, tmpFile, vm.Callbacks));
                     vm.ShowDialog();
 
                     Process.Start("explorer", tmpFile);
@@ -611,7 +620,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
         }
 
@@ -634,7 +643,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
             UpdateVersion();
         }
@@ -706,7 +715,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
             UpdateVersion();
         }
@@ -730,7 +739,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
         }
 
@@ -750,7 +759,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
         }
 
@@ -767,7 +776,7 @@ namespace VFSBrowser.ViewModel
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
         }
 
@@ -789,14 +798,14 @@ namespace VFSBrowser.ViewModel
                 }
 
                 var vm = new OperationProgressViewModel();
-                RunAsyncAction(() => _manipulator.Import(source, virtualPath, vm.Callbacks));
+                ViewModelHelper.RunAsyncAction(() => _manipulator.Import(source, virtualPath, vm.Callbacks));
                 vm.ShowDialog();
 
                 Items.Add(new ListItem(CurrentPath.DisplayPath, name, isDirectory));
             }
             catch (Exception ex)
             {
-                DisplayException(ex);
+                UserMessage.Exception(ex);
             }
             UpdateVersion();
         }

@@ -27,7 +27,8 @@
                 <MenuItem Header="_Login" Command="{Binding LoginCommand}" />
                 <MenuItem Header="_Logout" Command="{Binding LogoutCommand}" />
                 <Separator />
-                <MenuItem Header="_Switch to online mode" Command="{Binding SwitchToOnlineModeCommand}" />
+                <MenuItem Header="_Link to existing online disk" Command="{Binding LinkDiskCommand}" />
+                <MenuItem Header="_Switch to online mode (automatically starts synchronization)" Command="{Binding SwitchToOnlineModeCommand}" />
                 <MenuItem Header="_Switch to offline mode" Command="{Binding SwitchToOfflineModeCommand}" />
                 <Separator />
                 <MenuItem Header="_Open VFS" Command="{Binding OpenVfsCommand}" />
