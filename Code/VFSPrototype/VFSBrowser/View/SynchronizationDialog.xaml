@@ -1,0 +1,10 @@
+﻿<Window x:Class="VFSBrowser.View.SynchronizationDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SynchronizationDialog" Height="500" Width="350" ResizeMode="NoResize">
+    <StackPanel>
+        <Label>Please wait, synchronization is in progress...</Label>
+        <Label>Estimated remaining time (from http://xkcd.com/612/):</Label>
+        <Image Source="http://imgs.xkcd.com/comics/estimation.png"></Image>
+    </StackPanel>
+</Window>
