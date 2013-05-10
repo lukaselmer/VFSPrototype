@@ -16,14 +16,16 @@ namespace VFSBase.Search
         private readonly object _lock = new object();
 
 
-        public SearchService (IFileSystemTextManipulator manipulator)
+        public SearchService(IFileSystemTextManipulator manipulator)
         {
             _manipulator = manipulator;
             _indexService = new IndexService();
         }
 
-        public void StartIndexing() {
-            Task.Run(() => Index("/"));
+        public void StartIndexing()
+        {
+            Index("/");
+            // Does not work (yet)... Low prio...? Task.Run(() => Index("/"));
         }
 
         private void Index(string path)
@@ -60,8 +62,12 @@ namespace VFSBase.Search
 
         public void AddToIndexRecursive(string path)
         {
+            if (!_manipulator.Exists(path)) return;
+
             AddToIndex(path);
-            Task.Run(() => Index(path));
+
+            // Does not work (yet)... Low prio...? if (_manipulator.IsDirectory(path)) Task.Run(() => Index(path));
+            if (_manipulator.IsDirectory(path)) Index(path);
         }
     }
 }
