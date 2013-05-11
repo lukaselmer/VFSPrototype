@@ -1,0 +1,329 @@
+\documentclass[a4paper,12pt]{article}
+
+
+% add more packages if necessary
+\usepackage{xspace}
+%\usepackage{graphicx}
+%\usepackage{xcolor}
+%\usepackage{hyperref}
+\usepackage{amsmath}
+
+
+% TODO: Add your group name
+\newcommand{\groupname}{jcd\_dumplings\xspace}
+
+
+\title{
+Project Report \\ 
+Group \groupname \\
+\vspace{5mm}
+\large Java and C\# in depth, Spring 2013
+}
+\author{
+% TODO: Add your names here
+Elmer Lukas \\
+Ma Hua \\
+Nussbaumer Ivo
+}
+\date{\today}
+
+
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+This document describes the design and implementation of the \emph{Personal Virtual File System} of group \emph{\groupname}. The project is part of the course \emph{Java and C\# in depth} at ETH Zurich. The following sections describe each project phase, listing the requirements that were implemented and the design decisions taken. The last section describes a use case of using the \emph{Personal Virtual File System}.
+
+% PART I: VFS CORE
+% --------------------------------------
+
+\section{VFS Core}
+
+% TODO: Remove this line
+\textbf{[This section has to be completed by April 8th.]}
+
+%TODO: Remove this text and replace it with actual content
+\emph{Give a short description (1-2 paragraphs) of what VFS Core is.}
+
+
+\subsection{Requirements}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Describe which requirements (and possibly bonus requirements) you have implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.}
+
+
+\subsection{Design}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
+
+\subsection{File Format}
+
+The design of the file format is related to the Unix File System (UFS) and the New Technology File System (NTFS). The file is partitioned into two sections (reference / citation needed):
+
+\begin{itemize}
+  \item one super block
+  \item many normal blocks
+\end{itemize}
+
+\begin{figure}[h!]
+  \framebox(100,20){Super block}
+  \put(0,0){\framebox(290,20){Normal blocks}}
+  \put(0,-20){\framebox(15,20){$b_{1}$}}
+  \put(15,-20){\framebox(15,20){$b_{2}$}}
+  \put(30,-20){\framebox(15,20){$b_{3}$}}
+  \put(45,-20){\framebox(245,20){...}}
+  \put(275,-20){\framebox(15,20){$b_{n}$}}
+  \caption{Partitions of the virtual disk with $n$ normal blocks.}
+\end{figure}
+
+
+\subsubsection{Super Block}
+
+The super block has a constant size of 32 KB. Although most of the space is not needed yet, it can be used to save meta information about the file system:
+\begin{itemize}
+  \item block amount and block size\\
+  ($block\_amount * block\_size + super\_block\_size = disks\_size$)
+  \item version of the file format
+  \item date/time created of the virtual disk
+  \item compression algorithm(s)
+  \item file encryption algorithm(s)
+  \item encrypted key for file encryption
+  \item hashed seed/password for file encryption
+  \item etc.
+\end{itemize}
+
+\subsubsection{Normal Blocks}
+
+The normal blocks consist of many blocks of a fixed block size. The block size is stored in the file system meta information, which is stored in the super block. The block size is the same for every block and cannot be changed after creating the file. Tough it is possible to change the block amount, which is known as growing or shrinking the virtual file.
+
+\paragraph{Normal Block Types} ~\\
+
+\noindent One normal block can be of one of the following types:
+
+\begin{itemize}
+  \item Index Node
+    \item Root Node
+    \item File Node
+    \item Folder Node
+  \item File Content Node
+  \item Indirect Node
+\end{itemize}
+
+\paragraph{Index Node} ~\\
+
+(TODO: always use "folder" or always use "directory", TBD).
+
+The Index Node contains the file type (file or directory, 1 byte) and the name (max. 255 bytes, can contain any character excluding '/' and '$\backslash0$') of one object. The next 64 byte contain the block count of the blocks, which are referenced  (through the Indirection Nodes) by this Index node. The next block\_reference\_size byte (usually 64 byte) contain the indirection node number, which is a reference to the indirection node. If the Index Node is a file, then the next 32 byte describe the length of the last block.\\
+
+
+At the start of the normal blocks, at block $b_{0}$, there is always exactly one Root Node. The root node is a special kind of folder, but unlike the other Index Nodes, the Root Node does not have a name. Otherwise, the Root Node works exactly like a Folder Name, which is described below.\\
+
+(Not implemented yet: The block $b_{1}$ is reserved for other meta information, also organized as a folder).\\
+
+If and only if the file type is a directory, then the Index Node contains references to other Index Nodes (files and directories). These are considered sub-files and sub-directories. The referenced Index Nodes can be ordered by name, so searching becomes faster ($\mathcal{O}(log(n))$ instead of $\mathcal{O}(n)$). To implement this, an AVL or a B-Tree can be used. A B-Tree would be better, but an AVL tree is simpler to implement. (Currently, none of these data structures are used or implemented yet. Therefore searching currently takes $\mathcal{O}(n)$).\\
+
+If and only if the file type is a file, then the Index Node contains references to File Content Nodes. These File Content Nodes must be accessible in the same order they were put into the file system. Because of the concept of the Indirection Nodes, random access is possible. Therefore, seeking to any block in the file takes $\mathcal{O}(1)$, which is very good, especially if only a very small part of a huge file is needed.\\
+
+The File Content Node contains only file content. This content can be encrypted and/or compressed.\\
+
+The Indirect Nodes are used to address multiple blocks. There are three levels of Indirect Nodes. First, the one which is referenced by the Index Node (File Node or Folder Node), is the 1st level Indirect Node. This one references to multiple 2nd level indirect nodes. Any of the 2nd level Indirect Nodes references to multiple 3rd Indirect Nodes. And every 3rd Indirect Node references to multiple blocks, which are of type Index Node. For folders, these addressed blocks are File Nodes or Folder Nodes. For files, these addressed blocks are File Content Nodes.\\
+
+$$references\ per\ Indirect Node = \cfrac{block\ size}{block\ reference\ size}$$
+
+
+
+(TODO: add a good figure...)\\
+
+(TODO: After this: old, has to be adjusted)\\
+\\
+
+
+
+
+\paragraph{The Block Size} ~\\
+
+\noindent Because of the type and the name ($ = 1\ byte + 255\ bytes$), the block size must be larger than 256 bytes. In general, there is no good block size tough. If very many small files are stored and the block size is chosen  large (e.g. 32 KB), then there are huge losses because of the internal fragmentation (the rest of the block is unused). If the files are very large, the overhead to manage the data is huge, especially if the block size is very small (e.g. 512 bytes). So if rather few large files are stored in the VFS, the block size should be large, and if many small files are stored, the block size should be small. A good compromise is a block size of 2-8 KB (further literature/ links / reasoning / calculations / proofs required for these statements).
+
+\paragraph{The Block Reference Size} ~\\
+
+\noindent The block reference size determines, how many blocks can be addressed. There are $2^{block\_reference\_size}$ blocks that can be addressed.
+
+\subsection{Block Allocation}
+
+In this project, the blocks are allocated from the beginning of the file system to the end of the file system. The system has a pointer to the next free block when running. If a block is used for an object, this pointer is moved to the next free block in the file system. This can end up using O(n) time to find a free block, which is suboptimal. If a block is deleted, this pointer is not moved back to the free block. This can lead to external fragmentation, but partly prevents internal fragmentation (further literature/ links / reasoning / calculations / proofs required for these statements). If the pointer points to the last block of the file system and this block is reserved, but there is still free space in the file system, the pointer is moved back to the beginning.
+
+\subsection{Indices}
+
+Due to the simplicity of the block allocation, there is no need to store an index of free blocks.
+
+For the filename search, it would be convenient if the file names were stored in an ordered list. This could be achieved by storing the names in an AVL tree (citiation / source needed here). This would enable the file system to
+find a file name in $\mathcal{O}(log(n))$ time instead of $\mathcal{O}(n)$. Due to the complexity, this is not implemented (yet).
+
+\subsection{Data fragmentation}
+
+Due to the simple block allocation strategy, data fragmentation can occur. To avoid this, there are two possibilities:
+
+\begin{itemize}
+  \item Alternate block allocation strategy to avoid data fragmentation
+  \item A de-fragmentation procedure which de-fragments the data
+\end{itemize}
+
+Due to simplicity, none of these are implemented (yet).
+
+\subsection{Growing and shrinking the disk}
+
+As mentioned above, the disk can grow or shrink by changing the amount of blocks.
+
+\subsubsection{Growing}
+
+To grow the disk, additional blocks are added at the end of the disk. Additionally, the normal block amount is increased in the super block.
+
+\subsubsection{Shrinking}
+
+However, shrinking is more difficult, because the last block could be occupied, even if the disk is not full. Therefore, the last blocks have to be moved to free blocks, and the reference to this block has to be adjusted. This is very complex to implement efficiently and is therefore not implemented in this project (yet).\\
+Additionally, the normal block amount is decreased in the super block.
+
+\subsection{Formulas and Pseudocode}
+
+\begin{equation}
+\begin{split}
+maximal\_file\_size =
+  \bigg(\cfrac{block\ size}{block\ reference\ size}\bigg)^3 +\\
+  \bigg(\cfrac{block\ size}{block\ reference\ size}\bigg)^2 +\\
+  \bigg(\cfrac{block\ size}{block\ reference\ size}\bigg) +\\
+  (n=10, TBD)) * block\ size.
+\end{split}
+\end{equation}
+
+\begin{equation}
+maximal\ amount\ of\ blocks = 2^{block\ reference\ size}
+\end{equation}
+
+\subsection{Fault tolerance}
+
+No fault tolerance (e.g. on power loss) is implemented (yet). For this, journaling could be implemented.\\
+\\
+
+
+
+
+
+
+
+If the amount of directories is smaller or equal to (block\_size - 256 bytes) / block\_reference\_size, 
+then all references are stored in that file. Otherwise, it works like the large files with Indirect Nodes.\\
+
+
+Iff the Index Node type is file, then there are two possibilities:
+
+\begin{enumerate}
+  \item Small file content\\
+  The content of the file is very small (block size minus 1 type byte and 255 name bytes) and can be stored in the index node. Then the content of the file is stored in this very Index Node.
+  \item Large file content\\
+The content of the file exceeds the block size (minus the type byte and the name bytes = 256 bytes).\\
+Each reference to a file content block (description of file content block: see below) is of size $2^{block\_reference\_size}$, which allows maximum virtual file sizes of $2^{(block reference size, n=8, TBD)} * block\_size + super\_block\_size$.\\
+\begin{enumerate}
+  \item No indirection: The first (n=10, TBD) block references directly refer to file content blocks. This is (n=10, TBD) * block\_reference\_size bytes of size.
+  \item Single indirection: The next "block reference" references to one indirect node, which references to ($block\_size / block\_reference\_size$) other file content blocks each.
+  \item Double indirection: The next "block reference" references to one indirect node, which references to $block\_size / block\_reference\_size$ indirect nodes each, which references to $block\_size / block\_reference\_size$ other file contents each.
+  \item Triple indirection: The next "block reference" references to one indirect node, which references to $block\_size / block\_reference\_size$ indirect nodes each, which reference to $block\_size / block\_reference\_size$ indirect nodes each, which references to $block\_size / block\_reference\_size$ other file contents each.
+\end{enumerate}
+\end{enumerate}
+
+TODO: add reference to formulas\\
+
+% PART II: VFS Browser
+% --------------------------------------
+
+\section{VFS Browser}
+
+% TODO: Remove this line
+\textbf{[This section has to be completed by April 22nd.]}
+
+%TODO: Remove this text and replace it with actual content
+\emph{Give a short (1-2 paragraphs) description of what VFS Browser is.}
+
+
+\subsection{Requirements}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Describe which requirements (and possibly bonus requirements) you have implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.}
+
+
+\subsection{Design}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
+
+
+\subsection{Integration}
+
+% TODO: Remove this text and replace it with actual content
+\emph{If you had to change the design or API of the previous part, describe the changes and the reasons for each change here.}
+
+
+
+% PART III: Synchronization Server
+% --------------------------------------
+
+\section{Synchronization Server}
+
+% TODO: Remove this line
+\textbf{[This section has to be completed by May 13th.]}
+
+%TODO: Remove this text and replace it with actual content
+\emph{Give a short (1-2 paragraphs) description of what VFS Browser is.}
+
+
+\subsection{Requirements}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Describe which requirements (and possibly bonus requirements) you have implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.}
+
+
+\subsection{Design}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
+
+
+\subsection{Integration}
+
+% TODO: Remove this text and replace it with actual content
+\emph{If you had to change the design or API of the previous part, describe the changes and the reasons for each change here.}
+
+
+
+% PART IV: Quick Start Guide
+% --------------------------------------
+
+\section{Quick Start Guide}
+
+% TODO: Remove this line
+\textbf{[optional: This part has to be completed by April 8th.]}
+
+% TODO: Remove this text and replace it with actual content
+\emph{If you have a command line interface for your VFS, describe here the commands available (e.g. ls, copy, import).} \\ \\ \\
+
+
+% TODO: Remove this line
+\noindent\textbf{[This part has to be completed by May 13th.]}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Describe how to realize the following use case with your system. Describe the steps involved and how to perform each action (e.g. command line executions and arguments, menu entries, keyboard shortcuts, screenshots). The use case is the following:
+\begin{enumerate}
+\item Start synchronization server on localhost.
+\item Create account on synchronization server.
+\item Create two VFS disks (on the same machine) and link them to the new account.
+\item Import a directory (recursively) from the host file system into Disk 1.
+\item Dispose Disk 1 after the synchronization finished.
+\item Export the directory (recursively) from Disk 2 into the host file system.
+\item Stop synchronization server.
+\end{enumerate}
+}
+
+
+\end{document}

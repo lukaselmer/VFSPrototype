@@ -55,6 +55,7 @@ namespace VFSWCFService.Persistence
                 Console.WriteLine(message);
                 throw new Exception(message);
             }
+            throw new Exception("Please add sqlite.dll to your system path");
         }
 
         public Persistence()

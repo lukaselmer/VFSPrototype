@@ -1,0 +1,157 @@
+﻿<Window x:Class="VFSBrowser.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit" mc:Ignorable="d"
+        Title="{Binding FileSystemName}" MinWidth="525" MinHeight="300" Height="550" Width="725"
+        d:DataContext="{d:DesignInstance viewModel:MainViewModel}">  
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Menu -->
+            <RowDefinition Height="Auto"/> <!-- Search -->
+            <RowDefinition Height="Auto"/> <!-- History -->
+            <RowDefinition Height="Auto"/> <!-- Path -->
+            <RowDefinition Height="*"/>    <!-- DataGrid -->
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <!-- Menu -->
+        <Menu Grid.Row="0" IsMainMenu="True">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Register" Command="{Binding RegisterCommand}" />
+                <MenuItem Header="_Login" Command="{Binding LoginCommand}" />
+                <MenuItem Header="_Logout" Command="{Binding LogoutCommand}" />
+                <Separator />
+                <MenuItem Header="_Link to existing online disk" Command="{Binding LinkDiskCommand}" />
+                <MenuItem Header="_Switch to online mode (automatically starts synchronization)" Command="{Binding SwitchToOnlineModeCommand}" />
+                <MenuItem Header="_Switch to offline mode" Command="{Binding SwitchToOfflineModeCommand}" />
+                <Separator />
+                <MenuItem Header="_Open VFS" Command="{Binding OpenVfsCommand}" />
+                <MenuItem Header="_New VFS" Command="{Binding NewVfsCommand}" />
+                <MenuItem Header="_Close VFS" Command="{Binding CloseVfsCommand}" />
+                <Separator />
+                <MenuItem Header="_Import File" Command="{Binding ImportFileCommand}" />
+                <MenuItem Header="_Import Folder" Command="{Binding ImportFolderCommand}" />
+                <MenuItem Header="_Export" Command="{Binding ExportCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItems}" />
+                <Separator />
+                <MenuItem Header="_New Folder" Command="{Binding NewFolderCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Info">
+                <MenuItem Header="_Disk Info" Command="{Binding DiskInfoCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Search -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <BitmapImage x:Key="CancelImage" UriSource="../Resources/Cancel.png" />
+            </Grid.Resources>
+            <TextBox Grid.Column="0" Name="SearchTextBox" Text="{Binding Path=SearchOption.Keyword}"  >
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=SearchTextBox, Path=Text}" />
+                </TextBox.InputBindings>
+            </TextBox>
+            
+            <Button Grid.Column="1" Command="{Binding CancelSearchCommand}"><Image Source="{StaticResource CancelImage}" /></Button>
+            
+            <xctk:SplitButton Grid.Column="2" Content="Search" Command="{Binding SearchCommand}" Padding="10 3">
+                <xctk:SplitButton.DropDownContent>
+                    <StackPanel Background="WhiteSmoke">
+                        <CheckBox Margin="5 0 5 0" Content="Case Sensitive" IsChecked="{Binding SearchOption.CaseSensitive}" />
+                        <CheckBox Margin="5 0 5 0" Content="Global" IsChecked="{Binding SearchOption.Global}" />
+                        <CheckBox Margin="5 0 5 0" Content="Recrusive" IsChecked="{Binding SearchOption.Recursive}"/>
+                    </StackPanel>
+                </xctk:SplitButton.DropDownContent>
+            </xctk:SplitButton>
+        </Grid>
+
+        <!-- History -->
+        <Grid Grid.Row="2" Margin=" 0 3 0 3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <xctk:DoubleUpDown Grid.Column="0" Watermark="Enter Version" Value="{Binding Path=VersionInput}" Minimum="0" Maximum="{Binding LatestVersion}">
+                <xctk:DoubleUpDown.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding SwitchToVersionCommand}" />
+                </xctk:DoubleUpDown.InputBindings>
+            </xctk:DoubleUpDown>
+            <Button Grid.Column="1" Padding="10 3" Margin="5 0 0 0" Command="{Binding SwitchToVersionCommand}">
+                Switch to this version (read only)
+            </Button>
+            <Button Grid.Column="2" Padding="10 3" Margin="5 0 0 0" Command="{Binding SwitchToLatestVersionCommand}">
+                Switch to latest version
+            </Button>
+        </Grid>
+
+        <!-- Path -->
+        <Label Grid.Row="3" Content="{Binding CurrentPath.DisplayPath}" Height="30"></Label>
+
+        <!-- DataGrid -->
+        <DataGrid Grid.Row="4" ItemsSource="{Binding Items}" Name="ItemsGrid" AutoGenerateColumns="False"
+                  CanUserReorderColumns="False" CanUserResizeColumns="True" 
+                  CanUserResizeRows="False" CanUserSortColumns="True"
+                  GridLinesVisibility="None" RowHeaderWidth="0"
+                  AllowDrop="True" viewModel:DropBehavior.DropCommand="{Binding DropCommand}" >
+            
+            <DataGrid.Columns>
+                <DataGridTemplateColumn IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Icon}" MaxHeight="16" MaxWidth="16" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" MinWidth="200" />
+                <DataGridTextColumn Header="Path" Binding="{Binding Path}" IsReadOnly="True" Width="*" />
+            </DataGrid.Columns>
+
+            <DataGrid.InputBindings>
+                <KeyBinding Key="F2" Command="{Binding RenameCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItem}" />
+                <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItems}" />
+                <!-- Folder up Bindings -->
+                <KeyBinding Key="Left" Command="{Binding OpenCommand}" CommandParameter="{Binding Parent}" />
+                <KeyBinding Key="Back" Command="{Binding OpenCommand}" CommandParameter="{Binding Parent}" />
+                <KeyBinding Key="BrowserBack" Command="{Binding OpenCommand}" CommandParameter="{Binding Parent}" />
+                <!-- Open Folder Bindings -->
+                <KeyBinding Key="Right" Command="{Binding OpenCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItem}" />
+                <KeyBinding Key="Enter" Command="{Binding OpenCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItem}" />
+                <MouseBinding MouseAction="MiddleClick" Command="{Binding OpenCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItem}" />
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding OpenCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItem}" />
+                <!-- Copy/Paste Bindings -->
+                <KeyBinding Modifiers="Control" Key="X" Command="{Binding MoveCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItems}" />
+                <KeyBinding Modifiers="Control" Key="C" Command="{Binding CopyCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItems}" />
+                <KeyBinding Modifiers="Control" Key="V" Command="{Binding PasteCommand}" />
+            </DataGrid.InputBindings>
+
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Open" Command="{Binding OpenCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                    <MenuItem Header="Rename..." Command="{Binding RenameCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
+                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItems}" />
+                    <Separator />
+                    <MenuItem Header="Cut" Command="{Binding MoveCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItems}" />
+                    <MenuItem Header="Copy" Command="{Binding CopyCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItems}" />
+                    <MenuItem Header="Paste" Command="{Binding PasteCommand}" />
+                    <Separator />
+                    <MenuItem Header="New Folder" Command="{Binding NewFolderCommand}" />
+                    <MenuItem Header="Import File" Command="{Binding ImportFileCommand}" />
+                    <MenuItem Header="Import Folder" Command="{Binding ImportFolderCommand}" />
+                    <MenuItem Header="Export" Command="{Binding ExportCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItems}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+        </DataGrid>
+    </Grid>
+</Window>

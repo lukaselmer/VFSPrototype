@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2996B9E0-F50A-468D-8282-F62435108C4F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>VFSBase</RootNamespace>
+    <AssemblyName>VFSBase</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\JCDCodeAnalysisRules\[jcd]csharp.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Practices.ServiceLocation">
+      <HintPath>..\packages\CommonServiceLocator.1.0\lib\NET35\Microsoft.Practices.ServiceLocation.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity">
+      <HintPath>..\packages\Unity.2.1.505.2\lib\NET35\Microsoft.Practices.Unity.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.Unity.Configuration">
+      <HintPath>..\packages\Unity.2.1.505.2\lib\NET35\Microsoft.Practices.Unity.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Exceptions\AlreadyExistsException.cs" />
+    <Compile Include="Factories\FileSystemTextManipulatorFactory.cs" />
+    <Compile Include="Interfaces\FileSystemChangedEventArgs.cs" />
+    <Compile Include="Interfaces\IFileSystemTextManipulatorFactory.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeLz77\CircularBuffer.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeLz77\Lz77Constants.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeLz77\Lz77Triple.cs" />
+    <Compile Include="Persistence\Coding\Strategies\SelfMadeCaesarStreamEncryptionStrategy.cs" />
+    <Compile Include="Persistence\Coding\Strategies\SelfMadeLz77StreamCompressionStrategy.cs" />
+    <Compile Include="Persistence\Coding\Strategies\SelfMadeSimpleStreamEncryptionStrategy.cs" />
+    <Compile Include="Persistence\Coding\Strategies\StramStrategyResolver.cs" />
+    <Compile Include="Persistence\Coding\General\StreamCompressionType.cs" />
+    <Compile Include="Persistence\Coding\General\StreamEncryptionType.cs" />
+    <Compile Include="Callbacks\CallbacksBase.cs" />
+    <Compile Include="Callbacks\CopyCallbacks.cs" />
+    <Compile Include="Callbacks\ExportCallbacks.cs" />
+    <Compile Include="Callbacks\ImportCallbacks.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeAes\AesHelperMethods.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeAes\Constants.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeAes\CryptoDirection.cs" />
+    <Compile Include="Persistence\Coding\General\EncryptionOptions.cs" />
+    <Compile Include="Persistence\Coding\Strategies\NullStreamCodingStrategy.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeAes\SelfMadeAes256Cryptor.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeCaesar\SelfMadeCaesarCryptor.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeLz77\SelfMadeLz77Stream.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeSimple\SelfMadeSimpleCryptor.cs" />
+    <Compile Include="Persistence\Coding\Strategies\SelfMadeAes256StreamEncryptionStrategy.cs" />
+    <Compile Include="Persistence\Coding\Strategies\StreamCompressionEncryptionCodingStrategy.cs" />
+    <Compile Include="Persistence\Coding\MicrosoftCompression\MicrosoftStreamCompressionStrategy.cs" />
+    <Compile Include="Persistence\Coding\MicrosoftAes\MicrosoftStreamEncryptionStrategy.cs" />
+    <Compile Include="Implementation\VFSFileStream.cs" />
+    <Compile Include="Persistence\BlockList.cs" />
+    <Compile Include="Implementation\FileSystem.cs" />
+    <Compile Include="Factories\FileSystemFactory.cs" />
+    <Compile Include="Interfaces\IBlockList.cs" />
+    <Compile Include="Persistence\Persistence.cs" />
+    <Compile Include="Interfaces\IFileSystemOptions.cs" />
+    <Compile Include="Helpers\PathParser.cs" />
+    <Compile Include="Interfaces\IFileSystem.cs" />
+    <Compile Include="Persistence\MathUtil.cs" />
+    <Compile Include="Implementation\FileSystemOptions.cs" />
+    <Compile Include="Exceptions\NotFoundException.cs" />
+    <Compile Include="Interfaces\IFileSystemTextManipulator.cs" />
+    <Compile Include="Interfaces\IIndexNode.cs" />
+    <Compile Include="Implementation\VFSFile.cs" />
+    <Compile Include="Implementation\FileSystemTextManipulator.cs" />
+    <Compile Include="Implementation\Folder.cs" />
+    <Compile Include="Persistence\BlockParser.cs" />
+    <Compile Include="Persistence\Blocks\IndirectNode.cs" />
+    <Compile Include="Persistence\Coding\Strategies\IStreamCodingStrategy.cs" />
+    <Compile Include="Helpers\PositionCalculator.cs" />
+    <Compile Include="Helpers\PositionCalculatorSettings.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Exceptions\VFSException.cs" />
+    <Compile Include="Search\ISearchService.cs" />
+    <Compile Include="Search\SuffixTree.cs" />
+    <Compile Include="Search\SearchService.cs" />
+    <Compile Include="Search\IndexService.cs" />
+    <Compile Include="Search\SearchOptions.cs" />
+    <Compile Include="Search\SuffixTreeNode.cs" />
+    <Compile Include="Service References\DiskServiceReference\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Interfaces\ISynchronizationService.cs" />
+    <Compile Include="Callbacks\SynchronizationCallbacks.cs" />
+    <Compile Include="Synchronization\SynchronizationService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Service References\DiskServiceReference\DiskService.wsdl" />
+    <None Include="Service References\DiskServiceReference\DiskService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiskServiceReference\DiskService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiskServiceReference\DiskService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiskServiceReference\DiskService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.DiskDto.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.DiskOptionsDto.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.SynchronizationState.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\DiskServiceReference\VFSBase.DiskServiceReference.UserDto.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VFSBlockAbstraction\VFSBlockAbstraction.csproj">
+      <Project>{8937804B-8BD8-4058-85A2-A22FD767E0E7}</Project>
+      <Name>VFSBlockAbstraction</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\DiskServiceReference\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiskServiceReference\DiskService.disco" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiskServiceReference\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiskServiceReference\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\DiskServiceReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
