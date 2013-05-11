@@ -1,8 +1,13 @@
 using System;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using VFSBase.DiskServiceReference;
+using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Interfaces;
 using VFSBase.Synchronization;
+using VFSBlockAbstraction;
 
 namespace VFSBase.Factories
 {
@@ -30,10 +35,31 @@ namespace VFSBase.Factories
             return new FileSystemTextManipulator(fileSystem);
         }
 
-        public IFileSystemTextManipulator LinkFileSystemTextManipulator(UserDto user, DiskDto disk, string location)
+        public void LinkFileSystemTextManipulator(DiskOptionsDto diskOptions, string location)
         {
-            //TODO: implement thsi
-            throw new NotImplementedException();
+            if (File.Exists(location)) File.Delete(location);
+
+            FileSystemOptions fileSystemOptions;
+
+            using (var ms = new MemoryStream())
+            {
+                ms.Write(diskOptions.SerializedFileSystemOptions, 0, diskOptions.SerializedFileSystemOptions.Length);
+                ms.Seek(0, SeekOrigin.Begin);
+
+                IFormatter formatter = new BinaryFormatter();
+                fileSystemOptions = formatter.Deserialize(ms) as FileSystemOptions;
+                if (fileSystemOptions == null) throw new VFSException("Invalid remote file");
+
+                fileSystemOptions.LocalVersion = 0;
+                fileSystemOptions.LastServerVersion = 0;
+                fileSystemOptions.RootBlockNr = 0;
+            }
+
+            using (var disk = File.OpenWrite(location))
+            {
+                IFormatter f = new BinaryFormatter();
+                f.Serialize(disk, fileSystemOptions);
+            }
         }
     }
 }

@@ -315,19 +315,26 @@ namespace VFSBrowser.ViewModel
 
         private void LinkDisk(object parameter)
         {
-            if (_manipulator != null) return;
-            if (_synchronization != null) return;
-            if (_user == null) return;
+            try
+            {
+                if (_manipulator != null) return;
+                if (_synchronization != null) return;
+                if (_user == null) return;
 
-            var viewModel = new DiskBrowserViewModel(_diskService, _user);
-            if (!viewModel.ShowDialog() || viewModel.SelectedDisk == null) return;
+                var viewModel = new DiskBrowserViewModel(_diskService, _user);
+                if (!viewModel.ShowDialog() || viewModel.SelectedDisk == null) return;
 
-            var selectedDisk = viewModel.SelectedDisk;
-            var selectedLocation = viewModel.SelectedLocation;
-            
-            _container.Resolve<IFileSystemTextManipulatorFactory>().LinkFileSystemTextManipulator(_user, selectedDisk, selectedLocation);
+                var selectedDisk = viewModel.SelectedDisk;
+                var selectedLocation = viewModel.SelectedLocation;
+                var diskOptions = _diskService.GetDiskOptions(_user, selectedDisk);
 
-            //TODO: do initial synchronization
+                _container.Resolve<IFileSystemTextManipulatorFactory>().LinkFileSystemTextManipulator(diskOptions, selectedLocation);
+                OpenVfsWithPassword(selectedLocation);
+            }
+            catch (Exception ex)
+            {
+                UserMessage.Exception(ex);
+            }
         }
 
         private void SynchronizationFinished()
@@ -360,6 +367,8 @@ namespace VFSBrowser.ViewModel
 
         private void SwitchToOfflineMode(object parameter)
         {
+            if (_synchronization == null) return;
+
             _synchronization.StopSynchronization();
             _synchronization = null;
             UserMessage.Information("Synchronization stopped", "Switched to offline mode");
@@ -623,6 +632,8 @@ namespace VFSBrowser.ViewModel
 
         private void CloseVfs(object parameter)
         {
+            SwitchToOfflineMode(null);
+
             // Close last vfs
             DisposeManipulator();
             _manipulator = null;
@@ -659,13 +670,19 @@ namespace VFSBrowser.ViewModel
         {
             var dlg = new Microsoft.Win32.OpenFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
             if (dlg.ShowDialog() != true) return;
+            var fileName = dlg.FileName;
 
+            OpenVfsWithPassword(fileName);
+        }
+
+        private void OpenVfsWithPassword(string fileName)
+        {
             var passwordDialog = new PasswordDialogViewModel();
             if (passwordDialog.ShowDialog() != true) return;
 
             try
             {
-                var manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().OpenFileSystemTextManipulator(dlg.FileName, passwordDialog.Password);
+                var manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().OpenFileSystemTextManipulator(fileName, passwordDialog.Password);
 
                 // Close last vfs
                 DisposeManipulator();
