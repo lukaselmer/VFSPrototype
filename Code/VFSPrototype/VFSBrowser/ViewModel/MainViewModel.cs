@@ -185,32 +185,6 @@ namespace VFSBrowser.ViewModel
             return item != null && item.Name != "..";
         }
 
-        //private List<ListItem> SearchItems(string folder)
-        //{
-        //    var items = new List<ListItem>();
-        //    foreach (var item in _manipulator.List(folder))
-        //    {
-        //        if (SearchOption.Recursive && _manipulator.IsDirectory(folder + item))
-        //        {
-        //            items.AddRange(SearchItems(folder + item + DirectoryPath.Seperator));
-        //        }
-
-        //        var name = item;
-        //        var searchName = SearchOption.Keyword;
-        //        if (SearchOption.CaseSensitive == false)
-        //        {
-        //            name = name.ToLower();
-        //            searchName = searchName.ToLower();
-        //        }
-
-        //        if (name.Contains(searchName))
-        //        {
-        //            items.Add(new ListItem(folder, item, _manipulator.IsDirectory(folder + item)));
-        //        }
-        //    }
-        //    return items;
-        //}
-
         private void SwitchToLatestVersion(object parameter)
         {
             SwitchVersion(LatestVersion);
@@ -257,11 +231,10 @@ namespace VFSBrowser.ViewModel
                 SearchOption.Keyword = parameter as string;
 
             Items.Clear();
-            //SearchItems(CurrentPath).ForEach(i => Items.Add(i));
 
             try
             {
-                foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? DirectoryPath.Seperator : CurrentPath.DisplayPath, SearchOption.Recursive, SearchOption.CaseSensitive))
+                foreach (var i in _manipulator.Search(SearchOption.Keyword, SearchOption.Global ? DirectoryPath.Seperator : CurrentPath.Path, SearchOption.Recursive, SearchOption.CaseSensitive))
                 {
                     var path = i.TrimEnd(DirectoryPath.Seperator.First());
                     var idx = path.LastIndexOf(DirectoryPath.Seperator, StringComparison.CurrentCulture) + 1;
@@ -572,9 +545,6 @@ namespace VFSBrowser.ViewModel
                     }
                     _manipulator.Move(item.Path + item.Name, item.Path + dlg.Text);
                     RefreshCurrentDirectory();
-                    //item.Name = dlg.Text;
-                    //OnPropertyChanged("Items");
-
                 }
                 catch (Exception ex)
                 {
