@@ -633,6 +633,7 @@ namespace VFSBrowser.ViewModel
         private void CloseVfs(object parameter)
         {
             SwitchToOfflineMode(null);
+            SwitchToLatestVersion(null);
 
             // Close last vfs
             DisposeManipulator();
