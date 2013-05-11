@@ -12,7 +12,7 @@ using VFSBase.Synchronization;
 
 namespace VFSBase.Implementation
 {
-    internal class FileSystemTextManipulator : IFileSystemTextManipulator
+    class FileSystemTextManipulator : IFileSystemTextManipulator
     {
         private IFileSystem _fileSystem;
         private readonly ISearchService _searchService;

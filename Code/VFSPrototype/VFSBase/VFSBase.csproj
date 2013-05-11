@@ -58,6 +58,8 @@
   <ItemGroup>
     <Compile Include="Exceptions\AlreadyExistsException.cs" />
     <Compile Include="Factories\FileSystemTextManipulatorFactory.cs" />
+    <Compile Include="Implementation\ThreadSafeFileSystem.cs" />
+    <Compile Include="Implementation\ThreadSafeFileSystemTextManipulator.cs" />
     <Compile Include="Interfaces\FileSystemChangedEventArgs.cs" />
     <Compile Include="Interfaces\IFileSystemTextManipulatorFactory.cs" />
     <Compile Include="Persistence\Coding\SelfMadeLz77\CircularBuffer.cs" />

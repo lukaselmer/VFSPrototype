@@ -17,7 +17,7 @@ namespace VFSBase.Factories
         {
             var fileSystem = FileSystemFactory.Create(options, password);
             fileSystem.TestEncryptionKey();
-            return new FileSystemTextManipulator(fileSystem);
+            return new ThreadSafeFileSystemTextManipulator(fileSystem);
         }
 
         public IFileSystemTextManipulator OpenFileSystemTextManipulator(string location, string password)
@@ -32,7 +32,7 @@ namespace VFSBase.Factories
                 fileSystem.Dispose();
                 throw;
             }
-            return new FileSystemTextManipulator(fileSystem);
+            return new ThreadSafeFileSystemTextManipulator(fileSystem);
         }
 
         public void LinkFileSystemTextManipulator(DiskOptionsDto diskOptions, string location)
