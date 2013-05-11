@@ -6,15 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using VFSBase.DiskServiceReference;
-using VFSBase.Interfaces;
 using VFSBrowser.View;
 
 namespace VFSBrowser.ViewModel
 {
     public class DiskBrowserViewModel : AbstractViewModel
     {
-        private readonly IFileSystemTextManipulator _manipulator;
-
         private ObservableCollection<DiskDto> _disks;
         public ObservableCollection<DiskDto> Disks
         {
@@ -28,17 +25,20 @@ namespace VFSBrowser.ViewModel
 
         public object SelectItemCommand { get; private set; }
 
-        public DiskDto SelectedItem { get; private set; }
+        public DiskDto SelectedDisk { get; private set; }
+
+        public string SelectedLocation { get; private set; }
 
         public DiskBrowserViewModel(DiskServiceClient diskService, UserDto user)
         {
             _disks = new ObservableCollection<DiskDto>(diskService.Disks(user));
 
-            SelectItemCommand = new Command(SelectItem, o => SelectedItem != null);
+            SelectItemCommand = new Command(SelectItem, o => SelectedDisk != null);
         }
 
         private void SelectItem(object parameter)
         {
+            _dlg.DialogResult = true;
             _dlg.Close();
         }
 
@@ -47,7 +47,12 @@ namespace VFSBrowser.ViewModel
         public bool ShowDialog()
         {
             _dlg = new DiskBrowserDialog(this);
-            return _dlg.ShowDialog() == true;
+
+            bool? showDialog = _dlg.ShowDialog();
+            if (showDialog != true) return false;
+
+            SelectedLocation = ViewModelHelper.ChoosePlaceForNewVFSFile();
+            return SelectedLocation != null;
         }
     }
 }

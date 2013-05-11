@@ -10,7 +10,7 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
         </Grid.RowDefinitions>
-        <ListBox Grid.Row="0" ItemsSource="{Binding Disks}" SelectedItem="{Binding SelectedItem}" 
+        <ListBox Grid.Row="0" ItemsSource="{Binding Disks}" SelectedItem="{Binding SelectedDisk}" 
                  SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Visible">
             <ListBox.ItemTemplate>
                 <DataTemplate>
