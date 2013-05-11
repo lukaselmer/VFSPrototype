@@ -161,7 +161,15 @@ namespace VFSBase.Implementation
 
         public void SwitchToLatestVersion()
         {
-            Root = LatestRoot;
+            _readWriteLock.EnterWriteLock();
+            try
+            {
+                Root = LatestRoot;
+            }
+            finally
+            {
+                _readWriteLock.ExitWriteLock();
+            }
         }
 
         public void SwitchToVersion(long version)
@@ -623,7 +631,7 @@ namespace VFSBase.Implementation
             _readWriteLock.EnterReadLock();
             try
             {
-                return List(folder).OfType<VFSFile>();
+                return List(folder).OfType<VFSFile>().ToList();
             }
             finally
             {
