@@ -7,7 +7,7 @@ namespace VFSBrowser.ViewModel
     {
         public const string Seperator = "/";
 
-        private string _path = "";
+        private string _path = "/";
 
         public DirectoryPath()
         {
@@ -16,26 +16,32 @@ namespace VFSBrowser.ViewModel
 
         public DirectoryPath(string path, string name)
         {
-            _path = path;
-            if (!_path.EndsWith(Seperator)) _path += Seperator;
-            _path += name;
-            _path = _path.TrimEnd(Seperator.ToCharArray().First());
+            Path = path;
+            if (!Path.EndsWith(Seperator)) Path += Seperator;
+            Path += name;
+            Path = Path.TrimEnd(Seperator.ToCharArray().First());
         }
 
         public bool IsRoot
         {
-            get { return string.IsNullOrEmpty(_path); }
+            get { return Path == Seperator; }
         }
 
         public void SwitchToParent()
         {
-            if (string.IsNullOrEmpty(_path)) _path = "";
-            _path = _path.Substring(0, _path.LastIndexOf("/", StringComparison.CurrentCulture));
+            Path = Path.Substring (0, Path.LastIndexOf (Seperator, StringComparison.CurrentCulture));
+            if (string.IsNullOrEmpty (Path)) Path = "/";
         }
 
         public string DisplayPath
         {
-            get { return IsRoot ? "/" : _path + Seperator; }
+            get { return IsRoot ? Seperator : Path + Seperator; }
+        }
+
+        public string Path
+        {
+            get { return _path; }
+            set { _path = value; }
         }
 
         public DirectoryPath GetChild(string name)

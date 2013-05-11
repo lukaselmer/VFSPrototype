@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using VFSBase.Implementation;
 using VFSBase.Interfaces;
 
 namespace VFSBase.Search
@@ -24,8 +20,15 @@ namespace VFSBase.Search
 
         public void StartIndexing()
         {
-            Index("/");
-            // Does not work (yet)... Low prio...? Task.Run(() => Index("/"));
+            // Does not work (yet)... Low prio...? 
+            //Index("/");
+            //Task.Run(() => Index("/"));
+            new Thread (ThreadDelegate).Start ("/");
+        }
+
+        private void ThreadDelegate (object o)
+        {
+            Index(o.ToString());
         }
 
         private void Index(string path)
@@ -34,12 +37,12 @@ namespace VFSBase.Search
             {
                 foreach (var file in _manipulator.Files(path))
                 {
-                    _indexService.AddToIndex(path + "/" + file);
+                    _indexService.AddToIndex(path + file);
                 }
-                foreach (var folder in _manipulator.Folders(path))
+                foreach (var folder in _manipulator.Folders(path.TrimEnd('/')))
                 {
-                    _indexService.AddToIndex(path + "/" + folder);
-                    Index(path + "/" + folder);
+                    _indexService.AddToIndex (path + folder + "/");
+                    Index (path + folder + "/");
                 }
             }
         }
@@ -56,7 +59,7 @@ namespace VFSBase.Search
         {
             lock (_lock)
             {
-                _indexService.AddToIndex(path.TrimEnd('/'));
+                _indexService.AddToIndex(path);
             }
         }
 
@@ -64,10 +67,13 @@ namespace VFSBase.Search
         {
             if (!_manipulator.Exists(path)) return;
 
-            AddToIndex(path.TrimEnd('/'));
+            AddToIndex(path);
 
-            // Does not work (yet)... Low prio...? if (_manipulator.IsDirectory(path)) Task.Run(() => Index(path));
-            if (_manipulator.IsDirectory(path.TrimEnd('/'))) Index(path.TrimEnd('/'));
+            // Does not work (yet)... Low prio...? 
+            // if (_manipulator.IsDirectory(path.TrimEnd('/'))) Index(path.TrimEnd('/'));
+            // if (_manipulator.IsDirectory(path)) Task.Run(() => Index(path));
+            if (_manipulator.IsDirectory (path.TrimEnd ('/')))
+                new Thread (ThreadDelegate).Start (path);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace VFSBase.Search
         {
             var result = _flatNames.Search(searchOptions);
 
-            return result.Where(path => IsInFolder(searchOptions.RestrictToFolder ?? "", path, searchOptions.RecursionDistance));
+            return result.Where(path => IsInFolder(searchOptions.RestrictToFolder ?? "", path.TrimEnd('/'), searchOptions.RecursionDistance));
         }
 
         private static bool IsInFolder(string restrictFolderPath, string nodePath, int recursionDistance)
@@ -48,25 +48,10 @@ namespace VFSBase.Search
             return false;
         }
 
-        //private static bool IsInFolder(Folder folder, IIndexNode node, int recursionDistance)
-        //{
-        //    var parent = node.Parent;
-
-        //    var recursionDepth = 0;
-        //    while (parent != null && (recursionDistance == -1 || recursionDepth <= recursionDistance))
-        //    {
-        //        if (parent.Equals(folder))
-        //            return true;
-
-        //        recursionDepth++;
-        //        parent = parent.Parent;
-        //    }
-        //    return false;
-        //}
-
         private static string GetName(string path)
         {
-            return path.Substring(path.TrimEnd('/').LastIndexOf("/", StringComparison.Ordinal) + 1);
+            path = path.TrimEnd('/');
+            return path.Substring(path.LastIndexOf("/", StringComparison.Ordinal) + 1);
         }
 
         public void AddToIndex(string path)
