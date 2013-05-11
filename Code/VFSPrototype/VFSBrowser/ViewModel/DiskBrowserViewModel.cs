@@ -47,7 +47,7 @@ namespace VFSBrowser.ViewModel
         public bool ShowDialog()
         {
             _dlg = new DiskBrowserDialog(this);
-            return _dlg.ShowDialog();
+            return _dlg.ShowDialog() == true;
         }
     }
 }
