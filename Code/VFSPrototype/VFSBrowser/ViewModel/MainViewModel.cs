@@ -108,9 +108,9 @@ namespace VFSBrowser.ViewModel
             Items = new ObservableCollection<ListItem>();
             SearchOption = new SearchOption { CaseSensitive = false, Recursive = true, Keyword = "", Global = false };
 
-            OpenVfsCommand = new Command(OpenVfs, null);
-            NewVfsCommand = new Command(NewVfs, null);
-            CloseVfsCommand = new Command(CloseVfs, null);
+            OpenVfsCommand = new Command(OpenVfs, p => _manipulator == null);
+            NewVfsCommand = new Command(NewVfs, p => _manipulator == null);
+            CloseVfsCommand = new Command(CloseVfs, p => _manipulator != null);
             NewFolderCommand = new Command(NewFolder, p => (_manipulator != null));
             OpenCommand = new Command(Open, p => (_manipulator != null && p != null));
             RenameCommand = new Command(Rename, IsItemSelected);

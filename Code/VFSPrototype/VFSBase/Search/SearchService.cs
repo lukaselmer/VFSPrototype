@@ -29,7 +29,7 @@ namespace VFSBase.Search
         private void Index(string path)
         {
             path = path.TrimEnd('/');
-            _lock.EnterReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
                 foreach (var file in _manipulator.Files(path))
@@ -44,7 +44,7 @@ namespace VFSBase.Search
             }
             finally
             {
-                _lock.ExitReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
@@ -55,20 +55,20 @@ namespace VFSBase.Search
 
         public void AddToIndex(string path)
         {
-            _lock.EnterReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
                 _indexService.AddToIndex(path);
             }
             finally
             {
-                _lock.ExitReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
         public void AddToIndexRecursive(string path)
         {
-            _lock.EnterReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
                 if (!_manipulator.Exists(path)) return;
@@ -78,7 +78,7 @@ namespace VFSBase.Search
             }
             finally
             {
-                _lock.ExitReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
     }

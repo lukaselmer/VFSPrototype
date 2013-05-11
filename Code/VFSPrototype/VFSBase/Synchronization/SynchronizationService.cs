@@ -29,22 +29,22 @@ namespace VFSBase.Synchronization
         private readonly DiskServiceClient _diskService;
         //private UserServiceClient _userService;
         private DiskDto _disk;
+        private ReaderWriterLockSlim _lock;
 
         public SynchronizationService(IFileSystem fileSystem, UserDto user, SynchronizationCallbacks callbacks)
         {
             _fileSystem = fileSystem;
             _user = user;
             _callbacks = callbacks;
+            _lock = _fileSystem.GetReadWriteLock();
             _diskService = new DiskServiceClient();
         }
 
         public void Synchronize()
         {
-            var rwLock = _fileSystem.GetReadWriteLock();
-
+            _lock.EnterWriteLock();
             try
             {
-                rwLock.EnterWriteLock();
                 var version = _fileSystem.CurrentVersion;
                 try
                 {
@@ -60,7 +60,7 @@ namespace VFSBase.Synchronization
             }
             finally
             {
-                if (rwLock.IsWriteLockHeld) rwLock.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
 
             _callbacks.Finished();

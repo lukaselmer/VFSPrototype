@@ -267,14 +267,14 @@ namespace VFSBase.Implementation
 
         public byte[] ReadBlock(long blockNumber)
         {
-            l.EnterReadLock();
+            l.EnterUpgradeableReadLock();
             try
             {
                 return o.ReadBlock(blockNumber);
             }
             finally
             {
-                l.ExitReadLock();
+                l.ExitUpgradeableReadLock();
             }
         }
 
