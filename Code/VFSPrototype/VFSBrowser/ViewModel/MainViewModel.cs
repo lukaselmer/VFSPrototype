@@ -320,10 +320,13 @@ namespace VFSBrowser.ViewModel
             if (_user == null) return;
 
             var viewModel = new DiskBrowserViewModel(_diskService, _user);
-            if (!viewModel.ShowDialog() || viewModel.SelectedItem == null) return;
+            if (!viewModel.ShowDialog() || viewModel.SelectedDisk == null) return;
 
-            var selectedDisk = viewModel.SelectedItem;
-            Console.WriteLine(selectedDisk);
+            var selectedDisk = viewModel.SelectedDisk;
+            var selectedLocation = viewModel.SelectedLocation;
+            
+            _container.Resolve<IFileSystemTextManipulatorFactory>().LinkFileSystemTextManipulator(_user, selectedDisk, selectedLocation);
+
             //TODO: do initial synchronization
         }
 
@@ -629,7 +632,7 @@ namespace VFSBrowser.ViewModel
 
         private void NewVfs(object parameter)
         {
-            var pathToVFS = ChooseNewVFSFile();
+            var pathToVFS = ViewModelHelper.ChoosePlaceForNewVFSFile();
             if (pathToVFS == null) return;
 
             // Close last vfs
@@ -650,18 +653,6 @@ namespace VFSBrowser.ViewModel
                 MessageBox.Show(e.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             UpdateVersion();
-        }
-
-        private static string ChooseNewVFSFile()
-        {
-            // Create OpenFileDialog
-            var dlg = new SaveFileDialog { DefaultExt = ".vhs", Filter = "Virtual Filesystem (.vhs)|*.vhs" };
-
-            // Display OpenFileDialog by calling ShowDialog method
-            var result = dlg.ShowDialog();
-
-            // Get the selected file name and display in a TextBox
-            return result != true ? null : dlg.FileName;
         }
 
         private void OpenVfs(object parameter)

@@ -29,5 +29,11 @@ namespace VFSBase.Factories
             }
             return new FileSystemTextManipulator(fileSystem);
         }
+
+        public IFileSystemTextManipulator LinkFileSystemTextManipulator(UserDto user, DiskDto disk, string location)
+        {
+            //TODO: implement thsi
+            throw new NotImplementedException();
+        }
     }
 }
