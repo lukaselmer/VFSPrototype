@@ -16,6 +16,8 @@ namespace VFSBlockAbstraction
         private readonly int _masterBlockSize;
         private readonly string _location;
 
+        private readonly object _lock = new object();
+
         public BlockManipulator(string location, int blockSize, int masterBlockSize)
         {
             _location = location;
@@ -39,32 +41,38 @@ namespace VFSBlockAbstraction
 
         public void WriteBlock(long blockNumber, byte[] block)
         {
-            SeekToBlock(blockNumber);
-            LockBlock(blockNumber);
+            lock (_lock)
+            {
+                SeekToBlock(blockNumber);
+                LockBlock(blockNumber);
 
-            try
-            {
-                _diskWriter.Write(block);
-                _diskWriter.Flush();
-            }
-            finally
-            {
-                UnlockBlock(blockNumber);
+                try
+                {
+                    _diskWriter.Write(block);
+                    _diskWriter.Flush();
+                }
+                finally
+                {
+                    UnlockBlock(blockNumber);
+                }
             }
         }
 
         public byte[] ReadBlock(long blockNumber)
         {
-            SeekToBlock(blockNumber);
-            LockBlock(blockNumber);
-            try
+            lock (_lock)
             {
-                var block = _diskReader.ReadBytes(_blockSize);
-                return block.Length == _blockSize ? block : new byte[_blockSize];
-            }
-            finally
-            {
-                UnlockBlock(blockNumber);
+                SeekToBlock(blockNumber);
+                LockBlock(blockNumber);
+                try
+                {
+                    var block = _diskReader.ReadBytes(_blockSize);
+                    return block.Length == _blockSize ? block : new byte[_blockSize];
+                }
+                finally
+                {
+                    UnlockBlock(blockNumber);
+                }
             }
         }
 
@@ -133,16 +141,22 @@ namespace VFSBlockAbstraction
 
         public void SaveConfig(byte[] options)
         {
-            _disk.Seek(0, SeekOrigin.Begin);
-            _disk.Write(options, 0, options.Length);
+            lock (_lock)
+            {
+                _disk.Seek(0, SeekOrigin.Begin);
+                _disk.Write(options, 0, options.Length);
+            }
         }
 
         public void SaveConfig(object options)
         {
-            _disk.Seek(0, SeekOrigin.Begin);
+            lock (_lock)
+            {
+                _disk.Seek(0, SeekOrigin.Begin);
 
-            IFormatter formatter = new BinaryFormatter();
-            formatter.Serialize(_disk, options);
+                IFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(_disk, options);
+            }
         }
     }
 }

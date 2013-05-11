@@ -25,7 +25,7 @@ namespace VFSBase.Factories
                 formatter.Serialize(file, options);
             }
 
-            return new FileSystem(options);
+            return new ThreadSafeFileSystem(options);
         }
 
         internal static IFileSystem Import(string location, string password)
@@ -52,7 +52,7 @@ namespace VFSBase.Factories
                 formatter.Serialize(file, newOptions);
             }
 
-            return new FileSystem(newOptions);
+            return new ThreadSafeFileSystem(newOptions);
         }
 
         internal static void Delete(IFileSystem fileSystem)

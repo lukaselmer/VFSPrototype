@@ -23,7 +23,7 @@ namespace VFSBase.Implementation
         {
             _fileSystem = fileSystem;
 
-            _searchService = new SearchService(this);
+            _searchService = new SearchService(this, _fileSystem.GetReadWriteLock());
             // Leads to very slow startup... -> hope that it should be better now
             _searchService.StartIndexing();
         }
