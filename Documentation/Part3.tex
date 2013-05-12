@@ -116,8 +116,10 @@ Events: FileSystemChanged
 
 
 % 2. The server is able to synchronize changes, which are done simultaneously on the same account on different machines.
-\subsubsection{TODO}
-TODO.
+\subsubsection{Simultaneous synchronization}
+The server is implemented as a WCF \footnote{http://msdn.microsoft.com/en-us/library/dd456779.aspx} service  and it allows multiple parallel connections.\\
+For every new connection, a new IDiskService is instantiated. This allows multiple connections to the server and thus parallel synchronization of changes.\\
+Classes: IDiskService, DiskServiceImpl, ServiceContract
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=1]{imageslukas/todo.png} 
@@ -125,24 +127,83 @@ TODO.
 \end{figure}
 
 % Incremental Changes: minimize the communication between the browser and the server by only transfering the parts of a file that changed.
-\subsubsection{TODO}
-TODO.
+\subsubsection{Incremental changes}
+The synchronization only requires to synchronize the blocks which have not been synchronized before.\\
+For this, the DiskDto (persisted on the server) stores the NewestBlock which is to synchronize. Locally, every file system stores the blocks used in the root folder (BlocksUsed property) of the current version. When the synchronization starts, only $$Math.abs(NewestBlock_{OnServer}-BlocksUsed_{Locally})$$ have to be synchronized.\\
+Classes: SynchronizationService
 \begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{imageslukas/todo.png} 
-	\caption{TODO}
+	\centering 
+	\includegraphics[scale=1]{imageslukas/do_synchronization.png} 
+	\caption{Incremental changes: synchronize remote changes or local changes}
+\end{figure}
+\begin{figure}[h!]
+	\centering 
+	\includegraphics[scale=1]{imageslukas/incremental_changes.png}
+	\caption{Incremental changes: only synchronize blocks which have not been synchronized yet}
 \end{figure}
 
 % 3. File History: provide a history for les and an interface to restore a previous version.
-\subsubsection{TODO}
-TODO.
+\subsubsection{File history}
+There is a file history available. The user can switch to an older version and export files from there, and he also can roll back to an older version, discarding all changes in later versions.\\
+Technically, the file history is implemented like this:\\
+In the beginning, there is one root node. Every change in the file system then leads to a new root node, which points back to the old root node. The new root node contains block references to all children of the old root node which have not been changed during the update of the file system. Additionally, the new root node contains references to the newly created nodes. So, for every version of the history, a new root node is created. The file system options, which are stored at the start of the file system, point to the latest root node in the file system.\\
+\emph{
+Example: Given the $root folder_{v1}$ contains a $folder a_{v1}$ and $b_{v1}$. $folder a_{v1}$ also contains a subfolder $folder x_{v1}$. The options point to the $root folder_{v1}$.\\
+Now a new subfolder $y_{v2}$ should be created within the folder $a_{v1}$.\\
+Then a new folder $a_{v2}$ is created, which references to the new subfolder $y_{v2}$ and to the old folder $folder a_{v1}$. Next, a new $root folder_{v2}$ is created. It creates a back link to $root folder_{v1}$, so it can switch back to an older version. Additionally, the new $root folder_{v2}$ contains a reference to the folder $b_{v1}$ (old reference) and a reference to $a_{v2}$ (new reference). After this, the options now point to the $root folder_{v2}$.\\
+}\\
+This gives us multiple advantages: Firstly, a written block never will change again (immutable object pattern). Therefore, synchronization is faster, because only the newly created blocks have to be synchronized. Furthermore, copy operations do not depend on the file size or the amount to copy. Thus the time to copy only depends on the length of the path of the files to copy.\\
+Classes: FileSystem, BlockList\\
+Methods: FileSystem.ArchiveAndReplaceRoot, BlockList.CopyReplacingReference
+
 \begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{imageslukas/todo.png} 
-	\caption{TODO}
+	\begin{subfigure}[b]{0.3\textheight}
+		\centering
+		\includegraphics[scale=1]{imageslukas/history.png}
+		\caption{The file history GUI}
+	\end{subfigure}
+	\\\\
+	\begin{subfigure}[b]{0.3\textheight}
+		\centering
+		\includegraphics[scale=0.5]{imageslukas/history_implementation.png}
+		\caption{The file history implementation (FileSystem)}
+	\end{subfigure}
+	\\\\
+	\begin{subfigure}[b]{0.3\textheight}
+		\centering
+		\includegraphics[scale=0.5]{imageslukas/history_copy_replacing_reference.png}
+		\caption{The file history implementation (BlockList.CopyReplacingReference)}
+	\end{subfigure}
+	\caption{File history}
 \end{figure}
 
-
+	
+\begin{figure}
+        \centering
+        \begin{subfigure}[b]{0.3\textwidth}
+                \centering
+	\includegraphics[scale=1]{imageslukas/history.png}
+                \caption{A gull}
+                \label{fig:gull}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[b]{0.3\textwidth}
+                \centering
+	\includegraphics[scale=1]{imageslukas/history.png}
+                \caption{A tiger}
+                \label{fig:tiger}
+        \end{subfigure}
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[b]{0.3\textwidth}
+                \centering
+	\includegraphics[scale=1]{imageslukas/history.png}
+                \caption{A mouse}
+                \label{fig:mouse}
+        \end{subfigure}
+        \caption{Pictures of animals}\label{fig:animals}
+\end{figure}
 
 
 
