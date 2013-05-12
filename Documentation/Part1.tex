@@ -80,7 +80,7 @@ Methods: FileSystemOptions.DiskOccupied, FileSystemOptions.DiskFree\\
 % 1. Compression, if implemented with 3d party library. (1p)
 \subsubsection{Compression with 3rd party library}
 There are multiple compression types available. One of them is a third party implementation of the Microsoft deflate stream\footnote{http://msdn.microsoft.com/en-us/library/system.io.compression.deflatestream.aspx}.
-Patterns: Decorator pattern\\
+Patterns: Decorator pattern, Null object pattern (for no encryption)\\
 Classes: MicrosoftStreamCompressionStrategy, DeflateStream\\
 Methods: DecorateToVFS, DecorateToHost\\
 \begin{figure}[h!]
@@ -92,9 +92,8 @@ Methods: DecorateToVFS, DecorateToHost\\
 % 2. Encryption, if implemented with 3d party library. (1p)
 \subsubsection{Encryption with 3rd party library}
 There are multiple encryption types available. One of them is a third party implementation of the Microsoft Rijndael, the AES standard\footnote{http://msdn.microsoft.com/en-us/library/system.security.cryptography.rijndael.aspx}.\\
-Patterns: Decorator pattern\\
-Classes:\\
-Methods:
+Patterns: Decorator pattern, Null object pattern (for no encryption)\\
+Classes: Rijndael\\
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=1]{Images/encryption_types.png} 
@@ -110,27 +109,22 @@ Methods: BlockAllocation.Allocate
 % 1. Compression, if implemented by hand (you can take a look at the arithmetic compression8). (2p)
 \subsubsection{Compression implemented by hand}
 Compression by hand is implemented. The basic idea behind the compression is the LZ77 algorithm\footnote{http://www.ieeeghn.org/wiki/index.php/Milestones:Lempel-Ziv\_Data\_Compression\_Algorithm,\_1977}.\\
+Patterns: Decorator pattern, Null object pattern (for no encryption)\\
 Classes: SelfMadeLz77Stream, Lz77Triple, Lz77Constants, CircularBuffer, SelfMadeLz77StreamCompressionStrategy\\
 Methods: SelfMadeLz77Stream.Read, SelfMadeLz77Stream.Write
 
 % 2. Encryption, if implemented by hand. (3p)
 \subsubsection{Encryption implemented by hand}
 Encryption was also implemented by hand. There is a simple encryption and a caesar encryption which are fast, but very weak. Therefore, the AES-256 with CBC\footnote{part of the AES standard, http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf} was implemented.\\
+Patterns: Decorator pattern, Null object pattern (for no encryption)\\
 Classes: SelfMadeAes256Cryptor, AesHelperMethods, AesConstants\\
-Methods: SelfMadeAes256Cryptor.EncryptBlocks, SelfMadeAes256Cryptor.DecryptBlocks\\
-
+Methods: SelfMadeAes256Cryptor.EncryptBlocks, SelfMadeAes256Cryptor.DecryptBlocks
 
 % 3. Large data: This means, that VFS core can store & operate amount of data, that can't t to PC RAM ( typically, more than 4Gb). (3p)
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
-
+\subsubsection{Large data}
+As mentioned above, large data is supported. File contents are written directly to the disk, and does not store whole files in memory. Therefore, the file system does not need much RAM, but can handle huge files tough.\\
+Classes: BlockManipulator, FileSystem, FileSystemTextManipulator\\
+Methods: BlockManipulator.WriteBlock, BlockManipulator.ReadBlock, FileSystem.Import, FileSystem.Export
 
 
 
@@ -151,11 +145,11 @@ Methods:\\
 \subsection{Design}
 
 % TODO: Remove this text and replace it with actual content
-\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
+% Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.
 
 \subsection{File Format}
 
-The design of the file format is related to the Unix File System (UFS) and the New Technology File System (NTFS). The file is partitioned into two sections (reference / citation needed):
+The design of the file format is related to the Unix File System (UFS)\footnote{http://en.wikipedia.org/wiki/Unix\_File\_System} and the New Technology File System (NTFS)\footnote{http://en.wikipedia.org/wiki/NTFS}. The file is partitioned into two sections:
 
 \begin{itemize}
   \item one super block
@@ -178,11 +172,12 @@ The design of the file format is related to the Unix File System (UFS) and the N
 
 The super block has a constant size of 32 KB. Although most of the space is not needed yet, it can be used to save meta information about the file system:
 \begin{itemize}
-  \item block amount and block size\\
-  ($block\_amount * block\_size + super\_block\_size = disks\_size$)
+  \item used block amount and block size\\
+  ($block\_amount * block\_size + super\_block\_size = disk\_size$)
+  \item version of the current file (for file history)
   \item version of the file format
-  \item date/time created of the virtual disk
-  \item compression algorithm(s)
+  \item ID of the virtual disk (for synchronization)
+  \item selected compression algorithm
   \item file encryption algorithm(s)
   \item encrypted key for file encryption
   \item hashed seed/password for file encryption
@@ -191,7 +186,7 @@ The super block has a constant size of 32 KB. Although most of the space is not 
 
 \subsubsection{Normal Blocks}
 
-The normal blocks consist of many blocks of a fixed block size. The block size is stored in the file system meta information, which is stored in the super block. The block size is the same for every block and cannot be changed after creating the file. Tough it is possible to change the block amount, which is known as growing or shrinking the virtual file.
+The normal blocks consist of many blocks of a fixed block size (e.g. 8KB). The block size is stored in the file system meta information, which is stored in the super block. The block size is the same for every block and cannot be changed after creating the file. Though the block size could be configured at creation time of the disk, which is not available in the GUI, because it was not a requirement.
 
 \paragraph{Normal Block Types} ~\\
 
@@ -199,18 +194,17 @@ The normal blocks consist of many blocks of a fixed block size. The block size i
 
 \begin{itemize}
   \item Index Node
-    \item Root Node
     \item File Node
     \item Folder Node
-  \item File Content Node
   \item Indirect Node
+  \item File Content Node
 \end{itemize}
 
 \paragraph{Index Node} ~\\
 
-(TODO: always use "folder" or always use "directory", TBD).
-
-The Index Node contains the file type (file or directory, 1 byte) and the name (max. 255 bytes, can contain any character excluding '/' and '$\backslash0$') of one object. The next 64 byte contain the block count of the blocks, which are referenced  (through the Indirection Nodes) by this Index node. The next block\_reference\_size byte (usually 64 byte) contain the indirection node number, which is a reference to the indirection node. If the Index Node is a file, then the next 32 byte describe the length of the last block.\\
+The Index Node contains the file type (file or directory, 1 byte) and the name (max. 255 bytes, can contain any character excluding '/' and '$\backslash0$') of one object. The next 64 bytes contain the block count of the blocks, which are referenced  (through the Indirection Nodes) by this Index node. The next 64 bytes contain the indirection node number, which is a reference to the indirection node. The next 64 bytes are reserved for the version of the object (important for the history implementation). The next 64 bytes are reserved for the predecessor object reference (also for the history implementation).\\
+If the Index Node is a file, then the next 32 byte describe the length of the last block, so the file system knows which data of the last block is relevant.\\
+If the Index Node is a folder, then the next 64 bytes describe the amount of blocks used. This is important for the root folder and the synchronization.\\
 
 
 At the start of the normal blocks, at block $b_{0}$, there is always exactly one Root Node. The root node is a special kind of folder, but unlike the other Index Nodes, the Root Node does not have a name. Otherwise, the Root Node works exactly like a Folder Name, which is described below.\\
