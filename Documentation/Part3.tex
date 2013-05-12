@@ -1,0 +1,26 @@
+\documentclass[JCDReport.tex]{subfiles} 
+\begin{document}
+
+The synchronization server propagates changes from one machine to another using a network connection. The management of the distributed VFSs is made on an account basis, i.e. in order to use the server, a user must have an account and link a virtual disk to this account. Therefore the server allows user to register and login after successful registration. Once the user enters the online mode (see GUI part) the currently open disk is synchronized to the server automatically. After initial synchronization, every synchronized disk gets a unique ID, so the disk can be identified. A user can have multiple disks, while a disk belongs to a single user. Unlinked disks are not synchronized. There is an automatic conflict recognition so the user can resolve conflicts by rolling back to a specific version, which is not conflicted, and then restart the synchronization again.\\
+
+Technically the server is implemented as a WCF \footnote{http://msdn.microsoft.com/en-us/library/dd456779.aspx} service  and it allows multiple parallel connections. A an optional requirement, automatic persistence was implemented using SQLite. The usage of SQLite for this optional requirement was allowed by Alexey Kolesnichenko \footnote{https://piazza.com/class\#spring2013/252028400l/41}.\\
+
+\subsection{Requirements}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Describe which requirements (and possibly bonus requirements) you have implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.}
+
+
+\subsection{Design}
+
+% TODO: Remove this text and replace it with actual content
+\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
+
+
+\subsection{Integration}
+
+% TODO: Remove this text and replace it with actual content
+\emph{If you had to change the design or API of the previous part, describe the changes and the reasons for each change here.}
+
+
+\end{document}
