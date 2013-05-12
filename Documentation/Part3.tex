@@ -182,11 +182,18 @@ Classes: SynchronizationService
 There is a file history available. The user can switch to an older version and export files from there, and he also can roll back to an older version, discarding all changes in later versions.\\
 Technically, the file history is implemented like this:\\
 In the beginning, there is one root node. Every change in the file system then leads to a new root node, which points back to the old root node. The new root node contains block references to all children of the old root node which have not been changed during the update of the file system. Additionally, the new root node contains references to the newly created nodes. So, for every version of the history, a new root node is created. The file system options, which are stored at the start of the file system, point to the latest root node in the file system.\\
-\emph{
-Example: Given the $root folder_{v1}$ contains a $folder a_{v1}$ and $b_{v1}$. $folder a_{v1}$ also contains a subfolder $folder x_{v1}$. The options point to the $root folder_{v1}$.\\
-Now a new subfolder $y_{v2}$ should be created within the folder $a_{v1}$.\\
-Then a new folder $a_{v2}$ is created, which references to the new subfolder $y_{v2}$ and to the old folder $folder a_{v1}$. Next, a new $root folder_{v2}$ is created. It creates a back link to $root folder_{v1}$, so it can switch back to an older version. Additionally, the new $root folder_{v2}$ contains a reference to the folder $b_{v1}$ (old reference) and a reference to $a_{v2}$ (new reference). After this, the options now point to the $root folder_{v2}$.\\
-}\\
+
+
+
+\parbox{\textwidth}{
+\textbf{Example}\\
+\textbf{Given:} The $root folder_{v1}$ contains a $folder a_{v1}$ and $b_{v1}$. $folder a_{v1}$ also contains a subfolder $folder x_{v1}$. The options point to the $root folder_{v1}$.\\
+\textbf{Scenario:} Now a new subfolder $y_{v2}$ should be created within the folder $a_{v1}$.\\
+\textbf{Action:} Then a new folder $a_{v2}$ is created, which references to the new subfolder $y_{v2}$ and to the old folder $folder a_{v1}$. Next, a new $root folder_{v2}$ is created. It creates a back link to $root folder_{v1}$, so it can switch back to an older version. Additionally, the new $root folder_{v2}$ contains a reference to the folder $b_{v1}$ (old reference) and a reference to $a_{v2}$ (new reference).\\
+\textbf{Termination:} After this, the options now point to the $root folder_{v2}$.\\
+\\
+}
+
 This gives us multiple advantages: Firstly, a written block never will change again (immutable object pattern). Therefore, synchronization is faster, because only the newly created blocks have to be synchronized. Furthermore, copy operations do not depend on the file size or the amount to copy. Thus the time to copy only depends on the length of the path of the files to copy.\\
 Classes: FileSystem, BlockList\\
 Methods: FileSystem.ArchiveAndReplaceRoot, BlockList.CopyReplacingReference
