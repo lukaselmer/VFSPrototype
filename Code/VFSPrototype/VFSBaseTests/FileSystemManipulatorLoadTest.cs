@@ -19,19 +19,18 @@ namespace VFSBaseTests
         private const string DefaultTestfilePath = "../../../Testfiles/Testfile.vhs";
         private const string DummyFilePath = "../../../Testfiles/dummy.dat";
         private readonly long _dummyFileSize = MathUtil.KB(100); // TODO: increase this value. Could be MathUtil.GB(1), but it is disabled, so the unit tests run fast
-        private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
 
-        private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
+        private static FileSystemOptions InitTestFileSystemData(string testfilePath)
         {
             if (File.Exists(testfilePath)) File.Delete(testfilePath);
-            var fileSystemData = TestHelper.CreateFileSystemOptions(testfilePath, size);
+            var fileSystemData = TestHelper.CreateFileSystemOptions(testfilePath);
             Assert.IsFalse(File.Exists(testfilePath), String.Format("testfile {0} should not exist!", testfilePath));
             return fileSystemData;
         }
 
         private static IFileSystemTextManipulator InitTestFileSystemManipulator()
         {
-            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
+            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath), "");
         }
 
         [TestInitializeAttribute]

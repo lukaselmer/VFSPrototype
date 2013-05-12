@@ -22,9 +22,9 @@ namespace VFSBaseTests.Helpers
             PrepareTestFolder();
         }
 
-        public static FileSystemOptions CreateFileSystemOptions(string location, long diskSize)
+        public static FileSystemOptions CreateFileSystemOptions(string location)
         {
-            return new FileSystemOptions(location, diskSize, StreamEncryptionType.None, StreamCompressionType.None);
+            return new FileSystemOptions(location, StreamEncryptionType.None, StreamCompressionType.None);
         }
 
         internal void PrepareTestFolder()
@@ -39,7 +39,7 @@ namespace VFSBaseTests.Helpers
 
         internal IFileSystem GetFileSystem()
         {
-            return FileSystemFactory.Create(CreateFileSystemOptions(RandomTestfilePath(), 0), "");
+            return FileSystemFactory.Create(CreateFileSystemOptions(RandomTestfilePath()), "");
         }
 
         internal IFileSystemTextManipulator GetManipulator()
@@ -49,7 +49,7 @@ namespace VFSBaseTests.Helpers
 
         private static IFileSystemTextManipulator GetManipulator(string path)
         {
-            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(CreateFileSystemOptions(path, 0), "");
+            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(CreateFileSystemOptions(path), "");
         }
 
         internal string RandomTestfilePath()

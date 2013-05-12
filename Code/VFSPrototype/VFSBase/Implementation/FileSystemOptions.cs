@@ -27,10 +27,9 @@ namespace VFSBase.Implementation
         private IStreamCodingStrategy _streamCodingStrategy;
 
 
-        public FileSystemOptions(string location, long diskSize, StreamEncryptionType encryption, StreamCompressionType compression)
+        public FileSystemOptions(string location, StreamEncryptionType encryption, StreamCompressionType compression)
         {
             Location = location;
-            DiskSize = diskSize;
             Encryption = encryption;
             Compression = compression;
             BlockSize = (int)MathUtil.KB(8);
@@ -82,7 +81,6 @@ namespace VFSBase.Implementation
 
         public string Location { get; set; }
 
-        public long DiskSize { get; set; }
         public StreamEncryptionType Encryption { get; set; }
         public StreamCompressionType Compression { get; set; }
 

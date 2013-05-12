@@ -11,7 +11,7 @@ namespace VFSBaseTests
     {
         private static VFSFileStream VFSFileStream()
         {
-            return new VFSFileStream(new VFSFile("test"), null, TestHelper.CreateFileSystemOptions("", 0), null, null, null);
+            return new VFSFileStream(new VFSFile("test"), null, TestHelper.CreateFileSystemOptions(""), null, null, null);
         }
 
         [ExpectedException(typeof(NotSupportedException))]

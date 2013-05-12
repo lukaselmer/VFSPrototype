@@ -12,27 +12,21 @@ namespace VFSBaseTests
     [TestClass]
     public class FileSystemManipulatorCallbacksTest
     {
-        private const string DefaultTestfilePath = "../../../Testfiles/TestfileFileSystemManipulatorCallbacks.vhs";
+        private TestHelper _testHelper;
+        private const string DefaultTestfileFolderPath = "../../../Testfiles/FileSystemManipulatorCallbacksTest";
         private const string DummyImportFolderPath = "../../../Testfiles/DummyfolderImport";
         private const string DummyExportFolderPath = "../../../Testfiles/DummyfolderExport";
-        private const long DefaultSize = 1024 * 1024 * 1024 /* 1 MB */;
 
-        private static FileSystemOptions InitTestFileSystemData(string testfilePath, long size)
+        private IFileSystemTextManipulator InitTestFileSystemManipulator()
         {
-            if (File.Exists(testfilePath)) File.Delete(testfilePath);
-            var fileSystemData = TestHelper.CreateFileSystemOptions(testfilePath, size);
-            Assert.IsFalse(File.Exists(testfilePath), String.Format("testfile {0} actual not exist!", testfilePath));
-            return fileSystemData;
-        }
-
-        private static IFileSystemTextManipulator InitTestFileSystemManipulator()
-        {
-            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath, DefaultSize), "");
+            return _testHelper.GetManipulator();
         }
 
         [TestInitialize]
         public void CreateDummyfiles()
         {
+            _testHelper = new TestHelper(DefaultTestfileFolderPath);
+
             if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
             if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
             Directory.CreateDirectory(DummyImportFolderPath);
@@ -46,7 +40,8 @@ namespace VFSBaseTests
         {
             if (Directory.Exists(DummyImportFolderPath)) Directory.Delete(DummyImportFolderPath, true);
             if (Directory.Exists(DummyExportFolderPath)) Directory.Delete(DummyExportFolderPath, true);
-            File.Delete(DefaultTestfilePath);
+            
+            _testHelper.CleanupTestFolder();
         }
 
         [TestMethod]

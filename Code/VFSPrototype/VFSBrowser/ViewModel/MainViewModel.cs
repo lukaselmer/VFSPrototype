@@ -662,7 +662,7 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType);
+                var fileSystemData = new FileSystemOptions(pathToVFS, vm.EncryptionType, vm.CompressionType);
                 _manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().CreateFileSystemTextManipulator(fileSystemData, vm.Password);
                 _manipulator.FileSystemChanged += FileSystemChanged;
                 CurrentPath = new DirectoryPath();

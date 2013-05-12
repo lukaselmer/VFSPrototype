@@ -3,7 +3,6 @@
     public interface IFileSystemOptions
     {
         string Location { get; set; }
-        long DiskSize { get; set; }
         int MasterBlockSize { get; set; }
         int BlockSize { get; }
         long DiskFree { get; }

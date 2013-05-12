@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Threading;
+﻿using System.Windows.Controls;
 using VFSBase.Exceptions;
-using VFSBase.Implementation;
-using VFSBase.Interfaces;
 using VFSBase.Persistence.Coding.General;
 using VFSBrowser.View;
 
@@ -18,17 +7,6 @@ namespace VFSBrowser.ViewModel
 {
     internal class NewVFSViewModel : AbstractViewModel
     {
-        private long _maximumSize;
-        public long MaximumSize
-        {
-            get { return _maximumSize; }
-            set
-            {
-                _maximumSize = value;
-                OnPropertyChanged("MaximumSize");
-            }
-        }
-
         private StreamCompressionType _compressionType;
         public StreamCompressionType CompressionType
         {
@@ -50,8 +28,6 @@ namespace VFSBrowser.ViewModel
                 OnPropertyChanged("EncryptionType");
             }
         }
-
-
 
         private NewVFSView _dlg;
         private string _password;

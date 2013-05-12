@@ -14,7 +14,6 @@ namespace VFSBaseTests
     public class FileSystemFactoryTest
     {
         private const string DefaultTestfilePath = "../../../Testfiles/testfile.vhs";
-        private const long DefaultSize = 1000 * 1000 * 1000 /* 1 MB */;
 
         [TestCleanup]
         public void RemoveTestfile()
@@ -27,7 +26,7 @@ namespace VFSBaseTests
         {
             if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
 
-            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath, DefaultSize);
+            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath);
 
             Assert.IsFalse(File.Exists(DefaultTestfilePath));
 
@@ -40,7 +39,6 @@ namespace VFSBaseTests
             Assert.IsTrue(File.Exists(DefaultTestfilePath), String.Format("testfile {0} should exist!", DefaultTestfilePath));
             Assert.IsTrue(File.ReadAllText(DefaultTestfilePath).Length > 0);
             Assert.AreEqual(DefaultTestfilePath, fileSystemOptions.Location);
-            Assert.AreEqual(DefaultSize, fileSystemOptions.DiskSize);
         }
 
         [TestMethod]
@@ -48,7 +46,7 @@ namespace VFSBaseTests
         {
             if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
 
-            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath, DefaultSize);
+            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath);
 
             using (var fileSystem = FileSystemFactory.Create(fileSystemOptions, ""))
             {
@@ -66,7 +64,6 @@ namespace VFSBaseTests
             Assert.IsTrue(File.Exists(DefaultTestfilePath), String.Format("testfile {0} should exist!", DefaultTestfilePath));
             Assert.IsTrue(File.ReadAllText(DefaultTestfilePath).Length > 0);
             Assert.AreEqual(DefaultTestfilePath, fileSystemOptions.Location);
-            Assert.AreEqual(DefaultSize, fileSystemOptions.DiskSize);
         }
 
         [TestMethod]
@@ -74,7 +71,7 @@ namespace VFSBaseTests
         {
             if (File.Exists(DefaultTestfilePath)) File.Delete(DefaultTestfilePath);
 
-            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath, DefaultSize);
+            var fileSystemOptions = TestHelper.CreateFileSystemOptions(DefaultTestfilePath);
 
             Assert.IsFalse(File.Exists(DefaultTestfilePath));
 

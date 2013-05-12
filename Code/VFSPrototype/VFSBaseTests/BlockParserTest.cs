@@ -16,7 +16,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseTooSmallDirectoryBlock()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var b = new BlockParser(options);
             var b1 = new byte[1024];
             b.BytesToNode(b1);
@@ -27,7 +27,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseEmptyDirectoryBlock()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var b = new BlockParser(options);
             var b2 = new byte[options.BlockSize];
             b.BytesToNode(b2);
@@ -36,7 +36,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseDirectoryBlock()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var b = new BlockParser(options);
 
             var bb = new byte[options.BlockSize];
@@ -47,7 +47,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestParseFileBlock()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var b = new BlockParser(options);
 
             var bb = new byte[options.BlockSize];
@@ -59,7 +59,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestWriteFolderBlock()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var b = new BlockParser(options);
 
             var f = new Folder("blubα");
@@ -72,7 +72,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestWriteFileBlock()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var b = new BlockParser(options);
 
             var f = new VFSFile("αaαaαaαablubα");
@@ -85,7 +85,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestWriteAndPareseFolderBlock()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var b = new BlockParser(options);
 
             const string name = "blubα";
@@ -104,7 +104,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestInvalidNode()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var p = new BlockParser(options);
             p.NodeToBytes(new IndexNodeMock());
         }
@@ -113,7 +113,7 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestInvalidBlockSizeForFile()
         {
-            var options = TestHelper.CreateFileSystemOptions("", 0);
+            var options = TestHelper.CreateFileSystemOptions("");
             var p = new BlockParser(options);
             p.NodeToBytes(new IndexNodeMock());
         }
@@ -125,7 +125,7 @@ namespace VFSBaseTests
             var f = new VFSFile("0123456789");
             try
             {
-                var o1 = TestHelper.CreateFileSystemOptions("", 0);
+                var o1 = TestHelper.CreateFileSystemOptions("");
                 o1.NameLength = f.Name.Length;
                 var p1 = new BlockParser(o1);
                 p1.NodeToBytes(f);
@@ -134,7 +134,7 @@ namespace VFSBaseTests
             {
                 Assert.Fail("Exception unexpected yet");
             }
-            var o2 = TestHelper.CreateFileSystemOptions("", 0);
+            var o2 = TestHelper.CreateFileSystemOptions("");
             o2.NameLength = f.Name.Length - 1;
             var p2 = new BlockParser(o2);
             p2.NodeToBytes(f);

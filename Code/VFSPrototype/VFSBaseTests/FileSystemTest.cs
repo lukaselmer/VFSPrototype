@@ -14,7 +14,6 @@ namespace VFSBaseTests
     public class FilSystemTest
     {
         private const string DefaultTestfileFolder = "../../../Testfiles/FileSystemTests/";
-        private readonly long _defaultSize = MathUtil.MB(5);
 
         [TestInitialize]
         public void CreateTestFolder()
@@ -35,7 +34,7 @@ namespace VFSBaseTests
 
         private IFileSystem CreateFileSystem(string path)
         {
-            return FileSystemFactory.Create(TestHelper.CreateFileSystemOptions(path, _defaultSize), "");
+            return FileSystemFactory.Create(TestHelper.CreateFileSystemOptions(path), "");
         }
 
         private IFileSystem ImportFileSystem(string path)

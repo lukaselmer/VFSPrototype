@@ -17,11 +17,9 @@ namespace VFSBaseTests
         {
             using (var m = new MemoryStream())
             {
-                const long size = 1001L;
                 const int masterBlockSize = 30000;
 
-                var o1 = TestHelper.CreateFileSystemOptions("", 0);
-                o1.DiskSize = size;
+                var o1 = TestHelper.CreateFileSystemOptions("");
                 o1.MasterBlockSize = masterBlockSize;
 
                 IFormatter formatter = new BinaryFormatter();
@@ -30,7 +28,6 @@ namespace VFSBaseTests
                 m.Seek(0, SeekOrigin.Begin);
 
                 var o2 = FileSystemOptions.Deserialize(m, "");
-                Assert.AreEqual(size, o2.DiskSize);
                 Assert.AreEqual(masterBlockSize, o2.MasterBlockSize);
             }
         }
@@ -40,11 +37,9 @@ namespace VFSBaseTests
         {
             using (var m = new MemoryStream())
             {
-                const long size = 1001L;
                 const int masterBlockSize = 30000;
 
-                var o1 = TestHelper.CreateFileSystemOptions("", 0);
-                o1.DiskSize = size;
+                var o1 = TestHelper.CreateFileSystemOptions("");
                 o1.MasterBlockSize = masterBlockSize;
                 var b1 = o1.BlockAllocation;
                 Assert.AreEqual(2, b1.Allocate());
@@ -68,10 +63,8 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestMaximumFileSize()
         {
-            const long size = 1001L;
             const int masterBlockSize = 30000;
-            var o = TestHelper.CreateFileSystemOptions("", 0);
-            o.DiskSize = size;
+            var o = TestHelper.CreateFileSystemOptions("");
             o.MasterBlockSize = masterBlockSize;
             o.BlockSize = (int)MathUtil.KB(4);
             Assert.AreEqual(MathUtil.GB(1), o.MaximumFileSize);
@@ -87,14 +80,14 @@ namespace VFSBaseTests
         [TestMethod]
         public void TestSetInvlidBlockSize()
         {
-            var o = TestHelper.CreateFileSystemOptions("", 0);
+            var o = TestHelper.CreateFileSystemOptions("");
             o.BlockSize = (int)MathUtil.KB(1);
         }
 
         [TestMethod]
         public void TestStreamCodingStrategyInitialization()
         {
-            var o1 = TestHelper.CreateFileSystemOptions("", 0);
+            var o1 = TestHelper.CreateFileSystemOptions("");
 
             using (var ms = new MemoryStream())
             {
