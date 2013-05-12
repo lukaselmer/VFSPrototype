@@ -69,12 +69,15 @@ namespace VFSWCFService.Persistence
 
         private SQLiteConnection OpenDatabase()
         {
-            return new SQLiteConnection(_pathToDbFileToDbFile, SQLiteOpenFlags.ReadWrite);
+            return new SQLiteConnection(_pathToDbFileToDbFile, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex );
         }
 
         private SQLiteConnection CreateDatabase()
         {
-            return new SQLiteConnection(_pathToDbFileToDbFile);
+            var connection = new SQLiteConnection(_pathToDbFileToDbFile);
+            connection.Close();
+            connection.Dispose();
+            return OpenDatabase();
         }
 
 

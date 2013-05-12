@@ -165,8 +165,6 @@ namespace VFSBase.Persistence
             var toReplaceNr = toReplace == null ? 0 : toReplace.BlockNumber;
             var replacementNr = replacement == null ? 0 : replacement.BlockNumber;
 
-            //var newBlocksCount = toCopy.BlocksCount - (replacementNr == 0 ? -1 : 0);
-
             var newFolder = new Folder(toCopy.Name)
                                    {
                                        //BlocksCount = newBlocksCount,
@@ -178,7 +176,7 @@ namespace VFSBase.Persistence
 
             var b = new BlockList(newFolder, _blockAllocation, _options, _blockParser, _blockManipulator, _persistence);
 
-            // Improve this algorithm section! We don't have to copy everything, we only have to copy the blocks that are different.
+            // This algorithm section can be improved. We don't have to copy all references, we only have to copy the references that are different.
             foreach (var reference in AsEnumerable())
             {
                 var blockNumber = reference.BlockNumber == toReplaceNr ? replacementNr : reference.BlockNumber;
