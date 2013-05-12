@@ -5,18 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using VFSBrowser.Annotations;
 
 namespace VFSBrowser.ViewModel
 {
+    [UsedImplicitly]
     internal class ListItem : AbstractViewModel
     {
-        private string _name;
-        public string Name { get { return _name; } set { _name = value; OnPropertyChanged("Name"); } }
-        private bool _isDirectory;
-        public bool IsDirectory { get { return _isDirectory; } set { _isDirectory = value; OnPropertyChanged("IsDirectory"); } }
+        private readonly string _name;
+        public string Name { get { return _name; } }
+        private readonly bool _isDirectory;
+        public bool IsDirectory { get { return _isDirectory; }  }
 
         public string Path { get; set; }
 
+        // Used by the view
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode"), UsedImplicitly]
         public ImageSource Icon
         {
             get { return IsDirectory ? Folder : File; }

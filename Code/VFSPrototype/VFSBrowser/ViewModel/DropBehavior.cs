@@ -1,5 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 using System.Windows;
+using VFSBrowser.Annotations;
 
 namespace VFSBrowser.ViewModel
 {
@@ -26,6 +28,8 @@ namespace VFSBrowser.ViewModel
         /// </summary>
         public static void SetDropCommand(this UIElement uiElement, ICommand command)
         {
+            if (uiElement == null) throw new ArgumentNullException("uiElement");
+
             uiElement.SetValue(DropCommandProperty, command);
         }
 

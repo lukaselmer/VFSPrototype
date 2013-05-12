@@ -44,7 +44,7 @@ namespace VFSBrowser.ViewModel
         }
 
         private ICommand _okCommand;
-        public ICommand OkCommand { get { return _okCommand ?? (_okCommand = new Command(CloseDialog, p => (Text != ""))); } }
+        public ICommand OkCommand { get { return _okCommand ?? (_okCommand = new Command(CloseDialog, p => (!string.IsNullOrEmpty(Text)))); } }
 
         private void CloseDialog(object p)
         {

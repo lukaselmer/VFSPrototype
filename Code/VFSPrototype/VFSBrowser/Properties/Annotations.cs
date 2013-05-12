@@ -469,6 +469,9 @@ namespace VFSBrowser.Annotations
   public sealed class PublicAPIAttribute : Attribute
   {
     public PublicAPIAttribute() { }
+
+    //Generated code
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "comment")]
     public PublicAPIAttribute(string comment) { }
   }
 

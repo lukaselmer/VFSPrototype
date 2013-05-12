@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using VFSBase.Interfaces;
+using VFSBrowser.Annotations;
 using VFSBrowser.View;
 
 namespace VFSBrowser.ViewModel
@@ -70,6 +71,8 @@ namespace VFSBrowser.ViewModel
 
         public DiskInfoViewModel(IFileSystemTextManipulator manipulator)
         {
+            if (manipulator == null) throw new ArgumentNullException("manipulator");
+
             _manipulator = manipulator;
 
             _filePath = _manipulator.FileSystemOptions.Location;

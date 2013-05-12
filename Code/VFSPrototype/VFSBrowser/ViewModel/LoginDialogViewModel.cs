@@ -21,7 +21,12 @@ namespace VFSBrowser.ViewModel
         private string _login;
         private string _password;
 
+        // Used by the view
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public Command OkCommand { get; private set; }
+
+        // Used by the view
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         public string Login
         {
             get { return _login; }

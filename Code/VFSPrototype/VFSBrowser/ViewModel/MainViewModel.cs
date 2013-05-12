@@ -19,7 +19,8 @@ using MessageBox = System.Windows.MessageBox;
 
 namespace VFSBrowser.ViewModel
 {
-    [UsedImplicitly]
+    // This CA1506 is ok for the main view model
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling"), UsedImplicitly]
     internal sealed class MainViewModel : AbstractViewModel, IMainViewModel
     {
         private IFileSystemTextManipulator _manipulator;
@@ -51,6 +52,8 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         public DirectoryPath CurrentPath
         {
             get { return _currentPath; }
@@ -114,6 +117,7 @@ namespace VFSBrowser.ViewModel
 
         public ObservableCollection<ListItem> Items { get; set; }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
         public MainViewModel(IUnityContainer container)
         {
             _container = container;

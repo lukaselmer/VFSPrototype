@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using VFSBrowser.Annotations;
 using VFSBrowser.ViewModel;
 
 namespace VFSBrowser.View
@@ -23,6 +24,8 @@ namespace VFSBrowser.View
     {
         public InputDialog(InputViewModel viewModel)
         {
+            if (viewModel == null) throw new ArgumentNullException("viewModel");
+
             InitializeComponent();
             DataContext = viewModel;
             TextBox.Focus();
