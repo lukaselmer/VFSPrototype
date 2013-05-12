@@ -12,7 +12,19 @@ The VFSBase is the base of the file system. It implements the functionality to c
 
 
 
-% 
+% 1. The virtual disk must be stored in a single file in the working directory in the host file system.
+\subsubsection{Store data in single file}
+All the data is stored in a single file and in blocks. There are logical block numbers, which serve as pointers. All blocks are, once written, immutable to implement the file history.\\
+Classes: BlockManipulator, BlockAllocation\\
+Methods: BlockManipulator.WriteBlock BlockManipulator.ReadBlock, BlockAllocation.Allocate\\
+
+% 2. VFS must support the creation of a new disk with the specied maximum size at the specied location in the host le system.
+\subsubsection{Creation of new disk}
+The file system supports the creation of new disks at a specified location of the host file system. Because the disk size grows dynamically (elastic disk), no maximum size has to be specified\footnote{https://piazza.com/class\#spring2013/252028400l/26}.\\
+Classes: FileSystemFactory, FileSystemTextManipulatorFactory\\
+Methods: FileSystemTextManipulatorFactory.Create, FileSystemTextManipulatorFactory.Open, FileSystemFactory.Create, FileSystemFactory.Open\\
+
+% 3. VFS must support several virtual disks in the host le system.
 \subsubsection{TODO}
 TODO.\\
 Classes:\\
@@ -22,6 +34,152 @@ Methods:\\
 	\includegraphics[scale=1]{Images/todo.png} 
 	\caption{TODO}
 \end{figure}
+
+% 4. VFS must support disposing of the virtual disk.
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 5. VFS must support creating/deleting/renaming directories and les.
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 6. VFS must support navigation: listing of les and folders, and going to a location expressed by a concrete path.
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 7. VFS must support moving/copying directories and les, including hierarchy.
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 8. VFS must support importing les and directories from the host le system.
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 9. VFS must support exporting les and directories to the host le system.
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 10. VFS must support querying of free/occupied space in the virtual disk.
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 1. Compression, if implemented with 3d party library. (1p)
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 2. Encryption, if implemented with 3d party library. (1p)
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 3. Elastic disk: Virtual disk can dynamically grow or shrink, depending on its occupied space. (2p)
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 1. Compression, if implemented by hand (you can take a look at the arithmetic compression8). (2p)
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 2. Encryption, if implemented by hand. (3p)
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+% 3. Large data: This means, that VFS core can store & operate amount of data, that can't t to PC RAM ( typically, more than 4Gb). (3p)
+\subsubsection{TODO}
+TODO.\\
+Classes:\\
+Methods:\\
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/todo.png} 
+	\caption{TODO}
+\end{figure}
+
+
+
 
 % 
 \subsubsection{TODO}
