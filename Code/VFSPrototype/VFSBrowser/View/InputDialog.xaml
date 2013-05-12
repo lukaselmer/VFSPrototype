@@ -4,19 +4,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel" mc:Ignorable="d"
-        Title="InputDialog" MinHeight="100" MinWidth="309" Height="100" Width="309" d:DataContext="{d:DesignInstance viewModel:InputViewModel}">
+        Title="InputDialog" MinHeight="125" MinWidth="309" Height="125" Width="309" d:DataContext="{d:DesignInstance viewModel:InputViewModel}">
 
     <StackPanel>
         <Label Content="{Binding Path=Label, FallbackValue=Input}"></Label>
-        <TextBox Name="TextBox" Text="{Binding Text}" Margin="0 0 0 5">
-            <TextBox.InputBindings>
-                <KeyBinding Key="Enter" Command="{Binding Path=OkCommand}" />
-            </TextBox.InputBindings>
-        </TextBox>
+        <TextBox Name="TextBox" Text="{Binding Text}" Margin="0 0 0 5" />
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button IsDefault="True" Margin="5" Width="75" Name="OkButton" Command="{Binding Path=OkCommand}" Content="OK" />
-            <Button Margin="5" Width="75" IsCancel="True" Content="Cancel" />
-        </StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Button Padding="4" IsDefault="True" Name="OkButton" Command="{Binding Path=OkCommand}" Content="OK" />
+            <Button Padding="4" Grid.Column="2" IsCancel="True" Content="Cancel" />
+        </Grid>
     </StackPanel>
 </Window>

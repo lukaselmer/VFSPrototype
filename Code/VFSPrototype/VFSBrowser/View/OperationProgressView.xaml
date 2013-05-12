@@ -15,7 +15,7 @@
             </StackPanel>
             <ProgressBar Height="20" Value="{Binding CurrentlyProcessed}" Maximum="{Binding TotalToProcess}" />
             <Label HorizontalAlignment="Center" Margin="0 10 0 10">Operation in progress, please be patient...</Label>
-            <Button Command="{Binding AbortCommand}">Cancel</Button>
+            <Button Padding="4" Command="{Binding AbortCommand}">Cancel</Button>
         </StackPanel>
     </Grid>
 </Window>

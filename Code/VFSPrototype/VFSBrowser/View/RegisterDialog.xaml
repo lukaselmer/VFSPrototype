@@ -13,17 +13,18 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <Label Margin="3 5">Login</Label>
-        <TextBox Text="{Binding Login}" Margin="3 5" Grid.Column="1" />
+        <TextBox Text="{Binding Login}" Grid.Column="2" Margin="0 5" />
         
         <Label Margin="3 5" Grid.Row="1">Password</Label>
-        <PasswordBox Name="Secret" Margin="3 5" Grid.Row="1" Grid.Column="1" />
+        <PasswordBox Name="Secret" Grid.Row="1" Grid.Column="2" Margin="0 5" />
 
-        <Button Grid.Row="2" Grid.Column="0" Margin="3 5" Padding="4" Width="Auto" Content="Register" 
+        <Button Grid.Row="2" Grid.Column="0" Padding="4" Width="Auto" Content="Register" 
                     Command="{Binding OkCommand}" CommandParameter="{Binding ElementName=Secret}" IsDefault="True" />
-        <Button Grid.Row="2" Grid.Column="1" Margin="3 5" Padding="4" Width="Auto" IsCancel="True" Content="Cancel" />
+        <Button Grid.Row="2" Grid.Column="2" Padding="4" Width="Auto" IsCancel="True" Content="Cancel" />
     </Grid>
 </Window>
