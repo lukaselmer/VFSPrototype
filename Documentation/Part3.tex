@@ -16,17 +16,23 @@ Technically the server is implemented as a WCF \footnote{http://msdn.microsoft.c
 There are two forms for registration and login.\\
 Classes: MainViewModel, DiskServiceClient\\
 Commands: LoginCommand, LogoutCommand
+
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/registration.png}
-	\caption{Registration functionality}
-\end{figure}	
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{imageslukas/login.png} 
-	\caption{Login functionality}
-\end{figure}	
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/registration.png}
+		\caption{Registration functionality}
+	\end{subfigure}
 	
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/login.png} 
+		\caption{Login functionality}
+	\end{subfigure}
+	\caption{Registration and login}
+\end{figure}
+
 % 2. The browser should offer to switch to an offine mode, and be able to operate without a connection to the server.
 \subsubsection{Online / offline mode}
 The user can switch between online and offline mode.\\
@@ -34,7 +40,7 @@ Classes: MainViewModel, DiskServiceClient, SynchronizationViewModel, Synchroniza
 Commands: SwitchToOnlineModeCommand, SwitchToOfflineModeCommand
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/onlineofflinemode.png} 
+	\includegraphics[scale=1]{Images/onlineofflinemode.png} 
 	\caption{Online and offline switch}
 \end{figure}	
 
@@ -45,7 +51,7 @@ Classes: MainViewModel, DiskBrowserViewModel, DiskServiceClient\\
 Commands: LinkDiskCommand
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/todo.png} 
+	\includegraphics[scale=1]{Images/todo.png} 
 	\caption{Binding an existing virtual disk}
 \end{figure}	
 
@@ -55,7 +61,7 @@ The server provides a registration of unique user accounts. Each account include
 Classes: UserDto, DiskServiceImpl, PersistenceImpl
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/login_server.png} 
+	\includegraphics[scale=1]{Images/login_server.png} 
 	\caption{Code to persist and to find a user}
 \end{figure}
 
@@ -65,7 +71,7 @@ Classes: UserDto, DiskServiceImpl, PersistenceImpl
 Once a disk is bound to a server and the client is in online mode, the local changes are synchronized across the machines automatically. If remote changes occur, the client automatically downloads all changes from the server.
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.7]{imageslukas/synchronization_dialog.png} 
+	\includegraphics[scale=0.7]{Images/synchronization_dialog.png} 
 	\caption{The synchronization dialogue}
 \end{figure}
 
@@ -74,7 +80,7 @@ Once a disk is bound to a server and the client is in online mode, the local cha
 Because of the IoC pattern, mocked unit tests are fairly easy to implement. For example, in the VFSConsoleTests project, the FileSystemTextManipulatorMock mocks the FileSystemTextManipulator. Therefore the console can be tested without the FileSystemTextManipulator. Additionally, there are InOutMocks to mock the input / output.
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/inoutmocks.png} 
+	\includegraphics[scale=1]{Images/inoutmocks.png} 
 	\caption{The input / output mocks to test the console application}
 \end{figure}
 
@@ -84,12 +90,12 @@ There is an automatic conflict recognition so the user can resolve conflicts by 
 While the file system is conflicted, read operations are still possible. This way, the user can export a file he changed, roll back to a older version, synchronize the disk, and then import the file he changed again.
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/synchronization_conflict1.png}
+	\includegraphics[scale=1]{Images/synchronization_conflict1.png}
 	\caption{Conflict recognition}
 \end{figure}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.75]{imageslukas/synchronization_conflict2.png}
+	\includegraphics[scale=0.75]{Images/synchronization_conflict2.png}
 	\caption{Conflict resolution}
 \end{figure}
 
@@ -100,17 +106,17 @@ Classes: FileSystem, FileSystemTextManipulator, MainViewModel\\
 Events: FileSystemChanged
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/file_system_changed1.png} 
+	\includegraphics[scale=1]{Images/file_system_changed1.png} 
 	\caption{Automatic updates: the event implementation in the file system class}
 \end{figure}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/file_system_changed2.png} 
+	\includegraphics[scale=1]{Images/file_system_changed2.png} 
 	\caption{Automatic updates: the MainViewModel registers to updates when the file system is changed}
 \end{figure}
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/file_system_changed3.png} 
+	\includegraphics[scale=1]{Images/file_system_changed3.png} 
 	\caption{Automatic updates: Is executed when the file system is changed.}
 \end{figure}
 
@@ -122,7 +128,7 @@ For every new connection, a new IDiskService is instantiated. This allows multip
 Classes: IDiskService, DiskServiceImpl, ServiceContract
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{imageslukas/todo.png} 
+	\includegraphics[scale=1]{Images/todo.png} 
 	\caption{TODO}
 \end{figure}
 
@@ -133,12 +139,12 @@ For this, the DiskDto (persisted on the server) stores the NewestBlock which is 
 Classes: SynchronizationService
 \begin{figure}[h!]
 	\centering 
-	\includegraphics[scale=1]{imageslukas/do_synchronization.png} 
+	\includegraphics[scale=1]{Images/do_synchronization.png} 
 	\caption{Incremental changes: synchronize remote changes or local changes}
 \end{figure}
 \begin{figure}[h!]
 	\centering 
-	\includegraphics[scale=1]{imageslukas/incremental_changes.png}
+	\includegraphics[scale=1]{Images/incremental_changes.png}
 	\caption{Incremental changes: only synchronize blocks which have not been synchronized yet}
 \end{figure}
 
@@ -157,83 +163,25 @@ Classes: FileSystem, BlockList\\
 Methods: FileSystem.ArchiveAndReplaceRoot, BlockList.CopyReplacingReference
 
 \begin{figure}[h!]
-	\begin{subfigure}[b]{0.3\textheight}
+	\begin{subfigure}[b]{1\textwidth}
 		\centering
-		\includegraphics[scale=1]{imageslukas/history.png}
+		\includegraphics[scale=1]{Images/history.png}
 		\caption{The file history GUI}
 	\end{subfigure}
-	\\\\
-	\begin{subfigure}[b]{0.3\textheight}
+	
+	\begin{subfigure}[b]{1\textwidth}
 		\centering
-		\includegraphics[scale=0.5]{imageslukas/history_implementation.png}
+		\includegraphics[scale=0.5]{Images/history_implementation.png}
 		\caption{The file history implementation (FileSystem)}
 	\end{subfigure}
-	\\\\
-	\begin{subfigure}[b]{0.3\textheight}
+	
+	\begin{subfigure}[b]{1\textwidth}
 		\centering
-		\includegraphics[scale=0.5]{imageslukas/history_copy_replacing_reference.png}
+		\includegraphics[scale=0.5]{Images/history_copy_replacing_reference.png}
 		\caption{The file history implementation (BlockList.CopyReplacingReference)}
 	\end{subfigure}
 	\caption{File history}
 \end{figure}
-
-	
-\begin{figure}
-        \centering
-        \begin{subfigure}[b]{0.3\textwidth}
-                \centering
-	\includegraphics[scale=1]{imageslukas/history.png}
-                \caption{A gull}
-                \label{fig:gull}
-        \end{subfigure}%
-        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-          %(or a blank line to force the subfigure onto a new line)
-        \begin{subfigure}[b]{0.3\textwidth}
-                \centering
-	\includegraphics[scale=1]{imageslukas/history.png}
-                \caption{A tiger}
-                \label{fig:tiger}
-        \end{subfigure}
-        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
-          %(or a blank line to force the subfigure onto a new line)
-        \begin{subfigure}[b]{0.3\textwidth}
-                \centering
-	\includegraphics[scale=1]{imageslukas/history.png}
-                \caption{A mouse}
-                \label{fig:mouse}
-        \end{subfigure}
-        \caption{Pictures of animals}\label{fig:animals}
-\end{figure}
-
-
-
-
-% 
-\subsubsection{TODO}
-TODO.
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{imageslukas/todo.png} 
-	\caption{TODO}
-\end{figure}
-
-% 
-\subsubsection{TODO}
-TODO.
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{imageslukas/todo.png} 
-	\caption{TODO}
-\end{figure}
-
-
-
-
-
-
-
-
-
 
 
 \subsection{Design}
@@ -244,8 +192,25 @@ TODO.
 
 \subsection{Integration}
 
-% TODO: Remove this text and replace it with actual content
-\emph{If you had to change the design or API of the previous part, describe the changes and the reasons for each change here.}
+% If you had to change the design or API of the previous part, describe the changes and the reasons for each change here.
 
+Most of the existing design / API did not change, but it had to be enhanced for the server synchronization part. Especially, the FileSystemManipulator and the FileSystem now had to be thread safe, because the synchronization can run in the background.\\
+
+Additionally, some existing functionality was replaced / dropped because of the history functionality and the immutable blocks. For example, the free memory command is not necessary because with the history, there is no scenario where memory is freed.\\
+
+One very good thing were the tests. They only changed very little since they were written, and they provided immediate feedback, if something went wrong during a refactoring or by enhancing the system. The also run very fast and are run parallel by the Visual Studio 2012.
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
