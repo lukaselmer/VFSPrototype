@@ -23,6 +23,8 @@ namespace VFSWCFContracts.DataTransferObjects
         [DataMember]
         public int MasterBlockSize { get; set; }
 
+        // This message is not relevant for DataContracts / DataMembers and the WCF service
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1819:PropertiesShouldNotReturnArrays")]
         [DataMember]
         public byte[] SerializedFileSystemOptions { get; set; }
     }

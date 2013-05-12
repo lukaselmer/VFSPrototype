@@ -72,7 +72,7 @@ namespace VFSBrowser.ViewModel
         {
             _manipulator = manipulator;
 
-            FilePath = _manipulator.FileSystemOptions.Location;
+            _filePath = _manipulator.FileSystemOptions.Location;
             FreeDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskFree);
             FreeDiskSpaceGb = String.Format("{0:0,0.000} GB", _manipulator.FileSystemOptions.DiskFree / 1024.0 / 1024.0 / 1024.0);
             OccupiedDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskOccupied);

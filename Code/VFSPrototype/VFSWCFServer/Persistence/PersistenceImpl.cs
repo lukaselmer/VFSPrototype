@@ -74,9 +74,7 @@ namespace VFSWCFService.Persistence
 
         private SQLiteConnection CreateDatabase()
         {
-            var connection = new SQLiteConnection(_pathToDbFileToDbFile);
-            connection.Close();
-            connection.Dispose();
+            new SQLiteConnection(_pathToDbFileToDbFile).Dispose();
             return OpenDatabase();
         }
 

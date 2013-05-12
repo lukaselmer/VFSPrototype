@@ -37,8 +37,8 @@ namespace VFSBrowser.ViewModel
         public NewVFSViewModel()
         {
             OkCommand = new Command(Ok, p => true);
-            CompressionType = StreamCompressionType.None;
-            EncryptionType = StreamEncryptionType.None;
+            _compressionType = StreamCompressionType.None;
+            _encryptionType = StreamEncryptionType.None;
         }
 
         private void Ok(object parameter)
