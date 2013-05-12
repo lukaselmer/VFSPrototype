@@ -867,6 +867,7 @@ namespace VFSBrowser.ViewModel
             if (!disposing) return;
 
             // free managed resources
+            if (_manipulator != null) _manipulator.Dispose();
 
             DisposeManipulator();
         }

@@ -71,11 +71,7 @@ namespace VFSBrowser.ViewModel
         public DiskInfoViewModel(IFileSystemTextManipulator manipulator)
         {
             _manipulator = manipulator;
-            FillValues();
-        }
 
-        private void FillValues()
-        {
             FilePath = _manipulator.FileSystemOptions.Location;
             FreeDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskFree);
             FreeDiskSpaceGb = String.Format("{0:0,0.000} GB", _manipulator.FileSystemOptions.DiskFree / 1024.0 / 1024.0 / 1024.0);
