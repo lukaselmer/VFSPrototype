@@ -130,6 +130,8 @@ namespace VFSConsoleTests
             throw new NotImplementedException();
         }
 
+        public event EventHandler<FileSystemChangedEventArgs> FileSystemChanged;
+
         public void Dispose()
         {
         }

@@ -2,7 +2,7 @@
 
 namespace VFSBase.Interfaces
 {
-    internal class FileSystemChangedEventArgs : EventArgs
+    public class FileSystemChangedEventArgs : EventArgs
     {
     }
 }

@@ -350,6 +350,12 @@ namespace VFSBase.Implementation
             }
         }
 
+        public event EventHandler<FileSystemChangedEventArgs> FileSystemChanged
+        {
+            add { _manipulator.FileSystemChanged += value; }
+            remove { _manipulator.FileSystemChanged -= value; }
+        }
+
         public void Dispose()
         {
             Dispose(true);

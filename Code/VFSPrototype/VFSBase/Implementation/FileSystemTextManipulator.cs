@@ -302,5 +302,11 @@ namespace VFSBase.Implementation
         {
             return new SynchronizationService(_fileSystem, user, callbacks);
         }
+
+        public event EventHandler<FileSystemChangedEventArgs> FileSystemChanged
+        {
+            add { _fileSystem.FileSystemChanged += value; }
+            remove { _fileSystem.FileSystemChanged -= value; }
+        }
     }
 }

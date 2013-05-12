@@ -16,7 +16,6 @@ using VFSBrowser.Annotations;
 using VFSBrowser.Helpers;
 using DataFormats = System.Windows.DataFormats;
 using MessageBox = System.Windows.MessageBox;
-using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace VFSBrowser.ViewModel
 {
@@ -51,6 +50,7 @@ namespace VFSBrowser.ViewModel
                 {
                     try
                     {
+                        // Loop until directory exists
                         while (!_manipulator.Exists(newValue.DisplayPath) || !_manipulator.IsDirectory(newValue.DisplayPath)) newValue.SwitchToParent();
 
                         Items.Clear();
@@ -187,7 +187,7 @@ namespace VFSBrowser.ViewModel
 
         private void SwitchToLatestVersion(object parameter)
         {
-            SwitchVersion(LatestVersion);
+            SwitchVersion(_manipulator.LatestVersion);
         }
 
         private void SwitchToVersion(object parameter)
@@ -636,10 +636,17 @@ namespace VFSBrowser.ViewModel
             SwitchToLatestVersion(null);
 
             // Close last vfs
+            _manipulator.FileSystemChanged -= FileSystemChanged;
             DisposeManipulator();
             _manipulator = null;
             Items.Clear();
             OnPropertyChanged("FileSystemName");
+        }
+
+        private void FileSystemChanged(object sender, FileSystemChangedEventArgs e)
+        {
+            ViewModelHelper.InvokeOnGuiThread(() => SwitchToLatestVersion(null));
+            ViewModelHelper.InvokeOnGuiThread(RefreshCurrentDirectory);
         }
 
         private void NewVfs(object parameter)
@@ -657,6 +664,7 @@ namespace VFSBrowser.ViewModel
             {
                 var fileSystemData = new FileSystemOptions(pathToVFS, vm.MaximumSize, vm.EncryptionType, vm.CompressionType);
                 _manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().CreateFileSystemTextManipulator(fileSystemData, vm.Password);
+                _manipulator.FileSystemChanged += FileSystemChanged;
                 CurrentPath = new DirectoryPath();
                 OnPropertyChanged("FileSystemName");
             }
@@ -688,7 +696,10 @@ namespace VFSBrowser.ViewModel
                 // Close last vfs
                 DisposeManipulator();
 
+                if (_manipulator != null) _manipulator.FileSystemChanged -= FileSystemChanged;
                 _manipulator = manipulator;
+                _manipulator.FileSystemChanged += FileSystemChanged;
+
                 CurrentPath = new DirectoryPath();
                 OnPropertyChanged("FileSystemName");
             }

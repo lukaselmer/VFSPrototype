@@ -36,5 +36,10 @@ namespace VFSBase.Interfaces
         long LatestVersion { get; }
 
         ISynchronizationService GenerateSynchronizationService(UserDto user, SynchronizationCallbacks callbacks);
+
+        /// <summary>
+        /// Occurs when the file system has changed.
+        /// </summary>
+        event EventHandler<FileSystemChangedEventArgs> FileSystemChanged;
     }
 }
