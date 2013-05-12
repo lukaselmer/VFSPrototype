@@ -32,8 +32,8 @@ namespace VFSBrowser.ViewModel
 
         public InputViewModel(string label, string text)
         {
-            Label = label;
-            Text = text;
+            _label = label;
+            _text = text;
         }
 
         private InputDialog _dlg;

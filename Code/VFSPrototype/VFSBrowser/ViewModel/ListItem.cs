@@ -41,9 +41,9 @@ namespace VFSBrowser.ViewModel
 
         public ListItem(string path, string name, bool isDirectory)
         {
-            IsDirectory = isDirectory;
+            _isDirectory = isDirectory;
             Path = path;
-            Name = name;
+            _name = name;
         }
 
         public override bool Equals(object other)

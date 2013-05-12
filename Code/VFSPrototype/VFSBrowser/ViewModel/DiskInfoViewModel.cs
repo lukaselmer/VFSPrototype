@@ -73,10 +73,10 @@ namespace VFSBrowser.ViewModel
             _manipulator = manipulator;
 
             _filePath = _manipulator.FileSystemOptions.Location;
-            FreeDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskFree);
-            FreeDiskSpaceGb = String.Format("{0:0,0.000} GB", _manipulator.FileSystemOptions.DiskFree / 1024.0 / 1024.0 / 1024.0);
-            OccupiedDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskOccupied);
-            OccupiedDiskSpaceGb = String.Format("{0:0,0.000} GB", _manipulator.FileSystemOptions.DiskOccupied / 1024.0 / 1024.0 / 1024.0);
+            _freeDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskFree);
+            _freeDiskSpaceGb = String.Format("{0:0,0.000} GB", _manipulator.FileSystemOptions.DiskFree / 1024.0 / 1024.0 / 1024.0);
+            _occupiedDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskOccupied);
+            _occupiedDiskSpaceGb = String.Format("{0:0,0.000} GB", _manipulator.FileSystemOptions.DiskOccupied / 1024.0 / 1024.0 / 1024.0);
         }
 
         private DiskInfoDialog _dlg;
