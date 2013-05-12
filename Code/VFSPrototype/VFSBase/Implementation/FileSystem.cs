@@ -154,6 +154,14 @@ namespace VFSBase.Implementation
             }
         }
 
+        public void RollBackToVersion(long version)
+        {
+            SwitchToVersion(version);
+            LatestRoot = Root;
+            _options.RootBlockNr = Root.BlockNumber;
+            WriteConfig();
+        }
+
         private long NextVersion
         {
             get { return Root.Version + 1; }

@@ -81,6 +81,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <xctk:DoubleUpDown Grid.Column="0" Watermark="Enter Version" Value="{Binding Path=VersionInput}" Minimum="0" Maximum="{Binding LatestVersion}">
@@ -88,10 +89,13 @@
                     <KeyBinding Key="Enter" Command="{Binding SwitchToVersionCommand}" />
                 </xctk:DoubleUpDown.InputBindings>
             </xctk:DoubleUpDown>
-            <Button Grid.Column="1" Padding="4" Margin="5 0 0 0" Command="{Binding SwitchToVersionCommand}">
-                Switch to this version (read only)
+            <Button Grid.Column="1" Padding="4" Margin="5 0 0 0" Command="{Binding SwitchToVersionCommand}" ToolTip="Read only">
+                Switch to this version
             </Button>
-            <Button Grid.Column="2" Padding="4" Margin="5 0 0 0" Command="{Binding SwitchToLatestVersionCommand}">
+            <Button Grid.Column="2" Padding="4" Margin="5 0 0 0" Command="{Binding RollBackToVersionCommand}" ToolTip="Loose all changes!">
+                Roll back to this version
+            </Button>
+            <Button Grid.Column="3" Padding="4" Margin="5 0 0 0" Command="{Binding SwitchToLatestVersionCommand}">
                 Switch to latest version
             </Button>
         </Grid>

@@ -115,6 +115,11 @@ namespace VFSConsoleTests
             throw new NotImplementedException();
         }
 
+        public void RollBackToVersion(long version)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<long> Versions(string path)
         {
             throw new NotImplementedException();

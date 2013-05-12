@@ -258,6 +258,11 @@ namespace VFSBase.Implementation
             return FindNode(path).Version;
         }
 
+        public void RollBackToVersion(long version)
+        {
+            _fileSystem.RollBackToVersion(version);
+        }
+
         public IEnumerable<long> Versions(string path)
         {
             ISet<long> versions = new HashSet<long>();

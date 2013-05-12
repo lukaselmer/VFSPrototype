@@ -125,6 +125,7 @@ namespace VFSBrowser.ViewModel
             CancelSearchCommand = new Command(CancelSearch, p => (_manipulator != null));
             DiskInfoCommand = new Command(DiskInfo, p => (_manipulator != null));
             SwitchToVersionCommand = new Command(SwitchToVersion, p => (_manipulator != null));
+            RollBackToVersionCommand = new Command(RollBackToVersion, p => (_manipulator != null));
             SwitchToLatestVersionCommand = new Command(SwitchToLatestVersion, p => (_manipulator != null));
 
             LoginCommand = new Command(Login, p => (_user == null));
@@ -159,6 +160,7 @@ namespace VFSBrowser.ViewModel
         public Command CancelSearchCommand { get; private set; }
         public Command DiskInfoCommand { get; private set; }
         public Command SwitchToVersionCommand { get; private set; }
+        public Command RollBackToVersionCommand { get; private set; }
         public Command SwitchToLatestVersionCommand { get; private set; }
 
         public Command LoginCommand { get; private set; }
@@ -192,6 +194,16 @@ namespace VFSBrowser.ViewModel
 
         private void SwitchToVersion(object parameter)
         {
+            SwitchVersion(VersionInput);
+        }
+
+        private void RollBackToVersion(object parameter)
+        {
+            var res = MessageBox.Show("You loose all changes if you do this. Are you shure you would like to continue?",
+                            string.Format("Roll back to version {0}", VersionInput), MessageBoxButton.YesNo);
+            if (res != MessageBoxResult.Yes) return;
+
+            _manipulator.RollBackToVersion(VersionInput);
             SwitchVersion(VersionInput);
         }
 

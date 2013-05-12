@@ -307,6 +307,19 @@ namespace VFSBase.Implementation
             }
         }
 
+        public void RollBackToVersion(long version)
+        {
+            _lock.EnterUpgradeableReadLock();
+            try
+            {
+                _manipulator.RollBackToVersion(version);
+            }
+            finally
+            {
+                _lock.ExitUpgradeableReadLock();
+            }
+        }
+
         public IEnumerable<long> Versions(string path)
         {
             _lock.EnterUpgradeableReadLock();

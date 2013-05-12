@@ -390,5 +390,42 @@ namespace VFSBaseTests
                 Assert.AreEqual(16384L, m.FileSystemOptions.DiskOccupied);
             }
         }
+
+
+        [TestMethod]
+        public void TestRollback()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                var version = m.LatestVersion;
+                m.CreateFolder("test");
+                Assert.IsTrue(m.Exists("test"));
+                Assert.AreNotEqual(version, m.LatestVersion);
+
+                m.RollBackToVersion(version);
+                Assert.AreEqual(m.LatestVersion, version);
+            }
+        }
+
+        [ExpectedException(typeof(VFSException))]
+        [TestMethod]
+        public void TestInvalidRollback1()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                m.RollBackToVersion(-1);
+            }
+        }
+
+        [ExpectedException(typeof(VFSException))]
+        [TestMethod]
+        public void TestInvalidRollback2()
+        {
+            using (var m = InitTestFileSystemManipulator())
+            {
+                var version = m.LatestVersion;
+                m.RollBackToVersion(version + 1);
+            }
+        }
     }
 }

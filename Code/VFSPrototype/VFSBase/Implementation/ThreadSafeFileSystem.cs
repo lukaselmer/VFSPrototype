@@ -11,165 +11,165 @@ namespace VFSBase.Implementation
 {
     class ThreadSafeFileSystem : IFileSystem
     {
-        private FileSystem o;
-        private ReaderWriterLockSlim l;
+        private readonly FileSystem _fileSystem;
+        private readonly ReaderWriterLockSlim _lock;
 
         internal ThreadSafeFileSystem(FileSystemOptions options)
         {
-            o = new FileSystem(options);
-            l = o.GetReadWriteLock();
+            _fileSystem = new FileSystem(options);
+            _lock = _fileSystem.GetReadWriteLock();
         }
 
         public IEnumerable<IIndexNode> List(Folder folder)
         {
-            l.EnterUpgradeableReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
-                return o.List(folder).ToList();
+                return _fileSystem.List(folder).ToList();
             }
             finally
             {
-                l.ExitUpgradeableReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
         public IEnumerable<Folder> Folders(Folder folder)
         {
-            l.EnterUpgradeableReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
-                return o.Folders(folder).ToList();
+                return _fileSystem.Folders(folder).ToList();
             }
             finally
             {
-                l.ExitUpgradeableReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
         public IEnumerable<VFSFile> Files(Folder folder)
         {
-            l.EnterUpgradeableReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
-                return o.Files(folder).ToList();
+                return _fileSystem.Files(folder).ToList();
             }
             finally
             {
-                l.ExitUpgradeableReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
         public bool Exists(Folder folder, string name)
         {
-            l.EnterUpgradeableReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
-                return o.Exists(folder, name);
+                return _fileSystem.Exists(folder, name);
             }
             finally
             {
-                l.ExitUpgradeableReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
         public IIndexNode Find(Folder folder, string name)
         {
-            l.EnterUpgradeableReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
-                return o.Find(folder, name);
+                return _fileSystem.Find(folder, name);
             }
             finally
             {
-                l.ExitUpgradeableReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
         public Folder CreateFolder(Folder parentFolder, string name)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                return o.CreateFolder(parentFolder, name);
+                return _fileSystem.CreateFolder(parentFolder, name);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public void Import(string source, Folder destination, string name, CallbacksBase importCallbacks)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.Import(source, destination, name, importCallbacks);
+                _fileSystem.Import(source, destination, name, importCallbacks);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public void Export(IIndexNode source, string destination, CallbacksBase exportCallbacks)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.Export(source, destination, exportCallbacks);
+                _fileSystem.Export(source, destination, exportCallbacks);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public void Copy(IIndexNode nodeToCopy, Folder destination, string nameOfCopiedElement, CallbacksBase copyCallbacks)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.Copy(nodeToCopy, destination, nameOfCopiedElement, copyCallbacks);
+                _fileSystem.Copy(nodeToCopy, destination, nameOfCopiedElement, copyCallbacks);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public void Delete(IIndexNode node)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.Delete(node);
+                _fileSystem.Delete(node);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public Folder Root
         {
-            get { return o.Root; }
+            get { return _fileSystem.Root; }
         }
 
         public FileSystemOptions FileSystemOptions
         {
-            get { return o.FileSystemOptions; }
+            get { return _fileSystem.FileSystemOptions; }
         }
 
         public void TestEncryptionKey()
         {
-            l.EnterUpgradeableReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
-                o.TestEncryptionKey();
+                _fileSystem.TestEncryptionKey();
             }
             finally
             {
-                l.ExitUpgradeableReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
@@ -177,14 +177,14 @@ namespace VFSBase.Implementation
         {
             get
             {
-                l.EnterUpgradeableReadLock();
+                _lock.EnterUpgradeableReadLock();
                 try
                 {
-                    return o.CurrentVersion;
+                    return _fileSystem.CurrentVersion;
                 }
                 finally
                 {
-                    l.ExitUpgradeableReadLock();
+                    _lock.ExitUpgradeableReadLock();
                 }
             }
         }
@@ -193,159 +193,172 @@ namespace VFSBase.Implementation
         {
             get
             {
-                l.EnterUpgradeableReadLock();
+                _lock.EnterUpgradeableReadLock();
                 try
                 {
-                    return o.LatestVersion;
+                    return _fileSystem.LatestVersion;
                 }
                 finally
                 {
-                    l.ExitUpgradeableReadLock();
+                    _lock.ExitUpgradeableReadLock();
                 }
             }
         }
 
         public void SwitchToLatestVersion()
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.SwitchToLatestVersion();
+                _fileSystem.SwitchToLatestVersion();
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public void SwitchToVersion(long version)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.SwitchToVersion(version);
+                _fileSystem.SwitchToVersion(version);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
+            }
+        }
+
+        public void RollBackToVersion(long version)
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                _fileSystem.RollBackToVersion(version);
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
             }
         }
 
         public ReaderWriterLockSlim GetReadWriteLock()
         {
-            return l;
+            return _lock;
         }
 
         public bool IsSynchronizedDisk
         {
             get
             {
-                l.EnterUpgradeableReadLock();
+                _lock.EnterUpgradeableReadLock();
                 try
                 {
-                    return o.IsSynchronizedDisk;
+                    return _fileSystem.IsSynchronizedDisk;
                 }
                 finally
                 {
-                    l.ExitUpgradeableReadLock();
+                    _lock.ExitUpgradeableReadLock();
                 }
             }
         }
 
         public void MakeSynchronizedDisk(int id)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.MakeSynchronizedDisk(id);
+                _fileSystem.MakeSynchronizedDisk(id);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public byte[] ReadBlock(long blockNumber)
         {
-            l.EnterUpgradeableReadLock();
+            _lock.EnterUpgradeableReadLock();
             try
             {
-                return o.ReadBlock(blockNumber);
+                return _fileSystem.ReadBlock(blockNumber);
             }
             finally
             {
-                l.ExitUpgradeableReadLock();
+                _lock.ExitUpgradeableReadLock();
             }
         }
 
         public void WriteBlock(long blockNumber, byte[] block)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.WriteBlock(blockNumber, block);
+                _fileSystem.WriteBlock(blockNumber, block);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public void WriteFileSystemOptions(byte[] serializedFileSystemOptions)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.WriteFileSystemOptions(serializedFileSystemOptions);
+                _fileSystem.WriteFileSystemOptions(serializedFileSystemOptions);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public void WriteConfig()
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.WriteConfig();
+                _fileSystem.WriteConfig();
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public void Reload(FileSystemOptions newOptions)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.Reload(newOptions);
+                _fileSystem.Reload(newOptions);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
         public event EventHandler<FileSystemChangedEventArgs> FileSystemChanged
         {
-            add { o.FileSystemChanged += value; }
-            remove { o.FileSystemChanged -= value; }
+            add { _fileSystem.FileSystemChanged += value; }
+            remove { _fileSystem.FileSystemChanged -= value; }
         }
 
         public void OnFileSystemChanged(object sender, FileSystemChangedEventArgs e)
         {
-            l.EnterWriteLock();
+            _lock.EnterWriteLock();
             try
             {
-                o.OnFileSystemChanged(sender, e);
+                _fileSystem.OnFileSystemChanged(sender, e);
             }
             finally
             {
-                l.ExitWriteLock();
+                _lock.ExitWriteLock();
             }
         }
 
@@ -359,7 +372,7 @@ namespace VFSBase.Implementation
         {
             if (!disposing) return;
 
-            o.Dispose();
+            _fileSystem.Dispose();
         }
     }
 }

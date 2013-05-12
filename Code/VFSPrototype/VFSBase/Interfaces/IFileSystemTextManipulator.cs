@@ -32,6 +32,7 @@ namespace VFSBase.Interfaces
         long Version(string path);
         void SwitchToVersion(long version);
         void SwitchToLatestVersion();
+        void RollBackToVersion(long version);
         IEnumerable<long> Versions(string path);
         long LatestVersion { get; }
 
@@ -41,5 +42,6 @@ namespace VFSBase.Interfaces
         /// Occurs when the file system has changed.
         /// </summary>
         event EventHandler<FileSystemChangedEventArgs> FileSystemChanged;
+
     }
 }

@@ -134,12 +134,10 @@ namespace VFSBase.Interfaces
         void SwitchToVersion(long version);
 
         /// <summary>
-        /// Shifts all the blocks from version fromVersion (excluding fromVersion) by offset.
-        /// This method is used to free space after a specific version (i.e. the server version before synchronization)
+        /// Rolls the back to a specific version.
         /// </summary>
-        /// <param name="fromVersion">From version.</param>
-        /// <param name="offset">The offset.</param>
-        //void ShiftBlocks(long fromVersion, long offset);
+        /// <param name="version">The version.</param>
+        void RollBackToVersion(long version);
 
         /// <summary>
         /// Returns the mutex for the file system. This allows to lock the file system and thus allow parallel usage of the file system.
@@ -188,7 +186,7 @@ namespace VFSBase.Interfaces
         /// <summary>
         /// Reloads the file system with the specified options.
         /// </summary>
-        /// <param name="newOptions">The options.</param>
+        /// <param name="options">The options.</param>
         void Reload(FileSystemOptions options);
 
         /// <summary>
@@ -196,6 +194,12 @@ namespace VFSBase.Interfaces
         /// </summary>
         event EventHandler<FileSystemChangedEventArgs> FileSystemChanged;
 
+        /// <summary>
+        /// Called when the file system has changed.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="FileSystemChangedEventArgs"/> instance containing the event data.</param>
         void OnFileSystemChanged(object sender, FileSystemChangedEventArgs e);
+
     }
 }
