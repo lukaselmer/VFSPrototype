@@ -1,13 +1,9 @@
 \documentclass[JCDReport.tex]{subfiles} 
 \begin{document}
 
+The synchronization server propagates changes from one machine to another using a network connection. The management of the distributed VFSs is made on an account basis, i.e. in order to use the server, a user must have an account and link a virtual disk to this account. Therefore the server allows user to register and login after successful registration. Once the user enters the online mode (see GUI part) the currently open disk is synchronized to the server automatically. After initial synchronization, every synchronized disk gets a unique ID, so the disk can be identified. A user can have multiple disks, while a disk belongs to a single user. Unlinked disks are not synchronized. There is an automatic conflict recognition so the user can resolve conflicts by rolling back to a specific version, which is not conflicted, and then restart the synchronization again.\\
 
-% TODO: Remove this line
-\textbf{[This section has to be completed by May 13th.]}
-
-%TODO: Remove this text and replace it with actual content
-\emph{Give a short (1-2 paragraphs) description of what VFS Browser is.}
-
+Technically the server is implemented as a WCF \footnote{http://msdn.microsoft.com/en-us/library/dd456779.aspx} service  and it allows multiple parallel connections. A an optional requirement, automatic persistence was implemented using SQLite. The usage of SQLite for this optional requirement was allowed by Alexey Kolesnichenko \footnote{https://piazza.com/class\#spring2013/252028400l/41}.\\
 
 \subsection{Requirements}
 
