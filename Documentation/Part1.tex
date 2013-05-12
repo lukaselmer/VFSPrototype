@@ -12,9 +12,12 @@ The VFSBase is the base of the file system. It implements the functionality to c
 
 \subsubsection{Introduction: About the FileSystem and the FileSystemTextManipulator}
 Most of the features discussed in this section are about the FileSystem and the FileSystemTextManipulator. The first question might be: the FileSystem and the FileSystemTextManipulator are very similar and provide nearly the same interface, why are the separate? The answer to this question is: separation of concerns and encapsulation.\\
-The FileSystemTextManipulator provides a beautiful interface which is easy to use and to understand. It wraps the FileSystem and abstracts away certain tasks, like converting a given path to an object to the object itself (e.g. it converts "/a/b/c" to the directory object "c"). Also, using the FileSystemTextManipulator, only a certain part of the actual file system is extracted. This way, the file system can handle more files then the RAM size of the current client is. Also, the FileSystemTextManipulator uses some structures only known to the VFSBase assembly, and it encapsulates all the internal objects by only returning values that should be available publicly.\\
+The FileSystemTextManipulator provides a \textit{beautiful} interface which is easy to use and to understand. It wraps the FileSystem and abstracts away certain tasks, like converting a given path to an object to the object itself (e.g. it converts "/a/b/c" to the directory object "c"). Also, using the FileSystemTextManipulator, only a certain part of the actual file system is extracted. This way, the file system can handle more files then the RAM size of the current client is. Also, the FileSystemTextManipulator uses some structures only known to the VFSBase assembly, and it encapsulates all the internal objects by only returning values that should be available publicly.\\
+
 The FileSystem is the core of the file system functionality. It implements all the internal structure to store the files and folders to the disk.\\
-Finally, there are the ThreadSafeFileSystem and the ThreadSafeFileSystemTextManipulator classes. They also originate from the separation of concerns design principle and provide a thread safe implementation of the FileSystem and the FileSystemTextManipulator respectively. The thread safety is guaranteed through a ReaderWriterLock\footnote{http://msdn.microsoft.com/en-us/library/system.threading.readerwriterlockslim.aspx}, which allows multiple concurrent reads, and exclusive writes.
+Finally, there are the ThreadSafeFileSystem and the ThreadSafeFileSystemTextManipulator classes. They also originate from the separation of concerns design principle and provide a thread safe implementation of the FileSystem and the FileSystemTextManipulator respectively. The thread safety is guaranteed through a ReaderWriterLock\footnote{http://msdn.microsoft.com/en-us/library/system.threading.readerwriterlockslim.aspx}, which allows multiple concurrent reads, and exclusive writes.\\
+
+In this section, if the referenced classes are FileSystem and FileSystemTextManipulator, then of course the ThreadSafeFileSystemTextManipulator and the ThreadSafeFileSystem are relevant too. Furthermore, if there is a method FileSystem.\textit{SomeMethod} in the referenced methods, then the Methods ThreadSafeFileSystem.SomeMethod FileSystemTextManipulator.SomeMethod ThreadSafeFileSystemTextManipulator.SomeMethod are not mentioned, but of course, they are relevant too.
 
 % 1. The virtual disk must be stored in a single file in the working directory in the host file system.
 \subsubsection{Store data in single file}
@@ -56,37 +59,22 @@ The files and directories can be copied. Because of the history implementation, 
 Classes: FileSystem, FileSystemTextManipulator\\
 Methods: FileSystem.Move, FileSystem.Copy
 
-% 8. VFS must support importing les and directories from the host le system.
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
-
-% 9. VFS must support exporting les and directories to the host le system.
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+% 8. VFS must support importing files and directories from the host file system.
+% 9. VFS must support exporting files and directories to the host le system.
+\subsubsection{Import and export}
+The VFS supports importing and exporting files and directories from and to the host system respectively. Of course, the import and export functionality is recursive for directories.\\
+Classes: FileSystem, FileSystemTextManipulator\\
+Methods: FileSystem.Import, FileSystem.Export\\
 
 % 10. VFS must support querying of free/occupied space in the virtual disk.
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
+\subsubsection{Querying of free and occupied space}
+The file system allows to query for free and occupied space. The free space corresponds to the free space on the host file system. In the GUI, the view to the free and occupied space can be found in the main menu under "Info"/"Disk Info".\\
+Classes: FileSystemOptions\\
+Methods: FileSystemOptions.DiskOccupied, FileSystemOptions.DiskFree\\
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
+	\includegraphics[scale=1]{Images/free_and_occupied_space.png} 
+	\caption{Free and occupied space}
 \end{figure}
 
 % 1. Compression, if implemented with 3d party library. (1p)
