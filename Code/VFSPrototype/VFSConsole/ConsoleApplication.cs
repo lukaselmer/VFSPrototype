@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using VFSBase.Callbacks;
 using VFSBase.Exceptions;
+using VFSBase.Implementation;
 using VFSBase.Interfaces;
 
 namespace VFSConsole
@@ -22,11 +23,9 @@ namespace VFSConsole
         private readonly Action<bool> _operationCompleted;
         private readonly Action<int> _totalToProcessChanged;
 
-        internal ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemTextManipulator fileSystemTextManipulator)
+        public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, FileSystemOptions options, IFileSystemTextManipulatorFactory factory)
         {
-            if (fileSystemTextManipulator == null) throw new ArgumentNullException("fileSystemTextManipulator", "fileSystem must not be null.");
-
-            _fileSystemTextManipulator = fileSystemTextManipulator;
+            _fileSystemTextManipulator = factory.Create(options, "");
 
             _textReader = consoleApplicationSettings.Reader;
             _textWriter = consoleApplicationSettings.Writer;

@@ -358,7 +358,7 @@ namespace VFSBrowser.ViewModel
                 var selectedLocation = viewModel.SelectedLocation;
                 var diskOptions = _diskService.GetDiskOptions(_user, selectedDisk);
 
-                _container.Resolve<IFileSystemTextManipulatorFactory>().LinkFileSystemTextManipulator(diskOptions, selectedLocation);
+                _container.Resolve<IFileSystemTextManipulatorFactory>().Link(diskOptions, selectedLocation);
                 OpenVfsWithPassword(selectedLocation);
             }
             catch (Exception ex)
@@ -712,7 +712,7 @@ namespace VFSBrowser.ViewModel
             try
             {
                 var fileSystemData = new FileSystemOptions(pathToVFS, vm.EncryptionType, vm.CompressionType);
-                _manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().CreateFileSystemTextManipulator(fileSystemData, vm.Password);
+                _manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().Create(fileSystemData, vm.Password);
                 _manipulator.FileSystemChanged += FileSystemChanged;
                 CurrentPath = new DirectoryPath();
                 OnPropertyChanged("FileSystemName");
@@ -742,7 +742,7 @@ namespace VFSBrowser.ViewModel
 
             try
             {
-                var manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().OpenFileSystemTextManipulator(fileName, passwordDialog.Password);
+                var manipulator = _container.Resolve<IFileSystemTextManipulatorFactory>().Open(fileName, passwordDialog.Password);
 
                 // Close last vfs
                 DisposeManipulator();

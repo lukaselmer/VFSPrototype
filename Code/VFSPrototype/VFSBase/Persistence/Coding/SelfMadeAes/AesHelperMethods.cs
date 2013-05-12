@@ -103,7 +103,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         private static void MixColumn(byte[] column, bool isInv)
         {
             // galois multipication of 1 column of the 4x4 matrix, GF(2^8)
-            var mult = isInv ? Constants.GaloisMultInv : Constants.GaloisMult;
+            var mult = isInv ? AesConstants.GaloisMultInv : AesConstants.GaloisMult;
 
             var cpy = new byte[4];
             for (var i = 0; i < 4; i++) cpy[i] = column[i];
@@ -202,7 +202,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         private static void SubBytes(byte[] state, bool isInv)
         {
             for (var i = 0; i < 16; i++)
-                state[i] = (byte)(isInv ? Constants.InvertedSbox[state[i]] : Constants.Sbox[state[i]]);
+                state[i] = (byte)(isInv ? AesConstants.InvertedSbox[state[i]] : AesConstants.Sbox[state[i]]);
         }
 
         /// <summary>
@@ -241,8 +241,8 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             Rotate(word);
             // Use Sbox to substitute the four parts of the 32bit word
             for (var i = 0; i < 4; ++i)
-                word[i] = (byte)Constants.Sbox[word[i]];
-            word[0] = (byte)(word[0] ^ Constants.Rcon[iteration]);
+                word[i] = (byte)AesConstants.Sbox[word[i]];
+            word[0] = (byte)(word[0] ^ AesConstants.Rcon[iteration]);
 
         }
 
@@ -287,7 +287,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         /// <returns></returns>
         internal static byte[] CalculateExpandedKey(byte[] key)
         {
-            const int expandedKeySize = (16 * (Constants.Rounds + 1));
+            const int expandedKeySize = (16 * (AesConstants.Rounds + 1));
 
             var currentSize = 0;
             var rconIteration = 1;
@@ -297,24 +297,24 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             for (var i = 0; i < expandedKeySize; i++)
                 expandedKey[i] = 0;
 
-            for (var j = 0; j < Constants.KeySize256; j++)
+            for (var j = 0; j < AesConstants.KeySize256; j++)
                 expandedKey[j] = key[j];
-            currentSize += Constants.KeySize256;
+            currentSize += AesConstants.KeySize256;
 
             while (currentSize < expandedKeySize)
             {
                 for (var k = 0; k < 4; k++)
                     t[k] = expandedKey[(currentSize - 4) + k];
 
-                if (currentSize % Constants.KeySize256 == 0) KeySchedule(t, rconIteration++);
+                if (currentSize % AesConstants.KeySize256 == 0) KeySchedule(t, rconIteration++);
 
-                if (currentSize % Constants.KeySize256 == 16)
+                if (currentSize % AesConstants.KeySize256 == 16)
                     for (var l = 0; l < 4; l++)
-                        t[l] = (byte)Constants.Sbox[t[l]];
+                        t[l] = (byte)AesConstants.Sbox[t[l]];
 
                 for (var m = 0; m < 4; m++)
                 {
-                    expandedKey[currentSize] = (byte)(expandedKey[currentSize - Constants.KeySize256] ^ t[m]);
+                    expandedKey[currentSize] = (byte)(expandedKey[currentSize - AesConstants.KeySize256] ^ t[m]);
                     currentSize++;
                 }
             }

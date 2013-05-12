@@ -43,21 +43,21 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         /// 
         /// Needed for encryption
         /// </summary>
-        private readonly byte[] _lastCipherBlock = new byte[Constants.BlockSize];
+        private readonly byte[] _lastCipherBlock = new byte[AesConstants.BlockSize];
 
         /// <summary>
         /// The current block
         /// 
         /// Initialized once here, so it does not have to be created every time a block is encrypted.
         /// </summary>
-        private readonly byte[] _currentBlock = new byte[Constants.BlockSize];
+        private readonly byte[] _currentBlock = new byte[AesConstants.BlockSize];
 
         /// <summary>
         /// The current decrypt block
         /// 
         /// Initialized once here, so it does not have to be created every time a block is encrypted.
         /// </summary>
-        private readonly byte[] _currentDecryptBlock = new byte[Constants.BlockSize];
+        private readonly byte[] _currentDecryptBlock = new byte[AesConstants.BlockSize];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SelfMadeAes256Cryptor"/> class.
@@ -68,7 +68,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         /// <exception cref="System.NotSupportedException">Key size must be 256 bit!</exception>
         public SelfMadeAes256Cryptor(byte[] key, byte[] initializationVector, CryptoDirection cryptoDirection)
         {
-            if (key.Length != Constants.KeySize256) throw new NotSupportedException("Key size must be 256 bit!");
+            if (key.Length != AesConstants.KeySize256) throw new NotSupportedException("Key size must be 256 bit!");
 
             _key = key;
             _initializationVector = initializationVector;
@@ -133,15 +133,15 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
 
             var outIndex = outputOffset;
 
-            for (var j = 0; j < inputCount / Constants.BlockSize; j++)
+            for (var j = 0; j < inputCount / AesConstants.BlockSize; j++)
             {
-                var start = j * Constants.BlockSize;
-                var end = start + Constants.BlockSize;
+                var start = j * AesConstants.BlockSize;
+                var end = start + AesConstants.BlockSize;
                 if (end > inputCount) end = inputCount;
 
                 var paddedInput = AesHelperMethods.PaddedBlock(inputBuffer, start, end);
 
-                for (var i = 0; i < Constants.BlockSize; i++)
+                for (var i = 0; i < AesConstants.BlockSize; i++)
                     input[i] = (byte)(paddedInput[i] ^ (_firstRound ? _initializationVector[i] : _lastCipherBlock[i]));
 
                 _firstRound = false;
@@ -169,10 +169,10 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
 
             var outIndex = outputOffset;
 
-            for (var j = 0; j < inputCount / Constants.BlockSize; j++)
+            for (var j = 0; j < inputCount / AesConstants.BlockSize; j++)
             {
-                var start = (j * Constants.BlockSize);
-                var end = start + Constants.BlockSize;
+                var start = (j * AesConstants.BlockSize);
+                var end = start + AesConstants.BlockSize;
                 if (end > inputCount) end = inputCount;
 
                 var ciphertext = AesHelperMethods.PaddedBlock(inputBuffer, start, end);
@@ -205,7 +205,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
             var expandedKey = _expandedKey; /* the expanded key */
 
             /* encrypt the block using the expandedKey */
-            AesHelperMethods.AesMain(_currentBlock, expandedKey, Constants.Rounds);
+            AesHelperMethods.AesMain(_currentBlock, expandedKey, AesConstants.Rounds);
             for (var k = 0; k < 4; k++) /* unmap the block again into the output */
                 for (var l = 0; l < 4; l++) /* iterate over the rows */
                     output[(k * 4) + l] = _currentBlock[(k + (l * 4))];
@@ -219,7 +219,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         private void DecryptBlock(byte[] input, byte[] output)
         {
             AesHelperMethods.TransformToMatrix(input, _currentBlock);
-            AesHelperMethods.AesMainInv(_currentBlock, _expandedKey, Constants.Rounds);
+            AesHelperMethods.AesMainInv(_currentBlock, _expandedKey, AesConstants.Rounds);
             AesHelperMethods.TransformFromMatrix(_currentBlock, output);
         }
 
@@ -247,13 +247,13 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
         /// Gets the input block size.
         /// </summary>
         /// <returns>The size of the input data blocks in bytes.</returns>
-        public int InputBlockSize { get { return Constants.BlockSize; } }
+        public int InputBlockSize { get { return AesConstants.BlockSize; } }
 
         /// <summary>
         /// Gets the output block size.
         /// </summary>
         /// <returns>The size of the output data blocks in bytes.</returns>
-        public int OutputBlockSize { get { return Constants.BlockSize; } }
+        public int OutputBlockSize { get { return AesConstants.BlockSize; } }
 
         /// <summary>
         /// Gets a value indicating whether multiple blocks can be transformed.
