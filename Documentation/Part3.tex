@@ -222,9 +222,24 @@ Methods: FileSystem.ArchiveAndReplaceRoot, BlockList.CopyReplacingReference
 
 \subsection{Design}
 
-% TODO: Remove this text and replace it with actual content
-\emph{Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.}
+% Give an overview of the design of this part and describe in general terms how the implementation works. You can mention design patterns used, class diagrams, definition of custom file formats, network protocols, or anything else that helps understand the implementation.
 
+For the synchronization server, a new project calld VFSWCFService was added to the solution. It implements a IDiskService. The contracts which are shared among the clients have been extracted to the VFSWCFContracts Project. It contains the data contracts for the Data Transfer Objects (DTO) \footnote{http://msdn.microsoft.com/en-us/library/ff649585.aspx} and the interface for the service contract \footnote{http://msdn.microsoft.com/en-us/library/ms732002.aspx} IDiskService.\\
+
+Additionally, the BlockManipulator and the BlockAllocation were extracted from the VFSBase to the new project VFSBlockAbstraction. This way, the server can use the BlockManipulator and the BlockAllocation to store the blocks, which he receives from the clients, to the disk.\\
+
+Basically, the synchronization works like this: First, the client creates a disk and then chooses to make it a synchronized disk. For this, he creates an account with login and password. Then he can synchronize his disk for the first time. Here, the client checks if the disk is not already linked to the server (he can do this by checking if the disk id is 0) and then start the initial synchronization. All the blocks are sent to the server, and so are the options of the file system. After pushing all blocks to the server, the client sends the current root version to the server, which then is stored on the server. This way, the server can check if there are local changes, remote changes, conflicts, or if everything is up to date. Also, the maximum block number is stored on the server. This way, the client knows which blocks he has sent to the server and which blocks are not synchronized yet. This allows incremental updates by only transferring the blocks which have not been synchronized yet.\\
+
+As you can see in the Figure ~\ref{fig:wcfDependencDiagram}, the only dependencies of the VFSWCFService are the VFSWCFContracts and the BlockAbstraction. There is one hidden dependency tough: The service client for the VFSBase is generated automatically from the VFSWCFContracts. Therefore, there is a dependency from VFSBase to VFSWCFContracts, which is hidden on this diagram.\\
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.5]{Images/wcf_service_dependencies.png} 
+	\caption{WCFService dependency diagram}
+	\label{fig:wcfDependencDiagram}
+\end{figure}	
+
+The network protocol is defined on a very high level and can very easily be replaced, because to change the network protocol, only the configuration of the WCF service has to be changed. The current network protocol is set to the WCF default, which is HTTPS. The available operations can be looked up through a WSDL file, which is provided by the server.\\
 
 \subsection{Integration}
 
