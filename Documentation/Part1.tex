@@ -10,74 +10,51 @@ The VFSBase is the base of the file system. It implements the functionality to c
 
 % Describe which requirements (and possibly bonus requirements) you have implemented in this part. Give a quick description (1-2 sentences) of each requirement. List the software elements (classes and or functions) that are mainly involved in implementing each requirement.
 
-
+\subsubsection{Introduction: About the FileSystem and the FileSystemTextManipulator}
+Most of the features discussed in this section are about the FileSystem and the FileSystemTextManipulator. The first question might be: the FileSystem and the FileSystemTextManipulator are very similar and provide nearly the same interface, why are the separate? The answer to this question is: separation of concerns and encapsulation.\\
+The FileSystemTextManipulator provides a beautiful interface which is easy to use and to understand. It wraps the FileSystem and abstracts away certain tasks, like converting a given path to an object to the object itself (e.g. it converts "/a/b/c" to the directory object "c"). Also, using the FileSystemTextManipulator, only a certain part of the actual file system is extracted. This way, the file system can handle more files then the RAM size of the current client is. Also, the FileSystemTextManipulator uses some structures only known to the VFSBase assembly, and it encapsulates all the internal objects by only returning values that should be available publicly.\\
+The FileSystem is the core of the file system functionality. It implements all the internal structure to store the files and folders to the disk.\\
+Finally, there are the ThreadSafeFileSystem and the ThreadSafeFileSystemTextManipulator classes. They also originate from the separation of concerns design principle and provide a thread safe implementation of the FileSystem and the FileSystemTextManipulator respectively. The thread safety is guaranteed through a ReaderWriterLock\footnote{http://msdn.microsoft.com/en-us/library/system.threading.readerwriterlockslim.aspx}, which allows multiple concurrent reads, and exclusive writes.
 
 % 1. The virtual disk must be stored in a single file in the working directory in the host file system.
 \subsubsection{Store data in single file}
 All the data is stored in a single file and in blocks. There are logical block numbers, which serve as pointers. All blocks are, once written, immutable to implement the file history.\\
 Classes: BlockManipulator, BlockAllocation\\
-Methods: BlockManipulator.WriteBlock BlockManipulator.ReadBlock, BlockAllocation.Allocate\\
+Methods: BlockManipulator.WriteBlock BlockManipulator.ReadBlock, BlockAllocation.Allocate
 
 % 2. VFS must support the creation of a new disk with the specied maximum size at the specied location in the host le system.
 \subsubsection{Creation of new disk}
 The file system supports the creation of new disks at a specified location of the host file system. Because the disk size grows dynamically (elastic disk), no maximum size has to be specified\footnote{https://piazza.com/class\#spring2013/252028400l/26}.\\
 Classes: FileSystemFactory, FileSystemTextManipulatorFactory\\
-Methods: FileSystemTextManipulatorFactory.Create, FileSystemTextManipulatorFactory.Open, FileSystemFactory.Create, FileSystemFactory.Open\\
+Methods: FileSystemTextManipulatorFactory.Create, FileSystemTextManipulatorFactory.Open, FileSystemFactory.Create, FileSystemFactory.Open
 
 % 3. VFS must support several virtual disks in the host le system.
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+\subsubsection{Several virtual disks in the host file system}
+Multiple virtual disks can be created on the host file system.
 
 % 4. VFS must support disposing of the virtual disk.
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+\subsubsection{Disposing of the virtual disk}
+To dispose a virtual disk, the virtual file system can be closed. After closing a file system, the virtual disk can be deleted, as it is a normal file on the host system.\\
+Classes: FileSystem, FileSystemTextManipulator\\
+Methods: FileSystem.Dispose
 
-% 5. VFS must support creating/deleting/renaming directories and les.
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+% 5. VFS must support creating/deleting/renaming directories and files.
+\subsubsection{Creating, deleting, renaming directories and files}
+The user can create, delete and rename directories. Files can be imported, and then be renamed or deleted.
+Classes: FileSystem, FileSystemTextManipulator\\
+Methods:FileSystem.CreateFolder, FileSystem.Rename, FileSystem.Delete
 
 % 6. VFS must support navigation: listing of les and folders, and going to a location expressed by a concrete path.
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+\subsubsection{Listing and navigation}
+The files and folders can be listed and navigated through. The file system supports going to a location expressed by a concrete path.\\
+Classes: FileSystem, FileSystemTextManipulator\\
+Methods: FileSystem.List, FileSystem.Folders, FileSystem.Files, FileSystem.List
 
 % 7. VFS must support moving/copying directories and les, including hierarchy.
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+\subsubsection{Moving / copying directories and files}
+The files and directories can be copied. Because of the history implementation, some performance optimizations are possible. Thus, the copy time does not depend on the directory or file size, but solely on the directory depth.\\
+Classes: FileSystem, FileSystemTextManipulator\\
+Methods: FileSystem.Move, FileSystem.Copy
 
 % 8. VFS must support importing les and directories from the host le system.
 \subsubsection{TODO}
