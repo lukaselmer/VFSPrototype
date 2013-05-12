@@ -6,16 +6,20 @@ using VFSBlockAbstraction;
 using VFSWCFContracts.Contracts;
 using VFSWCFContracts.DataTransferObjects;
 using VFSWCFContracts.FaultContracts;
+using VFSWCFService.Persistence;
 
 namespace VFSWCFService.DiskService
 {
+    [ServiceBehavior(
+        InstanceContextMode = InstanceContextMode.PerSession, 
+        ConcurrencyMode = ConcurrencyMode.Multiple)]
     public sealed class DiskServiceImpl : IDiskService, IDisposable
     {
-        private Persistence.PersistenceImpl Persistence { get; set; }
+        private PersistenceImpl Persistence { get; set; }
 
-        public DiskServiceImpl() : this(new Persistence.PersistenceImpl()) { }
+        public DiskServiceImpl() : this(new PersistenceImpl()) { }
 
-        internal DiskServiceImpl(Persistence.PersistenceImpl persistence)
+        internal DiskServiceImpl(PersistenceImpl persistence)
         {
             Persistence = persistence;
         }

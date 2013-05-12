@@ -44,7 +44,11 @@ namespace VFSBrowser.ViewModel
         public ListItem SelectedItem
         {
             get { return _selectedItem; }
-            set { _selectedItem = value; OnPropertyChanged("SelectedItem"); }
+            set
+            {
+                _selectedItem = value;
+                OnPropertyChanged("SelectedItem");
+            }
         }
 
         public DirectoryPath CurrentPath
@@ -68,7 +72,7 @@ namespace VFSBrowser.ViewModel
                             Items.Add(new ListItem(newValue.DisplayPath, name, _manipulator.IsDirectory(newValue.GetChild(name).DisplayPath)));
                         }
                         OnPropertyChanged("Items");
-                        SelectedItem = Items[0];
+                        if (Items.Any()) SelectedItem = Items[0];
 
                     }
                     catch (Exception e)
