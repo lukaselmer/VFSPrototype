@@ -78,59 +78,47 @@ Methods: FileSystemOptions.DiskOccupied, FileSystemOptions.DiskFree\\
 \end{figure}
 
 % 1. Compression, if implemented with 3d party library. (1p)
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
+\subsubsection{Compression with 3rd party library}
+There are multiple compression types available. One of them is a third party implementation of the Microsoft deflate stream\footnote{http://msdn.microsoft.com/en-us/library/system.io.compression.deflatestream.aspx}.
+Patterns: Decorator pattern\\
+Classes: MicrosoftStreamCompressionStrategy, DeflateStream\\
+Methods: DecorateToVFS, DecorateToHost\\
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
+	\includegraphics[scale=1]{Images/compression_types.png} 
+	\caption{Compression types}
 \end{figure}
 
 % 2. Encryption, if implemented with 3d party library. (1p)
-\subsubsection{TODO}
-TODO.\\
+\subsubsection{Encryption with 3rd party library}
+There are multiple encryption types available. One of them is a third party implementation of the Microsoft Rijndael, the AES standard\footnote{http://msdn.microsoft.com/en-us/library/system.security.cryptography.rijndael.aspx}.\\
+Patterns: Decorator pattern\\
 Classes:\\
-Methods:\\
+Methods:
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
+	\includegraphics[scale=1]{Images/encryption_types.png} 
+	\caption{Encryption types}
 \end{figure}
 
 % 3. Elastic disk: Virtual disk can dynamically grow or shrink, depending on its occupied space. (2p)
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+\subsubsection{Elastic disk}
+The elastic disk is implemented. The file system only allocates disk space when it is required and there are no "practical" limit for the file size or the disk size. It probably will be limited either by the host file system or the hardware itself. The file system is designed in such a way that it does not need to reorganize itself to be fast (known as defragmentation).\\
+Classes: BlockAllocation\\
+Methods: BlockAllocation.Allocate
 
 % 1. Compression, if implemented by hand (you can take a look at the arithmetic compression8). (2p)
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+\subsubsection{Compression implemented by hand}
+Compression by hand is implemented. The basic idea behind the compression is the LZ77 algorithm\footnote{http://www.ieeeghn.org/wiki/index.php/Milestones:Lempel-Ziv\_Data\_Compression\_Algorithm,\_1977}.\\
+Classes: SelfMadeLz77Stream, Lz77Triple, Lz77Constants, CircularBuffer, SelfMadeLz77StreamCompressionStrategy\\
+Methods: SelfMadeLz77Stream.Read, SelfMadeLz77Stream.Write
 
 % 2. Encryption, if implemented by hand. (3p)
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+\subsubsection{Encryption implemented by hand}
+Encryption was also implemented by hand. There is a simple encryption and a caesar encryption which are fast, but very weak. Therefore, the AES-256 with CBC\footnote{part of the AES standard, http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf} was implemented.\\
+Classes: SelfMadeAes256Cryptor, AesHelperMethods, AesConstants\\
+Methods: SelfMadeAes256Cryptor.EncryptBlocks, SelfMadeAes256Cryptor.DecryptBlocks\\
+
 
 % 3. Large data: This means, that VFS core can store & operate amount of data, that can't t to PC RAM ( typically, more than 4Gb). (3p)
 \subsubsection{TODO}
