@@ -54,9 +54,10 @@ namespace VFSBase.Implementation
             InitializeFileSystem();
         }
 
-        public void Reload(FileSystemOptions options)
+        public void Reload(FileSystemOptions newOptions)
         {
-            _options = options;
+            newOptions.ApplyEncryptionSettings(_options);
+            _options = newOptions;
 
             _blockAllocation = _options.BlockAllocation;
             // TODO: reload indexing service

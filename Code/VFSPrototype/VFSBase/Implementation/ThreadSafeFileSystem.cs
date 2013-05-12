@@ -317,12 +317,12 @@ namespace VFSBase.Implementation
             }
         }
 
-        public void Reload(FileSystemOptions options)
+        public void Reload(FileSystemOptions newOptions)
         {
             l.EnterWriteLock();
             try
             {
-                o.Reload(options);
+                o.Reload(newOptions);
             }
             finally
             {

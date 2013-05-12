@@ -188,7 +188,7 @@ namespace VFSBase.Interfaces
         /// <summary>
         /// Reloads the file system with the specified options.
         /// </summary>
-        /// <param name="options">The options.</param>
+        /// <param name="newOptions">The options.</param>
         void Reload(FileSystemOptions options);
 
         /// <summary>

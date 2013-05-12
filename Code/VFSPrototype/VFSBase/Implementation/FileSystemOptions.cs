@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security;
 using System.Security.Cryptography;
+using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
 using VFSBase.Interfaces;
 
@@ -56,10 +57,15 @@ namespace VFSBase.Implementation
             InitializeStreamCodingStrategy(password);
         }
 
+        public void ApplyEncryptionSettings(FileSystemOptions oldOptions)
+        {
+            _encryptedEncryptionKey = oldOptions._encryptedEncryptionKey;
+            EncryptionKey = oldOptions.EncryptionKey;
+            _streamCodingStrategy = oldOptions._streamCodingStrategy;
+        }
+
         private static byte[] TransformEncryptionKey(byte[] key, string password)
         {
-            //TODO: enable this later... if (password.Length == 0) password = "empty";
-
             var bb = new byte[key.Length];
             for (var i = 0; i < key.Length; i++)
             {

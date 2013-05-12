@@ -138,10 +138,10 @@ namespace VFSBase.Synchronization
                 ms.Seek(0, SeekOrigin.Begin);
 
                 IFormatter formatter = new BinaryFormatter();
-                var fileSystemOptions = formatter.Deserialize(ms) as FileSystemOptions;
-                if (fileSystemOptions == null) throw new VFSException("Invalid file");
-
-                _fileSystem.Reload(fileSystemOptions);
+                var newFileSystemOptions = formatter.Deserialize(ms) as FileSystemOptions;
+                if (newFileSystemOptions == null) throw new VFSException("Invalid file");
+                
+                _fileSystem.Reload(newFileSystemOptions);
             }
 
             _fileSystem.FileSystemOptions.LocalVersion = _fileSystem.Root.Version;
