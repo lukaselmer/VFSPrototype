@@ -14,7 +14,7 @@ namespace VFSWCFContracts.Contracts
 
         [OperationContract]
         [FaultContract(typeof(ServiceFault))]
-        UserDto Login(string login, string hashedPassword);
+        UserDto Login(string loginName, string hashedPassword);
 
         [OperationContract]
         [FaultContract(typeof(ServiceFault))]

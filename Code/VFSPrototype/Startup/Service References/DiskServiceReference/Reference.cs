@@ -383,10 +383,10 @@ namespace Startup.DiskServiceReference {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Login", ReplyAction="http://tempuri.org/IDiskService/LoginResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(Startup.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/LoginServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
-        Startup.DiskServiceReference.UserDto Login([System.ServiceModel.MessageParameterAttribute(Name="login")] string login1, string hashedPassword);
+        Startup.DiskServiceReference.UserDto Login(string loginName, string hashedPassword);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Login", ReplyAction="http://tempuri.org/IDiskService/LoginResponse")]
-        System.Threading.Tasks.Task<Startup.DiskServiceReference.UserDto> LoginAsync(string login, string hashedPassword);
+        System.Threading.Tasks.Task<Startup.DiskServiceReference.UserDto> LoginAsync(string loginName, string hashedPassword);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IDiskService/Disks", ReplyAction="http://tempuri.org/IDiskService/DisksResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(Startup.DiskServiceReference.ServiceFault), Action="http://tempuri.org/IDiskService/DisksServiceFaultFault", Name="ServiceFault", Namespace="http://schemas.datacontract.org/2004/07/VFSWCFContracts.FaultContracts")]
@@ -487,12 +487,12 @@ namespace Startup.DiskServiceReference {
             return base.Channel.RegisterAsync(login, hashedPassword);
         }
         
-        public Startup.DiskServiceReference.UserDto Login(string login1, string hashedPassword) {
-            return base.Channel.Login(login1, hashedPassword);
+        public Startup.DiskServiceReference.UserDto Login(string loginName, string hashedPassword) {
+            return base.Channel.Login(loginName, hashedPassword);
         }
         
-        public System.Threading.Tasks.Task<Startup.DiskServiceReference.UserDto> LoginAsync(string login, string hashedPassword) {
-            return base.Channel.LoginAsync(login, hashedPassword);
+        public System.Threading.Tasks.Task<Startup.DiskServiceReference.UserDto> LoginAsync(string loginName, string hashedPassword) {
+            return base.Channel.LoginAsync(loginName, hashedPassword);
         }
         
         public Startup.DiskServiceReference.DiskDto[] Disks(Startup.DiskServiceReference.UserDto userDto) {

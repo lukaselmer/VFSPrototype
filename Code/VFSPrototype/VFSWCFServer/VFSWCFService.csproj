@@ -74,11 +74,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DiskService\DiskService.cs" />
+    <Compile Include="DiskService\DiskServiceImpl.cs" />
     <Compile Include="DiskService.svc.cs">
       <DependentUpon>DiskService.svc</DependentUpon>
     </Compile>
-    <Compile Include="Persistence\Persistence.cs" />
+    <Compile Include="Persistence\PersistenceImpl.cs" />
+    <Compile Include="Persistence\PersistenceException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

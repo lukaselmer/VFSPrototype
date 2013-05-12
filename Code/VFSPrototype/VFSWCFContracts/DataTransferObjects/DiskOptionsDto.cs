@@ -23,7 +23,10 @@ namespace VFSWCFContracts.DataTransferObjects
         [DataMember]
         public int MasterBlockSize { get; set; }
 
+        // CA1051 does not apply to data contracts. In data contracts, instance fields may be public.
+        // See also: http://msdn.microsoft.com/en-us/library/aa347850.aspx
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1051:DoNotDeclareVisibleInstanceFields")]
         [DataMember]
-        public byte[] SerializedFileSystemOptions { get; set; }
+        public byte[] SerializedFileSystemOptions;
     }
 }

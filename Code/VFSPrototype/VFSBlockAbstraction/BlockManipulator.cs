@@ -80,7 +80,7 @@ namespace VFSBlockAbstraction
         {
             var tries = 0;
             while (!TryLockBlock(blockNumber) && (tries++) < 100) { }
-            if (tries >= 100) throw new Exception("Unable to allocate block");
+            if (tries >= 100) throw new BlockException("Unable to allocate block");
         }
 
         private bool TryLockBlock(long blockNumber)
@@ -141,6 +141,8 @@ namespace VFSBlockAbstraction
 
         public void SaveConfig(byte[] options)
         {
+            if (options == null) throw new ArgumentNullException("options");
+
             lock (_lock)
             {
                 _disk.Seek(0, SeekOrigin.Begin);
@@ -150,6 +152,8 @@ namespace VFSBlockAbstraction
 
         public void SaveConfig(object options)
         {
+            if (options == null) throw new ArgumentNullException("options");
+
             lock (_lock)
             {
                 _disk.Seek(0, SeekOrigin.Begin);

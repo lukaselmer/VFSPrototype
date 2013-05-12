@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.ServiceModel;
-using System.Threading;
 using VFSBlockAbstraction;
 using VFSWCFContracts.Contracts;
 using VFSWCFContracts.DataTransferObjects;
@@ -12,13 +9,13 @@ using VFSWCFContracts.FaultContracts;
 
 namespace VFSWCFService.DiskService
 {
-    public sealed class DiskService : IDiskService, IDisposable
+    public sealed class DiskServiceImpl : IDiskService, IDisposable
     {
-        private Persistence.Persistence Persistence { get; set; }
+        private Persistence.PersistenceImpl Persistence { get; set; }
 
-        public DiskService() : this(new Persistence.Persistence()) { }
+        public DiskServiceImpl() : this(new Persistence.PersistenceImpl()) { }
 
-        internal DiskService(Persistence.Persistence persistence)
+        internal DiskServiceImpl(Persistence.PersistenceImpl persistence)
         {
             Persistence = persistence;
         }
@@ -159,12 +156,12 @@ namespace VFSWCFService.DiskService
         /// <summary>
         /// Authenticates the user with the login and password.
         /// </summary>
-        /// <param name="login">The login.</param>
+        /// <param name="loginName">The login.</param>
         /// <param name="hashedPassword">The hashed password.</param>
         /// <returns>The user if login is successful, null otherwise.</returns>
-        public UserDto Login(string login, string hashedPassword)
+        public UserDto Login(string loginName, string hashedPassword)
         {
-            var user = Persistence.Authenticate(login, hashedPassword);
+            var user = Persistence.Authenticate(loginName, hashedPassword);
 
             if (user == null) ErrorOccured("Authentication failed. Please check username and password.");
 

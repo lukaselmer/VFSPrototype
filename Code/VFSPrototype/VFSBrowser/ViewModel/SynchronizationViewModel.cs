@@ -78,6 +78,8 @@ namespace VFSBrowser.ViewModel
             _synchronizationTimer.Elapsed += CheckSynchronization;
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void CheckSynchronization(object sender, ElapsedEventArgs elapsedEventArgs)
         {
             if (_synchronizationTimer != null) _synchronizationTimer.Dispose();

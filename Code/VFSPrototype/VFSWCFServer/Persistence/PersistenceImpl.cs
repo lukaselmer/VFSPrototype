@@ -12,14 +12,14 @@ namespace VFSWCFService.Persistence
     /// <summary>
     /// The persistence is responsible for the data persistence.
     /// </summary>
-    public class Persistence : IDisposable
+    public class PersistenceImpl : IDisposable
     {
         private string _pathToDbFileToDbFile;
         public string PathToDataStore { get; private set; }
 
         private SQLiteConnection _db;
 
-        internal Persistence(string pathToDbFile)
+        internal PersistenceImpl(string pathToDbFile)
         {
             InitDatabase(pathToDbFile);
         }
@@ -53,12 +53,12 @@ namespace VFSWCFService.Persistence
                 var message = string.Format("Please add {0} to your system path", currentDirectory.Parent.FullName + "\\sqlite");
                 Console.WriteLine(e.Message);
                 Console.WriteLine(message);
-                throw new Exception(message);
+                throw new PersistenceException(message);
             }
-            throw new Exception("Please add sqlite.dll to your system path");
+            throw new PersistenceException("Please add sqlite.dll to your system path");
         }
 
-        public Persistence()
+        public PersistenceImpl()
         {
             var p = HostingEnvironment.ApplicationPhysicalPath;
             PathToDataStore = Path.Combine(p, "App_Data");
@@ -92,7 +92,6 @@ namespace VFSWCFService.Persistence
         /// <returns></returns>
         internal bool LoginFree(string login)
         {
-            var x = _db.Table<UserDto>().ToList();
             return _db.Find<UserDto>(d => d.Login == login) == null;
         }
 
@@ -121,12 +120,17 @@ namespace VFSWCFService.Persistence
 
         public IList<DiskDto> Disks(UserDto userDto)
         {
+            if (userDto == null) throw new ArgumentNullException("userDto");
+
             return _db.Table<DiskDto>().Where(d => d.UserId == userDto.Id).ToList();
         }
 
 
         public DiskDto CreateDisk(UserDto userDto, DiskOptionsDto optionsDto)
         {
+            if (userDto == null) throw new ArgumentNullException("userDto");
+            if (optionsDto == null) throw new ArgumentNullException("optionsDto");
+
             var disk = new DiskDto { UserId = userDto.Id };
             _db.Insert(disk);
 
@@ -138,11 +142,15 @@ namespace VFSWCFService.Persistence
 
         public void UpdateDisk(DiskDto diskDto)
         {
+            if (diskDto == null) throw new ArgumentNullException("diskDto");
+
             _db.Update(diskDto);
         }
 
         public bool RemoveDisk(DiskDto diskDto)
         {
+            if (diskDto == null) throw new ArgumentNullException("diskDto");
+
             if (FindDisk(diskDto) == null) return false;
 
             _db.Delete<DiskDto>(diskDto.Id);
@@ -151,6 +159,8 @@ namespace VFSWCFService.Persistence
 
         public DiskDto FindDisk(DiskDto remoteDiskDto)
         {
+            if (remoteDiskDto == null) throw new ArgumentNullException("remoteDiskDto");
+
             return _db.Find<DiskDto>(remoteDiskDto.Id);
         }
 
@@ -161,6 +171,8 @@ namespace VFSWCFService.Persistence
 
         public void SaveDiskOptions(int diskId, DiskOptionsDto optionsDto)
         {
+            if (optionsDto == null) throw new ArgumentNullException("optionsDto");
+
             _db.Delete<DiskOptionsDto>(LoadDiskOptions(diskId).Id);
             optionsDto.DiskId = diskId;
             _db.Insert(optionsDto);
@@ -176,6 +188,8 @@ namespace VFSWCFService.Persistence
 
         public bool UserExists(UserDto userDto)
         {
+            if (userDto == null) throw new ArgumentNullException("userDto");
+
             return _db.Find<UserDto>(userDto.Id) != null;
         }
 
@@ -203,6 +217,8 @@ namespace VFSWCFService.Persistence
 
         public DiskDto Disk(DiskDto diskDto)
         {
+            if (diskDto == null) throw new ArgumentNullException("diskDto");
+
             return _db.Find<DiskDto>(diskDto.Id);
         }
     }

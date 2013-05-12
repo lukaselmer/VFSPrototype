@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockAllocation.cs" />
+    <Compile Include="BlockException.cs" />
     <Compile Include="BlockManipulator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

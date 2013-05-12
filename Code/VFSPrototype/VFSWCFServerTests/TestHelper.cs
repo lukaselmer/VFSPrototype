@@ -15,9 +15,9 @@ namespace VFSWCFServiceTests
             if (!Directory.Exists(_testdirectoryPath)) Directory.CreateDirectory(_testdirectoryPath);
         }
 
-        public Persistence GetPersistence()
+        public PersistenceImpl GetPersistence()
         {
-            return new Persistence(Path.Combine(_testdirectoryPath, Guid.NewGuid() + ".sqlite"));
+            return new PersistenceImpl(Path.Combine(_testdirectoryPath, Guid.NewGuid() + ".sqlite"));
         }
 
         public void Cleanup()

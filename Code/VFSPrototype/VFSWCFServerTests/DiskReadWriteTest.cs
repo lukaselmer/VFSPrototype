@@ -36,7 +36,7 @@ namespace VFSWCFServiceTests
         [TestMethod]
         public void TestWriteRead()
         {
-            using (var s = new DiskService(GetPersistenceWithData()))
+            using (var s = new DiskServiceImpl(GetPersistenceWithData()))
             {
                 var expected = new byte[100];
                 new Random(1).NextBytes(expected);
@@ -53,7 +53,7 @@ namespace VFSWCFServiceTests
         [TestMethod]
         public void TestWriteFail()
         {
-            using (var s = new DiskService(GetPersistenceWithData()))
+            using (var s = new DiskServiceImpl(GetPersistenceWithData()))
             {
                 s.WriteBlock(new UserDto { Login = "bla", HashedPassword = "Wrong!" }, _disk.Id, 33, new byte[33]);
             }
@@ -63,13 +63,13 @@ namespace VFSWCFServiceTests
         [TestMethod]
         public void TestReadFail()
         {
-            using (var s = new DiskService(GetPersistenceWithData()))
+            using (var s = new DiskServiceImpl(GetPersistenceWithData()))
             {
                 s.ReadBlock(new UserDto { Login = "bla", HashedPassword = "Wrong!" }, _disk.Id, 33);
             }
         }
 
-        private Persistence GetPersistenceWithData()
+        private PersistenceImpl GetPersistenceWithData()
         {
             var p = _testHelper.GetPersistence();
 

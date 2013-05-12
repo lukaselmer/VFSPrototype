@@ -73,7 +73,6 @@ namespace VFSBaseTests
                 Assert.IsTrue(!fs.Folders(fs.Root).Any());
                 fs.CreateFolder(fs.Root, name);
                 Assert.IsTrue(fs.Folders(fs.Root).Count() == 1);
-                fs.Dispose();
             }
 
             using (var fs = ImportFileSystem(path))

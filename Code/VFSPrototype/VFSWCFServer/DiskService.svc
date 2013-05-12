@@ -1,1 +1,1 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="VFSWCFService.DiskService.DiskService" CodeBehind="DiskService.svc.cs" %>
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="VFSWCFService.DiskService.DiskServiceImpl" CodeBehind="DiskService.svc.cs" %>

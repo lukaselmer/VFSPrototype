@@ -90,6 +90,7 @@
     <Compile Include="ViewModel\AbstractViewModel.cs" />
     <Compile Include="ViewModel\Command.cs" />
     <Compile Include="ViewModel\DiskBrowserViewModel.cs" />
+    <Compile Include="ViewModel\IMainViewModel.cs" />
     <Compile Include="ViewModel\SynchronizationViewModel.cs" />
     <Compile Include="ViewModel\DirectoryPath.cs" />
     <Compile Include="ViewModel\LoginDialogViewModel.cs" />

@@ -207,6 +207,8 @@ namespace VFSBrowser.ViewModel
             SwitchVersion(VersionInput);
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void SwitchVersion(long version)
         {
             try
@@ -237,6 +239,8 @@ namespace VFSBrowser.ViewModel
             RefreshCurrentDirectory();
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Search(object parameter)
         {
             if (parameter != null)
@@ -325,6 +329,8 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void LinkDisk(object parameter)
         {
             try
@@ -354,6 +360,8 @@ namespace VFSBrowser.ViewModel
             ViewModelHelper.InvokeOnGuiThread(RefreshCurrentDirectory);
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void SwitchToOnlineMode(object parameter)
         {
             try
@@ -388,7 +396,8 @@ namespace VFSBrowser.ViewModel
 
         #endregion
 
-
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Delete(object parameter)
         {
             var deleteItems = parameter as ObservableCollection<object>;
@@ -413,6 +422,8 @@ namespace VFSBrowser.ViewModel
             UpdateVersion();
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Copy(object parameter)
         {
             var items = parameter as ObservableCollection<object>;
@@ -432,6 +443,8 @@ namespace VFSBrowser.ViewModel
             UpdateVersion();
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Move(object parameter)
         {
             var items = parameter as ObservableCollection<object>;
@@ -453,6 +466,8 @@ namespace VFSBrowser.ViewModel
             UpdateVersion();
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Paste(object parameter)
         {
             try
@@ -498,6 +513,8 @@ namespace VFSBrowser.ViewModel
             UpdateVersion();
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Export(object parameter)
         {
             var items = parameter as ObservableCollection<object>;
@@ -548,6 +565,8 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Rename(object parameter)
         {
             var item = parameter as ListItem;
@@ -578,6 +597,8 @@ namespace VFSBrowser.ViewModel
             UpdateVersion();
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Open(object parameter)
         {
             var item = parameter as ListItem;
@@ -618,6 +639,8 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void NewFolder(object parameter)
         {
             try
@@ -661,6 +684,8 @@ namespace VFSBrowser.ViewModel
             ViewModelHelper.InvokeOnGuiThread(RefreshCurrentDirectory);
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void NewVfs(object parameter)
         {
             var pathToVFS = ViewModelHelper.ChoosePlaceForNewVFSFile();
@@ -696,6 +721,8 @@ namespace VFSBrowser.ViewModel
             OpenVfsWithPassword(fileName);
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void OpenVfsWithPassword(string fileName)
         {
             var passwordDialog = new PasswordDialogViewModel();
@@ -722,6 +749,8 @@ namespace VFSBrowser.ViewModel
             UpdateVersion();
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Drop(object inObject)
         {
             var dragArgs = inObject as System.Windows.DragEventArgs;
@@ -745,6 +774,8 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void ImportFile(object parameter)
         {
             var dlg = new OpenFileDialog { AutoUpgradeEnabled = true, CheckFileExists = true, CheckPathExists = true, Multiselect = true };
@@ -765,6 +796,8 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void ImportFolder(object parameter)
         {
             var dlg = new FolderBrowserDialog();
@@ -782,6 +815,8 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        // CA1031 does not apply here, because we want to catch any exception to display it.
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private void Import(string source, string name, bool isDirectory)
         {
             try
@@ -835,9 +870,5 @@ namespace VFSBrowser.ViewModel
 
             DisposeManipulator();
         }
-    }
-
-    public interface IMainViewModel : IDisposable
-    {
     }
 }
