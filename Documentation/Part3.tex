@@ -65,7 +65,6 @@ Classes: UserDto, DiskServiceImpl, PersistenceImpl
 	\caption{Code to persist and to find a user}
 \end{figure}
 
-
 % 2. The server should track changes to linked virtual disks of registered accounts and synchronize the changes across the machines.
 \subsubsection{Atuomatic synchronization across machines}
 Once a disk is bound to a server and the client is in online mode, the local changes are synchronized across the machines automatically. If remote changes occur, the client automatically downloads all changes from the server.
@@ -88,36 +87,48 @@ Because of the IoC pattern, mocked unit tests are fairly easy to implement. For 
 \subsubsection{Conflict resolution}
 There is an automatic conflict recognition so the user can resolve conflicts by rolling back to a specific version, which is not conflicted, and then restart the synchronization again.\\
 While the file system is conflicted, read operations are still possible. This way, the user can export a file he changed, roll back to a older version, synchronize the disk, and then import the file he changed again.
+
 \begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/synchronization_conflict1.png}
-	\caption{Conflict recognition}
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/synchronization_conflict1.png}
+		\caption{Conflict recognition\\\ \\} % hack for line break
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=0.75]{Images/synchronization_conflict2.png}
+		\caption{Conflict resolution}
+	\end{subfigure}
+	\caption{Conflict recognition and resolution}
 \end{figure}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=0.75]{Images/synchronization_conflict2.png}
-	\caption{Conflict resolution}
-\end{figure}
+
 
 % 1. The browser is updating automatically when changes to the disk occur.
 \subsubsection{Automatic updates}
 The browser is updating automatically when changes to the disk occur. To make this possible, the file system provides an event, which fires when changes to the file system occur. The GUI registers to this event. This is the .NET / WPF implementation which is very similar to the observer pattern.\\
 Classes: FileSystem, FileSystemTextManipulator, MainViewModel\\
 Events: FileSystemChanged
+
 \begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/file_system_changed1.png} 
-	\caption{Automatic updates: the event implementation in the file system class}
-\end{figure}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/file_system_changed2.png} 
-	\caption{Automatic updates: the MainViewModel registers to updates when the file system is changed}
-\end{figure}
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/file_system_changed3.png} 
-	\caption{Automatic updates: Is executed when the file system is changed.}
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/file_system_changed1.png} 
+		\caption{Automatic updates: the event implementation in the file system class\\\ \\} % hack for line break
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/file_system_changed2.png} 
+		\caption{Automatic updates: the MainViewModel registers to updates when the file system is changed\\}
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/file_system_changed3.png} 
+		\caption{Automatic updates: Is executed when the file system is changed\\}
+	\end{subfigure}
+	\caption{Automatic updates}
 \end{figure}
 
 
@@ -137,16 +148,23 @@ Classes: IDiskService, DiskServiceImpl, ServiceContract
 The synchronization only requires to synchronize the blocks which have not been synchronized before.\\
 For this, the DiskDto (persisted on the server) stores the NewestBlock which is to synchronize. Locally, every file system stores the blocks used in the root folder (BlocksUsed property) of the current version. When the synchronization starts, only $$Math.abs(NewestBlock_{OnServer}-BlocksUsed_{Locally})$$ have to be synchronized.\\
 Classes: SynchronizationService
+
 \begin{figure}[h!]
-	\centering 
-	\includegraphics[scale=1]{Images/do_synchronization.png} 
-	\caption{Incremental changes: synchronize remote changes or local changes}
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/do_synchronization.png} 
+		\caption{Synchronize remote changes or local changes\\\ \\} % hack for line break
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/incremental_changes.png}
+		\caption{Only synchronize blocks which have not been synchronized yet}
+	\end{subfigure}
+	\caption{Incremental changes}
 \end{figure}
-\begin{figure}[h!]
-	\centering 
-	\includegraphics[scale=1]{Images/incremental_changes.png}
-	\caption{Incremental changes: only synchronize blocks which have not been synchronized yet}
-\end{figure}
+
+
 
 % 3. File History: provide a history for les and an interface to restore a previous version.
 \subsubsection{File history}
