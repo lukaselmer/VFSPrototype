@@ -23,9 +23,11 @@ namespace VFSConsole
         private readonly Action<bool> _operationCompleted;
         private readonly Action<int> _totalToProcessChanged;
 
-        public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, FileSystemOptions options, IFileSystemTextManipulatorFactory factory)
+        public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, IFileSystemTextManipulator manipulator)
         {
-            _fileSystemTextManipulator = factory.Create(options, "");
+            if (manipulator == null) throw new ArgumentNullException("manipulator");
+
+            _fileSystemTextManipulator = manipulator;
 
             _textReader = consoleApplicationSettings.Reader;
             _textWriter = consoleApplicationSettings.Writer;
@@ -49,6 +51,10 @@ namespace VFSConsole
             _totalToProcessChanged = i => _textWriter.WriteLine("total to process: {0}", i);
             _currentlyProcessedChanged = i => _textWriter.WriteLine("total to process: {0}", i);
         }
+
+        public ConsoleApplication(IConsoleApplicationSettings consoleApplicationSettings, FileSystemOptions options, IFileSystemTextManipulatorFactory factory)
+            : this(consoleApplicationSettings, File.Exists(options.Location) ? factory.Open(options.Location, "console") : factory.Create(options, "console"))
+        { }
 
         internal void Run()
         {
