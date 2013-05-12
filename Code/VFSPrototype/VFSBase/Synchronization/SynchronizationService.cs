@@ -16,20 +16,14 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Synchronization
 {
-    internal class SynchronizationService : ISynchronizationService
+    internal class SynchronizationService : ISynchronizationService, IDisposable
     {
-        /// <summary>
-        /// The synchronization interval specifies how long the pause in seconds between synchronization should be.
-        /// </summary>
-        //private const int SynchronizationIntervalInSeconds = 3;
         private readonly IFileSystem _fileSystem;
         private readonly UserDto _user;
         private readonly SynchronizationCallbacks _callbacks;
-        //private static BackgroundWorker _backgroundWorker;
-        private readonly DiskServiceClient _diskService;
-        //private UserServiceClient _userService;
+        private DiskServiceClient _diskService;
         private DiskDto _disk;
-        private ReaderWriterLockSlim _lock;
+        private readonly ReaderWriterLockSlim _lock;
 
         public SynchronizationService(IFileSystem fileSystem, UserDto user, SynchronizationCallbacks callbacks)
         {
@@ -140,7 +134,7 @@ namespace VFSBase.Synchronization
                 IFormatter formatter = new BinaryFormatter();
                 var newFileSystemOptions = formatter.Deserialize(ms) as FileSystemOptions;
                 if (newFileSystemOptions == null) throw new VFSException("Invalid file");
-                
+
                 _fileSystem.Reload(newFileSystemOptions);
             }
 
@@ -223,6 +217,28 @@ namespace VFSBase.Synchronization
                                       SerializedFileSystemOptions = serializedOptions
                                   };
             return diskOptions;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // If you need thread safety, use a lock around these  
+            // operations, as well as in your methods that use the resource.
+
+            if (!disposing) return;
+
+            // free managed resources
+
+            if (_diskService != null)
+            {
+                _diskService.Close();
+                _diskService = null;
+            }
         }
     }
 }

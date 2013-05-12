@@ -58,6 +58,8 @@ namespace VFSBase.Implementation
 
         public void ApplyEncryptionSettings(FileSystemOptions oldOptions)
         {
+            if(oldOptions == null) throw new ArgumentNullException("oldOptions");
+
             _encryptedEncryptionKey = oldOptions._encryptedEncryptionKey;
             EncryptionKey = oldOptions.EncryptionKey;
             _streamCodingStrategy = oldOptions._streamCodingStrategy;

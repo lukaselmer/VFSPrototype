@@ -16,6 +16,7 @@ namespace VFSBase.Implementation
     {
         private IFileSystem _fileSystem;
         private readonly ISearchService _searchService;
+        private SynchronizationService _synchronizationService;
 
         public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
 
@@ -245,10 +246,18 @@ namespace VFSBase.Implementation
             if (!disposing) return;
 
             // free managed resources
-            if (_fileSystem == null) return;
 
-            _fileSystem.Dispose();
-            _fileSystem = null;
+            if (_synchronizationService != null)
+            {
+                _synchronizationService.Dispose();
+                _synchronizationService = null;
+            }
+
+            if (_fileSystem != null)
+            {
+                _fileSystem.Dispose();
+                _fileSystem = null;
+            }
         }
 
         public long Version(string path)
@@ -305,7 +314,10 @@ namespace VFSBase.Implementation
 
         public ISynchronizationService GenerateSynchronizationService(UserDto user, SynchronizationCallbacks callbacks)
         {
-            return new SynchronizationService(_fileSystem, user, callbacks);
+            if (_synchronizationService != null) _synchronizationService.Dispose();
+
+            _synchronizationService = new SynchronizationService(_fileSystem, user, callbacks);
+            return _synchronizationService;
         }
 
         public event EventHandler<FileSystemChangedEventArgs> FileSystemChanged

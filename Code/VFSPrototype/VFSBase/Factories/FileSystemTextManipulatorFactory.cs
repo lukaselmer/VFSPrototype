@@ -37,6 +37,8 @@ namespace VFSBase.Factories
 
         public void LinkFileSystemTextManipulator(DiskOptionsDto diskOptions, string location)
         {
+            if (diskOptions == null) throw new ArgumentNullException("diskOptions");
+
             if (File.Exists(location)) File.Delete(location);
 
             FileSystemOptions fileSystemOptions;
