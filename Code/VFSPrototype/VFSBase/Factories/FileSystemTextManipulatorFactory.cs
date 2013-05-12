@@ -13,14 +13,14 @@ namespace VFSBase.Factories
 {
     internal class FileSystemTextManipulatorFactory : IFileSystemTextManipulatorFactory
     {
-        public IFileSystemTextManipulator CreateFileSystemTextManipulator(FileSystemOptions options, string password)
+        public IFileSystemTextManipulator Create(FileSystemOptions options, string password)
         {
             var fileSystem = FileSystemFactory.Create(options, password);
             fileSystem.TestEncryptionKey();
             return new ThreadSafeFileSystemTextManipulator(fileSystem);
         }
 
-        public IFileSystemTextManipulator OpenFileSystemTextManipulator(string location, string password)
+        public IFileSystemTextManipulator Open(string location, string password)
         {
             var fileSystem = FileSystemFactory.Import(location, password);
             try
@@ -35,7 +35,7 @@ namespace VFSBase.Factories
             return new ThreadSafeFileSystemTextManipulator(fileSystem);
         }
 
-        public void LinkFileSystemTextManipulator(DiskOptionsDto diskOptions, string location)
+        public void Link(DiskOptionsDto diskOptions, string location)
         {
             if (diskOptions == null) throw new ArgumentNullException("diskOptions");
 

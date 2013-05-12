@@ -5,8 +5,8 @@ namespace VFSBase.Interfaces
 {
     public interface IFileSystemTextManipulatorFactory
     {
-        IFileSystemTextManipulator CreateFileSystemTextManipulator(FileSystemOptions options, string password);
-        IFileSystemTextManipulator OpenFileSystemTextManipulator(string location, string password);
-        void LinkFileSystemTextManipulator(DiskOptionsDto diskOptions, string location);
+        IFileSystemTextManipulator Create(FileSystemOptions options, string password);
+        IFileSystemTextManipulator Open(string location, string password);
+        void Link(DiskOptionsDto diskOptions, string location);
     }
 }

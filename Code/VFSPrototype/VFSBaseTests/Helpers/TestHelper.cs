@@ -49,7 +49,7 @@ namespace VFSBaseTests.Helpers
 
         private static IFileSystemTextManipulator GetManipulator(string path)
         {
-            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(CreateFileSystemOptions(path), "");
+            return new FileSystemTextManipulatorFactory().Create(CreateFileSystemOptions(path), "");
         }
 
         internal string RandomTestfilePath()

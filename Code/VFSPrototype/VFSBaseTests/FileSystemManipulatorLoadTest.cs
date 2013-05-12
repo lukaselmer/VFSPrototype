@@ -30,7 +30,7 @@ namespace VFSBaseTests
 
         private static IFileSystemTextManipulator InitTestFileSystemManipulator()
         {
-            return new FileSystemTextManipulatorFactory().CreateFileSystemTextManipulator(InitTestFileSystemData(DefaultTestfilePath), "");
+            return new FileSystemTextManipulatorFactory().Create(InitTestFileSystemData(DefaultTestfilePath), "");
         }
 
         [TestInitializeAttribute]
