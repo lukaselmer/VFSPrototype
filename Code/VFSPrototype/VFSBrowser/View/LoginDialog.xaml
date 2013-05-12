@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModel="clr-namespace:VFSBrowser.ViewModel" mc:Ignorable="d"
-        Title="Register" MinHeight="150" MaxHeight="150" MinWidth="300" Width="400" d:DataContext="{d:DesignInstance viewModel:LoginDialogViewModel}">
+        Title="Login" MinHeight="150" MaxHeight="150" MinWidth="300" Width="400" d:DataContext="{d:DesignInstance viewModel:LoginDialogViewModel}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
