@@ -37,7 +37,7 @@
                 <Separator />
                 <MenuItem Header="_Import File" Command="{Binding ImportFileCommand}" />
                 <MenuItem Header="_Import Folder" Command="{Binding ImportFolderCommand}" />
-                <MenuItem Header="_Export" Command="{Binding ExportCommand}" CommandParameter="{Binding ElementName=ItemsList, Path=SelectedItems}" />
+                <MenuItem Header="_Export" Command="{Binding ExportCommand}" CommandParameter="{Binding ElementName=ItemsGrid, Path=SelectedItems}" />
                 <Separator />
                 <MenuItem Header="_New Folder" Command="{Binding NewFolderCommand}" />
             </MenuItem>
@@ -104,7 +104,7 @@
         <Label Grid.Row="3" Content="{Binding CurrentPath.DisplayPath}" Height="30"></Label>
 
         <!-- DataGrid -->
-        <DataGrid Grid.Row="4" ItemsSource="{Binding Items}" Name="ItemsGrid" AutoGenerateColumns="False"
+        <DataGrid Grid.Row="4" ItemsSource="{Binding Items}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay}" Name="ItemsGrid" AutoGenerateColumns="False"
                   CanUserReorderColumns="False" CanUserResizeColumns="True" 
                   CanUserResizeRows="False" CanUserSortColumns="True"
                   GridLinesVisibility="None" RowHeaderWidth="0"
