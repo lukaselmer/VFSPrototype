@@ -27,7 +27,7 @@ namespace VFSBrowser.ViewModel
         private readonly List<ListItem> _clipboard = new List<ListItem>();
         private readonly IUnityContainer _container;
         private UserDto _user;
-        private readonly DiskServiceClient _diskService;
+        private readonly IDiskService _diskService;
 
         private readonly ListItem _parent = new ListItem(null, "..", true);
         public ListItem Parent

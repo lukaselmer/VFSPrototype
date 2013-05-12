@@ -21,7 +21,7 @@ namespace VFSBase.Synchronization
         private readonly IFileSystem _fileSystem;
         private readonly UserDto _user;
         private readonly SynchronizationCallbacks _callbacks;
-        private DiskServiceClient _diskService;
+        private IDiskService _diskService;
         private DiskDto _disk;
         private readonly ReaderWriterLockSlim _lock;
 
@@ -236,7 +236,9 @@ namespace VFSBase.Synchronization
 
             if (_diskService != null)
             {
-                _diskService.Close();
+                var service = _diskService as DiskServiceClient;
+                if (service != null) service.Close();
+
                 _diskService = null;
             }
         }

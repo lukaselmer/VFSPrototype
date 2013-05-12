@@ -29,7 +29,7 @@ namespace VFSBrowser.ViewModel
 
         public string SelectedLocation { get; private set; }
 
-        public DiskBrowserViewModel(DiskServiceClient diskService, UserDto user)
+        public DiskBrowserViewModel(IDiskService diskService, UserDto user)
         {
             _disks = new ObservableCollection<DiskDto>(diskService.Disks(user));
 

@@ -11,7 +11,7 @@ using VFSWCFService.Persistence;
 namespace VFSWCFService.DiskService
 {
     [ServiceBehavior(
-        InstanceContextMode = InstanceContextMode.PerSession, 
+        InstanceContextMode = InstanceContextMode.PerSession,
         ConcurrencyMode = ConcurrencyMode.Multiple)]
     public sealed class DiskServiceImpl : IDiskService, IDisposable
     {
