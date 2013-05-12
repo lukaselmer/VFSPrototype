@@ -89,9 +89,17 @@ Methods: DecorateToVFS, DecorateToHost\\
 	\caption{Compression types}
 \end{figure}
 
+% 1. Compression, if implemented by hand (you can take a look at the arithmetic compression8). (2p)
+\subsubsection{Compression implemented by hand}
+Compression by hand is implemented. The basic idea behind the compression is the LZ77 algorithm\footnote{http://www.ieeeghn.org/wiki/index.php/Milestones:Lempel-Ziv\_Data\_Compression\_Algorithm,\_1977}.\\
+Patterns: Decorator pattern, Null object pattern (for no encryption)\\
+Classes: SelfMadeLz77Stream, Lz77Triple, Lz77Constants, CircularBuffer, SelfMadeLz77StreamCompressionStrategy\\
+Methods: SelfMadeLz77Stream.Read, SelfMadeLz77Stream.Write
+
 % 2. Encryption, if implemented with 3d party library. (1p)
 \subsubsection{Encryption with 3rd party library}
 There are multiple encryption types available. One of them is a third party implementation of the Microsoft Rijndael, the AES standard\footnote{http://msdn.microsoft.com/en-us/library/system.security.cryptography.rijndael.aspx}.\\
+Additionally, the encryption needs a user defined password. This password is then used to calculate the encryption / decryption key. This means, that a virtual disk without this password cannot be decrypted.
 Patterns: Decorator pattern, Null object pattern (for no encryption)\\
 Classes: Rijndael\\
 \begin{figure}[h!]
@@ -100,25 +108,19 @@ Classes: Rijndael\\
 	\caption{Encryption types}
 \end{figure}
 
+% 2. Encryption, if implemented by hand. (3p)
+\subsubsection{Encryption implemented by hand}
+Encryption was also implemented by hand. There is a simple encryption and a caesar encryption which are fast, but very weak. Therefore, the AES-256 with CBC\footnote{part of the AES standard, http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf} was implemented.\\
+Patterns: Decorator pattern, Null object pattern (for no encryption)\\
+Additionally, the encryption needs a user defined password. This password is then used to calculate the encryption / decryption key. This means, that a virtual disk without this password cannot be decrypted.\\
+Classes: SelfMadeAes256Cryptor, AesHelperMethods, AesConstants\\
+Methods: SelfMadeAes256Cryptor.EncryptBlocks, SelfMadeAes256Cryptor.DecryptBlocks
+
 % 3. Elastic disk: Virtual disk can dynamically grow or shrink, depending on its occupied space. (2p)
 \subsubsection{Elastic disk}
 The elastic disk is implemented. The file system only allocates disk space when it is required and there are no "practical" limit for the file size or the disk size. It probably will be limited either by the host file system or the hardware itself. The file system is designed in such a way that it does not need to reorganize itself to be fast (known as defragmentation).\\
 Classes: BlockAllocation\\
 Methods: BlockAllocation.Allocate
-
-% 1. Compression, if implemented by hand (you can take a look at the arithmetic compression8). (2p)
-\subsubsection{Compression implemented by hand}
-Compression by hand is implemented. The basic idea behind the compression is the LZ77 algorithm\footnote{http://www.ieeeghn.org/wiki/index.php/Milestones:Lempel-Ziv\_Data\_Compression\_Algorithm,\_1977}.\\
-Patterns: Decorator pattern, Null object pattern (for no encryption)\\
-Classes: SelfMadeLz77Stream, Lz77Triple, Lz77Constants, CircularBuffer, SelfMadeLz77StreamCompressionStrategy\\
-Methods: SelfMadeLz77Stream.Read, SelfMadeLz77Stream.Write
-
-% 2. Encryption, if implemented by hand. (3p)
-\subsubsection{Encryption implemented by hand}
-Encryption was also implemented by hand. There is a simple encryption and a caesar encryption which are fast, but very weak. Therefore, the AES-256 with CBC\footnote{part of the AES standard, http://csrc.nist.gov/publications/fips/fips197/fips-197.pdf} was implemented.\\
-Patterns: Decorator pattern, Null object pattern (for no encryption)\\
-Classes: SelfMadeAes256Cryptor, AesHelperMethods, AesConstants\\
-Methods: SelfMadeAes256Cryptor.EncryptBlocks, SelfMadeAes256Cryptor.DecryptBlocks
 
 % 3. Large data: This means, that VFS core can store & operate amount of data, that can't t to PC RAM ( typically, more than 4Gb). (3p)
 \subsubsection{Large data}
@@ -129,15 +131,15 @@ Methods: BlockManipulator.WriteBlock, BlockManipulator.ReadBlock, FileSystem.Imp
 
 
 % 
-\subsubsection{TODO}
-TODO.\\
-Classes:\\
-Methods:\\
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
-\end{figure}
+%\subsubsection{TODO}
+%TODO.\\
+%Classes:\\
+%Methods:\\
+%\begin{figure}[h!]
+%	\centering
+%	\includegraphics[scale=1]{Images/todo.png} 
+%	\caption{TODO}
+%\end{figure}
 
 
 
@@ -242,3 +244,29 @@ maximal\ amount\ of\ blocks = 2^{block\ reference\ size}
 \end{equation}
 
 \end{document}
+
+
+\subsection{Implementation}
+
+Most of the basic file system implementation can be found in the VFSBase project. The VFSBlockAbstraction abstracts all the block operations, so the VFSBase can use the block abstraction and write any data to any block which can be addressed with a block number.\\
+
+Therefore the VFSBase depends on the VFSBlockAbstraction. Additionally, the VFSBase depends on the VFSWCFContracts project, where the interface of the WCF disk service and the Data Transfer Objects (DTOs) are defined.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/vfsbase_dependency_diagram.png} 
+	\caption{TODO}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
