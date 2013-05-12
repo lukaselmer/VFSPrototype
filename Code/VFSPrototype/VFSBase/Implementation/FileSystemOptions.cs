@@ -58,7 +58,7 @@ namespace VFSBase.Implementation
 
         public void ApplyEncryptionSettings(FileSystemOptions oldOptions)
         {
-            if(oldOptions == null) throw new ArgumentNullException("oldOptions");
+            if (oldOptions == null) throw new ArgumentNullException("oldOptions");
 
             _encryptedEncryptionKey = oldOptions._encryptedEncryptionKey;
             EncryptionKey = oldOptions.EncryptionKey;
@@ -67,6 +67,7 @@ namespace VFSBase.Implementation
 
         private static byte[] TransformEncryptionKey(byte[] key, string password)
         {
+            if (password.Length == 0) password = "-blank-";
             var bb = new byte[key.Length];
             for (var i = 0; i < key.Length; i++)
             {
