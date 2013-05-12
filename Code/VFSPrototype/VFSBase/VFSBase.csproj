@@ -76,7 +76,7 @@
     <Compile Include="Callbacks\ExportCallbacks.cs" />
     <Compile Include="Callbacks\ImportCallbacks.cs" />
     <Compile Include="Persistence\Coding\SelfMadeAes\AesHelperMethods.cs" />
-    <Compile Include="Persistence\Coding\SelfMadeAes\Constants.cs" />
+    <Compile Include="Persistence\Coding\SelfMadeAes\AesConstants.cs" />
     <Compile Include="Persistence\Coding\SelfMadeAes\CryptoDirection.cs" />
     <Compile Include="Persistence\Coding\General\EncryptionOptions.cs" />
     <Compile Include="Persistence\Coding\Strategies\NullStreamCodingStrategy.cs" />
