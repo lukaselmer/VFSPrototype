@@ -166,6 +166,10 @@ pip-log.txt
 *.log
 
 Documentation/JCDReport.pdf
+Documentation/Part1.pdf
+Documentation/Part2.pdf
+Documentation/Part3.pdf
+Documentation/Part4.pdf
 
 *.synctex.gz
 
