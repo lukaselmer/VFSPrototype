@@ -135,12 +135,23 @@ Events: FileSystemChanged
 % 2. The server is able to synchronize changes, which are done simultaneously on the same account on different machines.
 \subsubsection{Simultaneous synchronization}
 The server is implemented as a WCF \footnote{http://msdn.microsoft.com/en-us/library/dd456779.aspx} service  and it allows multiple parallel connections.\\
-For every new connection, a new IDiskService is instantiated. This allows multiple connections to the server and thus parallel synchronization of changes.\\
+For every new connection, a new IDiskService is instantiated. This allows multiple connections to the server and thus parallel synchronization of changes. This is achieved by setting the ServiceBehavior.ConcurrencyMode to ConcurrencyMode.Multiple. To avoid additional overhead, the service is instantiated PerSession, meaning that every client creates a new service instance on the server.\\
 Classes: IDiskService, DiskServiceImpl, ServiceContract
+
 \begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{Images/todo.png} 
-	\caption{TODO}
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=1]{Images/parallel_sync1.png} 
+		\caption{Attributes to enable parallelism of the disk service\\\ \\\ \\} % hack for line break
+	\end{subfigure}
+	
+	\begin{subfigure}[b]{1\textwidth}
+		\centering
+		\includegraphics[scale=0.5]{Images/parallel_sync2.png} 
+		\caption{Demonstration of multiple simultaneous synchronization with one running server and two different disks (three of them linked, one of them separate)}
+	\end{subfigure}
+	
+	\caption{Simultaneous synchronization}
 \end{figure}
 
 % Incremental Changes: minimize the communication between the browser and the server by only transfering the parts of a file that changed.
