@@ -40,6 +40,13 @@ namespace VFSBrowser.ViewModel
         private long _latestVersion;
         private SynchronizationViewModel _synchronization;
 
+        private ListItem _selectedItem;
+        public ListItem SelectedItem
+        {
+            get { return _selectedItem; }
+            set { _selectedItem = value; OnPropertyChanged("SelectedItem"); }
+        }
+
         public DirectoryPath CurrentPath
         {
             get { return _currentPath; }
@@ -61,6 +68,7 @@ namespace VFSBrowser.ViewModel
                             Items.Add(new ListItem(newValue.DisplayPath, name, _manipulator.IsDirectory(newValue.GetChild(name).DisplayPath)));
                         }
                         OnPropertyChanged("Items");
+                        SelectedItem = Items[0];
 
                     }
                     catch (Exception e)
