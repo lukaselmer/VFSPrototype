@@ -38,43 +38,9 @@ You can start as many clients a you would like.\\
 There is one more catch, literally. Try the login functionality with some wrong credentials. Now the VS2012 will witch to the debug mode, because a FaultException was thrown. This is inconvenient, because these exceptions are propagated to the client, because of the FaultContracts. To disable this behaviour, stop the program, and click on "Debug"/"Exceptions" in the VS2012 main menu bar. Then a new window should occur. Click on "Find..." and enter "FaultException". You should find two items "FaultException" and "FaultException'1". Disable all flags of these two exceptions, especially the "User-unhandled" checkbox. Press ok, and you will not see this exception again.
 
 
-\subsection{Scenario}
-
-% TODO: Remove this text and replace it with actual content
-% Describe how to realize the following use case with your system. Describe the steps involved and how to perform each action (e.g. command line executions and arguments, menu entries, keyboard shortcuts, screenshots). The use case is the following:
-%\begin{enumerate}
-%\item Start synchronization server on localhost.
-%\item Create account on synchronization server.
-%\item Create two VFS disks (on the same machine) and link them to the new account.
-%\item Import a directory (recursively) from the host file system into Disk 1.
-%\item Dispose Disk 1 after the synchronization finished.
-%\item Export the directory (recursively) from Disk 2 into the host file system.
-%\item Stop synchronization server.
-%\end{enumerate}
-%}
-
-\subsubsection{Start synchronization server on localhost}
-
-
-\subsubsection{Create account on synchronization server.}
-
-\subsubsection{Create two VFS disks (on the same machine) and link them to the new account.}
-
-\subsubsection{Import a directory (recursively) from the host file system into Disk 1.}
-
-\subsubsection{Dispose Disk 1 after the synchronization finished.}
-
-\subsubsection{Export the directory (recursively) from Disk 2 into the host file system.}
-
-\subsubsection{Stop synchronization server.}
-
-
-
-
-% TODO: Remove this text and replace it with actual content
-% If you have a command line interface for your VFS, describe here the commands available (e.g. ls, copy, import).
-
 \subsection{Console Application}
+
+% If you have a command line interface for your VFS, describe here the commands available (e.g. ls, copy, import).
 
 The console application was developed at the beginning of the project. Therefore, many options available in the GUI are not available in the console.\\
 
@@ -90,6 +56,132 @@ Available commands:
 \item ls
 \item mkdir
 \end{itemize}
+
+
+
+\subsection{Scenario}
+
+% TODO: Remove this text and replace it with actual content
+% Describe how to realize the following use case with your system. Describe the steps involved and how to perform each action (e.g. command line executions and arguments, menu entries, keyboard shortcuts, screenshots). The use case is the following:
+%\begin{enumerate}
+%\item Start synchronization server on localhost.
+%\item Create account on synchronization server.
+%\item Create two VFS disks (on the same machine) and link them to the new account.
+%\item Import a directory (recursively) from the host file system into Disk 1.
+%\item Dispose Disk 1 after the synchronization finished.
+%\item Export the directory (recursively) from Disk 2 into the host file system.
+%\item Stop synchronization server.
+%\end{enumerate}
+%}
+
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{Images/tutorial/1.png} 
+	\caption{synchronization server on localhost.}
+\end{figure}	
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{Images/tutorial/2.png} 
+	\caption{You should see this.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{Images/tutorial/3.png} 
+	\caption{Start the client (do this two times to start two clients).}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{Images/tutorial/4.png} 
+	\caption{You should see this (two times if the client has been started two times).}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{Images/tutorial/5.png} 
+	\caption{Register a new user account.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/6.png} 
+	\caption{Enter credentials.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/7.png} 
+	\caption{Registration successful.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/8.png} 
+	\caption{Create a new (local) VFS.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/8_2.png} 
+	\caption{Import any folder.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/9.png} 
+	\caption{You should see the progress bar from the import.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/10.png} 
+	\caption{Switch to online mode to start synchronization.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{Images/tutorial/11.png} 
+	\caption{When the synchronization starts, you should see this dialogue.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/15.png} 
+	\caption{Close the VFS.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/12.png} 
+	\caption{Switch to the other client, login with your credentials, and choose Link to existing disk.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/13.png} 
+	\caption{Select a disk.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{Images/tutorial/14.png} 
+	\caption{When switching to online mode again, you should see the synchronization dialogue.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/16.png} 
+	\caption{As soon as the dialogue is closed, right click on the synchronized folder to export it.}
+\end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{Images/tutorial/17.png} 
+	\caption{Once again, a progress report shows the export progress. After the export has finished, the folder you imported now is on the host system.}
+\end{figure}
 
 
 
