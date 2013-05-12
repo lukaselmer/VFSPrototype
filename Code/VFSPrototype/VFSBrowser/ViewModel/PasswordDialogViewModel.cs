@@ -17,8 +17,8 @@ namespace VFSBrowser.ViewModel
 {
     internal class PasswordDialogViewModel : AbstractViewModel
     {
-        
         private PasswordDialog _dlg;
+        private string _password;
 
         public Command OkCommand { get; private set; }
 
@@ -37,7 +37,11 @@ namespace VFSBrowser.ViewModel
             _dlg.Close();
         }
 
-        public string Password { get; private set; }
+        public string Password
+        {
+            get { return _password ?? ""; }
+            private set { _password = value; }
+        }
 
         public bool? ShowDialog()
         {
