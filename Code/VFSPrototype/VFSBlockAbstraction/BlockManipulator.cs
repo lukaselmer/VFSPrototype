@@ -76,7 +76,7 @@ namespace VFSBlockAbstraction
             }
         }
 
-        private void LockBlock(long blockNumber)
+        internal void LockBlock(long blockNumber)
         {
             var tries = 0;
             while (!TryLockBlock(blockNumber) && (tries++) < 100) { }
@@ -136,17 +136,6 @@ namespace VFSBlockAbstraction
             {
                 _diskWriter.Dispose();
                 _diskWriter = null;
-            }
-        }
-
-        public void SaveConfig(byte[] options)
-        {
-            if (options == null) throw new ArgumentNullException("options");
-
-            lock (_lock)
-            {
-                _disk.Seek(0, SeekOrigin.Begin);
-                _disk.Write(options, 0, options.Length);
             }
         }
 
