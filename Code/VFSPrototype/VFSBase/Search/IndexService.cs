@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VFSBase.Implementation;
-using VFSBase.Interfaces;
 
 namespace VFSBase.Search
 {
@@ -34,17 +30,14 @@ namespace VFSBase.Search
 
         private static bool IsInFolder(string restrictFolderPath, string nodePath, int recursionDistance)
         {
-            var recursionDepth = 0;
-            while ((recursionDistance == -1 || recursionDepth <= recursionDistance) && nodePath.Length > 0)
-            {
-                nodePath = nodePath.Substring(0, nodePath.LastIndexOf("/", StringComparison.CurrentCulture));
-
-                if (nodePath == restrictFolderPath)
+            nodePath = nodePath.Substring (0, nodePath.LastIndexOf ("/", StringComparison.CurrentCulture));
+            if (nodePath.StartsWith (restrictFolderPath)) {
+                if (recursionDistance == -1)
                     return true;
-
-                recursionDepth++;
+                nodePath = nodePath.Remove (0, restrictFolderPath.Length);
+                var count = nodePath.Count (c => c == '/');
+                return count <= recursionDistance;
             }
-
             return false;
         }
 
