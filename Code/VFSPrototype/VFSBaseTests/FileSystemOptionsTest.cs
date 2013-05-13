@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Exceptions;
 using VFSBase.Implementation;
 using VFSBase.Persistence;
+using VFSBase.Persistence.Coding.General;
 using VFSBaseTests.Helpers;
 
 namespace VFSBaseTests
@@ -97,6 +99,7 @@ namespace VFSBaseTests
                 ms.Seek(0, SeekOrigin.Begin);
 
                 var o2 = b.Deserialize(ms) as FileSystemOptions;
+                Assert.IsNotNull(o2);
                 o2.InitializeStreamCodingStrategy("");
 
                 Assert.IsNotNull(o2);
@@ -105,8 +108,63 @@ namespace VFSBaseTests
                 Assert.IsNotNull(streamCodingStrategy);
                 Assert.AreNotSame(o1.StreamCodingStrategy, streamCodingStrategy);
             }
+        }
 
-            
+        [TestMethod]
+        public void TestEncryptionKey()
+        {
+            var o = TestHelper.CreateFileSystemOptions("");
+            o.EncryptionKey = new byte[] { 1, 2, 3 };
+            Assert.AreEqual(1, o.EncryptionKey[0]);
+            Assert.AreEqual(2, o.EncryptionKey[1]);
+            Assert.AreEqual(3, o.EncryptionKey[2]);
+        }
+
+        [TestMethod]
+        public void TestApplyEncryptionSettings()
+        {
+            var o = TestHelper.CreateFileSystemOptions("");
+            var o2 = new FileSystemOptions(o.Location, StreamEncryptionType.None, StreamCompressionType.None);
+            o.EncryptionKey = new byte[] { 1, 2, 3 };
+            Assert.IsNotNull(o.EncryptionKey);
+            Assert.IsNull(o2.EncryptionKey);
+            o2.ApplyEncryptionSettings(o);
+            Assert.AreEqual(o.EncryptionKey, o2.EncryptionKey);
+            Assert.AreEqual(1, o2.EncryptionKey[0]);
+            Assert.AreEqual(2, o2.EncryptionKey[1]);
+            Assert.AreEqual(3, o2.EncryptionKey[2]);
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestApplyEncryptionSettingFail()
+        {
+            var o2 = new FileSystemOptions("", StreamEncryptionType.None, StreamCompressionType.None);
+            o2.ApplyEncryptionSettings(null);
+        }
+
+        [TestMethod]
+        public void TestInitializePasswordNoneStrategy()
+        {
+            var o = TestHelper.CreateFileSystemOptions("");
+            Assert.AreEqual(StreamEncryptionType.None, o.Encryption);
+            o.InitializePassword("test");
+        }
+
+        [TestMethod]
+        public void TestInitializePassword()
+        {
+            var o = TestHelper.CreateFileSystemOptions("");
+            o.Encryption = StreamEncryptionType.SelfMadeAes;
+            Assert.AreEqual(StreamEncryptionType.SelfMadeAes, o.Encryption);
+
+            Assert.IsNull(o.EncryptionInitializationVector);
+            Assert.IsNull(o.EncryptionKey);
+
+            o.InitializePassword("test");
+
+            Assert.IsNotNull(o.EncryptionInitializationVector);
+            Assert.IsNotNull(o.EncryptionKey);
         }
 
 

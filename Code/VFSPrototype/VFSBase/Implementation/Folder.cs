@@ -45,24 +45,5 @@ namespace VFSBase.Implementation
         /// The blocks used.
         /// </value>
         public long BlocksUsed { get; set; }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((Folder)obj);
-        }
-
-        protected bool Equals(Folder other)
-        {
-            return BlockNumber == other.BlockNumber;
-        }
-
-        public override int GetHashCode()
-        {
-            return BlockNumber.GetHashCode();
-        }
-
     }
 }
