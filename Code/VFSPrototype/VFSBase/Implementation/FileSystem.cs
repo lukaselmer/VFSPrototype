@@ -234,7 +234,9 @@ namespace VFSBase.Implementation
 
         public Folder CreateFolder(Folder parentFolder, string name)
         {
-            return CreateFolder(parentFolder, name, true);
+            var ret = CreateFolder(parentFolder, name, true);
+            SetBlocksUsed();
+            return ret;
         }
 
         private Folder CreateFolder(Folder parentFolder, string name, bool createVersion)
@@ -256,6 +258,8 @@ namespace VFSBase.Implementation
             _persistence.Persist(folder);
 
             AppendBlockReference(newParentFolder, folder.BlockNumber);
+
+
 
             return folder;
         }
@@ -299,7 +303,15 @@ namespace VFSBase.Implementation
             else if (File.Exists(source)) ImportFile(source, destination, name, importCallbacks);
             else throw new NotFoundException();
 
+            SetBlocksUsed();
+
             importCallbacks.OperationCompleted(!importCallbacks.ShouldAbort());
+        }
+
+        private void SetBlocksUsed()
+        {
+            Root.BlocksUsed = _blockAllocation.CurrentMax;
+            _persistence.Persist(Root);
         }
 
         private static void CollectImportDirectoryTotals(string source, CallbacksBase importCallbacks)
@@ -453,6 +465,8 @@ namespace VFSBase.Implementation
             else if (nodeToCopy is VFSFile) CopyFile(nodeToCopy as VFSFile, destination, name, copyCallbacks);
             else throw new ArgumentException("nodeToCopy must be of type Folder or VFSFile", "nodeToCopy");
 
+            SetBlocksUsed();
+
             copyCallbacks.OperationCompleted(!copyCallbacks.ShouldAbort());
         }
 
@@ -508,6 +522,8 @@ namespace VFSBase.Implementation
 
             if (node.Parent == null) throw new VFSException("Cannot delete root node");
             ArchiveAndReplaceRoot(node.Parent, node, null);
+
+            SetBlocksUsed();
         }
 
         #endregion
