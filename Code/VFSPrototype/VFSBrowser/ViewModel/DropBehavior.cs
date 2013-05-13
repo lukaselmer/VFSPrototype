@@ -17,15 +17,16 @@ namespace VFSBrowser.ViewModel
         /// <summary>
         /// Dependency property so we can bind to a Command in the ViewModel
         /// </summary>
-        private static readonly DependencyProperty DropCommandProperty = 
-                                DependencyProperty.RegisterAttached ("DropCommand", 
-                                                                     typeof(ICommand), 
-                                                                     typeof(DropBehavior), 
+        private static readonly DependencyProperty DropCommandProperty =
+                                DependencyProperty.RegisterAttached("DropCommand",
+                                                                     typeof(ICommand),
+                                                                     typeof(DropBehavior),
                                                                      new PropertyMetadata(DropCommandPropertyChangedCallBack));
 
         /// <summary>
         /// Extension method for all UIElements, so we can set the DropCommand in the XAML.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")] // CA1011 solution cannot be applied here.
         public static void SetDropCommand(this UIElement uiElement, ICommand command)
         {
             if (uiElement == null) throw new ArgumentNullException("uiElement");
@@ -44,7 +45,7 @@ namespace VFSBrowser.ViewModel
         /// <summary>
         /// Adds a handler to the Drop-Event of the UIElement. The handler executes the DropCommand of the Element.
         /// </summary>
-        private static void DropCommandPropertyChangedCallBack (DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
+        private static void DropCommandPropertyChangedCallBack(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
         {
             var uiElement = dependencyObject as UIElement;
             if (null == uiElement) return;
