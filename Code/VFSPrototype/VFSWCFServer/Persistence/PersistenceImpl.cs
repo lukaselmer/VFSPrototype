@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,6 +23,9 @@ namespace VFSWCFService.Persistence
         internal PersistenceImpl(string pathToDbFile)
         {
             InitDatabase(pathToDbFile);
+
+            var directoryInfo = new DirectoryInfo(pathToDbFile).Parent;
+            if (directoryInfo != null) PathToDataStore = directoryInfo.FullName;
         }
 
         private void InitDatabase(string pathToDbFile)
@@ -62,14 +66,14 @@ namespace VFSWCFService.Persistence
         {
             var p = HostingEnvironment.ApplicationPhysicalPath;
             PathToDataStore = Path.Combine(p, "App_Data");
-            var pathToDbFileToDbFile = string.Format("{0}/data.sqlite", PathToDataStore);
+            var pathToDbFile = string.Format("{0}/data.sqlite", PathToDataStore);
 
-            InitDatabase(pathToDbFileToDbFile);
+            InitDatabase(pathToDbFile);
         }
 
         private SQLiteConnection OpenDatabase()
         {
-            return new SQLiteConnection(_pathToDbFileToDbFile, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex );
+            return new SQLiteConnection(_pathToDbFileToDbFile, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex);
         }
 
         private SQLiteConnection CreateDatabase()

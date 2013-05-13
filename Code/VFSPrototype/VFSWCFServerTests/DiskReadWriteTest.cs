@@ -13,7 +13,7 @@ using VFSWCFService.Persistence;
 namespace VFSWCFServiceTests
 {
     [TestClass]
-    class DiskReadWriteTest
+    public class DiskReadWriteTest
     {
         private UserDto _userDto;
         private static TestHelper _testHelper;
