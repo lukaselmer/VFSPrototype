@@ -8,7 +8,7 @@ To measure the code coverage of the VFSBase and VFSBaseTests correctly, the Disk
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{Images/code_coverage1.png} 
-	\caption{WCFService dependency diagram}
+	\caption{Exclude Tests}
 	\label{fig:excludeTests}
 \end{figure}	
 
@@ -16,10 +16,13 @@ The code coverage of the code was at 94\% on Monday, 2013-05-13 at 4.46 pm, see 
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.75]{Images/code_coverage1.png} 
-	\caption{WCFService dependency diagram}
+	\includegraphics[scale=0.75]{Images/code_coverage.png} 
+	\caption{Code Coverage}
 	\label{fig:codeCoverage}
 \end{figure}	
 
-\end{document}
+\subsection{Static Code Analysis}
+The static code analysis was run with the JCD C\# ruleset. 
+The Visual Studio didn't recognise that some methods in the view model are being used by the view in the xaml-files, which resulted in some warnings in the analysis, which were suppressed in the suppression file or directly in the code. Beside this few warnings there were none.
 
+\end{document}
