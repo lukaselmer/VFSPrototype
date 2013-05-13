@@ -79,7 +79,7 @@ Methods: FileSystemOptions.DiskOccupied, FileSystemOptions.DiskFree\\
 
 % 1. Compression, if implemented with 3d party library. (1p)
 \subsubsection{Compression with 3rd party library}
-There are multiple compression types available. One of them is a third party implementation of the Microsoft deflate stream\footnote{http://msdn.microsoft.com/en-us/library/system.io.compression.deflatestream.aspx}.
+There are multiple compression types available. One of them is a third party implementation of the Microsoft deflate stream\footnote{http://msdn.microsoft.com/en-us/library/system.io.compression.deflatestream.aspx}.\\
 Patterns: Decorator pattern, Null object pattern (for no encryption)\\
 Classes: MicrosoftStreamCompressionStrategy, DeflateStream\\
 Methods: DecorateToVFS, DecorateToHost\\
@@ -92,6 +92,7 @@ Methods: DecorateToVFS, DecorateToHost\\
 % 1. Compression, if implemented by hand (you can take a look at the arithmetic compression8). (2p)
 \subsubsection{Compression implemented by hand}
 Compression by hand is implemented. The basic idea behind the compression is the LZ77 algorithm\footnote{http://www.ieeeghn.org/wiki/index.php/Milestones:Lempel-Ziv\_Data\_Compression\_Algorithm,\_1977}.\\
+Due to the fact that the implementation is in C#, the implementation is slow compared to a 3rd party library. Also, no special optimizations were made. Therefore, it is recommended to use the 3rd party libraries for optimal performance.\\
 Patterns: Decorator pattern, Null object pattern (for no encryption)\\
 Classes: SelfMadeLz77Stream, Lz77Triple, Lz77Constants, CircularBuffer, SelfMadeLz77StreamCompressionStrategy\\
 Methods: SelfMadeLz77Stream.Read, SelfMadeLz77Stream.Write
@@ -99,7 +100,8 @@ Methods: SelfMadeLz77Stream.Read, SelfMadeLz77Stream.Write
 % 2. Encryption, if implemented with 3d party library. (1p)
 \subsubsection{Encryption with 3rd party library}
 There are multiple encryption types available. One of them is a third party implementation of the Microsoft Rijndael, the AES standard\footnote{http://msdn.microsoft.com/en-us/library/system.security.cryptography.rijndael.aspx}.\\
-Additionally, the encryption needs a user defined password. This password is then used to calculate the encryption / decryption key. This means, that a virtual disk without this password cannot be decrypted.
+Additionally, the encryption needs a user defined password. This password is then used to calculate the encryption / decryption key. This means, that a virtual disk without this password cannot be decrypted.\\
+Due to the fact that the implementation is in C#, the implementation is slow compared to a 3rd party library. Also, no special optimizations were made. Therefore, it is recommended to use the 3rd party libraries for optimal performance. Furthermore, the Microsoft implementation of AES is likely better tested then this self made implementation and thus should be preferred for security reasons.\\
 Patterns: Decorator pattern, Null object pattern (for no encryption)\\
 Classes: Rijndael\\
 \begin{figure}[h!]
