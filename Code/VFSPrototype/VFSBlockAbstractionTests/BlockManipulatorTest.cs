@@ -14,22 +14,22 @@ namespace VFSBlockAbstractionTests
         private string _randomTestFile;
 
         [TestInitialize]
-        public void InitTestHelper ()
+        public void InitTestHelper()
         {
-            _testHelper = new TestHelper (DefaultTestfileDirectoryPath);
-            _randomTestFile = _testHelper.RandomTestfilePath ();
+            _testHelper = new TestHelper(DefaultTestfileDirectoryPath);
+            _randomTestFile = _testHelper.RandomTestfilePath();
             File.Create(_randomTestFile).Close();
         }
 
         [TestCleanup]
-        public void RemoveTestfile ()
+        public void RemoveTestfile()
         {
-            _testHelper.CleanupTestFolder ();
+            _testHelper.CleanupTestFolder();
         }
 
         [TestMethod]
-        [ExpectedException (typeof (ArgumentNullException))]
-        public void TestBlockManipulatorSaveConfigException ()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void TestBlockManipulatorSaveConfigException()
         {
             using (var b = new BlockManipulator(_randomTestFile, 1024, 2048))
             {
@@ -38,13 +38,14 @@ namespace VFSBlockAbstractionTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof (BlockException))]
+        [ExpectedException(typeof(BlockException))]
         public void TestBlockManipulatorLockBlockException()
         {
-            using (var b = new BlockManipulator (_randomTestFile, 1024, 2048)) {
+            using (var b = new BlockManipulator(_randomTestFile, 1024, 2048))
+            {
                 b.LockBlock(0);
                 b.LockBlock(0);
-            } 
+            }
         }
     }
 }
