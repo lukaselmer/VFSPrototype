@@ -364,6 +364,8 @@ namespace VFSBrowser.ViewModel
 
                 _container.Resolve<IFileSystemTextManipulatorFactory>().Link(diskOptions, selectedLocation);
                 OpenVfsWithPassword(selectedLocation);
+
+                SwitchToOnlineMode(null);
             }
             catch (Exception ex)
             {
