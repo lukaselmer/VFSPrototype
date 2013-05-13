@@ -30,12 +30,14 @@ namespace VFSBase.Search
 
         private static bool IsInFolder(string restrictFolderPath, string nodePath, int recursionDistance)
         {
-            nodePath = nodePath.Substring (0, nodePath.LastIndexOf ("/", StringComparison.CurrentCulture));
-            if (nodePath.StartsWith (restrictFolderPath)) {
+            var lastIndexOf = nodePath.LastIndexOf("/", StringComparison.CurrentCulture);
+            if (lastIndexOf >= 0) nodePath = nodePath.Substring(0, lastIndexOf);
+            if (nodePath.StartsWith(restrictFolderPath))
+            {
                 if (recursionDistance == -1)
                     return true;
-                nodePath = nodePath.Remove (0, restrictFolderPath.Length);
-                var count = nodePath.Count (c => c == '/');
+                nodePath = nodePath.Remove(0, restrictFolderPath.Length);
+                var count = nodePath.Count(c => c == '/');
                 return count <= recursionDistance;
             }
             return false;

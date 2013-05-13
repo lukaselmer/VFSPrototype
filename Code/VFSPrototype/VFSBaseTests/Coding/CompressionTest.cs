@@ -56,7 +56,7 @@ namespace VFSBaseTests.Coding
         }
 
         [TestMethod]
-        public void TestCompressionStrategy()
+        public void TestCompressionLz77Strategy()
         {
             var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.None, StreamCompressionType.SelfMadeLz77));
             var s = res.ResolveStrategy();
@@ -75,6 +75,100 @@ namespace VFSBaseTests.Coding
                 Assert.AreEqual(true, c.CanWrite);
                 Assert.AreEqual(true, d.CanRead);
                 Assert.AreEqual(false, d.CanWrite);
+
+                Assert.IsFalse(c.CanSeek);
+            }
+        }
+
+        [ExpectedException(typeof(NotSupportedException))]
+        [TestMethod]
+        public void TestCompressionLz77StrategyFail1()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.None, StreamCompressionType.SelfMadeLz77));
+            var s = res.ResolveStrategy();
+
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms) as SelfMadeLz77Stream;
+                Assert.IsNotNull(a);
+                a.Seek(0, SeekOrigin.Begin);
+            }
+        }
+
+        [ExpectedException(typeof(NotSupportedException))]
+        [TestMethod]
+        public void TestCompressionLz77StrategyFail2()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.None, StreamCompressionType.SelfMadeLz77));
+            var s = res.ResolveStrategy();
+
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms) as SelfMadeLz77Stream;
+                Assert.IsNotNull(a);
+                a.SetLength(0);
+            }
+        }
+
+        [ExpectedException(typeof(NotSupportedException))]
+        [TestMethod]
+        public void TestCompressionLz77StrategyFail3()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.None, StreamCompressionType.SelfMadeLz77));
+            var s = res.ResolveStrategy();
+
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms) as SelfMadeLz77Stream;
+                Assert.IsNotNull(a);
+                var x = a.Length;
+            }
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestCompressionLz77StrategyFail4()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.None, StreamCompressionType.SelfMadeLz77));
+            var s = res.ResolveStrategy();
+
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms) as SelfMadeLz77Stream;
+                a.Write(null, 0, 0);
+                Assert.IsNotNull(a);
+                var x = a.Length;
+                Assert.AreEqual(0, x);
+            }
+        }
+
+        [ExpectedException(typeof(ArgumentNullException))]
+        [TestMethod]
+        public void TestCompressionLz77StrategyFail5()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.None, StreamCompressionType.SelfMadeLz77));
+            var s = res.ResolveStrategy();
+
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms) as SelfMadeLz77Stream;
+                a.Read(null, 0, 0);
+                Assert.IsNotNull(a);
+                var x = a.Length;
+                Assert.AreEqual(0, x);
+            }
+        }
+
+        [TestMethod]
+        public void TestCompressionLz77StrategyFail6()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.None, StreamCompressionType.SelfMadeLz77));
+            var s = res.ResolveStrategy();
+
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms) as SelfMadeLz77Stream;
+                Assert.AreEqual(0, a.Read(new byte[10], -1, 0));
             }
         }
 

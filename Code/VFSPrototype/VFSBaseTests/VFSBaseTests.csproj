@@ -70,6 +70,7 @@
     <Compile Include="Coding\CryptoTest.cs" />
     <Compile Include="Coding\EncryptionStrategiesTest.cs" />
     <Compile Include="Coding\CompressionTest.cs" />
+    <Compile Include="FileSystemExtendedTest.cs" />
     <Compile Include="Factories\FileSystemTestManipulatorFactoryTest.cs" />
     <Compile Include="History\BlocksDontChangeTest.cs" />
     <Compile Include="Exceptions\ExceptionsTest.cs" />
