@@ -42,19 +42,21 @@ namespace VFSBaseTests.Synchronization
                 f.FileSystemOptions.Id = 33;
 
                 var m = new DiskServiceMock();
-                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
 
-                m.SynchronizationState = SynchronizationState.LocalChanges;
-                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                using (var s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m))
+                {
+                    m.SynchronizationState = SynchronizationState.LocalChanges;
+                    Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                m.SynchronizationState = SynchronizationState.RemoteChanges;
-                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                    m.SynchronizationState = SynchronizationState.RemoteChanges;
+                    Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                m.SynchronizationState = SynchronizationState.UpToDate;
-                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                    m.SynchronizationState = SynchronizationState.UpToDate;
+                    Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                m.SynchronizationState = SynchronizationState.Conflicted;
-                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                    m.SynchronizationState = SynchronizationState.Conflicted;
+                    Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                }
             }
         }
 
@@ -67,19 +69,20 @@ namespace VFSBaseTests.Synchronization
                 Action<long, long> progrssChanged = (i, j) => { };
 
                 var m = new DiskServiceMock { DiskFake = new DiskDto { Id = 33 } };
-                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
+                using (var s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m))
+                {
+                    m.SynchronizationState = SynchronizationState.LocalChanges;
+                    Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                m.SynchronizationState = SynchronizationState.LocalChanges;
-                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                    m.SynchronizationState = SynchronizationState.RemoteChanges;
+                    Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                m.SynchronizationState = SynchronizationState.RemoteChanges;
-                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                    m.SynchronizationState = SynchronizationState.UpToDate;
+                    Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                m.SynchronizationState = SynchronizationState.UpToDate;
-                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
-
-                m.SynchronizationState = SynchronizationState.Conflicted;
-                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                    m.SynchronizationState = SynchronizationState.Conflicted;
+                    Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+                }
             }
         }
 
@@ -99,9 +102,11 @@ namespace VFSBaseTests.Synchronization
                         SerializedFileSystemOptions = SynchronizationHelper.CalculateDiskOptions(f.FileSystemOptions).SerializedFileSystemOptions
                     }
                 };
-                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
 
-                s.Synchronize();
+                using (var s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m))
+                {
+                    s.Synchronize();
+                }
             }
         }
 
@@ -123,9 +128,10 @@ namespace VFSBaseTests.Synchronization
                         SerializedFileSystemOptions = SynchronizationHelper.CalculateDiskOptions(f.FileSystemOptions).SerializedFileSystemOptions
                     }
                 };
-                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
-
-                s.Synchronize();
+                using (var s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m))
+                {
+                    s.Synchronize();
+                }
             }
         }
 
@@ -146,11 +152,12 @@ namespace VFSBaseTests.Synchronization
                         SerializedFileSystemOptions = SynchronizationHelper.CalculateDiskOptions(f.FileSystemOptions).SerializedFileSystemOptions
                     }
                 };
-                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
+                using (var s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m))
+                {
+                    Assert.IsNull(m.DiskOptionsResult);
 
-                Assert.IsNull(m.DiskOptionsResult);
-
-                s.Synchronize();
+                    s.Synchronize();
+                }
 
                 Assert.IsNotNull(m.DiskOptionsResult);
             }
@@ -173,11 +180,12 @@ namespace VFSBaseTests.Synchronization
                         SerializedFileSystemOptions = SynchronizationHelper.CalculateDiskOptions(f.FileSystemOptions).SerializedFileSystemOptions
                     }
                 };
-                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
+                using (var s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m))
+                {
+                    Assert.IsNull(m.DiskOptionsResult);
 
-                Assert.IsNull(m.DiskOptionsResult);
-
-                s.Synchronize();
+                    s.Synchronize();
+                }
             }
         }
 
