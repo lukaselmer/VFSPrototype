@@ -72,7 +72,6 @@
     <Compile Include="Coding\CompressionTest.cs" />
     <Compile Include="FileSystemExtendedTest.cs" />
     <Compile Include="Factories\FileSystemTestManipulatorFactoryTest.cs" />
-    <Compile Include="History\BlocksDontChangeTest.cs" />
     <Compile Include="Exceptions\ExceptionsTest.cs" />
     <Compile Include="FileSystemManipulatorFoldersTest.cs" />
     <Compile Include="FileSystemManipulatorLoadTest.cs" />

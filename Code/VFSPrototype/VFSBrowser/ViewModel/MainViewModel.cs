@@ -518,9 +518,8 @@ namespace VFSBrowser.ViewModel
                         vm.ShowDialog();
                     }
                     else _manipulator.Move(sourcePath, destinationPath);
-
-                    Items.Add(new ListItem(CurrentPath.DisplayPath, source.Name, _manipulator.IsDirectory(destinationPath)));
                 }
+                RefreshCurrentDirectory ();
             }
             catch (Exception ex)
             {
@@ -671,8 +670,7 @@ namespace VFSBrowser.ViewModel
 
                 _manipulator.CreateFolder(CurrentPath.GetChild(newFolderName).DisplayPath);
 
-                Items.Add(new ListItem(CurrentPath.DisplayPath, newFolderName, true));
-
+                RefreshCurrentDirectory ();
             }
             catch (Exception ex)
             {
@@ -854,7 +852,7 @@ namespace VFSBrowser.ViewModel
                 ViewModelHelper.RunAsyncAction(() => _manipulator.Import(source, virtualPath, vm.Callbacks));
                 vm.ShowDialog();
 
-                Items.Add(new ListItem(CurrentPath.DisplayPath, name, isDirectory));
+                RefreshCurrentDirectory();
             }
             catch (Exception ex)
             {
