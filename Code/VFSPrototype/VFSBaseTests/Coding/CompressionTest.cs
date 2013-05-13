@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using VFSBase.Persistence.Coding.SelfMadeLz77;
+using VFSBase.Persistence.Coding.Strategies;
 
 namespace VFSBaseTests.Coding
 {
@@ -51,5 +52,29 @@ namespace VFSBaseTests.Coding
                 }
             }
         }
+
+
+        [TestMethod]
+        public void TestCompressionStrategy()
+        {
+            var s = new SelfMadeLz77StreamCompressionStrategy();
+
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms);
+                var b = s.DecorateToHost(ms);
+                Assert.AreNotSame(ms, a);
+                Assert.AreNotSame(ms, b);
+                Assert.IsTrue(a is SelfMadeLz77Stream);
+                Assert.IsTrue(b is SelfMadeLz77Stream);
+                var c = a as SelfMadeLz77Stream;
+                var d = b as SelfMadeLz77Stream;
+                Assert.AreEqual(false, c.CanRead);
+                Assert.AreEqual(true, c.CanWrite);
+                Assert.AreEqual(true, d.CanRead);
+                Assert.AreEqual(false, d.CanWrite);
+            }
+        }
+
     }
 }
