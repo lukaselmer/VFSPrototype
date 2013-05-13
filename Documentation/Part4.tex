@@ -35,7 +35,7 @@ To start the client, right click on the project "Startup", click "Debug"/"Start 
 
 You can start as many clients a you would like.\\
 
-There is one more catch, literally. Try the login functionality with some wrong credentials. Now the VS2012 will witch to the debug mode, because a FaultException was thrown. This is inconvenient, because these exceptions are propagated to the client, because of the FaultContracts. To disable this behaviour, stop the program, and click on "Debug"/"Exceptions" in the VS2012 main menu bar. Then a new window should occur. Click on "Find..." and enter "FaultException". You should find two items "FaultException" and "FaultException'1". Disable all flags of these two exceptions, especially the "User-unhandled" checkbox. Press ok, and you will not see this exception again.
+There is one more catch, literally. Try the login functionality with some wrong credentials. Now the VS2012 will switch to the debug mode, because a FaultException was thrown. This is inconvenient, because these exceptions are propagated to the client, because of the FaultContracts. To disable this behaviour, stop the program, and click on "Debug"/"Exceptions" in the VS2012 main menu bar. Then a new window should occur. Click on "Find..." and enter "FaultException". You should find two items "FaultException" and "FaultException'1". Disable all flags of these two exceptions, especially the "User-unhandled" checkbox. Press ok, and you will not see this exception again.
 
 
 \subsection{Console Application}
