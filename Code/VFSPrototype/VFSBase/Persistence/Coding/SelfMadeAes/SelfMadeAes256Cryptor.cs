@@ -133,7 +133,7 @@ namespace VFSBase.Persistence.Coding.SelfMadeAes
 
             var outIndex = outputOffset;
 
-            for (var j = 0; j < inputCount / AesConstants.BlockSize; j++)
+            for (var j = 0; j < (inputCount / AesConstants.BlockSize); j++)
             {
                 var start = j * AesConstants.BlockSize;
                 var end = start + AesConstants.BlockSize;
