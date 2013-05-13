@@ -166,7 +166,7 @@ namespace VFSBase.Synchronization
                 _callbacks.ProgressChanged(currentBlockNr - fromBlockNr, untilBlockNr - fromBlockNr);
             }
 
-            _diskService.SetDiskOptions(_user, _disk, CalculateDiskOptions(_fileSystem.FileSystemOptions));
+            _diskService.SetDiskOptions(_user, _disk, SynchronizationHelper.CalculateDiskOptions(_fileSystem.FileSystemOptions));
 
             _disk.LocalVersion = _fileSystem.Root.Version;
             _disk.LastServerVersion = _fileSystem.Root.Version;
@@ -194,29 +194,10 @@ namespace VFSBase.Synchronization
         {
             var o = _fileSystem.FileSystemOptions;
 
-            var serverDisk = _diskService.CreateDisk(_user, CalculateDiskOptions(o));
+            var serverDisk = _diskService.CreateDisk(_user, SynchronizationHelper.CalculateDiskOptions(o));
 
             _fileSystem.MakeSynchronizedDisk(serverDisk.Id);
             LoadDisk();
-        }
-
-        private static DiskOptionsDto CalculateDiskOptions(IFileSystemOptions o)
-        {
-            byte[] serializedOptions;
-            using (var ms = new MemoryStream())
-            {
-                var bf = new BinaryFormatter();
-                bf.Serialize(ms, o);
-                serializedOptions = ms.ToArray();
-            }
-
-            var diskOptions = new DiskOptionsDto
-                                  {
-                                      BlockSize = o.BlockSize,
-                                      MasterBlockSize = o.MasterBlockSize,
-                                      SerializedFileSystemOptions = serializedOptions
-                                  };
-            return diskOptions;
         }
 
         public void Dispose()

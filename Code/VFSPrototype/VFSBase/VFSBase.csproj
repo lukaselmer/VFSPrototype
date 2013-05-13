@@ -125,6 +125,7 @@
     </Compile>
     <Compile Include="Interfaces\ISynchronizationService.cs" />
     <Compile Include="Callbacks\SynchronizationCallbacks.cs" />
+    <Compile Include="Synchronization\SynchronizationHelper.cs" />
     <Compile Include="Synchronization\SynchronizationService.cs" />
   </ItemGroup>
   <ItemGroup>
