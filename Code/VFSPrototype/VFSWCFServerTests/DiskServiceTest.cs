@@ -254,5 +254,50 @@ namespace VFSWCFServiceTests
             _userDto.Id = user.Id;
             return p;
         }
+
+        [TestMethod]
+        public void TestReadWriteOptions()
+        {
+            using (var persistence = GetPersistence())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
+                disk.LocalVersion = 10;
+                disk.LastServerVersion = 10;
+                persistence.UpdateDisk(disk);
+
+                var s = new DiskServiceImpl(persistence);
+
+                var b = new byte[] { 1, 2, 3 };
+
+                s.SetDiskOptions(user, disk, new DiskOptionsDto { SerializedFileSystemOptions = b });
+                var actual = s.GetDiskOptions(user, disk);
+                Assert.AreEqual(b.Length, actual.SerializedFileSystemOptions.Length);
+                Assert.AreEqual(1, actual.SerializedFileSystemOptions[0]);
+                Assert.AreEqual(2, actual.SerializedFileSystemOptions[1]);
+                Assert.AreEqual(3, actual.SerializedFileSystemOptions[2]);
+            }
+        }
+
+        [TestMethod]
+        public void TestUpdateDisk()
+        {
+            using (var persistence = GetPersistence())
+            {
+                var user = persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+
+                var disk = persistence.CreateDisk(user, new DiskOptionsDto());
+                disk.LocalVersion = 10;
+                disk.LastServerVersion = 10;
+                persistence.UpdateDisk(disk);
+
+                var s = new DiskServiceImpl(persistence);
+
+                disk.NewestBlock = 77;
+                s.UpdateDisk(user, disk);
+                Assert.AreEqual(77, s.Disks(user).First().NewestBlock);
+            }
+        }
     }
 }

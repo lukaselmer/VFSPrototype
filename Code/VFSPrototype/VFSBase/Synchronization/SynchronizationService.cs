@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using VFSBase.Callbacks;
 using VFSBase.DiskServiceReference;
 using VFSBase.Exceptions;
@@ -24,10 +20,6 @@ namespace VFSBase.Synchronization
         private IDiskService _diskService;
         private DiskDto _disk;
         private readonly ReaderWriterLockSlim _lock;
-        private IFileSystem fileSystem;
-        private UserDto user;
-        private SynchronizationCallbacks callbacks;
-        private DiskServiceClient diskServiceClient;
 
         public SynchronizationService(IFileSystem fileSystem, UserDto user, SynchronizationCallbacks callbacks)
             : this(fileSystem, user, callbacks, new DiskServiceClient())
