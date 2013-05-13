@@ -299,5 +299,29 @@ namespace VFSWCFServiceTests
                 Assert.AreEqual(77, s.Disks(user).First().NewestBlock);
             }
         }
+
+        [TestMethod]
+        public void TestRegisterAndLogin()
+        {
+            using (var persistence = GetPersistence())
+            {
+                var s = new DiskServiceImpl(persistence);
+                s.Register(_userDto.Login, _userDto.HashedPassword);
+                var user = s.Login(_userDto.Login, _userDto.HashedPassword);
+                Assert.IsNotNull(user);
+            }
+        }
+
+        [TestMethod]
+        public void TestFindUser()
+        {
+            using (var persistence = GetPersistence())
+            {
+                Assert.IsFalse(persistence.UserExists(new UserDto()));
+                persistence.CreateUser(_userDto.Login, _userDto.HashedPassword);
+                persistence.FindUser(_userDto.Login);
+                persistence.Clear();
+            }
+        }
     }
 }
