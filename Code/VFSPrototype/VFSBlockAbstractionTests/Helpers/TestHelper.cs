@@ -30,16 +30,5 @@ namespace VFSBlockAbstractionTests.Helpers
         {
             return Path.Combine(_testfileFolder, Guid.NewGuid() + ".vhs");
         }
-
-        internal void AssertSequenceEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual)
-        {
-            var expectedArray = expected as T[] ?? expected.ToArray();
-            var actualArray = actual as T[] ?? actual.ToArray();
-            Assert.AreEqual(expectedArray.Count(), actualArray.Count());
-            foreach (var e in expectedArray)
-            {
-                Assert.IsTrue(actualArray.Contains(e));
-            }
-        }
     }
 }
