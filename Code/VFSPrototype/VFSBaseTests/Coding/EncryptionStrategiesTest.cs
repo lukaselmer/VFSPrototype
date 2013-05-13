@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Implementation;
 using VFSBase.Persistence.Coding.General;
 using VFSBase.Persistence.Coding.MicrosoftAes;
 using VFSBase.Persistence.Coding.Strategies;
@@ -92,8 +93,71 @@ namespace VFSBaseTests.Coding
             }
         }
 
+        [TestMethod]
+        public void TestSelfMadeSimpleStrategyFactory()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.SelfMadeSimple, StreamCompressionType.None));
+            var s = res.ResolveStrategy();
 
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms);
+                var b = s.DecorateToHost(ms);
+                Assert.AreNotSame(ms, a);
+                Assert.AreNotSame(ms, b);
+                Assert.IsTrue(a is CryptoStream);
+                Assert.IsTrue(b is CryptoStream);
+                var c = a as CryptoStream;
+                var d = b as CryptoStream;
+                Assert.AreEqual(false, c.CanRead);
+                Assert.AreEqual(true, c.CanWrite);
+                Assert.AreEqual(true, d.CanRead);
+                Assert.AreEqual(false, d.CanWrite);
+            }
+        }
 
+        public void TestSelfMadeCaesarStrategyFactory()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.SelfMadeCaesar, StreamCompressionType.None));
+            var s = res.ResolveStrategy();
 
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms);
+                var b = s.DecorateToHost(ms);
+                Assert.AreNotSame(ms, a);
+                Assert.AreNotSame(ms, b);
+                Assert.IsTrue(a is CryptoStream);
+                Assert.IsTrue(b is CryptoStream);
+                var c = a as CryptoStream;
+                var d = b as CryptoStream;
+                Assert.AreEqual(false, c.CanRead);
+                Assert.AreEqual(true, c.CanWrite);
+                Assert.AreEqual(true, d.CanRead);
+                Assert.AreEqual(false, d.CanWrite);
+            }
+        }
+
+        public void TestMicrosoftAesStrategyFactory()
+        {
+            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.MicrosoftAes, StreamCompressionType.None));
+            var s = res.ResolveStrategy();
+
+            using (var ms = new MemoryStream())
+            {
+                var a = s.DecorateToVFS(ms);
+                var b = s.DecorateToHost(ms);
+                Assert.AreNotSame(ms, a);
+                Assert.AreNotSame(ms, b);
+                Assert.IsTrue(a is CryptoStream);
+                Assert.IsTrue(b is CryptoStream);
+                var c = a as CryptoStream;
+                var d = b as CryptoStream;
+                Assert.AreEqual(false, c.CanRead);
+                Assert.AreEqual(true, c.CanWrite);
+                Assert.AreEqual(true, d.CanRead);
+                Assert.AreEqual(false, d.CanWrite);
+            }
+        }
     }
 }
