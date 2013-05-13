@@ -157,8 +157,7 @@ namespace VFSBaseTests
                 using (var f = File.OpenWrite(testFileSource))
                 {
                     var buffer = new byte[bufferLength];
-                    //for (var i = 0; i < 10000; i++)
-                    for (var i = 0; i < 1; i++) // TODO: set value to 10000
+                    for (var i = 0; i < 100; i++)
                     {
                         rand.NextBytes(buffer);
                         f.Write(buffer, 0, buffer.Length);
@@ -210,7 +209,7 @@ namespace VFSBaseTests
                 using (var f = File.OpenWrite(testFileSource))
                 {
                     var buffer = new byte[bufferLength];
-                    for (var i = 0; i < 500; i++) // TODO: increase this value
+                    for (var i = 0; i < 500; i++)
                     {
                         rand.NextBytes(buffer);
                         f.Write(buffer, 0, buffer.Length);
