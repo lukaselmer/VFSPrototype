@@ -69,6 +69,19 @@ namespace VFSBrowser.ViewModel
             }
         }
 
+        private string _version;
+        public string Version
+        {
+            get { return _version; }
+            set
+            {
+                _version = value;
+                OnPropertyChanged ("Version");
+            }
+        }
+
+
+
         public DiskInfoViewModel(IFileSystemTextManipulator manipulator)
         {
             if (manipulator == null) throw new ArgumentNullException("manipulator");
@@ -77,9 +90,10 @@ namespace VFSBrowser.ViewModel
 
             _filePath = _manipulator.FileSystemOptions.Location;
             _freeDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskFree);
-            _freeDiskSpaceGb = String.Format("{0:0,0.000} GB", _manipulator.FileSystemOptions.DiskFree / 1024.0 / 1024.0 / 1024.0);
+            _freeDiskSpaceGb = String.Format("{0:0.000} GB", _manipulator.FileSystemOptions.DiskFree / 1024.0 / 1024.0 / 1024.0);
             _occupiedDiskSpace = String.Format("{0:0,0} Bytes", _manipulator.FileSystemOptions.DiskOccupied);
-            _occupiedDiskSpaceGb = String.Format("{0:0,0.000} GB", _manipulator.FileSystemOptions.DiskOccupied / 1024.0 / 1024.0 / 1024.0);
+            _occupiedDiskSpaceGb = String.Format("{0:0.000} GB", _manipulator.FileSystemOptions.DiskOccupied / 1024.0 / 1024.0 / 1024.0);
+            _version = String.Format ("{0}", _manipulator.LatestVersion);
         }
 
         private DiskInfoDialog _dlg;
