@@ -116,9 +116,14 @@ namespace VFSBaseTests.Coding
             }
         }
 
+        [TestMethod]
         public void TestSelfMadeCaesarStrategyFactory()
         {
-            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.SelfMadeCaesar, StreamCompressionType.None));
+            var options = new FileSystemOptions("", StreamEncryptionType.SelfMadeCaesar, StreamCompressionType.None);
+            var encryptionOptions = GetEncryptionOptions();
+            options.EncryptionKey = encryptionOptions.Key;
+            options.EncryptionInitializationVector = encryptionOptions.InitializationVector;
+            var res = new StramStrategyResolver(options);
             var s = res.ResolveStrategy();
 
             using (var ms = new MemoryStream())
@@ -138,9 +143,14 @@ namespace VFSBaseTests.Coding
             }
         }
 
+        [TestMethod]
         public void TestMicrosoftAesStrategyFactory()
         {
-            var res = new StramStrategyResolver(new FileSystemOptions("", StreamEncryptionType.MicrosoftAes, StreamCompressionType.None));
+            var options = new FileSystemOptions("", StreamEncryptionType.MicrosoftAes, StreamCompressionType.None);
+            var encryptionOptions = GetEncryptionOptions();
+            options.EncryptionKey = encryptionOptions.Key;
+            options.EncryptionInitializationVector = encryptionOptions.InitializationVector;
+            var res = new StramStrategyResolver(options);
             var s = res.ResolveStrategy();
 
             using (var ms = new MemoryStream())
