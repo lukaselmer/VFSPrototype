@@ -2,7 +2,7 @@
 \begin{document}
 
 The VFS Browser is the GUI (Graphical User Interface) for the VFS Core.
-With the browser it is possible to browse through existing or new file systems and perform the usual file system actions like delete, copy, move files or folders. Furthermore it serves as a client to the synchronization server which provides the user with the possibility to synchronize the file system with the a remote server.
+With the browser it is possible to browse through existing or new file systems and perform the usual file system actions like delete, copy, move files or folders. Furthermore it serves as a client to the synchronization server which provides the user with the possibility to synchronize the file system with a remote server.
 
 \subsection{Requirements}
 % TODO: Remove this text and replace it with actual content
@@ -29,7 +29,7 @@ The browser supports all operations of the VFS core.
 % 2. The browser should support all operations from Part 1 (VFS core). For example, users should be able to select a file/folder and copy it to another location without using console commands.
 
 \subsubsection{Selection}
-Selecting a file or a folder 
+Selecting a file or a folder is done by clicking with the left mouse button on the item in the grid.
 Multiple selection of files or folders is possible by pressing and holding down the Control- or Shift-Key and clicking with the left mouse button or with the Up- and Down-Key.\\
 \textit{\textbf{Classes}: MainWindow.xaml\\
 \textbf{View Items}: ItemsGrid}
@@ -37,7 +37,7 @@ Multiple selection of files or folders is possible by pressing and holding down 
 
 \subsubsection{Keyboard navigation}
 Most of the command are also executable by keyboard. All the other actions are accessible in the application menu, which can be opened by pressing the Alt-Key.\\
-The keyboard commands in figure \ref{table:keyboardShortCuts} are available:\\
+The keyboard commands which are available are listed in Figure \ref{table:keyboardShortCuts} \\
 \textit{\textbf{Classes}: MainWindow.xaml\\
 \textbf{View Items}: ItemsGrid}
 
@@ -69,7 +69,7 @@ Most of them are found in the application menu or the context menu of the grid. 
 % 5. The browser should support mouse navigation (or touch in case of the mobile platform). The required operations are the same as in requirement 4.
 
 \subsubsection{Search}	
-The line beneath the application menu (see figure \ref{img:searchFunctions}) offers all the necessary tools to search for files or folder in the file system. In the drop down menu of the split button are the options listed in figure \ref{tbl:searchOptions} adjustable.\\
+The line beneath the application menu (see Figure \ref{img:searchFunctions}) offers all the necessary tools to search for files or folder in the file system. In the drop down menu of the split button are the options listed in Figure \ref{tbl:searchOptions} adjustable.\\
 \textit{\textbf{Classes}: MainWindow.xaml, MainViewModel, \\
 \textbf{Methods}: Search, CancelSearch}
 
@@ -98,7 +98,7 @@ The line beneath the application menu (see figure \ref{img:searchFunctions}) off
 \subsection{Bonus features}
 
 \subsubsection{Responsive UI}
-The VFS Browser includes a progress view (see figure \ref{img:progressView}), which is show during long-running operations (i.e import, copy). These operations can be cancelled by clicking the cancel button on the progress view.\\
+The VFS Browser includes a progress view (see Figure \ref{img:progressView}), which is show during long-running operations (i.e import, copy). These operations can be cancelled by clicking the cancel button on the progress view.\\
 \textit{\textbf{Classes}: OperationProgressView.xaml, OperationProgressViewModel, CopyCallbacks, ImportCallback, ExportCallbacks, CallbacksBase, FileSystemTextManipulator\\
 \textbf{Methods}: Import, Export, Copy}
 
@@ -111,20 +111,20 @@ The VFS Browser includes a progress view (see figure \ref{img:progressView}), wh
 % 1. Responsive UI, i.e. the browser does not stall during long-running operations (i.e. file search or import). (3p)
 
 \subsubsection{Advanced search}
-Searching is implemented on a suffix basis. Therefore it is find files, by searching after a substring of the file name, in case you doesn't know the exact name.\\
+Searching is implemented on a suffix basis. Therefore it is possible to find files by searching after a substring of the file name, which makes searching easier, because the knowledge of the full file name isn't required.\\
 \textit{\textbf{Classes}: SearchService \\
 \textbf{Methods}: Search}
 % 2. Advanced search; For example, search with wildcards/regexp, and approximate search based on some metric, e.g. edit distance. (2p)
 
 \subsubsection{Operation progress}
-The progress of long lasting operations like copying and importing is displayed in a separate window (see figure \ref{img:progressView}). The view shows the user the number of files involved in the operation and how many are already processed. This is displayed with text and also with a progress bar.\\
+The progress of long lasting operations like copying and importing is displayed in a separate window (see Figure \ref{img:progressView}). The view shows the user the number of files involved in the operation and how many are already processed. This is displayed with text and also with a progress bar.\\
 \textit{\textbf{Classes}: OperationProgressView.xaml, OperationProgressViewModel, CopyCallbacks, ImportCallback, ExportCallbacks, CallbacksBase, FileSystemTextManipulator\\
 \textbf{Methods}: Import, Export, Copy}
 % 3. Nice-to-have features like operation progress report (e.g. the number of files processed during export) or drag-and-drop for manipulative operations (move, copy, import). (2p)
 
 
 \subsubsection{Drag-and-Drop}
-Drag and Drop is implemented for importing files. It is possible to drag files and folders from the explorer into the grid in the VFSBrowser to copy them into the virtual file system.\\
+Drag and Drop is implemented for importing files. It is possible to drag files and folders from the explorer into the grid in the VFSBrowser. This copies them into the virtual file system.\\
 \textit{\textbf{Classes}: MainWindow.xaml, MainViewModel, DropBehaviour \\
 \textbf{Methods}: Drop}
 % 3. Nice-to-have features like operation progress report (e.g. the number of files processed during export) or drag-and-drop for manipulative operations (move, copy, import). (2p)
@@ -144,11 +144,11 @@ The GUI is implemented with the MVVM design pattern. The main advantages of this
 Events from the view are bound with commands in the view model, and therefore no code-behind is necessary. Furthermore manual UI test aren't needed, just the view model has to be tested, assuming that the binding to the view works.
 
 \subsubsection{Search Index}
-The search index is stored in a suffix tree. For each suffix of all file and folder names a sub tree is generated, and on each node the path to the file or folder is added. With that data structure it is possible to search for substring of file names in O(n) time, with n=length of keyword. 
-The index is generated in a separate thread after opening a file system, and is kept uptodate after each modification. \\
+The search index is stored in a suffix tree. For each suffix of all file and folder names a sub tree is generated, and on each node the path to the file or folder is added. With this data structure it is possible to search for substring of file names in O(n) time, with n=length of keyword. 
+The index is generated in a separate thread after opening a file system, and is kept up-to-date after each modification. \\
 \\
-For example if the folder \textit{user} is added to the index, the tree in figure \ref{fig:searchIndex1} is build, and the path to the folder is added to each node.
-After adding the folder \textit{usa} to the index, the tree would look like figure \ref{fig:searchIndex2}, and the path to the folder is added to the bold nodes.\\
+For example if the folder \textit{user} is added to the index, the tree in Figure \ref{fig:searchIndex1} is build, and the path to the folder is added to each node.
+After adding the folder \textit{usa} to the index, the tree would look like Figure \ref{fig:searchIndex2}, and the path to the folder is added to the bold nodes.\\
 \\
 The search algorithm now just follows the letters of the keyword down the tree and returns the list attached to the node were it ends up. After that it has to check if the nodes are in the folder, which is specified in the search options, and it is also checked if the item exists in the current version.\\
 If the search is case insensitive, the algorithm follows on each node two path, one with the next lower case and one with the next upper case letter.
