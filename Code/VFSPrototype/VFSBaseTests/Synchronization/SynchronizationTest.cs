@@ -1,10 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using VFSBase.Callbacks;
 using VFSBase.DiskServiceReference;
-using VFSBase.Interfaces;
+using VFSBase.Exceptions;
 using VFSBase.Synchronization;
 using VFSBaseTests.Helpers;
+using VFSBaseTests.Mocks;
 
 namespace VFSBaseTests.Synchronization
 {
@@ -29,55 +32,152 @@ namespace VFSBaseTests.Synchronization
         }
 
         [TestMethod]
-        public void TestBlockRange()
+        public void TestFetchRemoteChanges()
         {
-            if (File.Exists(DefaultTestfileFile)) File.Delete(DefaultTestfileFile);
-            File.WriteAllText(DefaultTestfileFile, "xxx");
-
             using (var f = _testHelper.GetFileSystem())
             {
-                //var s = new SynchronizationService(f, new User(), new SynchronizationCallbacks(state => { }));
+                Action finished = () => { };
+                Action<long, long> progrssChanged = (i, j) => { };
 
+                f.FileSystemOptions.Id = 33;
 
+                var m = new DiskServiceMock();
+                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
 
-                /*
+                m.SynchronizationState = SynchronizationState.LocalChanges;
+                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                var root = f.Root; // V0
-                var testFolder = f.CreateFolder(root, "test"); // V1
+                m.SynchronizationState = SynchronizationState.RemoteChanges;
+                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                var blubFolder = f.CreateFolder(testFolder, "blub"); // V2
-                f.Import(DefaultTestfileFile, blubFolder, "test.txt", new ImportCallbacks()); // V3
-                File.Delete(DefaultTestfileFile);
+                m.SynchronizationState = SynchronizationState.UpToDate;
+                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                testFolder = f.Folders(f.Root).First();
-                blubFolder = f.Folders(testFolder).First();
-                var testfile = f.Files(blubFolder).First();
+                m.SynchronizationState = SynchronizationState.Conflicted;
+                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+            }
+        }
 
-                var testFolderBlockNr = testFolder.BlockNumber;
-                var blubFolderPredecessorBlockNr = blubFolder.PredecessorBlockNr;
-                var blubFolderBlockNr = blubFolder.BlockNumber;
-                var testfileBlockNr = testfile.BlockNumber;
-                var testfileIndrectNodeNumber = testfile.IndirectNodeNumber;
+        [TestMethod]
+        public void TestFetchRemoteChangesWithCreate()
+        {
+            using (var f = _testHelper.GetFileSystem())
+            {
+                Action finished = () => { };
+                Action<long, long> progrssChanged = (i, j) => { };
 
-                const long offset = 10;
-                f.ShiftBlocks(1L, 10L);
+                var m = new DiskServiceMock { DiskFake = new DiskDto { Id = 33 } };
+                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
 
-                testFolder = f.Folders(f.Root).First();
-                blubFolder = f.Folders(testFolder).First();
-                testfile = f.Files(blubFolder).First();
+                m.SynchronizationState = SynchronizationState.LocalChanges;
+                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                var testFolderBlockNrAfter = testFolder.BlockNumber;
-                var blubFolderPredecessorBlockNrAfter = blubFolder.PredecessorBlockNr;
-                var blubFolderBlockNrAfter = blubFolder.BlockNumber;
-                var testfileBlockNrAfter = testfile.BlockNumber;
-                var testfileIndrectNodeNumberAfter = testfile.IndirectNodeNumber;
+                m.SynchronizationState = SynchronizationState.RemoteChanges;
+                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                Assert.AreEqual(testFolderBlockNr, testFolderBlockNrAfter); // This one should be the same
+                m.SynchronizationState = SynchronizationState.UpToDate;
+                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
 
-                Assert.AreEqual(blubFolderPredecessorBlockNr + offset, blubFolderPredecessorBlockNrAfter);
-                Assert.AreEqual(blubFolderBlockNr + offset, blubFolderBlockNrAfter);
-                Assert.AreEqual(testfileBlockNr + offset, testfileBlockNrAfter);
-                Assert.AreEqual(testfileIndrectNodeNumber + offset, testfileIndrectNodeNumberAfter);*/
+                m.SynchronizationState = SynchronizationState.Conflicted;
+                Assert.AreEqual(m.SynchronizationState, s.FetchSynchronizationState());
+            }
+        }
+
+        [TestMethod]
+        public void TestSynchronizeWhenUpToDate()
+        {
+            using (var f = _testHelper.GetFileSystem())
+            {
+                Action finished = () => { };
+                Action<long, long> progrssChanged = (i, j) => { };
+
+                var m = new DiskServiceMock
+                {
+                    DiskFake = new DiskDto { Id = 33 },
+                    DiskOptionsMock = new DiskOptionsDto
+                    {
+                        SerializedFileSystemOptions = SynchronizationHelper.CalculateDiskOptions(f.FileSystemOptions).SerializedFileSystemOptions
+                    }
+                };
+                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
+
+                s.Synchronize();
+            }
+        }
+
+        [ExpectedException(typeof(VFSException))]
+        [TestMethod]
+        public void TestSynchronizeWhenConflicted()
+        {
+            using (var f = _testHelper.GetFileSystem())
+            {
+                Action finished = () => { };
+                Action<long, long> progrssChanged = (i, j) => { };
+
+                var m = new DiskServiceMock
+                {
+                    DiskFake = new DiskDto { Id = 33 },
+                    SynchronizationState = SynchronizationState.Conflicted,
+                    DiskOptionsMock = new DiskOptionsDto
+                    {
+                        SerializedFileSystemOptions = SynchronizationHelper.CalculateDiskOptions(f.FileSystemOptions).SerializedFileSystemOptions
+                    }
+                };
+                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
+
+                s.Synchronize();
+            }
+        }
+
+        [TestMethod]
+        public void TestSynchronizeWhenLocalChanges()
+        {
+            using (var f = _testHelper.GetFileSystem())
+            {
+                Action finished = () => { };
+                Action<long, long> progrssChanged = (i, j) => { };
+
+                var m = new DiskServiceMock
+                {
+                    DiskFake = new DiskDto { Id = 33 },
+                    SynchronizationState = SynchronizationState.LocalChanges,
+                    DiskOptionsMock = new DiskOptionsDto
+                    {
+                        SerializedFileSystemOptions = SynchronizationHelper.CalculateDiskOptions(f.FileSystemOptions).SerializedFileSystemOptions
+                    }
+                };
+                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
+
+                Assert.IsNull(m.DiskOptionsResult);
+
+                s.Synchronize();
+
+                Assert.IsNotNull(m.DiskOptionsResult);
+            }
+        }
+
+        [TestMethod]
+        public void TestSynchronizeWhenRemoteChanges()
+        {
+            using (var f = _testHelper.GetFileSystem())
+            {
+                Action finished = () => { };
+                Action<long, long> progrssChanged = (i, j) => { };
+
+                var m = new DiskServiceMock
+                {
+                    DiskFake = new DiskDto { Id = 33 },
+                    SynchronizationState = SynchronizationState.RemoteChanges,
+                    DiskOptionsMock = new DiskOptionsDto
+                    {
+                        SerializedFileSystemOptions = SynchronizationHelper.CalculateDiskOptions(f.FileSystemOptions).SerializedFileSystemOptions
+                    }
+                };
+                SynchronizationService s = new SynchronizationServiceMock(f, new UserDto(), new SynchronizationCallbacks(finished, progrssChanged), m);
+
+                Assert.IsNull(m.DiskOptionsResult);
+
+                s.Synchronize();
             }
         }
 

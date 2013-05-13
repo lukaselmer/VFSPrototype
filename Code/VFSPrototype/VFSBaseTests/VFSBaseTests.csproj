@@ -95,8 +95,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Mocks\DiskServiceMock.cs" />
+    <Compile Include="Mocks\SynchronizationServiceMock.cs" />
     <Compile Include="Synchronization\SynchronizationTest.cs" />
-    <Compile Include="Synchronization\ShiftBlockTest.cs" />
     <Compile Include="VFSFileStreamTest.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -132,9 +133,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Mocks\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>

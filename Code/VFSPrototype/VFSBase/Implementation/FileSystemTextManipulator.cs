@@ -16,7 +16,7 @@ namespace VFSBase.Implementation
     {
         private IFileSystem _fileSystem;
         private readonly ISearchService _searchService;
-        private SynchronizationService _synchronizationService;
+        private ISynchronizationService _synchronizationService;
 
         public IFileSystemOptions FileSystemOptions { get { return _fileSystem.FileSystemOptions; } }
 

@@ -16,7 +16,7 @@ using VFSBase.Interfaces;
 
 namespace VFSBase.Synchronization
 {
-    internal class SynchronizationService : ISynchronizationService, IDisposable
+    internal class SynchronizationService : ISynchronizationService
     {
         private readonly IFileSystem _fileSystem;
         private readonly UserDto _user;
@@ -24,14 +24,22 @@ namespace VFSBase.Synchronization
         private IDiskService _diskService;
         private DiskDto _disk;
         private readonly ReaderWriterLockSlim _lock;
+        private IFileSystem fileSystem;
+        private UserDto user;
+        private SynchronizationCallbacks callbacks;
+        private DiskServiceClient diskServiceClient;
 
         public SynchronizationService(IFileSystem fileSystem, UserDto user, SynchronizationCallbacks callbacks)
+            : this(fileSystem, user, callbacks, new DiskServiceClient())
+        { }
+
+        protected SynchronizationService(IFileSystem fileSystem, UserDto user, SynchronizationCallbacks callbacks, IDiskService diskServiceClient)
         {
             _fileSystem = fileSystem;
             _user = user;
             _callbacks = callbacks;
             _lock = _fileSystem.GetReadWriteLock();
-            _diskService = new DiskServiceClient();
+            _diskService = diskServiceClient;
         }
 
         public void Synchronize()
