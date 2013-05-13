@@ -1,7 +1,7 @@
 VFSPrototype
 ============
 
-Just a prototype at the moment...
+A virtual file system in C# with .NET technologies, versioning and historization, synchronization over a WCF service, a WPF GUI and with encryption and compression.
 
 * https://github.com/lukaselmer/VFSPrototype
 * https://code.vis.ethz.ch/project/jcd_dumplings/
