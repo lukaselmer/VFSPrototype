@@ -148,7 +148,10 @@ The search index is stored in a suffix tree. For each suffix of all file and fol
 The index is generated in a separate thread after opening a file system, and is kept uptodate after each modification. \\
 \\
 For example if the folder \textit{user} is added to the index, the tree in figure \ref{fig:searchIndex1} is build, and the path to the folder is added to each node.
-After adding the folder \textit{usa} to the index, the tree would look like figure \ref{fig:searchIndex2}, and the path to the folder is added to the bold nodes.
+After adding the folder \textit{usa} to the index, the tree would look like figure \ref{fig:searchIndex2}, and the path to the folder is added to the bold nodes.\\
+\\
+The search algorithm now just follows the letters of the keyword down the tree and returns the list attached to the node were it ends up. After that it has to check if the nodes are in the folder, which is specified in the search options, and it is also checked if the item exists in the current version.\\
+If the search is case insensitive, the algorithm follows on each node two path, one with the next lower case and one with the next upper case letter.
 
 \begin{figure}[h!]
   \centering
