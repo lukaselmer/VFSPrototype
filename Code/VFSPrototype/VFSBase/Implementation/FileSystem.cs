@@ -96,7 +96,7 @@ namespace VFSBase.Implementation
 
         public void TestEncryptionKey()
         {
-            var check = "0123456789".ToArray().Select(c => (byte)c).ToArray();
+            var check = "01234567890123456789".ToArray().Select(c => (byte)c).ToArray();
             byte[] ret;
             using (var ms = new MemoryStream())
             {
